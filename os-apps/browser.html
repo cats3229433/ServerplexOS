@@ -510,16 +510,19 @@
 
     function proxyUrl(url) {
       const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
+      const applyBase = (base, u) => base.includes('%s') ? base.replace('%s', encodeURIComponent(u)) : base + encodeURIComponent(u);
       if (mode === 'uv') {
         const base = localStorage.getItem('eclipseos_uv_base') || '';
-        if (base) return base.includes('%s') ? base.replace('%s', encodeURIComponent(url)) : base + encodeURIComponent(url);
+        if (base) return applyBase(base, url);
       }
       if (mode === 'sj') {
         const base = localStorage.getItem('eclipseos_sj_base') || '';
-        if (base) return base.includes('%s') ? base.replace('%s', encodeURIComponent(url)) : base + encodeURIComponent(url);
+        if (base) return applyBase(base, url);
       }
-      // Standard — load direct (most sites won't work without a real backend)
-      return url;
+      if (mode === 'direct') return url;
+      // cors (Standard) — use saved relay or fall back to corsproxy.io
+      const corsBase = localStorage.getItem('eclipseos_cors_base') || 'https://corsproxy.io/?%s';
+      return applyBase(corsBase, url);
     }
 
     function loadUrl(url, addHistory = true) {
@@ -533,7 +536,9 @@
       if (t.iframe) t.iframe.remove();
 
       const iframe = document.createElement('iframe');
-      iframe.src = proxyUrl(url);
+      // Don't proxy local .html files
+      const isLocal = !url.startsWith('http://') && !url.startsWith('https://');
+      iframe.src = isLocal ? url : proxyUrl(url);
       iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;inset:0;';
       iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals allow-presentation');
       iframe.setAttribute('allow', 'autoplay; fullscreen; clipboard-read; clipboard-write');
@@ -653,7 +658,20 @@
     document.getElementById('ddBookmarks').onclick = () => showBookmarksDD();
     document.getElementById('ddHistory').onclick   = () => showHistoryDD();
     document.getElementById('ddSettings').onclick  = () => {
-      navigate('../os-apps/browser/settings.html');
+      closeAllDropdowns();
+      // Load settings as a local file — bypass navigate() which adds https://
+      const t = activeTab();
+      if (t) { if (t.iframe) t.iframe.remove(); t.iframe = null; }
+      const iframe = document.createElement('iframe');
+      iframe.src = 'browser/settings.html';
+      iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;inset:0;';
+      iframe.onload = () => iframe.classList.add('loaded');
+      iframeWrap.innerHTML = '';
+      iframeWrap.appendChild(iframe);
+      if (t) { t.iframe = iframe; t.url = 'browser/settings.html'; t.title = 'Settings'; }
+      urlInput.value = 'browser/settings.html';
+      updateNavBtns(); renderTabs();
+
       closeAllDropdowns();
     };
 
@@ -671,6 +689,10 @@
     });
 
     // ── Init ──
+    // Set default CORS relay if not already saved
+    if (!localStorage.getItem('eclipseos_cors_base')) {
+      localStorage.setItem('eclipseos_cors_base', 'https://corsproxy.io/?%s');
+    }
     showHomepage();
   </script>
 </body>

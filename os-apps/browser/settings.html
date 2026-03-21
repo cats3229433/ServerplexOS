@@ -11,306 +11,260 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: 'Oxanium', sans-serif;
-      background: #0d1117; color: #e6edf3;
-      min-height: 100vh; padding: 32px 24px 64px;
+      background: linear-gradient(160deg, #0d1117 0%, #161b22 100%);
+      color: #e6edf3; min-height: 100vh; padding: 28px 20px 60px;
     }
-
     .back-btn {
       display: inline-flex; align-items: center; gap: 8px;
-      color: rgba(255,255,255,0.45); font-size: 13px; cursor: pointer;
-      margin-bottom: 28px; transition: color 0.2s; text-decoration: none;
-      letter-spacing: 0.5px;
+      padding: 8px 14px; border-radius: 8px; cursor: pointer;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7); font-size: 13px; margin-bottom: 24px;
+      transition: all 0.2s; user-select: none;
     }
-    .back-btn:hover { color: rgba(255,255,255,0.85); }
-
-    h1 {
-      font-size: 26px; font-weight: 700; letter-spacing: 1px;
-      margin-bottom: 6px; color: #fff;
-    }
-    .page-sub {
-      font-size: 13px; color: rgba(255,255,255,0.4);
-      margin-bottom: 36px; letter-spacing: 0.5px;
-    }
-
+    .back-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+    h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 28px; }
     .section {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px; padding: 24px; margin-bottom: 20px;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px; padding: 20px; margin-bottom: 16px;
     }
-    .section-title {
-      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(255,255,255,0.35); font-weight: 600; margin-bottom: 20px;
+    .section-label {
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); font-weight: 600; margin-bottom: 14px;
     }
-
-    /* Radio cards */
-    .card-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 10px; margin-bottom: 4px;
+    .backend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .backend-card {
+      padding: 14px; border-radius: 10px; cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03); transition: all 0.18s;
     }
-    .radio-card {
-      padding: 16px; background: rgba(255,255,255,0.04);
-      border: 2px solid rgba(255,255,255,0.08); border-radius: 10px;
-      cursor: pointer; transition: all 0.2s;
-      display: flex; flex-direction: column; gap: 6px;
-    }
-    .radio-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-    .radio-card.selected {
-      border-color: #0078d4; background: rgba(0,120,212,0.12);
-    }
-    .radio-card .rc-icon { font-size: 24px; }
-    .radio-card .rc-name { font-size: 14px; font-weight: 700; color: #fff; }
-    .radio-card .rc-desc { font-size: 12px; color: rgba(255,255,255,0.4); line-height: 1.4; }
-    .radio-card .rc-badge {
-      display: inline-block; padding: 2px 8px; border-radius: 20px;
-      font-size: 10px; font-weight: 700; letter-spacing: 1px;
-      margin-top: 2px; align-self: flex-start;
-    }
+    .backend-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.18); }
+    .backend-card.active { border-color: #0078d4; background: rgba(0,120,212,0.14); }
+    .bc-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .bc-icon { font-size: 20px; }
+    .bc-name { font-size: 14px; font-weight: 700; }
+    .bc-badge { margin-left: auto; font-size: 9px; font-weight: 700; letter-spacing: 1px; padding: 2px 7px; border-radius: 20px; }
     .badge-green  { background: rgba(52,199,89,0.2);  color: #34c759; }
-    .badge-blue   { background: rgba(0,120,212,0.2);   color: #0090ff; }
+    .badge-blue   { background: rgba(0,120,212,0.2);   color: #4db8ff; }
     .badge-purple { background: rgba(175,82,222,0.2);  color: #bf5af2; }
-    .badge-yellow { background: rgba(255,204,0,0.2);   color: #ffd60a; }
-
-    /* Relay list */
-    .relay-list { display: flex; flex-direction: column; gap: 8px; }
+    .bc-desc { font-size: 11px; color: rgba(255,255,255,0.38); line-height: 1.5; }
+    .relay-list { display: flex; flex-direction: column; gap: 7px; }
     .relay-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px; background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
-      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 13px; border-radius: 8px; cursor: pointer;
+      border: 1.5px solid rgba(255,255,255,0.07);
+      background: rgba(255,255,255,0.03); transition: all 0.15s;
     }
     .relay-item:hover { background: rgba(255,255,255,0.08); }
-    .relay-item.selected { border-color: #0078d4; background: rgba(0,120,212,0.1); }
+    .relay-item.active { border-color: #0078d4; background: rgba(0,120,212,0.1); }
     .relay-dot {
       width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.25); transition: all 0.15s;
     }
-    .relay-item.selected .relay-dot { background: #0078d4; box-shadow: 0 0 6px #0078d4; }
-    .relay-info { flex: 1; }
-    .relay-name { font-size: 14px; font-weight: 600; color: #fff; }
-    .relay-url  { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; word-break: break-all; }
-    .relay-tag  {
-      font-size: 10px; font-weight: 700; letter-spacing: 1px;
-      padding: 3px 8px; border-radius: 20px; flex-shrink: 0;
+    .relay-item.active .relay-dot { background: #0078d4; border-color: #0078d4; box-shadow: 0 0 6px rgba(0,120,212,0.7); }
+    .relay-info { flex: 1; min-width: 0; }
+    .relay-name { font-size: 13px; font-weight: 600; }
+    .relay-url { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .relay-tag { font-size: 9px; font-weight: 700; letter-spacing: 1px; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
+    .tag-rec    { background: rgba(52,199,89,0.2);  color: #34c759; }
+    .tag-comm   { background: rgba(255,204,0,0.2);   color: #ffd60a; }
+    .tag-custom { background: rgba(255,255,255,0.1);  color: rgba(255,255,255,0.6); }
+    .relay-del { color: rgba(255,80,80,0.6); cursor: pointer; padding: 4px 6px; font-size: 14px; flex-shrink: 0; border-radius: 4px; transition: all 0.15s; }
+    .relay-del:hover { color: #ff4444; background: rgba(255,80,80,0.1); }
+    .no-relay { font-size: 13px; color: rgba(255,255,255,0.3); padding: 6px 0; }
+    .add-relay { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+    .add-relay input {
+      flex: 1; padding: 10px 13px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; color: white; font-family: 'Oxanium', sans-serif;
+      font-size: 12px; outline: none;
     }
-
-    /* Custom relay input */
-    .custom-relay-row {
-      display: flex; gap: 8px; margin-top: 12px;
+    .add-relay input:focus { border-color: rgba(0,120,212,0.5); }
+    .add-relay input::placeholder { color: rgba(255,255,255,0.2); }
+    .add-relay button {
+      padding: 10px 16px; background: #0078d4; border: none; border-radius: 8px;
+      color: white; font-family: 'Oxanium', sans-serif; font-size: 12px;
+      font-weight: 700; cursor: pointer; white-space: nowrap; transition: background 0.15s;
     }
-    .custom-relay-row input {
-      flex: 1; padding: 11px 14px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 8px;
-      color: #fff; font-family: 'Oxanium', sans-serif; font-size: 13px; outline: none;
-      transition: border-color 0.2s;
-    }
-    .custom-relay-row input:focus { border-color: rgba(0,120,212,0.6); }
-    .custom-relay-row input::placeholder { color: rgba(255,255,255,0.25); }
-    .custom-relay-row button {
-      padding: 11px 18px; background: #0078d4; border: none; border-radius: 8px;
-      color: #fff; font-family: 'Oxanium', sans-serif; font-size: 13px;
-      font-weight: 600; cursor: pointer; transition: background 0.2s; white-space: nowrap;
-    }
-    .custom-relay-row button:hover { background: #0090ff; }
-
+    .add-relay button:hover { background: #0090ff; }
+    .helper { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 10px; line-height: 1.6; }
+    .helper a { color: rgba(0,144,255,0.6); text-decoration: none; }
+    .helper a:hover { color: #4db8ff; }
     .save-btn {
       width: 100%; padding: 14px; background: #0078d4; border: none;
-      border-radius: 10px; color: #fff; font-family: 'Oxanium', sans-serif;
+      border-radius: 10px; color: white; font-family: 'Oxanium', sans-serif;
       font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
-      margin-top: 8px; transition: all 0.25s; box-shadow: 0 4px 16px rgba(0,120,212,0.3);
+      transition: all 0.2s; box-shadow: 0 4px 16px rgba(0,120,212,0.3); margin-top: 4px;
     }
-    .save-btn:hover { background: #0090ff; box-shadow: 0 6px 24px rgba(0,120,212,0.5); transform: translateY(-1px); }
-
+    .save-btn:hover { background: #0090ff; transform: translateY(-1px); }
+    .save-btn:active { transform: translateY(0); }
     .toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
-      background: #1c2128; border: 1px solid rgba(255,255,255,0.12);
-      color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 14px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4); transition: transform 0.3s ease, opacity 0.3s ease;
-      opacity: 0; pointer-events: none; white-space: nowrap;
+      position: fixed; bottom: 20px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #238636; color: white; padding: 11px 22px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0; pointer-events: none;
     }
     .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 16px 0; }
-    .helper-text { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 10px; line-height: 1.6; }
-    .helper-text a { color: rgba(0,144,255,0.7); text-decoration: none; }
-    .helper-text a:hover { color: #0090ff; }
   </style>
 </head>
 <body>
 
-  <a class="back-btn" onclick="history.back()">← Back to Browser</a>
+  <div class="back-btn" id="backBtn">← Back to Browser</div>
 
   <h1>⚙️ Browser Settings</h1>
-  <p class="page-sub">Configure your proxy backend and network relay</p>
+  <p class="subtitle">Choose your proxy backend and network relay</p>
 
-  <!-- Backend Service -->
   <div class="section">
-    <div class="section-title">Backend Service</div>
-    <div class="card-grid" id="backendGrid">
-
-      <div class="radio-card" data-backend="direct" onclick="selectBackend('direct')">
-        <div class="rc-icon">🌐</div>
-        <div class="rc-name">Direct</div>
-        <div class="rc-desc">Load pages directly. Only works for sites that allow iframes.</div>
-        <div class="rc-badge badge-green">NO SETUP</div>
+    <div class="section-label">Backend Service</div>
+    <div class="backend-grid">
+      <div class="backend-card" data-b="direct" onclick="pickBackend('direct')">
+        <div class="bc-top"><span class="bc-icon">🌐</span><span class="bc-name">Direct</span><span class="bc-badge badge-green">NO SETUP</span></div>
+        <div class="bc-desc">Loads pages directly. Only works for sites that allow iframes.</div>
       </div>
-
-      <div class="radio-card" data-backend="cors" onclick="selectBackend('cors')">
-        <div class="rc-icon">🔀</div>
-        <div class="rc-name">Standard</div>
-        <div class="rc-desc">Routes through a CORS proxy. Works for more sites but not all.</div>
-        <div class="rc-badge badge-green">NO SETUP</div>
+      <div class="backend-card" data-b="cors" onclick="pickBackend('cors')">
+        <div class="bc-top"><span class="bc-icon">🔀</span><span class="bc-name">Standard</span><span class="bc-badge badge-green">NO SETUP</span></div>
+        <div class="bc-desc">Routes through a CORS proxy. Works for many sites out of the box.</div>
       </div>
-
-      <div class="radio-card" data-backend="uv" onclick="selectBackend('uv')">
-        <div class="rc-icon">🟣</div>
-        <div class="rc-name">Ultraviolet</div>
-        <div class="rc-desc">Full service worker proxy. Bypasses most restrictions. Requires a relay.</div>
-        <div class="rc-badge badge-blue">RELAY NEEDED</div>
+      <div class="backend-card" data-b="uv" onclick="pickBackend('uv')">
+        <div class="bc-top"><span class="bc-icon">🟣</span><span class="bc-name">Ultraviolet</span><span class="bc-badge badge-blue">RELAY NEEDED</span></div>
+        <div class="bc-desc">Full service worker proxy. Bypasses most restrictions.</div>
       </div>
-
-      <div class="radio-card" data-backend="sj" onclick="selectBackend('sj')">
-        <div class="rc-icon">⚡</div>
-        <div class="rc-name">ScramJet</div>
-        <div class="rc-desc">Next-gen proxy engine. Fast and modern. Requires a relay.</div>
-        <div class="rc-badge badge-purple">RELAY NEEDED</div>
+      <div class="backend-card" data-b="sj" onclick="pickBackend('sj')">
+        <div class="bc-top"><span class="bc-icon">⚡</span><span class="bc-name">ScramJet</span><span class="bc-badge badge-purple">RELAY NEEDED</span></div>
+        <div class="bc-desc">Next-gen proxy engine. Fastest and most compatible.</div>
       </div>
-
     </div>
   </div>
 
-  <!-- Relay Selection (hidden for direct/cors) -->
   <div class="section" id="relaySection">
-    <div class="section-title">Network Relay</div>
+    <div class="section-label">Network Relay</div>
     <div class="relay-list" id="relayList"></div>
-
-    <div class="divider"></div>
-    <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:10px;">Custom relay URL</div>
-    <div class="custom-relay-row">
-      <input type="text" id="customRelayInput" placeholder="https://your-server.com/uv/q%s">
-      <button onclick="addCustomRelay()">+ Add</button>
+    <div class="add-relay">
+      <input type="text" id="customInput" placeholder="https://your-server.com/uv/q%s">
+      <button onclick="addCustom()">+ Add</button>
     </div>
-    <p class="helper-text">
-      Use <code>%s</code> as a placeholder for the encoded URL.<br>
+    <p class="helper">
+      Use <code>%s</code> as the placeholder for the encoded URL.<br>
       Find public relays on the <a href="https://discord.gg/unblock" target="_blank">Titanium Network Discord</a>.
     </p>
   </div>
 
   <button class="save-btn" onclick="saveAll()">💾 Save Settings</button>
-
   <div class="toast" id="toast">✅ Settings saved!</div>
 
   <script>
-    // ── Relay presets per backend ──
-    const RELAY_PRESETS = {
+    const PRESETS = {
+      direct: [],
+      cors: [
+        { name: 'corsproxy.io',   url: 'https://corsproxy.io/?%s',             tag: 'rec'  },
+        { name: 'allorigins.win', url: 'https://api.allorigins.win/raw?url=%s', tag: 'comm' },
+        { name: 'proxy.cors.sh',  url: 'https://proxy.cors.sh/%s',             tag: 'comm' },
+      ],
       uv: [
-        { name: 'Holy Unblocker', url: 'https://uv.holyubofficial.net/uv/q%s',  tag: 'Official',  tagClass: 'badge-blue'   },
-        { name: 'Cryo',           url: 'https://uv.cryo.lol/uv/q%s',            tag: 'Community', tagClass: 'badge-yellow' },
+        { name: 'Holy Unblocker', url: 'https://uv.holyubofficial.net/uv/q%s',        tag: 'rec'  },
+        { name: 'Cryo',           url: 'https://uv.cryo.lol/uv/q%s',                  tag: 'comm' },
       ],
       sj: [
-        { name: 'Holy Unblocker', url: 'https://sj.holyubofficial.net/scramjet/q%s', tag: 'Official', tagClass: 'badge-blue' },
+        { name: 'Holy Unblocker', url: 'https://sj.holyubofficial.net/scramjet/q%s',  tag: 'rec'  },
       ],
-      cors: [
-        { name: 'corsproxy.io',        url: 'https://corsproxy.io/?%s',                      tag: 'Recommended', tagClass: 'badge-green'  },
-        { name: 'allorigins.win',       url: 'https://api.allorigins.win/raw?url=%s',         tag: 'Backup',      tagClass: 'badge-yellow' },
-        { name: 'proxy.cors.sh',        url: 'https://proxy.cors.sh/%s',                      tag: 'Community',   tagClass: 'badge-yellow' },
-      ],
-      direct: []
     };
 
-    // ── State ──
-    let currentBackend = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
-    let currentRelay   = localStorage.getItem('eclipseos_' + currentBackend + '_base') || '';
-    let customRelays   = JSON.parse(localStorage.getItem('eclipseos_custom_relays') || '{}');
+    const TAG_LABEL = { rec: 'Recommended', comm: 'Community', custom: 'Custom' };
+    const TAG_CLASS = { rec: 'tag-rec', comm: 'tag-comm', custom: 'tag-custom' };
 
-    // ── Init ──
-    selectBackend(currentBackend, false);
+    let backend = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
+    // Default CORS relay is corsproxy.io
+    const DEFAULTS = { cors: 'https://corsproxy.io/?%s', uv: '', sj: '', direct: '' };
+    let relay = localStorage.getItem('eclipseos_' + backend + '_base') || DEFAULTS[backend] || '';
+    let customs = JSON.parse(localStorage.getItem('eclipseos_custom_relays') || '{}');
 
-    function selectBackend(backend, updateRelay = true) {
-      currentBackend = backend;
-      document.querySelectorAll('.radio-card').forEach(c => {
-        c.classList.toggle('selected', c.dataset.backend === backend);
-      });
+    pickBackend(backend, false);
 
-      const section = document.getElementById('relaySection');
-      section.style.display = (backend === 'direct') ? 'none' : 'block';
-
-      if (updateRelay) {
-        currentRelay = localStorage.getItem('eclipseos_' + backend + '_base') || '';
-      }
-
+    function pickBackend(b, resetRelay) {
+      backend = b;
+      if (resetRelay !== false) relay = localStorage.getItem('eclipseos_' + b + '_base') || DEFAULTS[b] || '';
+      document.querySelectorAll('.backend-card').forEach(c => c.classList.toggle('active', c.dataset.b === b));
+      document.getElementById('relaySection').style.display = b === 'direct' ? 'none' : 'block';
+      const inp = document.getElementById('customInput');
+      inp.placeholder = b === 'uv' ? 'https://your-server.com/uv/q%s'
+                      : b === 'sj' ? 'https://your-server.com/sj/q%s'
+                      : 'https://your-cors-proxy.com/?%s';
       renderRelays();
-
-      // Update custom input placeholder
-      const inp = document.getElementById('customRelayInput');
-      if (backend === 'uv') inp.placeholder = 'https://your-server.com/uv/q%s';
-      else if (backend === 'sj') inp.placeholder = 'https://your-server.com/sj/q%s';
-      else inp.placeholder = 'https://your-cors-proxy.com/?%s';
     }
 
     function renderRelays() {
       const list = document.getElementById('relayList');
-      const presets = RELAY_PRESETS[currentBackend] || [];
-      const custom  = customRelays[currentBackend] || [];
-      const all = [...presets, ...custom.map(u => ({ name: 'Custom', url: u, tag: 'Custom', tagClass: 'badge-yellow', isCustom: true }))];
-
-      if (all.length === 0) {
-        list.innerHTML = '<div style="font-size:13px;color:rgba(255,255,255,0.3);padding:8px 0;">No relays needed for this backend.</div>';
+      const all = [
+        ...(PRESETS[backend] || []),
+        ...(customs[backend] || []).map(url => ({ name: 'Custom', url, tag: 'custom', isCustom: true }))
+      ];
+      if (!all.length) {
+        list.innerHTML = '<div class="no-relay">No relay needed for this backend.</div>';
         return;
       }
-
-      list.innerHTML = all.map((r, i) => `
-        <div class="relay-item ${r.url === currentRelay ? 'selected' : ''}" onclick="selectRelay('${r.url.replace(/'/g, "\\'")}')">
+      list.innerHTML = '';
+      all.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'relay-item' + (r.url === relay ? ' active' : '');
+        div.innerHTML = `
           <div class="relay-dot"></div>
           <div class="relay-info">
             <div class="relay-name">${r.name}</div>
             <div class="relay-url">${r.url}</div>
           </div>
-          <span class="relay-tag ${r.tagClass}">${r.tag}</span>
-          ${r.isCustom ? `<span style="color:rgba(255,80,80,0.7);cursor:pointer;padding:4px 8px;font-size:16px;" onclick="event.stopPropagation();removeCustomRelay('${r.url.replace(/'/g, "\\'")}')">✕</span>` : ''}
-        </div>`).join('');
+          <span class="relay-tag ${TAG_CLASS[r.tag]}">${TAG_LABEL[r.tag]}</span>
+          ${r.isCustom ? '<span class="relay-del">✕</span>' : ''}`;
+
+        div.addEventListener('click', e => {
+          if (e.target.classList.contains('relay-del')) {
+            customs[backend] = (customs[backend] || []).filter(u => u !== r.url);
+            localStorage.setItem('eclipseos_custom_relays', JSON.stringify(customs));
+            if (relay === r.url) relay = '';
+            renderRelays();
+            return;
+          }
+          relay = r.url;
+          renderRelays();
+        });
+
+        list.appendChild(div);
+      });
     }
 
-    function selectRelay(url) {
-      currentRelay = url;
-      renderRelays();
-    }
-
-    function addCustomRelay() {
-      const inp = document.getElementById('customRelayInput');
+    function addCustom() {
+      const inp = document.getElementById('customInput');
       const url = inp.value.trim();
       if (!url) return;
-      if (!customRelays[currentBackend]) customRelays[currentBackend] = [];
-      if (!customRelays[currentBackend].includes(url)) {
-        customRelays[currentBackend].push(url);
-        localStorage.setItem('eclipseos_custom_relays', JSON.stringify(customRelays));
-      }
-      currentRelay = url;
+      if (!customs[backend]) customs[backend] = [];
+      if (!customs[backend].includes(url)) customs[backend].push(url);
+      localStorage.setItem('eclipseos_custom_relays', JSON.stringify(customs));
+      relay = url;
       inp.value = '';
       renderRelays();
     }
 
-    function removeCustomRelay(url) {
-      if (!customRelays[currentBackend]) return;
-      customRelays[currentBackend] = customRelays[currentBackend].filter(u => u !== url);
-      localStorage.setItem('eclipseos_custom_relays', JSON.stringify(customRelays));
-      if (currentRelay === url) currentRelay = '';
-      renderRelays();
-    }
-
     function saveAll() {
-      localStorage.setItem('eclipseos_proxy_mode', currentBackend);
-      if (currentRelay) {
-        localStorage.setItem('eclipseos_' + currentBackend + '_base', currentRelay);
-        // Also keep uv/sj specific keys for browser.html compatibility
-        if (currentBackend === 'uv') localStorage.setItem('eclipseos_uv_base', currentRelay);
-        if (currentBackend === 'sj') localStorage.setItem('eclipseos_sj_base', currentRelay);
+      localStorage.setItem('eclipseos_proxy_mode', backend);
+      if (relay) {
+        localStorage.setItem('eclipseos_' + backend + '_base', relay);
+        if (backend === 'uv') localStorage.setItem('eclipseos_uv_base', relay);
+        if (backend === 'sj') localStorage.setItem('eclipseos_sj_base', relay);
       }
-
-      const toast = document.getElementById('toast');
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2500);
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
     }
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '../browser.html';
+      }
+    });
   </script>
 </body>
 </html>

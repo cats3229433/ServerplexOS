@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paint</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #f0f0f0; }
+        .toolbar { height: 50px; background: #fff; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 0 12px; gap: 12px; }
+        .tool-btn { padding: 8px 16px; background: #e0e0e0; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .tool-btn:hover { background: #d0d0d0; }
+        .tool-btn.active { background: #0078d4; color: white; }
+        input[type="color"] { width: 40px; height: 36px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+        canvas { background: #fff; cursor: crosshair; }
+        .canvas-container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button class="tool-btn active" onclick="setTool('brush')">🖌️ Brush</button>
+        <button class="tool-btn" onclick="setTool('eraser')">🧹 Eraser</button>
+        <input type="color" id="colorPicker" value="#000000">
+        <button class="tool-btn" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="tool-btn" onclick="saveImage()">💾 Save</button>
+    </div>
+    <div class="canvas-container">
+        <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const colorPicker = document.getElementById('colorPicker');
+        
+        let painting = false;
+        let tool = 'brush';
+        
+        canvas.addEventListener('mousedown', startPaint);
+        canvas.addEventListener('mouseup', endPaint);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseleave', endPaint);
+        
+        function startPaint(e) {
+            painting = true;
+            draw(e);
+        }
+        
+        function endPaint() {
+            painting = false;
+            ctx.beginPath();
+        }
+        
+        function draw(e) {
+            if (!painting) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            ctx.lineWidth = tool === 'eraser' ? 20 : 2;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = tool === 'eraser' ? '#ffffff' : colorPicker.value;
+            
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+        
+        function setTool(newTool) {
+            tool = newTool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+        
+        function clearCanvas() {
+            if (confirm('Clear canvas?')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+        
+        function saveImage() {
+            const link = document.createElement('a');
+            link.download = `paint-${Date.now()}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>

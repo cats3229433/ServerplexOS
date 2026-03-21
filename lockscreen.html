@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EclipseOS — Locked</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Oxanium', sans-serif;
+      background: #07090f;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: default;
+    }
+
+    /* ── Background ── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 20% 30%, rgba(0,120,212,0.1) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 80% 75%, rgba(118,75,162,0.08) 0%, transparent 65%),
+        #07090f;
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,120,212,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,120,212,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* ── Wake hint (shown first) ── */
+    #wakeScreen {
+      position: fixed; inset: 0; z-index: 20;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      cursor: pointer;
+      transition: opacity 0.6s ease;
+    }
+    #wakeScreen.hidden { opacity: 0; pointer-events: none; }
+
+    .wake-time {
+      font-size: 80px; font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 0 60px rgba(0,120,212,0.4);
+      line-height: 1;
+    }
+    .wake-date {
+      font-size: 16px; letter-spacing: 3px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+    }
+    .wake-hint {
+      margin-top: 32px;
+      font-size: 13px; letter-spacing: 2px;
+      color: rgba(255,255,255,0.22);
+      text-transform: uppercase;
+      animation: hintPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes hintPulse {
+      0%,100% { opacity: 0.22; transform: translateY(0); }
+      50%      { opacity: 0.55; transform: translateY(-4px); }
+    }
+
+    /* ── Login card (shown after wake) ── */
+    #loginScreen {
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 0;
+      opacity: 0; pointer-events: none;
+      transform: translateY(24px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    #loginScreen.visible { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+    .avatar-wrap {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0078d4, #764ba2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 44px;
+      box-shadow: 0 0 0 4px rgba(0,120,212,0.25), 0 12px 40px rgba(0,0,0,0.5);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+    .avatar-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+    .lock-username {
+      font-size: 22px; font-weight: 700;
+      letter-spacing: 1px; margin-bottom: 4px;
+      color: rgba(255,255,255,0.92);
+    }
+    .lock-subtitle {
+      font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.3); margin-bottom: 32px;
+    }
+
+    /* PIN dots */
+    .pin-display {
+      display: flex; gap: 16px; margin-bottom: 12px;
+      justify-content: center;
+    }
+    .pin-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      transition: all 0.2s;
+    }
+    .pin-dot.filled {
+      background: #0078d4; border-color: #0078d4;
+      box-shadow: 0 0 10px rgba(0,120,212,0.7);
+    }
+    .pin-dot.error {
+      background: #ff4444; border-color: #ff4444;
+      box-shadow: 0 0 10px rgba(255,68,68,0.7);
+    }
+
+    /* Password input */
+    .pw-wrap {
+      position: relative; width: 280px; margin-bottom: 12px;
+    }
+    .pw-wrap input {
+      width: 100%; padding: 13px 44px 13px 18px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: #fff;
+      font-family: 'Oxanium', sans-serif; font-size: 16px;
+      letter-spacing: 2px; outline: none;
+      transition: all 0.25s;
+    }
+    .pw-wrap input:focus {
+      border-color: rgba(0,120,212,0.6);
+      background: rgba(0,120,212,0.08);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.15);
+    }
+    .pw-wrap input::placeholder { letter-spacing: 1px; color: rgba(255,255,255,0.25); }
+    .pw-eye {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 18px; cursor: pointer; opacity: 0.4; transition: opacity 0.2s;
+    }
+    .pw-eye:hover { opacity: 0.8; }
+
+    /* Numpad */
+    .numpad {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; width: 280px; margin-bottom: 20px;
+    }
+    .nk {
+      padding: 16px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+      font-size: 20px; font-weight: 600; cursor: pointer;
+      text-align: center; transition: all 0.15s;
+      color: #fff; font-family: 'Oxanium', sans-serif;
+      user-select: none;
+    }
+    .nk:hover { background: rgba(255,255,255,0.12); border-color: rgba(0,120,212,0.4); }
+    .nk:active { transform: scale(0.93); background: rgba(0,120,212,0.2); }
+    .nk:empty { pointer-events: none; }
+
+    .unlock-btn {
+      width: 280px; padding: 14px;
+      background: linear-gradient(135deg, #0078d4, #005fa3);
+      border: none; border-radius: 12px;
+      color: #fff; font-family: 'Oxanium', sans-serif;
+      font-size: 15px; font-weight: 700; letter-spacing: 2px;
+      cursor: pointer; margin-bottom: 16px;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 4px 20px rgba(0,120,212,0.3);
+    }
+    .unlock-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,120,212,0.5); }
+    .unlock-btn:active { transform: translateY(0); }
+
+    .error-msg {
+      font-size: 13px; color: #ff6b6b; letter-spacing: 0.5px;
+      min-height: 18px; text-align: center; margin-bottom: 8px;
+    }
+
+    /* shake */
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-7px)}
+      40%{transform:translateX(7px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    .shake { animation: shake 0.4s ease; }
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Wake screen (clock + tap to unlock) -->
+  <div id="wakeScreen" onclick="wake()">
+    <div class="wake-time" id="wakeTime">00:00</div>
+    <div class="wake-date" id="wakeDate"></div>
+    <div class="wake-hint">Click anywhere to unlock</div>
+  </div>
+
+  <!-- Login card -->
+  <div id="loginScreen">
+    <div class="avatar-wrap" id="avatarWrap"></div>
+    <div class="lock-username" id="lockUsername">User</div>
+    <div class="lock-subtitle">EclipseOS</div>
+
+    <!-- PIN mode -->
+    <div id="pinMode">
+      <div class="pin-display" id="pinDisplay"></div>
+      <div class="error-msg" id="pinError"></div>
+      <div class="numpad" id="numpad"></div>
+    </div>
+
+    <!-- Password mode -->
+    <div id="pwMode" style="display:none;">
+      <div class="pw-wrap">
+        <input type="password" id="pwInput" placeholder="Password" autocomplete="off">
+        <span class="pw-eye" id="pwEye">👁</span>
+      </div>
+      <div class="error-msg" id="pwError"></div>
+      <button class="unlock-btn" onclick="submitPassword()">Unlock →</button>
+    </div>
+  </div>
+
+  <script>
+    const savedPin      = localStorage.getItem('eclipseos_pin') || '';
+    const savedPassword = localStorage.getItem('eclipseos_password') || '';
+    const savedUsername = localStorage.getItem('eclipseos_username') || 'User';
+    const savedAvatar   = localStorage.getItem('eclipseos_avatar') || '👤';
+    const avatarImage   = localStorage.getItem('eclipseos_avatar_image') || '';
+
+    // If no security, skip straight to OS
+    if (!savedPin && !savedPassword) {
+      window.location.replace('eclipseos.html');
+    }
+
+    // ── Set up user info ──
+    document.getElementById('lockUsername').textContent = savedUsername;
+    const avatarWrap = document.getElementById('avatarWrap');
+    if (avatarImage) {
+      avatarWrap.innerHTML = `<img src="${avatarImage}" alt="avatar">`;
+    } else {
+      avatarWrap.textContent = savedAvatar;
+    }
+
+    // ── Clock ──
+    function updateClock() {
+      const now = new Date();
+      const fmt = localStorage.getItem('eclipseos_clock_format') || '12';
+      let h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
+      let timeStr;
+      if (fmt === '24') {
+        timeStr = `${h.toString().padStart(2,'0')}:${m}`;
+      } else {
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        timeStr = `${h}:${m} ${ampm}`;
+      }
+      document.getElementById('wakeTime').textContent = timeStr;
+      const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('wakeDate').textContent =
+        `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── Wake ──
+    function wake() {
+      document.getElementById('wakeScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.add('visible');
+      if (savedPassword && !savedPin) {
+        document.getElementById('pwInput').focus();
+      }
+    }
+
+    // ── Build UI based on security type ──
+    if (savedPin) {
+      document.getElementById('pwMode').style.display = 'none';
+      document.getElementById('pinMode').style.display = 'block';
+      buildPinUI();
+    } else {
+      document.getElementById('pinMode').style.display = 'none';
+      document.getElementById('pwMode').style.display = 'block';
+    }
+
+    // ── PIN ──
+    let pinValue = '';
+
+    function buildPinUI() {
+      // Dots
+      const display = document.getElementById('pinDisplay');
+      display.innerHTML = '';
+      for (let i = 0; i < 4; i++) {
+        const d = document.createElement('div');
+        d.className = 'pin-dot';
+        d.id = 'pd' + i;
+        display.appendChild(d);
+      }
+      // Numpad
+      const numpad = document.getElementById('numpad');
+      [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k => {
+        const key = document.createElement('div');
+        key.className = 'nk';
+        key.textContent = k === '' ? '' : k;
+        if (k !== '') {
+          key.addEventListener('click', () => {
+            if (k === '⌫') { pinValue = pinValue.slice(0,-1); }
+            else if (pinValue.length < 4) { pinValue += k; }
+            updateDots();
+            document.getElementById('pinError').textContent = '';
+            if (pinValue.length === 4) setTimeout(submitPin, 200);
+          });
+        }
+        numpad.appendChild(key);
+      });
+    }
+
+    function updateDots(errorState = false) {
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById('pd' + i);
+        if (!dot) return;
+        dot.className = 'pin-dot' + (i < pinValue.length ? (errorState ? ' error' : ' filled') : '');
+      }
+    }
+
+    function submitPin() {
+      if (pinValue === savedPin) {
+        unlock();
+      } else {
+        updateDots(true);
+        document.getElementById('pinError').textContent = 'Incorrect PIN.';
+        document.getElementById('numpad').classList.add('shake');
+        setTimeout(() => {
+          pinValue = '';
+          updateDots();
+          document.getElementById('pinError').textContent = '';
+          document.getElementById('numpad').classList.remove('shake');
+        }, 700);
+      }
+    }
+
+    // ── Password ──
+    document.getElementById('pwEye').addEventListener('click', () => {
+      const inp = document.getElementById('pwInput');
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    });
+    document.getElementById('pwInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') submitPassword();
+    });
+
+    function submitPassword() {
+      const entered = document.getElementById('pwInput').value;
+      if (entered === savedPassword) {
+        unlock();
+      } else {
+        const inp = document.getElementById('pwInput');
+        inp.classList.add('shake');
+        document.getElementById('pwError').textContent = 'Incorrect password.';
+        inp.style.borderColor = 'rgba(255,80,80,0.6)';
+        setTimeout(() => {
+          inp.classList.remove('shake');
+          inp.style.borderColor = '';
+          document.getElementById('pwError').textContent = '';
+          inp.value = '';
+        }, 700);
+      }
+    }
+
+    function unlock() {
+      document.getElementById('loginScreen').style.transition = 'opacity 0.4s ease';
+      document.getElementById('loginScreen').style.opacity = '0';
+      setTimeout(() => sessionStorage.setItem('eclipseos_authed', 'true'); window.location.href = 'eclipseos.html', 400);
+    }
+
+    // Keyboard support for PIN
+    document.addEventListener('keydown', e => {
+      if (!document.getElementById('loginScreen').classList.contains('visible')) {
+        wake(); return;
+      }
+      if (savedPin) {
+        if (e.key >= '0' && e.key <= '9' && pinValue.length < 4) {
+          pinValue += e.key;
+          updateDots();
+          if (pinValue.length === 4) setTimeout(submitPin, 200);
+        } else if (e.key === 'Backspace') {
+          pinValue = pinValue.slice(0,-1);
+          updateDots();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

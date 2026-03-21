@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Consolas', 'Courier New', monospace; background: #000; color: #0f0; height: 100vh; overflow: hidden; }
+        .terminal { padding: 20px; height: 100%; display: flex; flex-direction: column; }
+        .output { flex: 1; overflow-y: auto; margin-bottom: 10px; }
+        .output-line { margin-bottom: 4px; white-space: pre-wrap; word-wrap: break-word; }
+        .prompt { color: #0f0; }
+        .input-line { display: flex; align-items: center; }
+        .input-line span { margin-right: 8px; color: #0f0; }
+        .input-line input { flex: 1; background: transparent; border: none; outline: none; color: #0f0; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="output" id="output">
+            <div class="output-line">ServerplexOS Terminal v1.0</div>
+            <div class="output-line">Type 'help' for available commands</div>
+            <div class="output-line"></div>
+        </div>
+        <div class="input-line">
+            <span class="prompt">$</span>
+            <input type="text" id="input" autofocus>
+        </div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const input = document.getElementById('input');
+        const commandHistory = [];
+        let historyIndex = -1;
+
+        const commands = {
+            help: () => `Available commands:
+  help       - Show this help message
+  clear      - Clear the terminal
+  echo       - Echo text (usage: echo [text])
+  date       - Show current date and time
+  version    - Show OS version
+  calc       - Calculate expression (usage: calc [expression])
+  theme      - Change OS theme (usage: theme [white/black/grey])
+  apps       - List installed apps
+  exit       - Close terminal`,
+            
+            clear: () => {
+                output.innerHTML = '';
+                return null;
+            },
+            
+            echo: (args) => args.join(' '),
+            
+            date: () => new Date().toString(),
+            
+            version: () => 'ServerplexOS v1.0 - Build 2026.03.14',
+            
+            calc: (args) => {
+                try {
+                    const expression = args.join(' ');
+                    const result = eval(expression);
+                    return `${expression} = ${result}`;
+                } catch (error) {
+                    return `Error: Invalid expression`;
+                }
+            },
+            
+            theme: (args) => {
+                const theme = args[0];
+                if (['white', 'black', 'grey'].includes(theme)) {
+                    if (window.parent && window.parent.changeTheme) {
+                        window.parent.changeTheme(theme);
+                        return `Theme changed to: ${theme}`;
+                    } else {
+                        localStorage.setItem('serverplexos_theme', theme);
+                        return `Theme will change on next OS reload: ${theme}`;
+                    }
+                } else {
+                    return `Usage: theme [white/black/grey]`;
+                }
+            },
+            
+            apps: () => {
+                return `Installed apps:
+  Browser, Games, Tools, Notepad, Calculator
+  Calendar, Terminal, Paint, Task Manager
+  To-Do List, Sticky Notes, Image Viewer, Clock
+  Recycle Bin, Search, Music Player, Markdown Editor
+  Notifications, Settings`;
+            },
+            
+            exit: () => {
+                if (window.parent && window.parent.closeWindow) {
+                    window.parent.closeWindow('terminal');
+                }
+                return 'Closing terminal...';
+            }
+        };
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const commandText = input.value.trim();
+                input.value = '';
+                
+                if (commandText) {
+                    commandHistory.push(commandText);
+                    historyIndex = commandHistory.length;
+                    executeCommand(commandText);
+                }
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex];
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex];
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+            }
+        });
+
+        function executeCommand(commandText) {
+            addOutput(`$ ${commandText}`, 'prompt');
+            
+            const parts = commandText.split(' ');
+            const cmd = parts[0];
+            const args = parts.slice(1);
+            
+            if (commands[cmd]) {
+                const result = commands[cmd](args);
+                if (result !== null) {
+                    addOutput(result);
+                }
+            } else {
+                addOutput(`Command not found: ${cmd}`);
+                addOutput(`Type 'help' for available commands`);
+            }
+        }
+
+        function addOutput(text, className = '') {
+            const line = document.createElement('div');
+            line.className = `output-line ${className}`;
+            line.textContent = text;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Focus input when clicking anywhere in terminal
+        document.addEventListener('click', () => input.focus());
+    </script>
+</body>
+</html>

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Editor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #1e1e1e; 
+            color: #cccccc; 
+            height: 100vh; 
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Menu Bar */
+        .menu-bar {
+            background: #323233;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            gap: 16px;
+            border-bottom: 1px solid #2d2d30;
+            font-size: 13px;
+        }
+        .menu-item {
+            padding: 4px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 4px;
+        }
+        .menu-item:hover {
+            background: #3e3e42;
+        }
+
+        /* Main Container */
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: #252526;
+            border-right: 1px solid #2d2d30;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #888;
+            letter-spacing: 0.5px;
+        }
+        .file-tree {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .file-item {
+            padding: 6px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .file-item:hover {
+            background: #2a2d2e;
+        }
+        .file-item.active {
+            background: #37373d;
+        }
+        .file-icon {
+            font-size: 16px;
+        }
+        .new-file-btn {
+            padding: 8px;
+            margin: 8px;
+            background: #0e639c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.2s;
+        }
+        .new-file-btn:hover {
+            background: #1177bb;
+        }
+
+        /* Editor Area */
+        .editor-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+        }
+        .tabs {
+            background: #2d2d2d;
+            display: flex;
+            border-bottom: 1px solid #2d2d30;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 10px 16px;
+            background: #2d2d2d;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            border-right: 1px solid #2d2d30;
+            transition: background 0.2s;
+            min-width: 120px;
+        }
+        .tab:hover {
+            background: #1e1e1e;
+        }
+        .tab.active {
+            background: #1e1e1e;
+            border-top: 2px solid #0e639c;
+        }
+        .tab-close {
+            margin-left: auto;
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .tab-close:hover {
+            background: #464647;
+        }
+        .editor {
+            flex: 1;
+            position: relative;
+        }
+        #monaco-editor {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #007acc;
+            color: white;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            font-size: 12px;
+            justify-content: space-between;
+        }
+        .status-left, .status-right {
+            display: flex;
+            gap: 16px;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #1e1e1e;
+            color: #cccccc;
+            gap: 24px;
+        }
+        .welcome-screen h1 {
+            font-size: 32px;
+            font-weight: 300;
+        }
+        .welcome-screen p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #424242;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4e4e4e;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-bar">
+        <div class="menu-item">File</div>
+        <div class="menu-item">Edit</div>
+        <div class="menu-item">Selection</div>
+        <div class="menu-item">View</div>
+        <div class="menu-item">Go</div>
+        <div class="menu-item">Run</div>
+        <div class="menu-item">Terminal</div>
+        <div class="menu-item">Help</div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">Explorer</div>
+            <button class="new-file-btn" onclick="createNewFile()">+ New File</button>
+            <div class="file-tree" id="fileTree"></div>
+        </div>
+
+        <div class="editor-area">
+            <div class="tabs" id="tabs"></div>
+            <div class="editor" id="editorContainer">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <h1>💻 Code Editor</h1>
+                    <p>Create a new file or select an existing one to start coding</p>
+                </div>
+                <div id="monaco-editor" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-left">
+            <span id="statusLanguage">Plain Text</span>
+            <span id="statusLine">Ln 1, Col 1</span>
+        </div>
+        <div class="status-right">
+            <span id="statusEncoding">UTF-8</span>
+            <span id="statusEOL">LF</span>
+        </div>
+    </div>
+
+    <!-- Monaco Editor CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    
+    <script>
+        let files = JSON.parse(localStorage.getItem('eclipseos_code_files') || '{}');
+        let activeFile = null;
+        let editor = null;
+        let fileCounter = Object.keys(files).length;
+
+        // Language icon mapping
+        const languageIcons = {
+            'javascript': '📜',
+            'typescript': '📘',
+            'python': '🐍',
+            'html': '🌐',
+            'css': '🎨',
+            'json': '📋',
+            'markdown': '📝',
+            'plaintext': '📄',
+            'java': '☕',
+            'cpp': '⚙️',
+            'csharp': '🔷',
+            'go': '🔵',
+            'rust': '🦀',
+            'php': '🐘',
+            'ruby': '💎',
+            'swift': '🦅'
+        };
+
+        // Initialize Monaco Editor
+        require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+        require(['vs/editor/editor.main'], function () {
+            editor = monaco.editor.create(document.getElementById('monaco-editor'), {
+                value: '',
+                theme: 'vs-dark',
+                language: 'javascript',
+                fontSize: 14,
+                minimap: { enabled: true },
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                wordWrap: 'on'
+            });
+
+            // Update cursor position
+            editor.onDidChangeCursorPosition((e) => {
+                document.getElementById('statusLine').textContent = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
+            });
+
+            // Auto-save on change
+            editor.onDidChangeModelContent(() => {
+                if (activeFile) {
+                    files[activeFile].content = editor.getValue();
+                    saveFiles();
+                }
+            });
+
+            // Load existing files or create default
+            if (Object.keys(files).length === 0) {
+                createDefaultFiles();
+            }
+            renderFileTree();
+        });
+
+        function createDefaultFiles() {
+            files = {
+                'welcome.js': {
+                    name: 'welcome.js',
+                    language: 'javascript',
+                    content: `// Welcome to Code Editor!\n// This is a VS Code-style editor built into EclipseOS\n\nfunction greet(name) {\n    console.log(\`Hello, \${name}! Welcome to EclipseOS!\`);\n}\n\ngreet('Developer');\n`
+                },
+                'index.html': {
+                    name: 'index.html',
+                    language: 'html',
+                    content: `<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>My Project</title>\n</head>\n<body>\n    <h1>Hello, EclipseOS!</h1>\n</body>\n</html>`
+                },
+                'styles.css': {
+                    name: 'styles.css',
+                    language: 'css',
+                    content: `body {\n    margin: 0;\n    padding: 0;\n    font-family: 'Segoe UI', sans-serif;\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    color: white;\n}`
+                }
+            };
+            saveFiles();
+        }
+
+        function createNewFile() {
+            const fileName = prompt('Enter file name (e.g., script.js, index.html, styles.css):');
+            if (!fileName) return;
+
+            const ext = fileName.split('.').pop().toLowerCase();
+            const languageMap = {
+                'js': 'javascript',
+                'ts': 'typescript',
+                'py': 'python',
+                'html': 'html',
+                'css': 'css',
+                'json': 'json',
+                'md': 'markdown',
+                'java': 'java',
+                'cpp': 'cpp',
+                'c': 'cpp',
+                'cs': 'csharp',
+                'go': 'go',
+                'rs': 'rust',
+                'php': 'php',
+                'rb': 'ruby',
+                'swift': 'swift'
+            };
+
+            files[fileName] = {
+                name: fileName,
+                language: languageMap[ext] || 'plaintext',
+                content: ''
+            };
+
+            saveFiles();
+            renderFileTree();
+            openFile(fileName);
+        }
+
+        function openFile(fileName) {
+            activeFile = fileName;
+            const file = files[fileName];
+
+            // Show editor, hide welcome
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('monaco-editor').style.display = 'block';
+
+            // Update editor
+            if (editor) {
+                monaco.editor.setModelLanguage(editor.getModel(), file.language);
+                editor.setValue(file.content);
+                document.getElementById('statusLanguage').textContent = file.language.charAt(0).toUpperCase() + file.language.slice(1);
+            }
+
+            renderTabs();
+            renderFileTree();
+        }
+
+        function closeFile(fileName, event) {
+            event.stopPropagation();
+            delete files[fileName];
+            saveFiles();
+
+            if (activeFile === fileName) {
+                activeFile = null;
+                document.getElementById('welcomeScreen').style.display = 'flex';
+                document.getElementById('monaco-editor').style.display = 'none';
+            }
+
+            renderTabs();
+            renderFileTree();
+        }
+
+        function renderFileTree() {
+            const tree = document.getElementById('fileTree');
+            tree.innerHTML = '';
+
+            Object.keys(files).forEach(fileName => {
+                const file = files[fileName];
+                const item = document.createElement('div');
+                item.className = 'file-item' + (activeFile === fileName ? ' active' : '');
+                item.innerHTML = `
+                    <span class="file-icon">${languageIcons[file.language] || '📄'}</span>
+                    <span>${file.name}</span>
+                `;
+                item.onclick = () => openFile(fileName);
+                tree.appendChild(item);
+            });
+        }
+
+        function renderTabs() {
+            const tabs = document.getElementById('tabs');
+            tabs.innerHTML = '';
+
+            Object.keys(files).forEach(fileName => {
+                const file = files[fileName];
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (activeFile === fileName ? ' active' : '');
+                tab.innerHTML = `
+                    <span class="file-icon">${languageIcons[file.language] || '📄'}</span>
+                    <span>${file.name}</span>
+                    <span class="tab-close" onclick="closeFile('${fileName}', event)">×</span>
+                `;
+                tab.onclick = (e) => {
+                    if (!e.target.classList.contains('tab-close')) {
+                        openFile(fileName);
+                    }
+                };
+                tabs.appendChild(tab);
+            });
+        }
+
+        function saveFiles() {
+            localStorage.setItem('eclipseos_code_files', JSON.stringify(files));
+        }
+
+        // Open first file by default after editor loads
+        setTimeout(() => {
+            const firstFile = Object.keys(files)[0];
+            if (firstFile) openFile(firstFile);
+        }, 500);
+    </script>
+</body>
+</html>

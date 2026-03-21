@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Notifications</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; height: 100vh; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { font-size: 28px; margin-bottom: 20px; color: #333; }
+        .toolbar { margin-bottom: 20px; }
+        button { padding: 10px 16px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 8px; }
+        button:hover { background: #005a9e; }
+        button.clear { background: #ff3b30; }
+        .notification { padding: 16px; background: #f9f9f9; border-left: 4px solid #0078d4; border-radius: 6px; margin-bottom: 12px; }
+        .notification.info { border-left-color: #0078d4; }
+        .notification.success { border-left-color: #34c759; }
+        .notification.warning { border-left-color: #ff9500; }
+        .notification.error { border-left-color: #ff3b30; }
+        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .notif-title { font-weight: 600; font-size: 16px; }
+        .notif-time { font-size: 12px; color: #666; }
+        .notif-message { font-size: 14px; color: #333; line-height: 1.5; }
+        .empty { text-align: center; padding: 60px; color: #999; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Notifications</h1>
+        <div class="toolbar">
+            <button onclick="addTestNotification()">➕ Test Notification</button>
+            <button class="clear" onclick="clearAll()">Clear All</button>
+        </div>
+        <div id="notificationsList"></div>
+    </div>
+
+    <script>
+        let notifications = JSON.parse(localStorage.getItem('serverplexos_notifications') || '[]');
+
+        function render() {
+            const list = document.getElementById('notificationsList');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="empty">No notifications</div>';
+                return;
+            }
+            
+            list.innerHTML = notifications.map(notif => `
+                <div class="notification ${notif.type}">
+                    <div class="notif-header">
+                        <span class="notif-title">${notif.title}</span>
+                        <span class="notif-time">${new Date(notif.time).toLocaleTimeString()}</span>
+                    </div>
+                    <div class="notif-message">${notif.message}</div>
+                </div>
+            `).join('');
+        }
+
+        function addNotification(title, message, type = 'info') {
+            notifications.unshift({
+                title,
+                message,
+                type,
+                time: Date.now()
+            });
+            
+            // Keep only last 50 notifications
+            if (notifications.length > 50) {
+                notifications = notifications.slice(0, 50);
+            }
+            
+            save();
+        }
+
+        function addTestNotification() {
+            const types = ['info', 'success', 'warning', 'error'];
+            const messages = [
+                { title: 'System Update', message: 'ServerplexOS updated successfully' },
+                { title: 'Task Complete', message: 'Your download has finished' },
+                { title: 'Low Storage', message: 'Storage is running low' },
+                { title: 'Error', message: 'Failed to connect to network' }
+            ];
+            
+            const type = types[Math.floor(Math.random() * types.length)];
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            
+            addNotification(msg.title, msg.message, type);
+        }
+
+        function clearAll() {
+            if (confirm('Clear all notifications?')) {
+                notifications = [];
+                save();
+            }
+        }
+
+        function save() {
+            localStorage.setItem('serverplexos_notifications', JSON.stringify(notifications));
+            render();
+        }
+
+        // Add some default notifications if empty
+        if (notifications.length === 0) {
+            addNotification('Welcome', 'Welcome to ServerplexOS!', 'success');
+            addNotification('Getting Started', 'Explore apps from the Start menu', 'info');
+        }
+
+        render();
+    </script>
+</body>
+</html>

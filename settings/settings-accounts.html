@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
+        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
+        .profile-section { padding: 24px; background: #f9f9f9; border-radius: 12px; }
+        .profile-header { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
+        .profile-avatar { width: 80px; height: 80px; background: #0078d4; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; cursor: pointer; }
+        .profile-info { flex: 1; }
+        .profile-name { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+        .profile-email { font-size: 14px; color: #666; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+        .avatar-picker { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 12px; }
+        .avatar-option { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
+        .avatar-option:hover { background: #e0e0e0; transform: scale(1.1); }
+        .avatar-option.selected { background: #e3f2fd; border: 2px solid #0078d4; }
+        button { padding: 12px 24px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #005a9e; }
+        .success-message { padding: 12px; background: #d4edda; color: #155724; border-radius: 6px; margin-bottom: 20px; display: none; }
+
+        .security-section { padding: 24px; background: #f9f9f9; border-radius: 12px; }
+        .sec-type-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
+        .sec-type-btn { flex: 1; padding: 10px; background: #fff; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; font-size: 13px; font-family: 'Oxanium', sans-serif; transition: all 0.2s; }
+        .sec-type-btn:hover { background: #f0f0f0; }
+        .sec-type-btn.active { border-color: #0078d4; background: #e3f2fd; color: #0078d4; font-weight: 600; }
+        .pin-display { display: flex; justify-content: center; gap: 14px; margin: 16px 0 8px; }
+        .pin-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ccc; transition: all 0.2s; }
+        .pin-dot.filled { background: #0078d4; border-color: #0078d4; }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0 16px; }
+        .numpad-key { padding: 14px; background: #fff; border: 1px solid #ddd; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.15s; font-family: 'Oxanium', sans-serif; }
+        .numpad-key:hover { background: #e3f2fd; border-color: #0078d4; }
+        .numpad-key:active { transform: scale(0.95); }
+        .current-security { padding: 12px 16px; background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; font-size: 14px; color: #2e7d32; margin-bottom: 16px; }
+        .current-security.none { background: #fff8e1; border-color: #ffe082; color: #f57f17; }
+        .remove-btn { background: #ff3b30 !important; }
+        .remove-btn:hover { background: #cc2f26 !important; }
+        input[type="password"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: 'Oxanium', sans-serif; margin-bottom: 8px; }
+        .error-text { color: #ff3b30; font-size: 13px; min-height: 18px; margin-bottom: 8px; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1>👤 Accounts</h1>
+    
+    <div class="section">
+        <div class="section-title">User Profile</div>
+        <div class="profile-section">
+            <div class="profile-header">
+                <div class="profile-avatar" id="currentAvatar">👤</div>
+                <div class="profile-info">
+                    <div class="profile-name" id="displayName">User</div>
+                    <div class="profile-email">Local Account</div>
+                </div>
+            </div>
+            
+            <div class="success-message" id="successMessage">Profile updated successfully!</div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label>Choose Avatar</label>
+                <div class="avatar-picker" id="avatarPicker"></div>
+            </div>
+            
+            <button onclick="saveProfile()">💾 Save Changes</button>
+        </div>
+    </div>
+
+
+    <div class="section">
+        <div class="section-title">🔒 Security</div>
+        <div class="security-section">
+            <div class="current-security" id="currentSecStatus"></div>
+
+            <div class="sec-type-toggle">
+                <div class="sec-type-btn active" id="btnPin" onclick="switchSecType('pin')">🔢 Set PIN</div>
+                <div class="sec-type-btn" id="btnPassword" onclick="switchSecType('password')">🔐 Set Password</div>
+            </div>
+
+            <!-- PIN section -->
+            <div id="pinSection">
+                <label style="font-weight:600;margin-bottom:8px;display:block;">New 4-digit PIN</label>
+                <div class="pin-display">
+                    <div class="pin-dot" id="pd0"></div>
+                    <div class="pin-dot" id="pd1"></div>
+                    <div class="pin-dot" id="pd2"></div>
+                    <div class="pin-dot" id="pd3"></div>
+                </div>
+                <div class="error-text" id="pinError"></div>
+                <div class="numpad" id="numpad"></div>
+                <button onclick="savePin()">💾 Save PIN</button>
+            </div>
+
+            <!-- Password section -->
+            <div id="passwordSection" style="display:none;">
+                <label style="font-weight:600;margin-bottom:8px;display:block;">New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password...">
+                <input type="password" id="confirmPassword" placeholder="Confirm new password...">
+                <div class="error-text" id="passError"></div>
+                <button onclick="savePassword()">💾 Save Password</button>
+            </div>
+
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid #ddd;">
+                <button class="remove-btn" onclick="removeSecurity()">🗑️ Remove Security</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const avatars = ['👤', '😀', '😎', '🤖', '👨', '👩', '🧑', '👴', '👵', '🧔', '👨‍💼', '👩‍💼', '🎓', '👑', '🐱', '🐶'];
+        let selectedAvatar = localStorage.getItem('eclipseos_avatar') || '👤';
+
+        function renderAvatarPicker() {
+            const picker = document.getElementById('avatarPicker');
+            picker.innerHTML = avatars.map(avatar => `
+                <div class="avatar-option ${avatar === selectedAvatar ? 'selected' : ''}" 
+                     onclick="selectAvatar('${avatar}')">
+                    ${avatar}
+                </div>
+            `).join('');
+        }
+
+        function selectAvatar(avatar) {
+            selectedAvatar = avatar;
+            renderAvatarPicker();
+            document.getElementById('currentAvatar').textContent = avatar;
+        }
+
+        function saveProfile() {
+            const username = document.getElementById('username').value.trim();
+            
+            if (username) {
+                localStorage.setItem('eclipseos_username', username);
+                document.getElementById('displayName').textContent = username;
+            }
+            
+            localStorage.setItem('eclipseos_avatar', selectedAvatar);
+            
+            // Update parent OS if accessible
+            if (window.parent && window.parent.document.getElementById('startMenuUsername')) {
+                window.parent.document.getElementById('startMenuUsername').textContent = username || 'User';
+                window.parent.document.getElementById('startMenuAvatar').textContent = selectedAvatar;
+            }
+            
+            // Show success message
+            const msg = document.getElementById('successMessage');
+            msg.style.display = 'block';
+            setTimeout(() => msg.style.display = 'none', 3000);
+        }
+
+
+        // ── Security section ──
+        let pinValue = '';
+        let secType = 'pin';
+
+        function updateSecStatus() {
+            const hasPin = !!localStorage.getItem('eclipseos_pin');
+            const hasPw  = !!localStorage.getItem('eclipseos_password');
+            const el = document.getElementById('currentSecStatus');
+            if (hasPin) { el.textContent = '🔢 PIN is currently set'; el.className = 'current-security'; }
+            else if (hasPw) { el.textContent = '🔐 Password is currently set'; el.className = 'current-security'; }
+            else { el.textContent = '🔓 No security set — anyone can access this account'; el.className = 'current-security none'; }
+        }
+
+        function switchSecType(type) {
+            secType = type;
+            document.getElementById('btnPin').classList.toggle('active', type === 'pin');
+            document.getElementById('btnPassword').classList.toggle('active', type === 'password');
+            document.getElementById('pinSection').style.display = type === 'pin' ? 'block' : 'none';
+            document.getElementById('passwordSection').style.display = type === 'password' ? 'block' : 'none';
+            pinValue = ''; updatePinDots();
+        }
+
+        // Build numpad
+        const numpad = document.getElementById('numpad');
+        [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k => {
+            const key = document.createElement('div');
+            key.className = 'numpad-key';
+            key.textContent = k === '' ? '' : k;
+            if (k !== '') key.onclick = () => {
+                if (k === '⌫') { pinValue = pinValue.slice(0,-1); }
+                else if (pinValue.length < 4) { pinValue += k; }
+                document.getElementById('pinError').textContent = '';
+                updatePinDots();
+            };
+            numpad.appendChild(key);
+        });
+
+        function updatePinDots() {
+            for (let i = 0; i < 4; i++) {
+                document.getElementById('pd' + i).classList.toggle('filled', i < pinValue.length);
+            }
+        }
+
+        function savePin() {
+            if (pinValue.length !== 4) { document.getElementById('pinError').textContent = 'Please enter all 4 digits.'; return; }
+            localStorage.setItem('eclipseos_pin', pinValue);
+            localStorage.removeItem('eclipseos_password');
+            pinValue = ''; updatePinDots();
+            updateSecStatus();
+            showSuccess('PIN saved successfully!');
+        }
+
+        function savePassword() {
+            const pw   = document.getElementById('newPassword').value;
+            const conf = document.getElementById('confirmPassword').value;
+            if (!pw) { document.getElementById('passError').textContent = 'Please enter a password.'; return; }
+            if (pw !== conf) { document.getElementById('passError').textContent = 'Passwords do not match.'; return; }
+            localStorage.setItem('eclipseos_password', pw);
+            localStorage.removeItem('eclipseos_pin');
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passError').textContent = '';
+            updateSecStatus();
+            showSuccess('Password saved successfully!');
+        }
+
+        function removeSecurity() {
+            if (!confirm('Remove all security? Anyone will be able to access EclipseOS without a PIN or password.')) return;
+            localStorage.removeItem('eclipseos_pin');
+            localStorage.removeItem('eclipseos_password');
+            updateSecStatus();
+            showSuccess('Security removed.');
+        }
+
+        updateSecStatus();
+
+        // Load current profile
+        const currentUsername = localStorage.getItem('eclipseos_username') || 'User';
+        document.getElementById('username').value = currentUsername;
+        document.getElementById('displayName').textContent = currentUsername;
+        document.getElementById('currentAvatar').textContent = selectedAvatar;
+        
+        renderAvatarPicker();
+    </script>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #fff; }
+        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
+        .about-header { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 40px; color: white; }
+        .about-header .logo { font-size: 80px; margin-bottom: 16px; }
+        .about-header h2 { font-size: 32px; margin-bottom: 8px; }
+        .about-header .version { font-size: 16px; opacity: 0.9; }
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
+        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .info-item { padding: 16px; background: #f9f9f9; border-radius: 8px; }
+        .info-label { font-size: 13px; color: #666; margin-bottom: 4px; }
+        .info-value { font-size: 16px; font-weight: 600; color: #333; }
+        .link-section { margin-top: 40px; text-align: center; }
+        .link-section a { color: #0078d4; text-decoration: none; margin: 0 12px; font-size: 14px; }
+        .link-section a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="about-header">
+        <div class="logo">💻</div>
+        <h2>ServerplexOS</h2>
+        <div class="version">Version 1.0 - Build 2026.03.14</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">System Information</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">OS Name</div>
+                <div class="info-value">ServerplexOS</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Version</div>
+                <div class="info-value">1.0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Build</div>
+                <div class="info-value">2026.03.14</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Browser</div>
+                <div class="info-value" id="browserInfo">Loading...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Screen Resolution</div>
+                <div class="info-value" id="resolution">Loading...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Platform</div>
+                <div class="info-value" id="platform">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Statistics</div>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Installed Apps</div>
+                <div class="info-value">18 apps</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Running Processes</div>
+                <div class="info-value" id="runningProcesses">0</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Storage Used</div>
+                <div class="info-value" id="storageUsed">Loading...</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Last Login</div>
+                <div class="info-value" id="lastLogin">Today</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">About</div>
+        <div class="info-item" style="padding: 20px;">
+            <p style="line-height: 1.8; color: #666;">
+                ServerplexOS is a web-based operating system that runs entirely in your browser. 
+                It features a complete desktop environment with window management, file storage, 
+                and a suite of productivity and entertainment applications.
+            </p>
+        </div>
+    </div>
+
+    <div class="link-section">
+        <a href="../Legal/index.html" target="_blank">📋 Legal & Terms</a>
+        <a href="../Credits/index.html" target="_blank">👥 Credits</a>
+        <a href="https://github.com" target="_blank">💻 GitHub</a>
+    </div>
+
+    <script>
+        // Browser detection
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            let browser = 'Unknown';
+            
+            if (ua.includes('Firefox')) browser = 'Firefox';
+            else if (ua.includes('Edg')) browser = 'Edge';
+            else if (ua.includes('Chrome')) browser = 'Chrome';
+            else if (ua.includes('Safari')) browser = 'Safari';
+            else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
+            
+            return browser;
+        }
+
+        // Platform detection
+        function getPlatform() {
+            const platform = navigator.platform;
+            if (platform.includes('Win')) return 'Windows';
+            if (platform.includes('Mac')) return 'macOS';
+            if (platform.includes('Linux')) return 'Linux';
+            if (platform.includes('iPhone') || platform.includes('iPad')) return 'iOS';
+            if (platform.includes('Android')) return 'Android';
+            return platform;
+        }
+
+        // Calculate storage
+        function getStorageUsed() {
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            return (totalSize / 1024).toFixed(2) + ' KB';
+        }
+
+        // Update running processes
+        function updateRunningProcesses() {
+            if (window.parent && window.parent.windows) {
+                const count = Object.keys(window.parent.windows).length;
+                document.getElementById('runningProcesses').textContent = count;
+            }
+        }
+
+        // Initialize
+        document.getElementById('browserInfo').textContent = getBrowserInfo();
+        document.getElementById('resolution').textContent = `${window.screen.width} × ${window.screen.height}`;
+        document.getElementById('platform').textContent = getPlatform();
+        document.getElementById('storageUsed').textContent = getStorageUsed();
+        
+        updateRunningProcesses();
+        setInterval(updateRunningProcesses, 2000);
+    </script>
+</body>
+</html>

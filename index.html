@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EclipseOS</title>
+    <link rel="icon" type="image/png" href="https://i.ibb.co/6JtbZdfP/Sp-Icon-newer.png">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; overflow: hidden; animation: fadeIn 0.8s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        iframe { width: 100%; height: 100%; border: none; opacity: 0; animation: fadeIn 1s ease-in 0.3s forwards; }
+
+        .popup-blocked-fullscreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; z-index: 999999; font-family: 'Oxanium', sans-serif; text-align: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; overflow-y: auto; }
+        .popup-blocked-fullscreen-inner { margin: auto; display: flex; flex-direction: column; align-items: center; width: 100%; padding: 20px 0; }
+        .popup-blocked-fullscreen.show { opacity: 1; pointer-events: all; }
+        .popup-blocked-fullscreen .icon { font-size: 3.5em; margin-bottom: 20px; }
+        .popup-blocked-fullscreen h2 { font-size: 2em; color: #f9a825; margin-bottom: 16px; font-weight: 900; }
+        .popup-blocked-fullscreen p { font-size: 1.05em; color: #ccc; margin-bottom: 24px; max-width: 480px; line-height: 1.6; }
+        .popup-blocked-fullscreen .steps { background: #1a1a2e; border-radius: 10px; padding: 20px 28px; font-size: 0.95em; color: #ddd; line-height: 2; text-align: left; white-space: pre-line; max-width: 440px; width: 100%; margin-bottom: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        .popup-blocked-fullscreen .dismiss-btn { background: #f9a825; color: #0d0d1a; border: none; padding: 12px 32px; border-radius: 8px; font-size: 1em; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+        .popup-blocked-fullscreen .dismiss-btn:hover { background: #fbc02d; transform: scale(1.05); }
+
+        .popup-blocked-banner { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(120px); background: #1a1a2e; color: white; padding: 16px 24px; border-radius: 10px; font-family: 'Oxanium', sans-serif; font-size: 0.95em; max-width: 420px; width: 90%; text-align: center; box-shadow: 0 6px 25px rgba(0,0,0,0.5); z-index: 99999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; pointer-events: none; }
+        .popup-blocked-banner.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: all; }
+        .popup-blocked-banner strong { display: block; font-size: 1.05em; margin-bottom: 8px; color: #f9a825; font-weight: 900; }
+        .popup-blocked-banner .steps { font-size: 0.88em; color: #ccc; line-height: 1.7; text-align: left; margin-top: 10px; white-space: pre-line; }
+        .popup-blocked-banner .dismiss-btn { margin-top: 14px; background: #f9a825; color: #1a1a2e; border: none; padding: 8px 20px; border-radius: 6px; font-size: 0.9em; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .popup-blocked-banner .dismiss-btn:hover { background: #fbc02d; }
+    </style>
+</head>
+<body>
+    <div class="popup-blocked-fullscreen" id="popupBlockedFullscreen">
+        <div class="popup-blocked-fullscreen-inner">
+            <div class="icon"><img src="Serverplex Guard.png" alt="EclipseOS Guard" style="width:160px;height:160px;object-fit:contain;"></div>
+            <h2>Popups &amp; Redirects Blocked</h2>
+            <p>To load EclipseOS in your browser, please allow popups &amp; redirects for this site.</p>
+            <div class="steps" id="popupStepsFull"></div>
+        </div>
+    </div>
+
+    <div class="popup-blocked-banner" id="popupBlockedBanner">
+        <strong>🚫 Popup Blocked</strong>
+        To use Quick Exit, please allow popups &amp; redirects for this site:
+        <div class="steps" id="popupSteps"></div>
+    </div>
+
+    <!-- src set by JS based on setup/security state -->
+    <iframe id="mainFrame" src=""></iframe>
+
+    <script>
+        document.getElementById('mainFrame').src = 'eclipseos.html';
+
+
+        // ── Anti-close ──
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+        });
+        const isAboutBlank = document.documentElement.dataset.cloaked === 'true';
+
+        function getPopupInstructions() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Chrome') && !ua.includes('Edg') && !ua.includes('OPR')) return '1. Click the 🔒 icon in the address bar\n2. Go to "Site settings"\n3. Set "Pop-ups and redirects" to Allow\n4. Refresh the page';
+            else if (ua.includes('Firefox')) return '1. Click the shield/lock icon in the address bar\n2. Select "Connection Secure" → "More Information"\n3. Go to Permissions and allow Pop-ups\n4. Refresh the page';
+            else if (ua.includes('Edg')) return '1. Click the 🔒 icon in the address bar\n2. Go to "Permissions for this site"\n3. Set "Pop-ups and redirects" to Allow\n4. Refresh the page';
+            else if (ua.includes('Safari')) return '1. Go to Safari → Settings for This Website\n2. Set Pop-up Windows to Allow\n3. Refresh the page';
+            else return '1. Click the lock/info icon in your address bar\n2. Find "Pop-ups and redirects" or "Permissions"\n3. Set it to Allow for this site\n4. Refresh the page';
+        }
+
+        function showBlockedNotification() {
+            const instructions = getPopupInstructions();
+            if (isAboutBlank) { document.getElementById('popupSteps').innerText = instructions; const banner = document.getElementById('popupBlockedBanner'); banner.classList.add('show'); setTimeout(() => banner.classList.remove('show'), 12000); }
+            else { document.getElementById('popupStepsFull').innerText = instructions; document.getElementById('popupBlockedFullscreen').classList.add('show'); }
+        }
+
+        function openAboutBlank() {
+            const newTab = window.open('about:blank', '_blank');
+            if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') showBlockedNotification();
+        }
+
+        (function cloakInAboutBlank() {
+            if (!isAboutBlank) {
+                const newWin = window.open('about:blank', '_blank');
+                if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') { showBlockedNotification(); }
+                else {
+                    const html = document.documentElement.outerHTML.replace('<html', '<html data-cloaked="true"');
+                    newWin.document.open(); newWin.document.write(html); newWin.document.close();
+                    window.location.replace('https://www.google.com');
+                }
+            }
+        })();
+
+        window.addEventListener('message', (e) => {
+            if (e.data.type === 'navigate') {
+                const mainIframe = document.getElementById('mainFrame');
+                if (mainIframe) mainIframe.src = e.data.path;
+            }
+        });
+    </script>
+</body>
+</html>

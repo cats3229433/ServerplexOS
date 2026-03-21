@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to EclipseOS</title>
+  <style>
+    :root {
+      --accent: #0078d4;
+      --accent2: #00b4d8;
+      --bg: #07090f;
+      --card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --text: #f0f0f0;
+      --muted: rgba(255,255,255,0.38);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Oxanium', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 160px 20px 200px;
+    }
+
+    /* ── Background ── */
+    .bg-layer {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 15% 40%, rgba(0,120,212,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 85% 70%, rgba(0,180,216,0.08) 0%, transparent 70%),
+        var(--bg);
+    }
+    .bg-grid {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,120,212,0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,120,212,0.035) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+
+    /* ── Wrapper ── */
+    .wizard {
+      position: relative; z-index: 10;
+      width: 520px;
+      max-width: calc(100vw - 40px);
+      margin: auto;
+    }
+
+    /* ── Progress bar ── */
+    .progress-track {
+      display: flex; gap: 6px; margin-bottom: 32px;
+    }
+    .progress-seg {
+      flex: 1; height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      transition: background 0.4s ease;
+      overflow: hidden;
+    }
+    .progress-seg.done { background: var(--accent); }
+    .progress-seg.active {
+      background: var(--border);
+      position: relative;
+    }
+    .progress-seg.active::after {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: var(--accent);
+      animation: fillSeg 0.5s ease forwards;
+    }
+    @keyframes fillSeg {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 44px 44px 36px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: visible;
+    }
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,180,216,0.4), transparent);
+    }
+
+    /* ── Step ── */
+    .step { display: none; }
+    .step.active {
+      display: block;
+      animation: stepIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0)  scale(1); }
+    }
+
+    .step-eyebrow {
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent2); font-weight: 500; margin-bottom: 10px;
+    }
+    .step-title {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 28px; font-weight: 800;
+      line-height: 1.15; margin-bottom: 8px;
+      background: linear-gradient(135deg, #fff 40%, rgba(0,180,216,0.7));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .step-sub {
+      font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px;
+    }
+
+    /* ── Inputs ── */
+    .field { margin-bottom: 16px; }
+    .field label {
+      display: block; font-size: 12px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 8px; font-weight: 500;
+    }
+    .field input {
+      width: 100%; padding: 13px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-family: 'Oxanium', sans-serif; font-size: 15px;
+      outline: none; transition: all 0.25s;
+    }
+    .field input:focus {
+      border-color: rgba(0,120,212,0.6);
+      background: rgba(0,120,212,0.07);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.12);
+    }
+    .field input::placeholder { color: rgba(255,255,255,0.2); }
+
+    /* ── Avatar picker ── */
+    .avatar-tabs {
+      display: flex; gap: 0; margin-bottom: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 10px; padding: 4px;
+    }
+    .avatar-tab {
+      flex: 1; padding: 9px 0; text-align: center;
+      border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.25s; color: var(--muted); letter-spacing: 0.3px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .avatar-tab:hover { color: var(--text); }
+    .avatar-tab.active { background: var(--accent); color: white; box-shadow: 0 2px 12px rgba(0,120,212,0.4); }
+    .avatar-tab-panel { display: none; }
+    .avatar-tab-panel.active { display: block; animation: stepIn 0.25s ease; }
+    .avatar-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr);
+      gap: 7px; margin-bottom: 4px;
+    }
+    .avatar-opt {
+      aspect-ratio: 1; background: rgba(255,255,255,0.04);
+      border: 2px solid transparent; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; cursor: pointer;
+      transition: all 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .avatar-opt:hover { transform: scale(1.15); background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); }
+    .avatar-opt.selected {
+      border-color: var(--accent); background: rgba(0,120,212,0.18);
+      transform: scale(1.08); box-shadow: 0 0 0 3px rgba(0,120,212,0.25);
+    }
+    .upload-zone {
+      border: 2px dashed rgba(255,255,255,0.12); border-radius: 14px;
+      padding: 32px 20px; text-align: center; cursor: pointer;
+      transition: all 0.25s; position: relative;
+      background: rgba(255,255,255,0.02);
+    }
+    .upload-zone:hover { border-color: rgba(0,120,212,0.5); background: rgba(0,120,212,0.06); }
+    .upload-zone.has-image { border-style: solid; border-color: var(--accent); padding: 0; background: transparent; }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; z-index: 2; }
+    .upload-preview { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: none; pointer-events: none; }
+    .upload-zone.has-image .upload-preview { display: block; }
+    .upload-zone.has-image .upload-placeholder { display: none; }
+    .upload-placeholder { pointer-events: none; }
+    .upload-icon { font-size: 38px; margin-bottom: 10px; line-height: 1; }
+    .upload-placeholder p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .upload-placeholder p span { color: var(--accent2); font-weight: 600; }
+    .upload-clear {
+      position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(0,0,0,0.7); border: 1px solid rgba(255,255,255,0.25);
+      color: white; font-size: 13px; font-weight: 700; cursor: pointer;
+      display: none; align-items: center; justify-content: center; z-index: 10; transition: background 0.2s;
+    }
+    .upload-zone.has-image .upload-clear { display: flex; }
+    .upload-clear:hover { background: rgba(220,40,40,0.85); }
+
+    /* ── PIN/Password toggle ── */
+    .security-toggle {
+      display: flex; gap: 8px; margin-bottom: 20px;
+    }
+    .sec-opt {
+      flex: 1; padding: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 2px solid var(--border);
+      border-radius: 10px; cursor: pointer;
+      text-align: center; transition: all 0.2s;
+    }
+    .sec-opt:hover { background: rgba(255,255,255,0.08); }
+    .sec-opt.selected {
+      border-color: var(--accent);
+      background: rgba(0,120,212,0.1);
+    }
+    .sec-opt .sec-icon { font-size: 22px; display: block; margin-bottom: 4px; }
+    .sec-opt .sec-label { font-size: 12px; font-weight: 500; letter-spacing: 0.5px; }
+    .sec-opt .sec-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* PIN dots */
+    .pin-display {
+      display: flex; justify-content: center; gap: 14px;
+      margin: 20px 0 10px;
+    }
+    .pin-dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.25);
+      transition: all 0.2s;
+    }
+    .pin-dot.filled {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 8px rgba(0,120,212,0.6);
+    }
+
+    /* PIN numpad */
+    .numpad {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; margin-top: 8px;
+    }
+    .numpad-key {
+      padding: 14px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); border-radius: 10px;
+      font-size: 18px; font-weight: 500; cursor: pointer;
+      text-align: center; transition: all 0.15s;
+      color: var(--text); font-family: 'Oxanium', sans-serif;
+    }
+    .numpad-key:hover { background: rgba(255,255,255,0.12); transform: scale(1.04); }
+    .numpad-key:active { transform: scale(0.96); }
+    .numpad-key.del { font-size: 20px; }
+
+    /* ── Theme picker ── */
+    .theme-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-bottom: 4px;
+    }
+    .theme-card {
+      border: 2px solid var(--border); border-radius: 12px;
+      overflow: hidden; cursor: pointer; transition: all 0.2s;
+    }
+    .theme-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+    .theme-card.selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.25);
+    }
+    .theme-preview { height: 64px; }
+    .theme-label {
+      text-align: center; font-size: 12px; font-weight: 600;
+      padding: 8px; letter-spacing: 0.5px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    /* skip security */
+    .skip-link {
+      text-align: center; margin-top: 12px;
+      font-size: 13px; color: var(--muted); cursor: pointer;
+      transition: color 0.2s;
+    }
+    .skip-link:hover { color: var(--text); }
+    .skip-link span { text-decoration: underline; }
+
+    /* ── Buttons ── */
+    .btn-row {
+      display: flex; gap: 10px; margin-top: 28px;
+    }
+    .btn {
+      flex: 1; padding: 14px;
+      border: none; border-radius: 10px;
+      font-family: 'Oxanium', sans-serif; font-size: 15px;
+      font-weight: 500; cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      letter-spacing: 0.3px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #005fa3);
+      color: white;
+      box-shadow: 0 4px 20px rgba(0,120,212,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(0,120,212,0.5);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); color: var(--muted);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.09); color: var(--text); }
+
+    /* ── Step 0: Welcome big ── */
+    .welcome-logo {
+      font-size: 56px; text-align: center; margin-bottom: 20px;
+      animation: logoBounce 2s ease infinite;
+    }
+    @keyframes logoBounce {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .welcome-title {
+      font-family: 'Oxanium', sans-serif; font-size: 34px;
+      font-weight: 800; text-align: center; margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff, rgba(0,180,216,0.8));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .welcome-sub {
+      text-align: center; color: var(--muted); font-size: 15px;
+      line-height: 1.6; margin-bottom: 32px;
+    }
+
+    /* ── Step 5: All done ── */
+    .done-icon {
+      font-size: 64px; text-align: center; margin-bottom: 16px;
+      animation: popIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    .summary {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px 20px;
+      margin-bottom: 4px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .summary-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 14px;
+    }
+    .summary-row .s-key { color: var(--muted); }
+    .summary-row .s-val { font-weight: 500; }
+
+    /* Error shake */
+    @keyframes shake {
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-6px)}
+      40%{transform:translateX(6px)}
+      60%{transform:translateX(-4px)}
+      80%{transform:translateX(4px)}
+    }
+    .shake { animation: shake 0.4s ease; }
+
+    .error-text {
+      font-size: 12px; color: #ff6b6b; text-align: center;
+      margin-top: 8px; min-height: 16px;
+    }
+  </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-layer"></div>
+  <div class="bg-grid"></div>
+
+  <div class="wizard">
+    <!-- Progress -->
+    <div class="progress-track" id="progressTrack">
+      <div class="progress-seg" id="seg0"></div>
+      <div class="progress-seg" id="seg1"></div>
+      <div class="progress-seg" id="seg2"></div>
+      <div class="progress-seg" id="seg3"></div>
+      <div class="progress-seg" id="seg4"></div>
+    </div>
+
+    <div class="card">
+
+      <!-- ── STEP 0: Welcome ── -->
+      <div class="step active" id="step0">
+        <div class="welcome-logo">💻</div>
+        <div class="welcome-title">Welcome to EclipseOS</div>
+        <div class="welcome-sub">Let's get you set up in just a few steps.<br>This will only take a minute.</div>
+        <button class="btn btn-primary" style="width:100%;" onclick="nextStep()">Get Started →</button>
+      </div>
+
+      <!-- ── STEP 1: Profile ── -->
+      <div class="step" id="step1" style="padding-top: 48px;">
+        <div class="step-eyebrow">Step 1 of 4</div>
+        <div class="step-title">Who are you?</div>
+        <div class="step-sub">Set your username and pick an avatar.</div>
+
+        <div class="field">
+          <label>Username</label>
+          <input type="text" id="usernameInput" placeholder="Enter your name..." maxlength="20">
+        </div>
+
+        <label class="field" style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:500;display:block;margin-bottom:10px;">Avatar</label>
+
+        <!-- Tab switcher -->
+        <div class="avatar-tabs">
+          <div class="avatar-tab active" id="tabEmoji" onclick="switchAvatarTab('emoji')">
+            <span>😀</span> Emoji
+          </div>
+          <div class="avatar-tab" id="tabUpload" onclick="switchAvatarTab('upload')">
+            <span>📷</span> Photo
+          </div>
+        </div>
+
+        <!-- Emoji panel -->
+        <div class="avatar-tab-panel active" id="panelEmoji">
+          <div class="avatar-grid" id="avatarGrid"></div>
+        </div>
+
+        <!-- Upload panel -->
+        <div class="avatar-tab-panel" id="panelUpload">
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="avatarFileInput" accept="image/*" onchange="handleAvatarUpload(event)">
+            <div class="upload-clear" onclick="clearUpload(event)">✕</div>
+            <img class="upload-preview" id="uploadPreview" src="" alt="">
+            <div class="upload-placeholder">
+              <div class="upload-icon">🖼️</div>
+              <p>Drag & drop or <span>click to browse</span><br>JPG, PNG, GIF, WEBP</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="saveProfile()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Security ── -->
+      <div class="step" id="step2">
+        <div class="step-eyebrow">Step 2 of 4</div>
+        <div class="step-title">Secure your account</div>
+        <div class="step-sub">Add a PIN or password — or skip this step.</div>
+
+        <div class="security-toggle">
+          <div class="sec-opt selected" id="optPin" onclick="selectSecType('pin')">
+            <span class="sec-icon">🔢</span>
+            <div class="sec-label">PIN</div>
+            <div class="sec-desc">4-digit code</div>
+          </div>
+          <div class="sec-opt" id="optPassword" onclick="selectSecType('password')">
+            <span class="sec-icon">🔐</span>
+            <div class="sec-label">Password</div>
+            <div class="sec-desc">Custom text</div>
+          </div>
+        </div>
+
+        <!-- PIN entry -->
+        <div id="pinSection">
+          <div class="pin-display">
+            <div class="pin-dot" id="d0"></div>
+            <div class="pin-dot" id="d1"></div>
+            <div class="pin-dot" id="d2"></div>
+            <div class="pin-dot" id="d3"></div>
+          </div>
+          <div class="error-text" id="pinError"></div>
+          <div class="numpad" id="numpad"></div>
+        </div>
+
+        <!-- Password entry -->
+        <div id="passwordSection" style="display:none;">
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="passwordInput" placeholder="Enter a password...">
+          </div>
+          <div class="field">
+            <label>Confirm Password</label>
+            <input type="password" id="passwordConfirm" placeholder="Confirm your password...">
+          </div>
+          <div class="error-text" id="passError"></div>
+        </div>
+
+        <div class="skip-link" onclick="skipSecurity()">
+          <span>Skip — no security for now</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="saveSecurity()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Theme ── -->
+      <div class="step" id="step3">
+        <div class="step-eyebrow">Step 3 of 4</div>
+        <div class="step-title">Pick your style</div>
+        <div class="step-sub">Choose a desktop theme. You can change this anytime in Settings.</div>
+
+        <div class="theme-grid">
+          <div class="theme-card selected" id="theme-white" onclick="selectTheme('white')">
+            <div class="theme-preview" style="background: linear-gradient(135deg,#f5f5f5,#e0e0e0);"></div>
+            <div class="theme-label">White</div>
+          </div>
+          <div class="theme-card" id="theme-black" onclick="selectTheme('black')">
+            <div class="theme-preview" style="background: linear-gradient(135deg,#1a1a1a,#000);"></div>
+            <div class="theme-label">Black</div>
+          </div>
+          <div class="theme-card" id="theme-grey" onclick="selectTheme('grey')">
+            <div class="theme-preview" style="background: linear-gradient(135deg,#888,#555);"></div>
+            <div class="theme-label">Grey</div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="saveTheme()">Next →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: Extra settings ── -->
+      <div class="step" id="step4">
+        <div class="step-eyebrow">Step 4 of 4</div>
+        <div class="step-title">A few more things</div>
+        <div class="step-sub">These can all be changed later in Settings.</div>
+
+        <div class="field">
+          <label>Notifications</label>
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;">
+            <span style="flex:1;font-size:14px;">Enable system notifications</span>
+            <label style="position:relative;width:44px;height:24px;display:block;cursor:pointer;">
+              <input type="checkbox" id="notifToggle" checked style="opacity:0;width:0;height:0;">
+              <span id="toggleTrack" style="position:absolute;inset:0;background:var(--accent);border-radius:12px;transition:background 0.2s;"></span>
+              <span id="toggleThumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform 0.2s;transform:translateX(20px);"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Clock format</label>
+          <div style="display:flex;gap:8px;">
+            <div class="sec-opt selected" id="fmt12" onclick="selectClockFmt('12')" style="flex:1;">
+              <div class="sec-label">12-hour</div>
+              <div class="sec-desc">e.g. 3:00 PM</div>
+            </div>
+            <div class="sec-opt" id="fmt24" onclick="selectClockFmt('24')" style="flex:1;">
+              <div class="sec-label">24-hour</div>
+              <div class="sec-desc">e.g. 15:00</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep()">← Back</button>
+          <button class="btn btn-primary" onclick="saveExtras()">Finish →</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 5: Done ── -->
+      <div class="step" id="step5">
+        <div class="done-icon">🎉</div>
+        <div class="step-title" style="text-align:center;">You're all set!</div>
+        <div class="step-sub" style="text-align:center;margin-bottom:20px;">Here's what we saved for you:</div>
+
+        <div class="summary" id="summaryBox"></div>
+
+        <div class="btn-row" style="margin-top:24px;">
+          <button class="btn btn-primary" style="font-size:16px;" onclick="launchOS()">
+            Launch EclipseOS →
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /wizard -->
+
+  <script>
+    // ── Check if already set up ──
+    if (localStorage.getItem('eclipseos_setup_complete') === 'true') {
+      window.location.replace('eclipseos.html');
+    }
+
+    // ── State ──
+    let currentStep = 0;
+    const TOTAL_STEPS = 5;
+    let selectedAvatar = '👤';
+    let avatarIsImage = false;   // true if user uploaded a photo
+    let avatarImageData = null;  // base64 data URL
+    let selectedSecType = 'pin';
+    let pinValue = '';
+    let selectedTheme = 'white';
+    let clockFmt = '12';
+
+    const avatars = ['👤','😀','😎','🤖','👨','👩','🧑','👴','👵','🧔','👨‍💼','👩‍💼','🎓','👑','🐱','🐶','🦊','🐺','🦁','🐯','🐸','🐧','🦋','🌟'];
+
+    // ── Build avatar grid ──
+    const grid = document.getElementById('avatarGrid');
+    avatars.forEach(av => {
+      const el = document.createElement('div');
+      el.className = 'avatar-opt' + (av === selectedAvatar ? ' selected' : '');
+      el.textContent = av;
+      el.onclick = () => {
+        document.querySelectorAll('.avatar-opt').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedAvatar = av;
+        avatarIsImage = false;
+        avatarImageData = null;
+      };
+      grid.appendChild(el);
+    });
+
+    // ── Avatar tab switching ──
+    function switchAvatarTab(tab) {
+      document.getElementById('tabEmoji').classList.toggle('active', tab === 'emoji');
+      document.getElementById('tabUpload').classList.toggle('active', tab === 'upload');
+      document.getElementById('panelEmoji').classList.toggle('active', tab === 'emoji');
+      document.getElementById('panelUpload').classList.toggle('active', tab === 'upload');
+    }
+
+    // ── Image upload ──
+    function handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        avatarImageData = e.target.result;
+        avatarIsImage = true;
+        selectedAvatar = null;
+        const zone = document.getElementById('uploadZone');
+        const preview = document.getElementById('uploadPreview');
+        preview.src = avatarImageData;
+        zone.classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUpload(e) {
+      e.stopPropagation();
+      avatarImageData = null;
+      avatarIsImage = false;
+      selectedAvatar = '👤';
+      document.getElementById('uploadZone').classList.remove('has-image');
+      document.getElementById('uploadPreview').src = '';
+      document.getElementById('avatarFileInput').value = '';
+      // Re-select default emoji
+      document.querySelectorAll('.avatar-opt').forEach((el, i) => {
+        el.classList.toggle('selected', i === 0);
+      });
+    }
+
+    // ── Build numpad ──
+    const numpad = document.getElementById('numpad');
+    [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(k => {
+      const key = document.createElement('div');
+      key.className = 'numpad-key' + (k === '⌫' ? ' del' : '');
+      key.textContent = k === '' ? '' : k;
+      if (k !== '') key.onclick = () => handlePin(k);
+      numpad.appendChild(key);
+    });
+
+    function handlePin(k) {
+      document.getElementById('pinError').textContent = '';
+      if (k === '⌫') {
+        pinValue = pinValue.slice(0, -1);
+      } else if (pinValue.length < 4) {
+        pinValue += k;
+      }
+      updatePinDots();
+    }
+    function updatePinDots() {
+      for (let i = 0; i < 4; i++) {
+        document.getElementById('d' + i).classList.toggle('filled', i < pinValue.length);
+      }
+    }
+
+    // ── Notification toggle ──
+    const notifCb = document.getElementById('notifToggle');
+    const toggleTrack = document.getElementById('toggleTrack');
+    const toggleThumb = document.getElementById('toggleThumb');
+    notifCb.addEventListener('change', () => {
+      toggleTrack.style.background = notifCb.checked ? 'var(--accent)' : 'rgba(255,255,255,0.15)';
+      toggleThumb.style.transform = notifCb.checked ? 'translateX(20px)' : 'translateX(0)';
+    });
+
+    // ── Progress ──
+    function updateProgress() {
+      for (let i = 0; i < TOTAL_STEPS; i++) {
+        const seg = document.getElementById('seg' + i);
+        seg.className = 'progress-seg';
+        if (i < currentStep) seg.classList.add('done');
+        else if (i === currentStep) seg.classList.add('active');
+      }
+    }
+
+    function showStep(n) {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step' + n).classList.add('active');
+      currentStep = n;
+      updateProgress();
+    }
+
+    function nextStep() { showStep(currentStep + 1); }
+    function prevStep() { showStep(currentStep - 1); }
+
+    // ── Security type ──
+    function selectSecType(type) {
+      selectedSecType = type;
+      document.getElementById('optPin').classList.toggle('selected', type === 'pin');
+      document.getElementById('optPassword').classList.toggle('selected', type === 'password');
+      document.getElementById('pinSection').style.display = type === 'pin' ? 'block' : 'none';
+      document.getElementById('passwordSection').style.display = type === 'password' ? 'block' : 'none';
+      pinValue = ''; updatePinDots();
+    }
+
+    function skipSecurity() {
+      localStorage.removeItem('eclipseos_pin');
+      localStorage.removeItem('eclipseos_password');
+      showStep(3);
+    }
+
+    // ── Theme ──
+    function selectTheme(t) {
+      selectedTheme = t;
+      document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+      document.getElementById('theme-' + t).classList.add('selected');
+    }
+
+    // ── Clock format ──
+    function selectClockFmt(f) {
+      clockFmt = f;
+      document.getElementById('fmt12').classList.toggle('selected', f === '12');
+      document.getElementById('fmt24').classList.toggle('selected', f === '24');
+    }
+
+    // ── Save steps ──
+    function saveProfile() {
+      const name = document.getElementById('usernameInput').value.trim();
+      if (!name) {
+        const inp = document.getElementById('usernameInput');
+        inp.classList.add('shake');
+        inp.style.borderColor = 'rgba(255,80,80,0.6)';
+        setTimeout(() => { inp.classList.remove('shake'); inp.style.borderColor = ''; }, 600);
+        return;
+      }
+      localStorage.setItem('eclipseos_username', name);
+      if (avatarIsImage && avatarImageData) {
+        localStorage.setItem('eclipseos_avatar', '📷');        // fallback emoji
+        localStorage.setItem('eclipseos_avatar_image', avatarImageData); // actual image
+      } else {
+        localStorage.setItem('eclipseos_avatar', selectedAvatar || '👤');
+        localStorage.removeItem('eclipseos_avatar_image');
+      }
+      nextStep();
+    }
+
+    function saveSecurity() {
+      if (selectedSecType === 'pin') {
+        if (pinValue.length !== 4) {
+          document.getElementById('pinError').textContent = 'Please enter all 4 digits.';
+          document.getElementById('numpad').classList.add('shake');
+          setTimeout(() => document.getElementById('numpad').classList.remove('shake'), 600);
+          return;
+        }
+        localStorage.setItem('eclipseos_pin', pinValue);
+        localStorage.removeItem('eclipseos_password');
+      } else {
+        const pw = document.getElementById('passwordInput').value;
+        const conf = document.getElementById('passwordConfirm').value;
+        if (!pw) { document.getElementById('passError').textContent = 'Please enter a password.'; return; }
+        if (pw !== conf) { document.getElementById('passError').textContent = 'Passwords do not match.'; return; }
+        localStorage.setItem('eclipseos_password', pw);
+        localStorage.removeItem('eclipseos_pin');
+      }
+      nextStep();
+    }
+
+    function saveTheme() {
+      localStorage.setItem('eclipseos_theme', selectedTheme);
+      localStorage.setItem('eclipseos_theme', selectedTheme); // compat with OS
+      nextStep();
+    }
+
+    function saveExtras() {
+      localStorage.setItem('eclipseos_notifications_enabled', notifCb.checked);
+      localStorage.setItem('eclipseos_clock_format', clockFmt);
+      buildSummary();
+      nextStep();
+    }
+
+    function buildSummary() {
+      const name = localStorage.getItem('eclipseos_username') || 'Unknown';
+      const av   = localStorage.getItem('eclipseos_avatar') || '👤';
+      const hasPin = !!localStorage.getItem('eclipseos_pin');
+      const hasPw  = !!localStorage.getItem('eclipseos_password');
+      const theme  = localStorage.getItem('eclipseos_theme') || 'white';
+      const notif  = localStorage.getItem('eclipseos_notifications_enabled') !== 'false';
+      const clock  = localStorage.getItem('eclipseos_clock_format') || '12';
+
+      const secLabel = hasPin ? '🔢 PIN set' : hasPw ? '🔐 Password set' : '🔓 None';
+      const avatarImg = localStorage.getItem('eclipseos_avatar_image');
+      const avatarDisplay = avatarImg
+        ? `<img src="${avatarImg}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;">`
+        : av;
+
+      document.getElementById('summaryBox').innerHTML = `
+        <div class="summary-row"><span class="s-key">Account</span><span class="s-val">${avatarDisplay} ${name}</span></div>
+        <div class="summary-row"><span class="s-key">Security</span><span class="s-val">${secLabel}</span></div>
+        <div class="summary-row"><span class="s-key">Theme</span><span class="s-val" style="text-transform:capitalize;">${theme}</span></div>
+        <div class="summary-row"><span class="s-key">Notifications</span><span class="s-val">${notif ? '✅ On' : '❌ Off'}</span></div>
+        <div class="summary-row"><span class="s-key">Clock</span><span class="s-val">${clock === '12' ? '12-hour' : '24-hour'}</span></div>
+      `;
+    }
+
+    function launchOS() {
+      localStorage.setItem('eclipseos_setup_complete', 'true');
+      sessionStorage.setItem('eclipseos_authed', 'true'); window.location.href = 'eclipseos.html';
+    }
+
+    // Init
+    updateProgress();
+  </script>
+</body>
+</html>

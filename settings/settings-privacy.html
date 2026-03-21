@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #fff; }
+        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
+        .setting-item { padding: 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 12px; }
+        .setting-label { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #333; }
+        .setting-desc { font-size: 13px; color: #666; margin-bottom: 12px; }
+        button { padding: 10px 20px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 8px; }
+        button:hover { background: #005a9e; }
+        button.danger { background: #ff3b30; }
+        button.danger:hover { background: #cc2f26; }
+        input[type="file"] { display: none; }
+        .warning { padding: 12px; background: #fff3cd; color: #856404; border-radius: 6px; margin-bottom: 12px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>🔒 Privacy & Security</h1>
+    
+    <div class="section">
+        <div class="section-title">Clear Data</div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Clear Notepad Data</div>
+            <div class="setting-desc">Delete all saved notepad text</div>
+            <button onclick="clearNotepad()">Clear Notepad</button>
+        </div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Clear To-Do List</div>
+            <div class="setting-desc">Delete all tasks from your to-do list</div>
+            <button onclick="clearTodos()">Clear Tasks</button>
+        </div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Clear Sticky Notes</div>
+            <div class="setting-desc">Delete all sticky notes</div>
+            <button onclick="clearStickyNotes()">Clear Notes</button>
+        </div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Clear Markdown</div>
+            <div class="setting-desc">Delete saved markdown content</div>
+            <button onclick="clearMarkdown()">Clear Markdown</button>
+        </div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Clear Recycle Bin</div>
+            <div class="setting-desc">Empty the recycle bin permanently</div>
+            <button onclick="clearRecycleBin()">Empty Bin</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Data Management</div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Export Settings</div>
+            <div class="setting-desc">Download all OS settings and data as JSON file</div>
+            <button onclick="exportSettings()">📥 Export Settings</button>
+        </div>
+        
+        <div class="setting-item">
+            <div class="setting-label">Import Settings</div>
+            <div class="setting-desc">Restore settings from previously exported file</div>
+            <button onclick="document.getElementById('importFile').click()">📤 Import Settings</button>
+            <input type="file" id="importFile" accept=".json" onchange="importSettings(event)">
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Danger Zone</div>
+        
+        <div class="setting-item">
+            <div class="warning">⚠️ Warning: This action cannot be undone!</div>
+            <div class="setting-label">Clear ALL OS Data</div>
+            <div class="setting-desc">Factory reset - delete all settings, apps data, and personalization</div>
+            <button class="danger" onclick="clearAllData()">🗑️ Factory Reset</button>
+        </div>
+    </div>
+
+    <script>
+        function clearNotepad() {
+            if (confirm('Clear all notepad text?')) {
+                localStorage.removeItem('serverplexos_notepad_text');
+                alert('✅ Notepad cleared');
+            }
+        }
+
+        function clearTodos() {
+            if (confirm('Clear all tasks?')) {
+                localStorage.removeItem('serverplexos_tasks');
+                alert('✅ Tasks cleared');
+            }
+        }
+
+        function clearStickyNotes() {
+            if (confirm('Clear all sticky notes?')) {
+                localStorage.removeItem('serverplexos_sticky_notes');
+                alert('✅ Sticky notes cleared');
+            }
+        }
+
+        function clearMarkdown() {
+            if (confirm('Clear markdown content?')) {
+                localStorage.removeItem('serverplexos_markdown');
+                alert('✅ Markdown cleared');
+            }
+        }
+
+        function clearRecycleBin() {
+            if (confirm('Empty recycle bin?')) {
+                localStorage.removeItem('serverplexos_recycle_bin');
+                alert('✅ Recycle bin emptied');
+            }
+        }
+
+        function exportSettings() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('serverplexos_')) {
+                    data[key] = localStorage.getItem(key);
+                }
+            }
+            
+            const exportData = {
+                exportDate: new Date().toISOString(),
+                version: '1.0',
+                data: data
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `serverplexos-settings-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ Settings exported successfully!');
+        }
+
+        function importSettings(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    
+                    if (!confirm('⚠️ Import settings?\n\nThis will replace your current OS settings. Continue?')) {
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    if (imported.data) {
+                        Object.keys(imported.data).forEach(key => {
+                            localStorage.setItem(key, imported.data[key]);
+                        });
+                    }
+                    
+                    alert('✅ Settings imported successfully!\n\nReloading OS...');
+                    event.target.value = '';
+                    
+                    if (window.parent && window.parent.location) {
+                        setTimeout(() => window.parent.location.reload(), 1000);
+                    } else {
+                        setTimeout(() => location.reload(), 1000);
+                    }
+                } catch (error) {
+                    alert('❌ Error importing settings: Invalid file format');
+                    event.target.value = '';
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (!confirm('⚠️ FACTORY RESET\n\nThis will delete ALL OS data including:\n- All app data\n- Settings and personalization\n- User profile\n- Desktop layout\n\nThis CANNOT be undone!\n\nContinue?')) {
+                return;
+            }
+            
+            if (!confirm('Are you absolutely sure? This is your last chance to cancel!')) {
+                return;
+            }
+            
+            // Clear all serverplexos data
+            const keys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('serverplexos_')) {
+                    keys.push(key);
+                }
+            }
+            
+            keys.forEach(key => localStorage.removeItem(key));
+            
+            alert('✅ Factory reset complete!\n\nReloading OS...');
+            
+            if (window.parent && window.parent.location) {
+                setTimeout(() => window.parent.location.reload(), 1000);
+            } else {
+                setTimeout(() => location.reload(), 1000);
+            }
+        }
+    </script>
+</body>
+</html>

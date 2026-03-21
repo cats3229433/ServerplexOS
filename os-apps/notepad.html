@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Consolas', 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; background: #ffffff; color: #000000; }
+        .toolbar { height: 40px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
+        .toolbar button { padding: 6px 12px; background: #fff; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 13px; transition: background 0.2s; }
+        .toolbar button:hover { background: #e0e0e0; }
+        textarea { flex: 1; width: 100%; padding: 16px; border: none; outline: none; resize: none; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button onclick="saveNote()">💾 Save</button>
+        <button onclick="clearNote()">🗑️ Clear</button>
+        <span style="margin-left: auto; font-size: 12px; color: #666;" id="status">Auto-saved</span>
+    </div>
+    <textarea id="notepad" placeholder="Start typing..."></textarea>
+
+    <script>
+        const notepad = document.getElementById('notepad');
+        const status = document.getElementById('status');
+        
+        // Load saved text
+        notepad.value = localStorage.getItem('serverplexos_notepad_text') || '';
+        
+        // Auto-save on input
+        notepad.addEventListener('input', () => {
+            localStorage.setItem('serverplexos_notepad_text', notepad.value);
+            status.textContent = 'Auto-saved';
+        });
+        
+        function saveNote() {
+            localStorage.setItem('serverplexos_notepad_text', notepad.value);
+            status.textContent = 'Saved!';
+            setTimeout(() => status.textContent = 'Auto-saved', 2000);
+        }
+        
+        function clearNote() {
+            if (confirm('Clear all text?')) {
+                notepad.value = '';
+                localStorage.setItem('serverplexos_notepad_text', '');
+                status.textContent = 'Cleared';
+            }
+        }
+    </script>
+</body>
+</html>

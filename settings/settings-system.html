@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #fff; }
+        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
+        .setting-item { padding: 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 12px; }
+        .setting-label { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #333; }
+        .setting-desc { font-size: 13px; color: #666; margin-bottom: 12px; }
+        button { padding: 10px 20px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #005a9e; }
+        .storage-bar { width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .storage-fill { height: 100%; background: #0078d4; transition: width 0.3s; }
+        .storage-text { font-size: 13px; color: #666; }
+        select { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>💻 System</h1>
+    
+    <div class="section">
+        <div class="section-title">Display</div>
+        <div class="setting-item">
+            <div class="setting-label">Screen Resolution</div>
+            <div class="setting-desc">Current: <span id="resolution">Loading...</span></div>
+            <button onclick="goFullscreen()">Enter Fullscreen</button>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Storage</div>
+        <div class="setting-item">
+            <div class="setting-label">Local Storage Usage</div>
+            <div class="storage-bar">
+                <div class="storage-fill" id="storageFill"></div>
+            </div>
+            <div class="storage-text" id="storageText">Loading...</div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Notifications</div>
+        <div class="setting-item">
+            <div class="setting-label">System Notifications</div>
+            <div class="setting-desc">Enable notifications from apps</div>
+            <label><input type="checkbox" id="notifToggle" checked onchange="toggleNotifications()"> Enabled</label>
+        </div>
+    </div>
+
+    <script>
+        // Display info
+        document.getElementById('resolution').textContent = `${window.screen.width} × ${window.screen.height}`;
+
+        function goFullscreen() {
+            if (window.parent && window.parent.document.documentElement.requestFullscreen) {
+                window.parent.document.documentElement.requestFullscreen();
+            }
+        }
+
+        // Storage usage
+        function updateStorage() {
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            const totalKB = (totalSize / 1024).toFixed(2);
+            const maxKB = 5120; // 5MB limit
+            const percentage = (totalKB / maxKB) * 100;
+            
+            document.getElementById('storageFill').style.width = percentage + '%';
+            document.getElementById('storageText').textContent = `${totalKB} KB used of ~${maxKB} KB`;
+        }
+
+        function toggleNotifications() {
+            const enabled = document.getElementById('notifToggle').checked;
+            localStorage.setItem('serverplexos_notifications_enabled', enabled);
+        }
+
+        // Load notification setting
+        const notifEnabled = localStorage.getItem('serverplexos_notifications_enabled') !== 'false';
+        document.getElementById('notifToggle').checked = notifEnabled;
+
+        updateStorage();
+    </script>
+</body>
+</html>

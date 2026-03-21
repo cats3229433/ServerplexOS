@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Clock</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f5f5f5; height: 100vh; }
+        .tabs { display: flex; background: #fff; border-bottom: 2px solid #ddd; }
+        .tab { flex: 1; padding: 16px; text-align: center; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+        .tab:hover { background: #f0f0f0; }
+        .tab.active { background: #0078d4; color: white; }
+        .tab-content { display: none; padding: 40px; text-align: center; }
+        .tab-content.active { display: block; }
+        .clock-display { font-size: 64px; font-weight: 700; margin-bottom: 20px; color: #333; font-family: 'Courier New', monospace; }
+        button { padding: 12px 24px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin: 8px; }
+        button:hover { background: #005a9e; }
+        button.stop { background: #ff3b30; }
+        input { padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; margin: 8px; width: 80px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('clock')">🕐 Clock</div>
+        <div class="tab" onclick="showTab('timer')">⏲️ Timer</div>
+        <div class="tab" onclick="showTab('stopwatch')">⏱️ Stopwatch</div>
+        <div class="tab" onclick="showTab('alarm')">⏰ Alarm</div>
+    </div>
+
+    <div id="clock" class="tab-content active">
+        <div class="clock-display" id="currentTime">12:00:00</div>
+        <div style="font-size: 24px; color: #666;" id="currentDate">Loading...</div>
+    </div>
+
+    <div id="timer" class="tab-content">
+        <div class="clock-display" id="timerDisplay">00:00:00</div>
+        <div>
+            <input type="number" id="timerHours" placeholder="HH" min="0" max="23" value="0">
+            <input type="number" id="timerMinutes" placeholder="MM" min="0" max="59" value="5">
+            <input type="number" id="timerSeconds" placeholder="SS" min="0" max="59" value="0">
+        </div>
+        <button onclick="startTimer()">▶️ Start</button>
+        <button class="stop" onclick="stopTimer()">⏹️ Stop</button>
+        <button onclick="resetTimer()">🔄 Reset</button>
+    </div>
+
+    <div id="stopwatch" class="tab-content">
+        <div class="clock-display" id="stopwatchDisplay">00:00:00</div>
+        <button onclick="startStopwatch()">▶️ Start</button>
+        <button class="stop" onclick="stopStopwatch()">⏸️ Pause</button>
+        <button onclick="resetStopwatch()">🔄 Reset</button>
+    </div>
+
+    <div id="alarm" class="tab-content">
+        <div class="clock-display" id="alarmDisplay">--:--</div>
+        <div>
+            <input type="time" id="alarmTime" style="width: 200px;">
+        </div>
+        <button onclick="setAlarm()">⏰ Set Alarm</button>
+        <button class="stop" onclick="clearAlarm()">✕ Clear</button>
+    </div>
+
+    <script>
+        let timerInterval, stopwatchInterval, alarmInterval;
+        let timerSeconds = 0, stopwatchSeconds = 0, alarmTime = null;
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab).classList.add('active');
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-US', { hour12: false });
+            const date = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('currentTime').textContent = time;
+            document.getElementById('currentDate').textContent = date;
+        }
+
+        function formatTime(seconds) {
+            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function startTimer() {
+            stopTimer();
+            const h = parseInt(document.getElementById('timerHours').value) || 0;
+            const m = parseInt(document.getElementById('timerMinutes').value) || 0;
+            const s = parseInt(document.getElementById('timerSeconds').value) || 0;
+            timerSeconds = h * 3600 + m * 60 + s;
+            if (timerSeconds > 0) {
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+                    if (timerSeconds <= 0) {
+                        stopTimer();
+                        alert('Timer finished!');
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function resetTimer() {
+            stopTimer();
+            timerSeconds = 0;
+            document.getElementById('timerDisplay').textContent = '00:00:00';
+        }
+
+        function startStopwatch() {
+            stopwatchInterval = setInterval(() => {
+                stopwatchSeconds++;
+                document.getElementById('stopwatchDisplay').textContent = formatTime(stopwatchSeconds);
+            }, 1000);
+        }
+
+        function stopStopwatch() {
+            clearInterval(stopwatchInterval);
+        }
+
+        function resetStopwatch() {
+            stopStopwatch();
+            stopwatchSeconds = 0;
+            document.getElementById('stopwatchDisplay').textContent = '00:00:00';
+        }
+
+        function setAlarm() {
+            const time = document.getElementById('alarmTime').value;
+            if (time) {
+                alarmTime = time;
+                document.getElementById('alarmDisplay').textContent = time;
+                alert('Alarm set for ' + time);
+                checkAlarm();
+            }
+        }
+
+        function checkAlarm() {
+            alarmInterval = setInterval(() => {
+                if (alarmTime) {
+                    const now = new Date().toTimeString().slice(0, 5);
+                    if (now === alarmTime) {
+                        alert('⏰ ALARM! ' + alarmTime);
+                        clearAlarm();
+                    }
+                }
+            }, 1000);
+        }
+
+        function clearAlarm() {
+            clearInterval(alarmInterval);
+            alarmTime = null;
+            document.getElementById('alarmDisplay').textContent = '--:--';
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    </script>
+</body>
+</html>

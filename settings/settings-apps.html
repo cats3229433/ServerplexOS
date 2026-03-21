@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; padding: 20px; background: #fff; }
+        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
+        .section { margin-bottom: 40px; }
+        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
+        .app-list { display: grid; gap: 12px; }
+        .app-item { padding: 16px; background: #f9f9f9; border-radius: 8px; display: flex; align-items: center; gap: 16px; }
+        .app-icon { font-size: 32px; }
+        .app-info { flex: 1; }
+        .app-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
+        .app-status { font-size: 13px; color: #666; }
+        .app-status.running { color: #34c759; }
+        button { padding: 8px 16px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #005a9e; }
+    </style>
+</head>
+<body>
+    <h1>📱 Apps</h1>
+    
+    <div class="section">
+        <div class="section-title">Installed Apps</div>
+        <div class="app-list" id="appList"></div>
+    </div>
+
+    <script>
+        const apps = {
+            browser: { name: 'Browser', icon: '🌐' },
+            games: { name: 'Games', icon: '🎮' },
+            tools: { name: 'Tools', icon: '🔧' },
+            notepad: { name: 'Notepad', icon: '📝' },
+            calculator: { name: 'Calculator', icon: '🧮' },
+            calendar: { name: 'Calendar', icon: '📅' },
+            terminal: { name: 'Terminal', icon: '💻' },
+            paint: { name: 'Paint', icon: '🎨' },
+            taskmanager: { name: 'Task Manager', icon: '📊' },
+            todolist: { name: 'To-Do List', icon: '📋' },
+            stickynotes: { name: 'Sticky Notes', icon: '📌' },
+            imageviewer: { name: 'Image Viewer', icon: '🖼️' },
+            clock: { name: 'Clock', icon: '⏰' },
+            recyclebin: { name: 'Recycle Bin', icon: '🗑️' },
+            search: { name: 'Search', icon: '🔍' },
+            musicplayer: { name: 'Music Player', icon: '🎵' },
+            markdowneditor: { name: 'Markdown Editor', icon: '📄' },
+            notifications: { name: 'Notifications', icon: '🔔' },
+            settings: { name: 'Settings', icon: '⚙️' }
+        };
+
+        function render() {
+            const list = document.getElementById('appList');
+            let html = '';
+            
+            Object.keys(apps).forEach(appId => {
+                const app = apps[appId];
+                const isRunning = window.parent && window.parent.windows && window.parent.windows[appId];
+                
+                html += `
+                    <div class="app-item">
+                        <div class="app-icon">${app.icon}</div>
+                        <div class="app-info">
+                            <div class="app-name">${app.name}</div>
+                            <div class="app-status ${isRunning ? 'running' : ''}">
+                                ${isRunning ? '● Running' : 'Not running'}
+                            </div>
+                        </div>
+                        <button onclick="launchApp('${appId}')">
+                            ${isRunning ? 'Open' : 'Launch'}
+                        </button>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        }
+
+        function launchApp(appId) {
+            if (window.parent && window.parent.openApp) {
+                window.parent.openApp(appId);
+            }
+        }
+
+        render();
+        setInterval(render, 2000); // Update running status every 2 seconds
+    </script>
+</body>
+</html>

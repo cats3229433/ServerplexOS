@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EclipseOS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Oxanium', sans-serif;
+      background: #000;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== BOOT SCREEN ===== */
+    #bootScreen {
+      position: fixed; inset: 0;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 32px;
+      z-index: 100;
+      transition: opacity 0.8s ease;
+    }
+    #bootScreen.fade-out { opacity: 0; pointer-events: none; }
+
+    .boot-logo {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      color: #fff;
+      text-transform: uppercase;
+      animation: logoReveal 1s ease forwards;
+      opacity: 0;
+    }
+    @keyframes logoReveal {
+      0% { opacity: 0; letter-spacing: 20px; }
+      100% { opacity: 1; letter-spacing: 8px; }
+    }
+
+    .boot-icon {
+      font-size: 80px;
+      animation: iconPulse 2s ease infinite;
+    }
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(0,120,212,0.5)); }
+      50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(0,120,212,0.9)); }
+    }
+
+    .boot-progress-container {
+      width: 300px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .boot-status {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 2px;
+      text-align: center;
+      text-transform: uppercase;
+      font-family: 'Oxanium', sans-serif;
+      min-height: 16px;
+    }
+    .boot-bar-track {
+      width: 100%; height: 3px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .boot-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0078d4, #00b4d8);
+      width: 0%;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px rgba(0,120,212,0.8);
+    }
+
+    /* ===== LOGIN SCREEN ===== */
+    #loginScreen {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse at 30% 20%, #0d1b2a 0%, #000 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    #loginScreen.visible { opacity: 1; pointer-events: all; }
+
+    /* Animated grid background */
+    .grid-bg {
+      position: absolute; inset: 0;
+      background-image: 
+        linear-gradient(rgba(0,120,212,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,120,212,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(60px); }
+    }
+
+    /* Glow orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+    .orb-1 { width: 400px; height: 400px; background: #0078d4; top: -100px; left: -100px; animation-delay: 0s; }
+    .orb-2 { width: 300px; height: 300px; background: #764ba2; bottom: -50px; right: -50px; animation-delay: -4s; }
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, 20px); }
+    }
+
+    .login-card {
+      position: relative; z-index: 10;
+      width: 420px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 48px 40px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+      animation: cardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    @keyframes cardIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-avatar {
+      width: 80px; height: 80px;
+      background: linear-gradient(135deg, #0078d4, #764ba2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 32px rgba(0,120,212,0.4);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .login-avatar:hover { transform: scale(1.05) rotate(5deg); }
+
+    .login-username {
+      text-align: center;
+      font-family: 'Oxanium', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+    .login-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 14px 48px 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Oxanium', sans-serif;
+      font-size: 16px;
+      letter-spacing: 1px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+    .input-group input::placeholder { color: rgba(255,255,255,0.3); }
+    .input-group input:focus {
+      border-color: rgba(0,120,212,0.6);
+      background: rgba(0,120,212,0.08);
+      box-shadow: 0 0 0 3px rgba(0,120,212,0.15);
+    }
+    .input-icon {
+      position: absolute; right: 16px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px; opacity: 0.4;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .input-icon:hover { opacity: 0.8; }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #0078d4, #0056a8);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Oxanium', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 20px rgba(0,120,212,0.3);
+    }
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,120,212,0.5);
+      background: linear-gradient(135deg, #0090ff, #0078d4);
+    }
+    .login-btn:active { transform: translateY(0); }
+
+    .login-hint {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 1px;
+    }
+    .login-hint span { color: rgba(0,180,216,0.6); cursor: pointer; }
+    .login-hint span:hover { color: rgba(0,180,216,0.9); }
+
+    .error-msg {
+      color: #ff6b6b;
+      font-size: 13px;
+      text-align: center;
+      margin-top: 12px;
+      min-height: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== LAUNCHING OVERLAY ===== */
+    #launchOverlay {
+      position: fixed; inset: 0;
+      background: #000;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 24px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+      transition: opacity 0.4s ease;
+    }
+    #launchOverlay.visible { opacity: 1; pointer-events: all; }
+    .launch-text {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 14px;
+      letter-spacing: 6px;
+      color: rgba(255,255,255,0.6);
+      text-transform: uppercase;
+      animation: textBlink 1s ease infinite;
+    }
+    @keyframes textBlink {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .launch-dots { display: flex; gap: 8px; }
+    .launch-dots span {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #0078d4;
+      animation: dotPulse 1.2s ease-in-out infinite;
+    }
+    .launch-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .launch-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(0.6); opacity: 0.4; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* Clock on login screen */
+    .login-clock {
+      position: absolute;
+      top: 40px; left: 50%; transform: translateX(-50%);
+      text-align: center;
+      z-index: 10;
+    }
+    .clock-time {
+      font-family: 'Oxanium', sans-serif;
+      font-size: 52px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.9);
+      text-shadow: 0 0 40px rgba(0,120,212,0.4);
+    }
+    .clock-date {
+      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+  </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- BOOT SCREEN -->
+  <div id="bootScreen">
+    <div class="boot-icon">💻</div>
+    <div class="boot-logo">EclipseOS</div>
+    <div class="boot-progress-container">
+      <div class="boot-status" id="bootStatus">Initializing...</div>
+      <div class="boot-bar-track">
+        <div class="boot-bar-fill" id="bootBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <div class="grid-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="login-clock">
+      <div class="clock-time" id="loginTime">00:00</div>
+      <div class="clock-date" id="loginDate">Loading...</div>
+    </div>
+
+    <div class="login-card" id="loginCard">
+      <div class="login-avatar" id="loginAvatar">👤</div>
+      <div class="login-username" id="loginUsername">USER</div>
+      <div class="login-subtitle">EclipseOS</div>
+
+      <div class="input-group">
+        <input type="password" id="passwordInput" placeholder="Enter PIN or leave blank" autocomplete="off" />
+        <span class="input-icon" id="togglePassword">👁</span>
+      </div>
+
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign In →</button>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="login-hint">
+        No account? <span onclick="guestLogin()">Continue as Guest</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAUNCH OVERLAY -->
+  <div id="launchOverlay">
+    <div class="launch-text">Loading Desktop</div>
+    <div class="launch-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <script>
+    // ===== Load saved user info =====
+    const savedUsername = localStorage.getItem('eclipseos_username') || 'User';
+    const savedAvatar = localStorage.getItem('eclipseos_avatar') || '👤';
+    const savedPin = localStorage.getItem('eclipseos_pin') || '';
+
+    document.getElementById('loginUsername').textContent = savedUsername.toUpperCase();
+    document.getElementById('loginAvatar').textContent = savedAvatar;
+
+    // ===== Clock =====
+    function updateClock() {
+      const now = new Date();
+      const h = now.getHours().toString().padStart(2, '0');
+      const m = now.getMinutes().toString().padStart(2, '0');
+      document.getElementById('loginTime').textContent = `${h}:${m}`;
+      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('loginDate').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ===== Toggle password visibility =====
+    document.getElementById('togglePassword').onclick = () => {
+      const input = document.getElementById('passwordInput');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    };
+
+    // ===== Enter key to login =====
+    document.getElementById('passwordInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+
+    // ===== Login logic =====
+    function doLogin() {
+      const entered = document.getElementById('passwordInput').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (savedPin && entered !== savedPin) {
+        errorMsg.textContent = 'Incorrect PIN. Try again.';
+        document.getElementById('passwordInput').style.borderColor = 'rgba(255,80,80,0.6)';
+        setTimeout(() => {
+          errorMsg.textContent = '';
+          document.getElementById('passwordInput').style.borderColor = '';
+        }, 2000);
+        return;
+      }
+
+      launchOS();
+    }
+
+    function guestLogin() {
+      localStorage.setItem('eclipseos_username', 'Guest');
+      localStorage.setItem('eclipseos_avatar', '👤');
+      launchOS();
+    }
+
+    function launchOS() {
+      const overlay = document.getElementById('launchOverlay');
+      overlay.classList.add('visible');
+      setTimeout(() => {
+        sessionStorage.setItem('eclipseos_authed', 'true'); window.location.href = 'eclipseos.html';
+      }, 1200);
+    }
+
+    // ===== Boot sequence =====
+    const bootSteps = [
+      { pct: 15, msg: 'Loading kernel...' },
+      { pct: 30, msg: 'Initializing hardware...' },
+      { pct: 50, msg: 'Loading system files...' },
+      { pct: 65, msg: 'Starting services...' },
+      { pct: 80, msg: 'Loading desktop environment...' },
+      { pct: 95, msg: 'Finalizing...' },
+      { pct: 100, msg: 'Welcome.' },
+    ];
+
+    const bootBar = document.getElementById('bootBar');
+    const bootStatus = document.getElementById('bootStatus');
+
+    let stepIndex = 0;
+    function runBootStep() {
+      if (stepIndex >= bootSteps.length) {
+        setTimeout(showLoginScreen, 600);
+        return;
+      }
+      const step = bootSteps[stepIndex++];
+      bootBar.style.width = step.pct + '%';
+      bootStatus.textContent = step.msg;
+      const delay = stepIndex === bootSteps.length ? 800 : 350 + Math.random() * 200;
+      setTimeout(runBootStep, delay);
+    }
+
+    function showLoginScreen() {
+      const bootScreen = document.getElementById('bootScreen');
+      const loginScreen = document.getElementById('loginScreen');
+      bootScreen.classList.add('fade-out');
+      setTimeout(() => {
+        bootScreen.style.display = 'none';
+        loginScreen.classList.add('visible');
+        // Animate card in
+        document.getElementById('loginCard').style.animationPlayState = 'running';
+        document.getElementById('passwordInput').focus();
+      }, 800);
+    }
+
+    // Start boot after a brief pause
+    setTimeout(runBootStep, 500);
+  </script>
+</body>
+</html>

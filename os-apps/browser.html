@@ -422,9 +422,7 @@
       // Wire up after insert
       document.getElementById('ntpInput').onkeydown = e => { if (e.key === 'Enter') navigate(e.target.value.trim()); };
       document.getElementById('ntpGo').onclick = () => navigate(document.getElementById('ntpInput').value.trim());
-      document.getElementById('proxySelect').onchange = function() { changeProxy(this.value); };
-      const saveBtn = document.getElementById('proxyEndpointSave');
-      if (saveBtn) saveBtn.onclick = saveProxyEndpoint;
+      document.getElementById('ntpEngineBtn').onclick = () => openSettings();
       setTimeout(() => { const i = document.getElementById('ntpInput'); if (i) i.focus(); }, 50);
 
       updateNavBtns();
@@ -444,61 +442,20 @@
       cors: []
     };
 
-    function changeProxy(mode) {
-      localStorage.setItem('eclipseos_proxy_mode', mode);
-      const ep  = document.getElementById('proxyEndpoint');
-      const inp = document.getElementById('proxyEndpointInput');
-      const sel = document.getElementById('proxyPreset');
-      if (!ep || !inp) return;
-      ep.classList.toggle('show', mode !== 'cors');
-      if (mode === 'cors') return;
 
-      // Populate presets
-      const saved = mode === 'uv'
-        ? localStorage.getItem('eclipseos_uv_base') || ''
-        : localStorage.getItem('eclipseos_sj_base') || '';
-
-      sel.innerHTML = '<option value="" style="background:#1a1a2e;">— Select a relay —</option>';
-      PRESETS[mode].forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.value;
-        opt.textContent = p.label;
-        opt.style.background = '#1a1a2e';
-        sel.appendChild(opt);
-      });
-
-      // Select matching preset if saved value matches
-      const match = PRESETS[mode].find(p => p.value === saved);
-      sel.value = match ? saved : (saved ? '__custom__' : '');
-      inp.value = saved;
-      inp.style.display = (!saved || match) && saved ? 'none' : 'block';
-      if (!saved) inp.style.display = 'none';
-
-      inp.placeholder = mode === 'uv' ? 'https://your-server.com/uv/q%s' : 'https://your-server.com/sj/?';
-
-      sel.onchange = function() {
-        if (this.value === '__custom__') {
-          inp.style.display = 'block';
-          inp.value = '';
-          inp.focus();
-        } else if (this.value) {
-          inp.style.display = 'none';
-          inp.value = this.value;
-          // Auto-save preset selection
-          if (mode === 'uv') localStorage.setItem('eclipseos_uv_base', this.value);
-          if (mode === 'sj') localStorage.setItem('eclipseos_sj_base', this.value);
-        } else {
-          inp.style.display = 'none';
-          inp.value = '';
-        }
-      };
-    }
-
-    function saveProxyEndpoint() {
-      const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
-      const val = (document.getElementById('proxyEndpointInput')?.value || '').trim();
-      if (mode === 'uv') localStorage.setItem('eclipseos_uv_base', val);
-      if (mode === 'sj') localStorage.setItem('eclipseos_sj_base', val);
+    function openSettings() {
+      closeAllDropdowns();
+      const t = activeTab();
+      if (t) { if (t.iframe) t.iframe.remove(); t.iframe = null; }
+      const iframe = document.createElement('iframe');
+      iframe.src = 'browser/settings.html#proxy';
+      iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;inset:0;';
+      iframe.onload = () => iframe.classList.add('loaded');
+      iframeWrap.innerHTML = '';
+      iframeWrap.appendChild(iframe);
+      if (t) { t.iframe = iframe; t.url = 'browser/settings.html'; t.title = 'Settings'; }
+      urlInput.value = 'browser/settings.html';
+      updateNavBtns(); renderTabs();
     }
 
     // ── Navigate ──
@@ -511,15 +468,15 @@
     function proxyUrl(url) {
       const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
       const applyBase = (base, u) => base.includes('%s') ? base.replace('%s', encodeURIComponent(u)) : base + encodeURIComponent(u);
-      if (mode === 'uv') {
-        const base = localStorage.getItem('eclipseos_uv_base') || '';
-        if (base) return applyBase(base, url);
-      }
-      if (mode === 'sj') {
-        const base = localStorage.getItem('eclipseos_sj_base') || '';
-        if (base) return applyBase(base, url);
-      }
       if (mode === 'direct') return url;
+
+      // For all relay-based engines, look up their saved base URL
+      const engineKeys = { uv: 'eclipseos_uv_base', sj: 'eclipseos_sj_base', rh: 'eclipseos_rh_base', nebula: 'eclipseos_nebula_base', palladium: 'eclipseos_palladium_base', corrosion: 'eclipseos_corrosion_base' };
+      if (engineKeys[mode]) {
+        const base = localStorage.getItem(engineKeys[mode]) || localStorage.getItem('eclipseos_' + mode + '_base') || '';
+        if (base) return applyBase(base, url);
+      }
+
       // cors (Standard) — use saved relay or fall back to corsproxy.io
       const corsBase = localStorage.getItem('eclipseos_cors_base') || 'https://corsproxy.io/?%s';
       return applyBase(corsBase, url);

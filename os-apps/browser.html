@@ -124,11 +124,14 @@
 
     /* Dropdowns */
     .dropdown {
-      position: absolute; top: 100%; background: #fff;
-      border: 1px solid #ddd; border-radius: 8px; z-index: 9999;
-      display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.15); min-width: 200px;
+      position: fixed; background: #fff;
+      border: 1px solid #ddd; border-radius: 8px; z-index: 99999;
+      display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.2); min-width: 200px;
+      max-height: 360px; overflow-y: auto;
     }
     .dropdown.open { display: block; }
+    #menuDropdown { right: 12px; min-width: 220px; }
+    #bookmarksDropdown, #historyDropdown { left: 12px; right: 12px; }
     .dd-item {
       padding: 10px 14px; cursor: pointer; display: flex;
       align-items: center; gap: 10px; font-size: 13px; color: #333;
@@ -251,9 +254,9 @@
         <input class="url-input" id="urlInput" type="text" placeholder="Enter URL or search...">
       </div>
 
-      <div class="menu-btn" id="menuBtn" style="position:relative;">
+      <div class="menu-btn" id="menuBtn">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-        <div class="dropdown" id="menuDropdown" style="right:0;top:36px;width:220px;">
+        <div class="dropdown" id="menuDropdown">
           <div class="dd-item" id="ddBookmark"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>Bookmark this page</div>
           <div class="dd-item" id="ddBookmarks"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>Show bookmarks</div>
           <div class="dd-item" id="ddHistory"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>History</div>
@@ -264,10 +267,11 @@
 
     <div class="loading-bar" id="loadingBar"></div>
 
-    <!-- Bookmarks / history dropdowns -->
-    <div class="dropdown" id="bookmarksDropdown" style="left:12px;right:12px;top:auto;"></div>
-    <div class="dropdown" id="historyDropdown" style="left:12px;right:12px;top:auto;"></div>
   </div>
+
+  <!-- Dropdowns — outside header so they overlay content -->
+  <div class="dropdown" id="bookmarksDropdown"></div>
+  <div class="dropdown" id="historyDropdown"></div>
 
   <!-- Bookmarks bar -->
   <div class="bookmarks-bar" id="bookmarksBar">
@@ -465,6 +469,55 @@
       loadUrl(url);
     }
 
+    // ── Content filter ──
+    let blocklist = null;
+
+    async function loadBlocklist() {
+      try {
+        const r = await fetch('browser/blocklist.json');
+        blocklist = await r.json();
+      } catch(e) {
+        // Fallback minimal list if file not found
+        blocklist = {
+          blockedKeywords: ["porn","xxx","adult","nsfw","gore","gambling","casino"],
+          blockedDomains:  ["pornhub.com","xvideos.com","xnxx.com"],
+          warningMessage:  "This content has been blocked by the content filter."
+        };
+      }
+    }
+
+    function isUrlBlocked(url) {
+      if (!blocklist) return { blocked: false };
+      try {
+        const fullUrl = url.toLowerCase();
+        const hostname = new URL(url.startsWith('http') ? url : 'https://' + url)
+          .hostname.toLowerCase().replace('www.', '');
+
+        // Check blocked domains
+        for (const domain of blocklist.blockedDomains) {
+          if (hostname === domain || hostname.endsWith('.' + domain)) {
+            return { blocked: true, reason: 'Blocked site: ' + domain };
+          }
+        }
+        // Check blocked keywords
+        for (const kw of blocklist.blockedKeywords) {
+          if (fullUrl.includes(kw.toLowerCase())) {
+            return { blocked: true, reason: 'Blocked keyword: ' + kw };
+          }
+        }
+        return { blocked: false };
+      } catch(e) { return { blocked: false }; }
+    }
+
+    function showBlockedPage(reason) {
+      iframeWrap.innerHTML = `<div style="position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:white;font-family:'Oxanium',sans-serif;text-align:center;padding:40px;">
+        <div style="font-size:52px;">🚫</div>
+        <h2 style="font-size:20px;">Content Blocked</h2>
+        <p style="font-size:13px;color:rgba(255,255,255,0.5);max-width:380px;line-height:1.6;">${blocklist?.warningMessage || 'This content has been blocked.'}</p>
+        <p style="font-size:11px;color:rgba(255,255,255,0.25);">${reason}</p>
+      </div>`;
+    }
+
     function proxyUrl(url) {
       const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
       const applyBase = (base, u) => base.includes('%s') ? base.replace('%s', encodeURIComponent(u)) : base + encodeURIComponent(u);
@@ -482,9 +535,40 @@
       return applyBase(corsBase, url);
     }
 
+    // Engines that use service workers — must open in new tab
+    const SW_ENGINES = ['uv', 'sj', 'rh', 'stomp', 'womginx', 'incognito'];
+
     function loadUrl(url, addHistory = true) {
       const t = activeTab();
       if (!t) return;
+
+      const isLocal = !url.startsWith('http://') && !url.startsWith('https://');
+      const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
+
+      // Check blocklist
+      if (!isLocal) {
+        const check = isUrlBlocked(url);
+        if (check.blocked) { showBlockedPage(check.reason); urlInput.value = url; return; }
+      }
+
+      // Service worker engines can't run inside iframes — open in new tab instead
+      if (!isLocal && SW_ENGINES.includes(mode)) {
+        const base = localStorage.getItem('eclipseos_' + mode + '_base') || '';
+        if (base) {
+          const proxied = base.includes('%s') ? base.replace('%s', encodeURIComponent(url)) : base + encodeURIComponent(url);
+          window.open(proxied, '_blank');
+          return;
+        } else {
+          // No relay set — prompt user to set one
+          iframeWrap.innerHTML = `<div style="position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:white;font-family:'Oxanium',sans-serif;text-align:center;padding:40px;">
+            <div style="font-size:48px;">⚠️</div>
+            <h2 style="font-size:18px;">No relay configured</h2>
+            <p style="font-size:13px;color:rgba(255,255,255,0.5);max-width:360px;line-height:1.6;">The <strong>${mode}</strong> engine requires a relay server. Please configure one in browser settings.</p>
+            <button onclick="openSettings()" style="padding:10px 20px;background:#0078d4;border:none;border-radius:8px;color:white;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">⚙️ Open Settings</button>
+          </div>`;
+          return;
+        }
+      }
 
       // Start loading animation
       loadingBar.classList.add('active');
@@ -493,8 +577,6 @@
       if (t.iframe) t.iframe.remove();
 
       const iframe = document.createElement('iframe');
-      // Don't proxy local .html files
-      const isLocal = !url.startsWith('http://') && !url.startsWith('https://');
       iframe.src = isLocal ? url : proxyUrl(url);
       iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;inset:0;';
       iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals allow-presentation');
@@ -544,8 +626,16 @@
       alert('Bookmark added!');
     }
 
+    function positionDropdown(el) {
+      const headerBottom = document.getElementById('header').getBoundingClientRect().bottom;
+      const bkBar = document.getElementById('bookmarksBar');
+      const extra = bkBar ? bkBar.offsetHeight : 0;
+      el.style.top = (headerBottom + extra + 2) + 'px';
+    }
+
     function showBookmarksDD() {
       closeAllDropdowns();
+      positionDropdown(bmDD);
       const bm = getBookmarks();
       bmDD.innerHTML = bm.length === 0
         ? '<div class="dd-item" style="color:#aaa;pointer-events:none;">No bookmarks yet</div>'
@@ -565,6 +655,7 @@
 
     function showHistoryDD() {
       closeAllDropdowns();
+      positionDropdown(histDD);
       histDD.innerHTML = globalHistory.length === 0
         ? '<div class="dd-item" style="color:#aaa;pointer-events:none;">No history yet</div>'
         : globalHistory.map(h => `<div class="dd-item" data-url="${h.url}">
@@ -608,7 +699,12 @@
       e.stopPropagation();
       const open = menuDD.classList.contains('open');
       closeAllDropdowns();
-      if (!open) menuDD.classList.add('open');
+      if (!open) {
+        const rect = menuBtn.getBoundingClientRect();
+        menuDD.style.top  = (rect.bottom + 4) + 'px';
+        menuDD.style.right = (window.innerWidth - rect.right) + 'px';
+        menuDD.classList.add('open');
+      }
     };
 
     document.getElementById('ddBookmark').onclick  = () => { addBookmark(); closeAllDropdowns(); };

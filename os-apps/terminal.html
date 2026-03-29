@@ -1,161 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Consolas', 'Courier New', monospace; background: #000; color: #0f0; height: 100vh; overflow: hidden; }
-        .terminal { padding: 20px; height: 100%; display: flex; flex-direction: column; }
-        .output { flex: 1; overflow-y: auto; margin-bottom: 10px; }
-        .output-line { margin-bottom: 4px; white-space: pre-wrap; word-wrap: break-word; }
-        .prompt { color: #0f0; }
-        .input-line { display: flex; align-items: center; }
-        .input-line span { margin-right: 8px; color: #0f0; }
-        .input-line input { flex: 1; background: transparent; border: none; outline: none; color: #0f0; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; }
-    </style>
+<meta charset="UTF-8"><title>Terminal</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Courier New',monospace;background:#0d1117;color:#3fb950;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.term-header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.term-title{font-family:'Oxanium',sans-serif;font-size:13px;color:#8b949e;flex:1}
+.term-btns{display:flex;gap:6px}
+.term-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:4px;color:#8b949e;padding:4px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
+.term-btn:hover{background:rgba(255,255,255,0.12);color:#e6edf3}
+.output{flex:1;overflow-y:auto;padding:14px 18px;line-height:1.65;font-size:14px}
+.line{margin-bottom:2px;word-break:break-all;white-space:pre-wrap}
+.line-prompt{color:#8b949e}
+.line-cmd{color:#e6edf3}
+.line-out{color:#3fb950}
+.line-err{color:#f85149}
+.line-warn{color:#e3b341}
+.line-info{color:#58a6ff}
+.line-success{color:#3fb950}
+.line-title{color:#d2a8ff;font-weight:bold}
+.line-muted{color:#8b949e}
+.input-line{display:flex;align-items:center;padding:8px 18px 14px;flex-shrink:0;border-top:1px solid rgba(255,255,255,0.06)}
+.prompt-label{color:#58a6ff;font-size:14px;flex-shrink:0;user-select:none}
+.cmd-input{flex:1;background:transparent;border:none;outline:none;color:#e6edf3;font-family:'Courier New',monospace;font-size:14px;margin-left:8px;caret-color:#3fb950}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0d1117}
+::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px}
+</style>
 </head>
 <body>
-    <div class="terminal">
-        <div class="output" id="output">
-            <div class="output-line">ServerplexOS Terminal v1.0</div>
-            <div class="output-line">Type 'help' for available commands</div>
-            <div class="output-line"></div>
-        </div>
-        <div class="input-line">
-            <span class="prompt">$</span>
-            <input type="text" id="input" autofocus>
-        </div>
-    </div>
+<div class="term-header">
+  <div class="term-title">EclipseOS Terminal — bash</div>
+  <div class="term-btns">
+    <button class="term-btn" onclick="clearTerm()">Clear</button>
+    <button class="term-btn" onclick="copyOutput()">Copy</button>
+  </div>
+</div>
+<div class="output" id="output"></div>
+<div class="input-line">
+  <span class="prompt-label" id="promptLabel">user@eclipseos:~$</span>
+  <input class="cmd-input" id="cmdInput" autofocus autocomplete="off" spellcheck="false">
+</div>
+<script>
+const output=document.getElementById('output');
+const input=document.getElementById('cmdInput');
+let history=[],histIdx=-1;
+let cwd='~';
+let env={USER:'user',HOME:'~',SHELL:'bash',TERM:'xterm',LANG:'en_US.UTF-8',PATH:'/usr/local/bin:/usr/bin:/bin'};
+let vars={};
 
-    <script>
-        const output = document.getElementById('output');
-        const input = document.getElementById('input');
-        const commandHistory = [];
-        let historyIndex = -1;
+const fs={
+  '~':{type:'dir',children:{documents:{type:'dir',children:{readme:{type:'file',content:'Welcome to EclipseOS!\nThis is a sample document.'},notes:{type:'file',content:'My notes here'}}},downloads:{type:'dir',children:{}},desktop:{type:'dir',children:{}}}},
+};
 
-        const commands = {
-            help: () => `Available commands:
-  help       - Show this help message
-  clear      - Clear the terminal
-  echo       - Echo text (usage: echo [text])
-  date       - Show current date and time
-  version    - Show OS version
-  calc       - Calculate expression (usage: calc [expression])
-  theme      - Change OS theme (usage: theme [white/black/grey])
-  apps       - List installed apps
-  exit       - Close terminal`,
-            
-            clear: () => {
-                output.innerHTML = '';
-                return null;
-            },
-            
-            echo: (args) => args.join(' '),
-            
-            date: () => new Date().toString(),
-            
-            version: () => 'ServerplexOS v1.0 - Build 2026.03.14',
-            
-            calc: (args) => {
-                try {
-                    const expression = args.join(' ');
-                    const result = eval(expression);
-                    return `${expression} = ${result}`;
-                } catch (error) {
-                    return `Error: Invalid expression`;
-                }
-            },
-            
-            theme: (args) => {
-                const theme = args[0];
-                if (['white', 'black', 'grey'].includes(theme)) {
-                    if (window.parent && window.parent.changeTheme) {
-                        window.parent.changeTheme(theme);
-                        return `Theme changed to: ${theme}`;
-                    } else {
-                        localStorage.setItem('serverplexos_theme', theme);
-                        return `Theme will change on next OS reload: ${theme}`;
-                    }
-                } else {
-                    return `Usage: theme [white/black/grey]`;
-                }
-            },
-            
-            apps: () => {
-                return `Installed apps:
-  Browser, Games, Tools, Notepad, Calculator
-  Calendar, Terminal, Paint, Task Manager
-  To-Do List, Sticky Notes, Image Viewer, Clock
-  Recycle Bin, Search, Music Player, Markdown Editor
-  Notifications, Settings`;
-            },
-            
-            exit: () => {
-                if (window.parent && window.parent.closeWindow) {
-                    window.parent.closeWindow('terminal');
-                }
-                return 'Closing terminal...';
-            }
-        };
+function resolvePath(p){
+  if(!p||p==='~')return'~';
+  if(p.startsWith('~/'))p='~'+p.slice(1);
+  if(!p.startsWith('~')&&!p.startsWith('/'))p=cwd+'/'+(p);
+  return p.replace(/\/+/g,'/').replace(/\/$/, '');
+}
+function getNode(path){
+  if(path==='~')return fs['~'];
+  const parts=path.split('/').filter(Boolean);
+  let node=fs['~'];
+  for(let p of parts){if(!p||p==='~')continue;if(!node||!node.children||!node.children[p])return null;node=node.children[p];}
+  return node;
+}
 
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const commandText = input.value.trim();
-                input.value = '';
-                
-                if (commandText) {
-                    commandHistory.push(commandText);
-                    historyIndex = commandHistory.length;
-                    executeCommand(commandText);
-                }
-            } else if (e.key === 'ArrowUp') {
-                e.preventDefault();
-                if (historyIndex > 0) {
-                    historyIndex--;
-                    input.value = commandHistory[historyIndex];
-                }
-            } else if (e.key === 'ArrowDown') {
-                e.preventDefault();
-                if (historyIndex < commandHistory.length - 1) {
-                    historyIndex++;
-                    input.value = commandHistory[historyIndex];
-                } else {
-                    historyIndex = commandHistory.length;
-                    input.value = '';
-                }
-            }
-        });
+const commands={
+  help:()=>{
+    print('title','EclipseOS Terminal Commands');
+    print('info','  help            Show this help');
+    print('info','  clear           Clear terminal');
+    print('info','  echo [text]     Print text');
+    print('info','  date            Show date/time');
+    print('info','  whoami          Show current user');
+    print('info','  pwd             Print working directory');
+    print('info','  ls [path]       List directory');
+    print('info','  cd [path]       Change directory');
+    print('info','  mkdir [name]    Make directory');
+    print('info','  touch [name]    Create file');
+    print('info','  cat [file]      Show file contents');
+    print('info','  rm [name]       Remove file/dir');
+    print('info','  mv [src] [dst]  Move/rename');
+    print('info','  cp [src] [dst]  Copy file');
+    print('info','  env             Show environment');
+    print('info','  export [k=v]    Set env variable');
+    print('info','  calc [expr]     Calculate expression');
+    print('info','  history         Show command history');
+    print('info','  uptime          Show uptime');
+    print('info','  version         OS version');
+    print('info','  cowsay [text]   Important');
+    print('info','  theme [name]    Change OS theme (white/black/grey)');
+    print('info','  neofetch        System info');
+  },
+  clear:()=>clearTerm(),
+  echo:(args)=>print('out',args.join(' ')),
+  date:()=>print('out',new Date().toString()),
+  whoami:()=>print('out',env.USER),
+  pwd:()=>print('out',cwd),
+  env:()=>Object.entries(env).forEach(([k,v])=>print('out',`${k}=${v}`)),
+  export:(args)=>{const p=args[0];if(!p)return;const[k,v]=p.split('=');if(k&&v!==undefined){env[k]=v;print('success','Exported: '+k+'='+v);}else print('err','Usage: export KEY=VALUE');},
+  version:()=>print('out','EclipseOS v1.0 — Build 2026.03.21'),
+  uptime:()=>{const u=Math.floor(performance.now()/1000);const h=Math.floor(u/3600),m=Math.floor((u%3600)/60),s=u%60;print('out',`Uptime: ${h}h ${m}m ${s}s`);},
+  history:()=>history.forEach((h,i)=>print('muted',`  ${String(i+1).padStart(3,' ')}  ${h}`)),
+  calc:(args)=>{try{const r=Function('"use strict";return ('+args.join(' ')+')')();print('out',`= ${r}`);}catch(e){print('err','Invalid expression');}},
+  theme:(args)=>{const t=args[0];if(!['white','black','grey'].includes(t)){print('err','Usage: theme [white|black|grey]');return;}if(window.parent&&window.parent.changeTheme){window.parent.changeTheme(t);print('success','Theme changed to '+t);}else{localStorage.setItem('eclipseos_theme',t);print('warn','Theme saved, will apply on next OS load');}},
+  ls:(args)=>{
+    const path=args[0]?resolvePath(args[0]):cwd;
+    const node=getNode(path);
+    if(!node){print('err',`ls: ${args[0]||cwd}: No such file or directory`);return;}
+    if(node.type==='file'){print('out',path.split('/').pop());return;}
+    const children=Object.entries(node.children||{});
+    if(!children.length){print('muted','(empty)');return;}
+    children.forEach(([name,n])=>print(n.type==='dir'?'info':'out',(n.type==='dir'?'📁 ':'📄 ')+name));
+  },
+  cd:(args)=>{
+    if(!args[0]||args[0]==='~'){cwd='~';updatePrompt();return;}
+    const path=resolvePath(args[0]);
+    const node=getNode(path);
+    if(!node)print('err',`cd: ${args[0]}: No such directory`);
+    else if(node.type==='file')print('err',`cd: ${args[0]}: Not a directory`);
+    else{cwd=path;updatePrompt();}
+  },
+  mkdir:(args)=>{
+    if(!args[0]){print('err','Usage: mkdir [name]');return;}
+    const node=getNode(cwd);
+    if(!node||!node.children){print('err','Cannot create directory here');return;}
+    if(node.children[args[0]]){print('err',`mkdir: ${args[0]}: File exists`);return;}
+    node.children[args[0]]={type:'dir',children:{}};
+    print('success','Created directory: '+args[0]);
+  },
+  touch:(args)=>{
+    if(!args[0]){print('err','Usage: touch [name]');return;}
+    const node=getNode(cwd);
+    if(!node||!node.children){print('err','Cannot create file here');return;}
+    if(!node.children[args[0]])node.children[args[0]]={type:'file',content:''};
+    print('success','Created: '+args[0]);
+  },
+  cat:(args)=>{
+    if(!args[0]){print('err','Usage: cat [file]');return;}
+    const path=cwd+'/'+args[0];
+    const node=getNode(resolvePath(path));
+    if(!node)print('err',`cat: ${args[0]}: No such file`);
+    else if(node.type==='dir')print('err',`cat: ${args[0]}: Is a directory`);
+    else print('out',node.content||'(empty file)');
+  },
+  rm:(args)=>{
+    if(!args[0]){print('err','Usage: rm [name]');return;}
+    const node=getNode(cwd);
+    if(!node||!node.children||!node.children[args[0]]){print('err',`rm: ${args[0]}: No such file or directory`);return;}
+    delete node.children[args[0]];
+    print('success','Removed: '+args[0]);
+  },
+  mv:(args)=>{
+    if(args.length<2){print('err','Usage: mv [source] [dest]');return;}
+    const parent=getNode(cwd);
+    if(!parent||!parent.children||!parent.children[args[0]]){print('err',`mv: ${args[0]}: No such file`);return;}
+    parent.children[args[1]]=parent.children[args[0]];
+    delete parent.children[args[0]];
+    print('success',`Moved ${args[0]} → ${args[1]}`);
+  },
+  cp:(args)=>{
+    if(args.length<2){print('err','Usage: cp [source] [dest]');return;}
+    const parent=getNode(cwd);
+    if(!parent||!parent.children||!parent.children[args[0]]){print('err',`cp: ${args[0]}: No such file`);return;}
+    parent.children[args[1]]=JSON.parse(JSON.stringify(parent.children[args[0]]));
+    print('success',`Copied ${args[0]} → ${args[1]}`);
+  },
+  cowsay:(args)=>{
+    const msg=args.join(' ')||'Moo!';const len=msg.length+2;const top='_'.repeat(len);const bot='-'.repeat(len);
+    print('out',` ${top}`);print('out',`< ${msg} >`);print('out',` ${bot}`);
+    print('out','        \\   ^__^');print('out','         \\  (oo)\\_______');print('out','            (__)\\       )\\/\\');print('out','                ||----w |');print('out','                ||     ||');
+  },
+  neofetch:()=>{
+    const now=new Date();
+    print('title', '    ██████╗ ██╗     ██╗██████╗ ███████╗███████╗');
+    print('title', '    ██╔══╝██║     ██║██╔══██╗██╔════╝██╔════╝');
+    print('title', '    █████╗ ██║     ██║██████╔╝███████╗█████╗  ');
+    print('title', '    ██╔══╝ ██║     ██║██╔═══╝ ╚════██║██╔══╝  ');
+    print('title', '    ███████╗███████╗██║██║     ███████║███████╗');
+    print('out','');
+    print('info',`  OS:        EclipseOS 1.0`);
+    print('info',`  Host:      Web Browser`);
+    print('info',`  Shell:     EclipseBash 1.0`);
+    print('info',`  Date:      ${now.toLocaleDateString()}`);
+    print('info',`  Time:      ${now.toLocaleTimeString()}`);
+    print('info',`  User:      ${env.USER}`);
+    print('info',`  Theme:     ${localStorage.getItem('eclipseos_theme')||'white'}`);
+    print('info',`  Platform:  ${navigator.platform}`);
+  },
+};
 
-        function executeCommand(commandText) {
-            addOutput(`$ ${commandText}`, 'prompt');
-            
-            const parts = commandText.split(' ');
-            const cmd = parts[0];
-            const args = parts.slice(1);
-            
-            if (commands[cmd]) {
-                const result = commands[cmd](args);
-                if (result !== null) {
-                    addOutput(result);
-                }
-            } else {
-                addOutput(`Command not found: ${cmd}`);
-                addOutput(`Type 'help' for available commands`);
-            }
-        }
+function print(type,text){
+  const d=document.createElement('div');
+  d.className='line line-'+type;
+  d.textContent=text;
+  output.appendChild(d);
+  output.scrollTop=output.scrollHeight;
+}
 
-        function addOutput(text, className = '') {
-            const line = document.createElement('div');
-            line.className = `output-line ${className}`;
-            line.textContent = text;
-            output.appendChild(line);
-            output.scrollTop = output.scrollHeight;
-        }
+function updatePrompt(){
+  document.getElementById('promptLabel').textContent=`${env.USER}@eclipseos:${cwd}$`;
+}
 
-        // Focus input when clicking anywhere in terminal
-        document.addEventListener('click', () => input.focus());
-    </script>
+function run(cmdStr){
+  const trimmed=cmdStr.trim();
+  if(!trimmed)return;
+  history.push(trimmed);histIdx=history.length;
+  print('prompt','');
+  const last=output.lastChild;
+  if(last){last.innerHTML=`<span style="color:#58a6ff">${env.USER}@eclipseos:${cwd}$</span> <span style="color:#e6edf3">${trimmed}</span>`;}
+  const parts=trimmed.split(/\s+/);
+  const cmd=parts[0];const args=parts.slice(1);
+  if(commands[cmd])commands[cmd](args);
+  else{
+    // Check for variable assignment
+    if(trimmed.match(/^\w+=.*/)){const[k,v]=trimmed.split('=');vars[k]=v;return;}
+    print('err',`${cmd}: command not found. Type 'help' for commands.`);
+  }
+}
+
+input.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const v=input.value;input.value='';run(v);}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(histIdx>0){histIdx--;input.value=history[histIdx];}}
+  else if(e.key==='ArrowDown'){e.preventDefault();if(histIdx<history.length-1){histIdx++;input.value=history[histIdx];}else{histIdx=history.length;input.value='';}}
+  else if(e.key==='Tab'){e.preventDefault();autoComplete();}
+  else if(e.key==='l'&&e.ctrlKey){e.preventDefault();clearTerm();}
+});
+
+function autoComplete(){
+  const v=input.value.trim();
+  const parts=v.split(' ');
+  if(parts.length===1){
+    const matches=Object.keys(commands).filter(c=>c.startsWith(v));
+    if(matches.length===1)input.value=matches[0]+' ';
+  } else {
+    const node=getNode(cwd);
+    if(!node||!node.children)return;
+    const last=parts[parts.length-1];
+    const matches=Object.keys(node.children).filter(n=>n.startsWith(last));
+    if(matches.length===1){parts[parts.length-1]=matches[0];input.value=parts.join(' ');}
+  }
+}
+
+function clearTerm(){output.innerHTML='';}
+function copyOutput(){navigator.clipboard.writeText(output.innerText);}
+
+document.addEventListener('click',()=>input.focus());
+
+// Boot
+print('title','EclipseOS Terminal v1.0');
+print('muted',`Last login: ${new Date().toUTCString()}`);
+print('out','Type \'help\' for available commands. Tab to autocomplete.');
+print('out','');
+</script>
 </body>
 </html>

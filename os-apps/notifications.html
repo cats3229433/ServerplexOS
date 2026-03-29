@@ -1,110 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Notifications</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; height: 100vh; }
-        .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { font-size: 28px; margin-bottom: 20px; color: #333; }
-        .toolbar { margin-bottom: 20px; }
-        button { padding: 10px 16px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 8px; }
-        button:hover { background: #005a9e; }
-        button.clear { background: #ff3b30; }
-        .notification { padding: 16px; background: #f9f9f9; border-left: 4px solid #0078d4; border-radius: 6px; margin-bottom: 12px; }
-        .notification.info { border-left-color: #0078d4; }
-        .notification.success { border-left-color: #34c759; }
-        .notification.warning { border-left-color: #ff9500; }
-        .notification.error { border-left-color: #ff3b30; }
-        .notif-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .notif-title { font-weight: 600; font-size: 16px; }
-        .notif-time { font-size: 12px; color: #666; }
-        .notif-message { font-size: 14px; color: #333; line-height: 1.5; }
-        .empty { text-align: center; padding: 60px; color: #999; }
-    </style>
+<meta charset="UTF-8"><title>Notifications</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:700}
+.badge{background:#da3633;color:white;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:700}
+.spacer{flex:1}
+.tb-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:7px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s}
+.tb-btn:hover{background:rgba(255,255,255,0.1)}
+.filter-row{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.filter-row::-webkit-scrollbar{display:none}
+.f-btn{padding:5px 12px;border:1px solid rgba(255,255,255,0.08);border-radius:20px;background:none;color:#8b949e;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.f-btn:hover{color:#e6edf3;border-color:rgba(255,255,255,0.2)}
+.f-btn.active{background:#0078d4;border-color:#0078d4;color:white}
+.list{flex:1;overflow-y:auto;padding:12px 16px}
+.notif{background:#161b22;border:1px solid rgba(255,255,255,0.06);border-left:4px solid #0078d4;border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;transition:all 0.2s;cursor:pointer}
+.notif:hover{background:#1f2937;border-color:rgba(255,255,255,0.12)}
+.notif.unread{background:#0d1f35}
+.notif.success{border-left-color:#238636}
+.notif.warning{border-left-color:#e3b341}
+.notif.error{border-left-color:#da3633}
+.notif.info{border-left-color:#0078d4}
+.notif-icon{font-size:22px;flex-shrink:0;margin-top:2px}
+.notif-body{flex:1;min-width:0}
+.notif-header-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.notif-title{font-size:14px;font-weight:700;color:#e6edf3}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:#0078d4;flex-shrink:0}
+.notif.read .notif-dot{display:none}
+.notif-time{font-size:11px;color:#8b949e;margin-left:auto}
+.notif-msg{font-size:13px;color:#8b949e;line-height:1.5}
+.notif-del{background:none;border:none;color:#8b949e;cursor:pointer;font-size:17px;padding:4px 6px;border-radius:4px;opacity:0;transition:all 0.15s;flex-shrink:0}
+.notif:hover .notif-del{opacity:1}
+.notif-del:hover{color:#f85149;background:rgba(248,81,73,0.1)}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,0.15);padding:40px}
+.empty div{font-size:56px}
+.empty p{font-size:15px}
+.notif-source{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔔 Notifications</h1>
-        <div class="toolbar">
-            <button onclick="addTestNotification()">➕ Test Notification</button>
-            <button class="clear" onclick="clearAll()">Clear All</button>
+<div class="header">
+  <div>🔔</div>
+  <h1>Notifications</h1>
+  <span class="badge" id="unreadBadge">0</span>
+  <div class="spacer"></div>
+  <button class="tb-btn" onclick="markAllRead()">✓ Mark all read</button>
+  <button class="tb-btn" onclick="clearAll()">🗑️ Clear all</button>
+</div>
+<div class="filter-row">
+  <button class="f-btn active" onclick="setFilter('all')">All</button>
+  <button class="f-btn" onclick="setFilter('unread')">Unread</button>
+  <button class="f-btn" onclick="setFilter('info')">ℹ️ Info</button>
+  <button class="f-btn" onclick="setFilter('success')">✅ Success</button>
+  <button class="f-btn" onclick="setFilter('warning')">⚠️ Warning</button>
+  <button class="f-btn" onclick="setFilter('error')">🚨 Error</button>
+</div>
+<div class="list" id="list"></div>
+<script>
+let notifs=JSON.parse(localStorage.getItem('eclipseos_notifications_v2')||'[]');
+let filter='all';
+const ICONS={info:'ℹ️',success:'✅',warning:'⚠️',error:'🚨'};
+
+if(!notifs.length){
+  notifs=[
+    {id:1,title:'Welcome to EclipseOS',message:'Your system is ready to use. Explore the apps from the Start menu.',type:'success',source:'System',time:Date.now()-5000,read:false},
+    {id:2,title:'Getting Started',message:'Try opening the Code Editor, Browser, or any other app to get started.',type:'info',source:'System',time:Date.now()-3000,read:false},
+  ];
+  save();
+}
+
+function save(){localStorage.setItem('eclipseos_notifications_v2',JSON.stringify(notifs));}
+function setFilter(f){filter=f;document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active');render();}
+function markAllRead(){notifs.forEach(n=>n.read=true);save();render();}
+function clearAll(){if(confirm('Clear all notifications?')){notifs=[];save();render();}}
+function delNotif(id){notifs=notifs.filter(n=>n.id!==id);save();render();}
+function readNotif(id){const n=notifs.find(x=>x.id===id);if(n){n.read=true;save();render();}}
+
+function addNotification(title,message,type='info',source='System'){
+  notifs.unshift({id:Date.now(),title,message,type,source,time:Date.now(),read:false});
+  if(notifs.length>100)notifs=notifs.slice(0,100);
+  save();render();
+}
+window.addNotification=addNotification;
+
+const testMsgs=[
+  {title:'Update Available',message:'EclipseOS 1.1 is ready to install.',type:'info',source:'Updates'},
+  {title:'File Downloaded',message:'Your download completed successfully.',type:'success',source:'Browser'},
+  {title:'Storage Low',message:'You are running low on local storage (80% used).',type:'warning',source:'System'},
+  {title:'Connection Error',message:'Failed to connect to the network. Check your settings.',type:'error',source:'Network'},
+];
+let testIdx=0;
+function addTest(){const m=testMsgs[testIdx%testMsgs.length];addNotification(m.title,m.message,m.type,m.source);testIdx++;}
+
+function fmtTime(ts){
+  const diff=(Date.now()-ts)/1000;
+  if(diff<60)return'Just now';
+  if(diff<3600)return Math.floor(diff/60)+'m ago';
+  if(diff<86400)return Math.floor(diff/3600)+'h ago';
+  return new Date(ts).toLocaleDateString();
+}
+
+function render(){
+  const list=document.getElementById('list');
+  const unread=notifs.filter(n=>!n.read);
+  document.getElementById('unreadBadge').textContent=unread.length;
+  document.getElementById('unreadBadge').style.display=unread.length?'':'none';
+  let filtered=notifs.filter(n=>{
+    if(filter==='unread')return!n.read;
+    if(['info','success','warning','error'].includes(filter))return n.type===filter;
+    return true;
+  });
+  if(!filtered.length){
+    list.innerHTML=`<div class="empty"><div>🔔</div><p>${filter==='unread'?'No unread notifications':'No notifications'}</p></div>`;
+    return;
+  }
+  list.innerHTML=filtered.map(n=>`
+    <div class="notif ${n.type} ${n.read?'read':'unread'}" onclick="readNotif(${n.id})">
+      <div class="notif-icon">${ICONS[n.type]||'ℹ️'}</div>
+      <div class="notif-body">
+        <div class="notif-header-row">
+          <div class="notif-title">${n.title}</div>
+          ${!n.read?'<div class="notif-dot"></div>':''}
+          <div class="notif-time">${fmtTime(n.time)}</div>
         </div>
-        <div id="notificationsList"></div>
-    </div>
-
-    <script>
-        let notifications = JSON.parse(localStorage.getItem('serverplexos_notifications') || '[]');
-
-        function render() {
-            const list = document.getElementById('notificationsList');
-            if (notifications.length === 0) {
-                list.innerHTML = '<div class="empty">No notifications</div>';
-                return;
-            }
-            
-            list.innerHTML = notifications.map(notif => `
-                <div class="notification ${notif.type}">
-                    <div class="notif-header">
-                        <span class="notif-title">${notif.title}</span>
-                        <span class="notif-time">${new Date(notif.time).toLocaleTimeString()}</span>
-                    </div>
-                    <div class="notif-message">${notif.message}</div>
-                </div>
-            `).join('');
-        }
-
-        function addNotification(title, message, type = 'info') {
-            notifications.unshift({
-                title,
-                message,
-                type,
-                time: Date.now()
-            });
-            
-            // Keep only last 50 notifications
-            if (notifications.length > 50) {
-                notifications = notifications.slice(0, 50);
-            }
-            
-            save();
-        }
-
-        function addTestNotification() {
-            const types = ['info', 'success', 'warning', 'error'];
-            const messages = [
-                { title: 'System Update', message: 'ServerplexOS updated successfully' },
-                { title: 'Task Complete', message: 'Your download has finished' },
-                { title: 'Low Storage', message: 'Storage is running low' },
-                { title: 'Error', message: 'Failed to connect to network' }
-            ];
-            
-            const type = types[Math.floor(Math.random() * types.length)];
-            const msg = messages[Math.floor(Math.random() * messages.length)];
-            
-            addNotification(msg.title, msg.message, type);
-        }
-
-        function clearAll() {
-            if (confirm('Clear all notifications?')) {
-                notifications = [];
-                save();
-            }
-        }
-
-        function save() {
-            localStorage.setItem('serverplexos_notifications', JSON.stringify(notifications));
-            render();
-        }
-
-        // Add some default notifications if empty
-        if (notifications.length === 0) {
-            addNotification('Welcome', 'Welcome to ServerplexOS!', 'success');
-            addNotification('Getting Started', 'Explore apps from the Start menu', 'info');
-        }
-
-        render();
-    </script>
+        <div class="notif-msg">${n.message}</div>
+        <div class="notif-source">${n.source}</div>
+      </div>
+      <button class="notif-del" onclick="event.stopPropagation();delNotif(${n.id})">×</button>
+    </div>`).join('');
+}
+render();
+</script>
 </body>
 </html>

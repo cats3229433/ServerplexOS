@@ -1,52 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Notepad</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Consolas', 'Courier New', monospace; height: 100vh; display: flex; flex-direction: column; background: #ffffff; color: #000000; }
-        .toolbar { height: 40px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
-        .toolbar button { padding: 6px 12px; background: #fff; border: 1px solid #ccc; border-radius: 3px; cursor: pointer; font-size: 13px; transition: background 0.2s; }
-        .toolbar button:hover { background: #e0e0e0; }
-        textarea { flex: 1; width: 100%; padding: 16px; border: none; outline: none; resize: none; font-family: 'Consolas', 'Courier New', monospace; font-size: 14px; line-height: 1.5; }
-    </style>
+<meta charset="UTF-8"><title>Notepad</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.tb-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e6edf3;padding:5px 12px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s;white-space:nowrap}
+.tb-btn:hover{background:rgba(255,255,255,0.12)}
+.tb-btn.active{background:#0078d4;border-color:#0078d4}
+.sep{width:1px;height:20px;background:rgba(255,255,255,0.1);margin:0 4px}
+.font-size-wrap{display:flex;align-items:center;gap:4px}
+.font-select{background:#161b22;border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6edf3;padding:4px 8px;font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.font-select option{background:#0d1117}
+.spacer{flex:1}
+.status{font-size:11px;color:#8b949e}
+.editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.tabs-bar{background:#161b22;display:flex;border-bottom:1px solid rgba(255,255,255,0.08);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.tabs-bar::-webkit-scrollbar{display:none}
+.note-tab{padding:8px 16px;cursor:pointer;font-size:13px;color:#8b949e;border-right:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:100px;border-bottom:2px solid transparent}
+.note-tab:hover{background:rgba(255,255,255,0.04);color:#ccc}
+.note-tab.active{color:#e6edf3;border-bottom-color:#0078d4;background:rgba(255,255,255,0.04)}
+.tab-x{color:#666;font-size:15px;padding:0 2px;border-radius:2px}
+.tab-x:hover{color:#f85149;background:rgba(248,81,73,0.1)}
+.add-tab{padding:8px 14px;cursor:pointer;color:#8b949e;font-size:18px;flex-shrink:0}
+.add-tab:hover{color:#e6edf3;background:rgba(255,255,255,0.04)}
+.textarea{flex:1;width:100%;background:#0d1117;border:none;resize:none;outline:none;font-family:'Oxanium',sans-serif;font-size:14px;line-height:1.7;color:#e6edf3;padding:20px;display:none}
+.textarea.active{display:block}
+.find-bar{background:#1f2937;border-top:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:none;align-items:center;gap:8px;flex-shrink:0}
+.find-bar.show{display:flex}
+.find-input{background:#0d1117;border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6edf3;padding:5px 10px;font-family:'Oxanium',sans-serif;font-size:13px;outline:none;width:200px}
+.find-input:focus{border-color:#0078d4}
+.find-count{font-size:12px;color:#8b949e;min-width:60px}
+.stat-bar{background:#161b22;border-top:1px solid rgba(255,255,255,0.08);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:#8b949e;flex-shrink:0}
+</style>
 </head>
 <body>
-    <div class="toolbar">
-        <button onclick="saveNote()">💾 Save</button>
-        <button onclick="clearNote()">🗑️ Clear</button>
-        <span style="margin-left: auto; font-size: 12px; color: #666;" id="status">Auto-saved</span>
-    </div>
-    <textarea id="notepad" placeholder="Start typing..."></textarea>
+<div class="toolbar">
+  <button class="tb-btn" onclick="newNote()">📄 New</button>
+  <button class="tb-btn" onclick="saveNote()">💾 Save</button>
+  <button class="tb-btn" onclick="downloadNote()">⬇️ Download</button>
+  <div class="sep"></div>
+  <button class="tb-btn" id="boldBtn" onclick="fmt('bold')"><b>B</b></button>
+  <button class="tb-btn" id="italicBtn" onclick="fmt('italic')"><i>I</i></button>
+  <div class="sep"></div>
+  <select class="font-select" onchange="setFont(this.value)">
+    <option value="'Oxanium',sans-serif">Oxanium</option>
+    <option value="'Courier New',monospace">Monospace</option>
+    <option value="Georgia,serif">Serif</option>
+    <option value="Arial,sans-serif">Sans</option>
+  </select>
+  <select class="font-select" onchange="setFontSize(this.value)">
+    <option value="12">12px</option>
+    <option value="14" selected>14px</option>
+    <option value="16">16px</option>
+    <option value="18">18px</option>
+    <option value="20">20px</option>
+    <option value="24">24px</option>
+  </select>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="toggleFind()">🔍 Find</button>
+  <button class="tb-btn" onclick="clearNote()">🗑️ Clear</button>
+  <div class="spacer"></div>
+  <div class="status" id="saveStatus">Auto-saved</div>
+</div>
+<div class="editor-area">
+  <div class="tabs-bar" id="tabsBar">
+    <div class="add-tab" onclick="newNote()" title="New note">+</div>
+  </div>
+  <div id="textareas"></div>
+</div>
+<div class="find-bar" id="findBar">
+  <span style="font-size:12px;color:#8b949e">Find:</span>
+  <input class="find-input" id="findInput" placeholder="Search…" oninput="doFind()">
+  <span class="find-count" id="findCount"></span>
+  <button class="tb-btn" onclick="findNext(-1)">↑</button>
+  <button class="tb-btn" onclick="findNext(1)">↓</button>
+  <button class="tb-btn" onclick="toggleFind()">✕</button>
+</div>
+<div class="stat-bar">
+  <span id="statWords">Words: 0</span>
+  <span id="statChars">Chars: 0</span>
+  <span id="statLines">Lines: 1</span>
+</div>
+<script>
+let notes=JSON.parse(localStorage.getItem('eclipseos_notepad_notes')||'null');
+if(!notes||!Array.isArray(notes))notes=[{id:1,title:'Note 1',content:''}];
+let activeId=notes[0].id;
+let fontFamily="'Oxanium',sans-serif",fontSize=14;
+let autoSaveTimer;
 
-    <script>
-        const notepad = document.getElementById('notepad');
-        const status = document.getElementById('status');
-        
-        // Load saved text
-        notepad.value = localStorage.getItem('serverplexos_notepad_text') || '';
-        
-        // Auto-save on input
-        notepad.addEventListener('input', () => {
-            localStorage.setItem('serverplexos_notepad_text', notepad.value);
-            status.textContent = 'Auto-saved';
-        });
-        
-        function saveNote() {
-            localStorage.setItem('serverplexos_notepad_text', notepad.value);
-            status.textContent = 'Saved!';
-            setTimeout(() => status.textContent = 'Auto-saved', 2000);
-        }
-        
-        function clearNote() {
-            if (confirm('Clear all text?')) {
-                notepad.value = '';
-                localStorage.setItem('serverplexos_notepad_text', '');
-                status.textContent = 'Cleared';
-            }
-        }
-    </script>
+function save(){localStorage.setItem('eclipseos_notepad_notes',JSON.stringify(notes));}
+function getNoteById(id){return notes.find(n=>n.id===id);}
+function getActiveTA(){return document.getElementById('ta-'+activeId);}
+
+function render(){
+  const bar=document.getElementById('tabsBar');
+  const addBtn=bar.querySelector('.add-tab');
+  // Remove old tabs
+  bar.querySelectorAll('.note-tab').forEach(t=>t.remove());
+  notes.forEach(n=>{
+    const tab=document.createElement('div');
+    tab.className='note-tab'+(n.id===activeId?' active':'');
+    tab.innerHTML=`<span ondblclick="renameNote(${n.id})">${n.title}</span>${notes.length>1?`<span class="tab-x" onclick="closeNote(${n.id},event)">×</span>`:''}`;
+    tab.onclick=(e)=>{if(!e.target.classList.contains('tab-x'))switchNote(n.id);};
+    bar.insertBefore(tab,addBtn);
+  });
+  const areas=document.getElementById('textareas');
+  notes.forEach(n=>{
+    let ta=document.getElementById('ta-'+n.id);
+    if(!ta){
+      ta=document.createElement('textarea');
+      ta.id='ta-'+n.id;
+      ta.className='textarea';
+      ta.value=n.content;
+      ta.style.fontFamily=fontFamily;
+      ta.style.fontSize=fontSize+'px';
+      ta.oninput=()=>{
+        n.content=ta.value;
+        updateStats();
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer=setTimeout(()=>{save();document.getElementById('saveStatus').textContent='Saved ✓';},800);
+      };
+      areas.appendChild(ta);
+    }
+    ta.className='textarea'+(n.id===activeId?' active':'');
+  });
+  updateStats();
+}
+
+function switchNote(id){activeId=id;render();}
+function newNote(){
+  const id=Date.now();
+  notes.push({id,title:`Note ${notes.length+1}`,content:''});
+  activeId=id;save();render();
+  setTimeout(()=>getActiveTA()&&getActiveTA().focus(),50);
+}
+function closeNote(id,e){
+  e&&e.stopPropagation();
+  if(notes.length===1)return;
+  const idx=notes.findIndex(n=>n.id===id);
+  notes.splice(idx,1);
+  document.getElementById('ta-'+id)&&document.getElementById('ta-'+id).remove();
+  if(activeId===id)activeId=notes[Math.max(0,idx-1)].id;
+  save();render();
+}
+function renameNote(id){
+  const n=getNoteById(id);
+  const nw=prompt('Rename note:',n.title);
+  if(nw&&nw.trim()){n.title=nw.trim();save();render();}
+}
+function saveNote(){save();document.getElementById('saveStatus').textContent='Saved ✓';setTimeout(()=>document.getElementById('saveStatus').textContent='Auto-saved',2000);}
+function clearNote(){if(confirm('Clear this note?')){const n=getNoteById(activeId);n.content='';getActiveTA().value='';save();updateStats();}}
+function downloadNote(){
+  const n=getNoteById(activeId);
+  const b=new Blob([n.content],{type:'text/plain'});
+  const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(b),download:n.title+'.txt'});
+  a.click();URL.revokeObjectURL(a.href);
+}
+function setFont(f){fontFamily=f;document.querySelectorAll('.textarea').forEach(t=>t.style.fontFamily=f);}
+function setFontSize(s){fontSize=parseInt(s);document.querySelectorAll('.textarea').forEach(t=>t.style.fontSize=s+'px');}
+function fmt(type){
+  const ta=getActiveTA();if(!ta)return;
+  const s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.substring(s,e);
+  if(!sel)return;
+  const wrapped=type==='bold'?`**${sel}**`:`_${sel}_`;
+  ta.value=ta.value.substring(0,s)+wrapped+ta.value.substring(e);
+  getNoteById(activeId).content=ta.value;save();
+}
+function toggleFind(){const b=document.getElementById('findBar');b.classList.toggle('show');if(b.classList.contains('show'))document.getElementById('findInput').focus();}
+function doFind(){
+  const q=document.getElementById('findInput').value;
+  const ta=getActiveTA();if(!ta||!q){document.getElementById('findCount').textContent='';return;}
+  const matches=[...ta.value.matchAll(new RegExp(q,'gi'))];
+  document.getElementById('findCount').textContent=`${matches.length} found`;
+}
+function findNext(dir){
+  const q=document.getElementById('findInput').value;
+  const ta=getActiveTA();if(!ta||!q)return;
+  const txt=ta.value,idx=txt.toLowerCase().indexOf(q.toLowerCase(),ta.selectionEnd+(dir>0?0:-(q.length+1)));
+  if(idx>=0){ta.setSelectionRange(idx,idx+q.length);ta.focus();}
+}
+function updateStats(){
+  const ta=getActiveTA();if(!ta)return;
+  const text=ta.value;
+  const words=text.trim()?text.trim().split(/\s+/).length:0;
+  document.getElementById('statWords').textContent=`Words: ${words}`;
+  document.getElementById('statChars').textContent=`Chars: ${text.length}`;
+  document.getElementById('statLines').textContent=`Lines: ${text.split('\n').length}`;
+}
+render();
+setTimeout(()=>getActiveTA()&&getActiveTA().focus(),100);
+</script>
 </body>
 </html>

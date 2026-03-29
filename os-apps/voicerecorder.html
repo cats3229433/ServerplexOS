@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><title>Voice Recorder</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:700}
+.main{flex:1;display:flex;overflow:hidden}
+.recorder-panel{width:320px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:20px;border-right:1px solid rgba(255,255,255,0.08)}
+.mic-btn{width:100px;height:100px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:40px;transition:all .2s;background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12)}
+.mic-btn:hover{background:rgba(255,255,255,0.14);transform:scale(1.05)}
+.mic-btn.recording{background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.5);animation:micPulse 1s ease infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)}50%{box-shadow:0 0 0 16px rgba(239,68,68,0)}}
+.timer{font-size:42px;font-weight:800;letter-spacing:3px;font-variant-numeric:tabular-nums}
+.timer.recording{color:#ef4444}
+.status-label{font-size:13px;color:#8b949e;letter-spacing:1px;text-transform:uppercase}
+.waveform{width:100%;height:60px;border-radius:8px;background:#161b22;border:1px solid rgba(255,255,255,0.06);overflow:hidden}
+.recordings-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.panel-title{padding:14px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid rgba(255,255,255,0.06)}
+.recordings-list{flex:1;overflow-y:auto;padding:10px}
+.recording-item{background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:all .15s}
+.recording-item:hover{border-color:rgba(255,255,255,0.12)}
+.ri-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ri-name{font-size:14px;font-weight:600;cursor:pointer}
+.ri-name:hover{color:#58a6ff}
+.ri-meta{font-size:11px;color:#8b949e}
+.ri-actions{display:flex;gap:6px}
+.ri-btn{padding:5px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:6px;background:rgba(255,255,255,0.04);color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:11px;cursor:pointer;transition:all .15s}
+.ri-btn:hover{background:rgba(255,255,255,0.1)}
+.ri-btn.danger:hover{background:rgba(239,68,68,0.15);color:#f85149;border-color:rgba(239,68,68,0.3)}
+audio{width:100%;margin-top:4px;height:32px}
+audio::-webkit-media-controls-panel{background:#0d1117}
+.empty-recs{text-align:center;padding:40px;color:#8b949e}
+.empty-recs div{font-size:48px;margin-bottom:12px}
+.perm-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:16px;text-align:center;font-size:13px;color:#fca5a5;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="header"><div>🎙️</div><h1>Voice Recorder</h1></div>
+<div class="main">
+  <div class="recorder-panel">
+    <canvas class="waveform" id="waveform" width="260" height="60"></canvas>
+    <div class="timer" id="timer">00:00</div>
+    <div class="status-label" id="statusLabel">Ready to record</div>
+    <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
+    <div id="permError"></div>
+  </div>
+  <div class="recordings-panel">
+    <div class="panel-title">Recordings</div>
+    <div class="recordings-list" id="recordingsList"></div>
+  </div>
+</div>
+<script>
+let mediaRecorder = null, chunks = [], timerInt = null, seconds = 0;
+let recordings = JSON.parse(localStorage.getItem('eclipseos_voice_recordings') || '[]');
+let audioCtx = null, analyser = null, animFrame = null;
+
+function save() { localStorage.setItem('eclipseos_voice_recordings', JSON.stringify(recordings.map(r => ({...r, url: undefined})))); }
+
+function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+
+async function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    stopRecording(); return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    startRecording(stream);
+  } catch(e) {
+    document.getElementById('permError').innerHTML = '<div class="perm-error">🎙️ Microphone access denied.<br>Please allow microphone access in your browser settings.</div>';
+  }
+}
+
+function startRecording(stream) {
+  chunks = []; seconds = 0;
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.ondataavailable = e => chunks.push(e.data);
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'audio/webm' });
+    const url = URL.createObjectURL(blob);
+    const rec = { id: Date.now(), name: 'Recording ' + (recordings.length+1), duration: seconds, date: new Date().toLocaleString(), url };
+    recordings.unshift(rec);
+    save(); renderRecordings();
+    stream.getTracks().forEach(t => t.stop());
+    stopWaveform();
+  };
+  mediaRecorder.start();
+  document.getElementById('micBtn').classList.add('recording');
+  document.getElementById('micBtn').textContent = '⏹️';
+  document.getElementById('statusLabel').textContent = 'Recording…';
+  document.getElementById('timer').classList.add('recording');
+  timerInt = setInterval(() => { seconds++; document.getElementById('timer').textContent = fmt(seconds); }, 1000);
+  startWaveform(stream);
+}
+
+function stopRecording() {
+  if (!mediaRecorder) return;
+  mediaRecorder.stop();
+  clearInterval(timerInt);
+  document.getElementById('micBtn').classList.remove('recording');
+  document.getElementById('micBtn').textContent = '🎙️';
+  document.getElementById('statusLabel').textContent = 'Ready to record';
+  document.getElementById('timer').classList.remove('recording');
+  document.getElementById('timer').textContent = '00:00';
+}
+
+function startWaveform(stream) {
+  audioCtx = new AudioContext();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  audioCtx.createMediaStreamSource(stream).connect(analyser);
+  const canvas = document.getElementById('waveform');
+  const ctx = canvas.getContext('2d');
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  function draw() {
+    animFrame = requestAnimationFrame(draw);
+    analyser.getByteFrequencyData(data);
+    ctx.fillStyle = '#161b22'; ctx.fillRect(0,0,canvas.width,canvas.height);
+    const bw = canvas.width / data.length;
+    data.forEach((v,i) => {
+      const h = (v/255) * canvas.height;
+      ctx.fillStyle = `rgba(239,68,68,${0.4+v/512})`;
+      ctx.fillRect(i*bw, canvas.height-h, bw-1, h);
+    });
+  }
+  draw();
+}
+function stopWaveform() {
+  cancelAnimationFrame(animFrame);
+  if (audioCtx) audioCtx.close();
+  const canvas = document.getElementById('waveform');
+  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+}
+
+function renderRecordings() {
+  const list = document.getElementById('recordingsList');
+  if (!recordings.length) { list.innerHTML = '<div class="empty-recs"><div>🎙️</div><p>No recordings yet</p></div>'; return; }
+  list.innerHTML = recordings.map(r => `
+    <div class="recording-item" id="rec-${r.id}">
+      <div class="ri-header">
+        <div>
+          <div class="ri-name" ondblclick="renameRec(${r.id})">${r.name}</div>
+          <div class="ri-meta">${r.date} · ${fmt(r.duration)}</div>
+        </div>
+        <div class="ri-actions">
+          <button class="ri-btn" onclick="downloadRec(${r.id})">💾</button>
+          <button class="ri-btn danger" onclick="deleteRec(${r.id})">🗑️</button>
+        </div>
+      </div>
+      ${r.url ? `<audio controls src="${r.url}"></audio>` : '<div style="font-size:11px;color:#8b949e;margin-top:4px">Reload to play</div>'}
+    </div>`).join('');
+}
+
+function renameRec(id) {
+  const r = recordings.find(x => x.id === id);
+  const nw = prompt('Rename:', r.name); if (!nw) return;
+  r.name = nw; save(); renderRecordings();
+}
+function deleteRec(id) {
+  if (!confirm('Delete this recording?')) return;
+  recordings = recordings.filter(x => x.id !== id); save(); renderRecordings();
+}
+function downloadRec(id) {
+  const r = recordings.find(x => x.id === id);
+  if (!r || !r.url) return;
+  const a = Object.assign(document.createElement('a'), {href:r.url, download:r.name+'.webm'});
+  a.click();
+}
+
+renderRecordings();
+
+function saveToFileManager(name, blob) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      let fs = JSON.parse(localStorage.getItem('eclipseos_fs') || 'null');
+      if (!fs) return;
+      if (!fs['~'].children.Music) fs['~'].children.Music = {type:'dir',children:{}};
+      fs['~'].children.Music.children[name] = { type:'file', content: e.target.result, size: blob.size, modified: Date.now() };
+      localStorage.setItem('eclipseos_fs', JSON.stringify(fs));
+    } catch(err) {}
+  };
+  reader.readAsDataURL(blob);
+}
+
+</script>
+</body>
+</html>

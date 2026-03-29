@@ -1,84 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Recycle Bin</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; height: 100vh; }
-        .container { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { font-size: 28px; margin-bottom: 20px; color: #333; }
-        .toolbar { margin-bottom: 20px; }
-        button { padding: 10px 16px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 8px; }
-        button:hover { background: #005a9e; }
-        button.danger { background: #ff3b30; }
-        .item { padding: 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        .item-info { flex: 1; }
-        .item-name { font-weight: 600; margin-bottom: 4px; }
-        .item-date { font-size: 12px; color: #666; }
-        .empty { text-align: center; padding: 60px; color: #999; }
-    </style>
+<meta charset="UTF-8"><title>Recycle Bin</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:700}
+.spacer{flex:1}
+.tb-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:7px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s}
+.tb-btn:hover{background:rgba(255,255,255,0.1)}
+.tb-btn.danger{background:rgba(218,54,51,0.1);border-color:rgba(218,54,51,0.3);color:#f85149}
+.tb-btn.danger:hover{background:rgba(218,54,51,0.25)}
+.stats{display:flex;gap:12px;font-size:12px;color:#8b949e}
+.list-area{flex:1;overflow-y:auto;padding:12px 16px}
+.item{background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:center;gap:14px;transition:all 0.2s}
+.item:hover{background:#1f2937;border-color:rgba(255,255,255,0.12)}
+.item-icon{font-size:28px;flex-shrink:0}
+.item-info{flex:1;min-width:0}
+.item-name{font-size:14px;font-weight:600;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-meta{font-size:11px;color:#8b949e}
+.item-acts{display:flex;gap:6px;flex-shrink:0}
+.act-btn{padding:6px 12px;border:none;border-radius:6px;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s}
+.restore-btn{background:rgba(35,134,54,0.15);color:#3fb950;border:1px solid rgba(35,134,54,0.3)}
+.restore-btn:hover{background:rgba(35,134,54,0.3)}
+.del-btn{background:rgba(218,54,51,0.1);color:#f85149;border:1px solid rgba(218,54,51,0.2)}
+.del-btn:hover{background:rgba(218,54,51,0.25)}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:rgba(255,255,255,0.12)}
+.empty div{font-size:64px}
+.empty p{font-size:15px}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🗑️ Recycle Bin</h1>
-        <div class="toolbar">
-            <button class="danger" onclick="emptyBin()">Empty Recycle Bin</button>
-        </div>
-        <div id="itemsList"></div>
-    </div>
+<div class="header">
+  <div style="font-size:22px">🗑️</div>
+  <h1>Recycle Bin</h1>
+  <div class="spacer"></div>
+  <div class="stats"><span id="statItems">0 items</span><span id="statSize">0 KB</span></div>
+  <button class="tb-btn" onclick="restoreAll()">↩️ Restore All</button>
+  <button class="tb-btn danger" onclick="emptyBin()">💀 Empty Bin</button>
+</div>
+<div class="list-area" id="listArea"></div>
+<script>
+let items=JSON.parse(localStorage.getItem('eclipseos_recycle_bin')||'[]');
+const ICONS={folder:'📁',image:'🖼️',text:'📄',code:'💻',audio:'🎵',video:'🎬',other:'📄'};
 
-    <script>
-        let deletedItems = JSON.parse(localStorage.getItem('serverplexos_recycle_bin') || '[]');
+function save(){localStorage.setItem('eclipseos_recycle_bin',JSON.stringify(items));}
+function fmtSize(b){if(!b)return'—';if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
+function fmtDate(ts){return new Date(ts).toLocaleString();}
+function getIcon(type){return ICONS[type]||ICONS.other;}
 
-        function render() {
-            const list = document.getElementById('itemsList');
-            if (deletedItems.length === 0) {
-                list.innerHTML = '<div class="empty">Recycle Bin is empty</div>';
-                return;
-            }
-            
-            list.innerHTML = deletedItems.map((item, index) => `
-                <div class="item">
-                    <div class="item-info">
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-date">Deleted: ${new Date(item.date).toLocaleString()}</div>
-                    </div>
-                    <div>
-                        <button onclick="restore(${index})">↩️ Restore</button>
-                        <button class="danger" onclick="deletePermanently(${index})">Delete</button>
-                    </div>
-                </div>
-            `).join('');
-        }
+function restore(id){
+  const item=items.find(x=>x.id===id);
+  if(item){alert(`Restored: ${item.name}`);items=items.filter(x=>x.id!==id);save();render();}
+}
+function delPermanent(id){
+  if(confirm('Permanently delete this item? This cannot be undone.')){items=items.filter(x=>x.id!==id);save();render();}
+}
+function restoreAll(){
+  if(!items.length)return;
+  if(confirm(`Restore all ${items.length} items?`)){alert(`Restored ${items.length} item(s)`);items=[];save();render();}
+}
+function emptyBin(){
+  if(!items.length)return;
+  if(confirm('Permanently delete ALL items? This cannot be undone!')){items=[];save();render();}
+}
 
-        function restore(index) {
-            const item = deletedItems[index];
-            alert(`Restored: ${item.name}`);
-            deletedItems.splice(index, 1);
-            save();
-        }
+function render(){
+  const area=document.getElementById('listArea');
+  const totalSize=items.reduce((a,b)=>a+(b.size||0),0);
+  document.getElementById('statItems').textContent=items.length+' item'+(items.length!==1?'s':'');
+  document.getElementById('statSize').textContent=fmtSize(totalSize);
+  if(!items.length){
+    area.innerHTML=`<div class="empty"><div>🗑️</div><p>Recycle Bin is empty</p></div>`;
+    return;
+  }
+  area.innerHTML=items.map(item=>`
+    <div class="item">
+      <div class="item-icon">${getIcon(item.type)}</div>
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-meta">Deleted ${fmtDate(item.deleted)} · ${fmtSize(item.size)} · ${item.originalPath||'Unknown location'}</div>
+      </div>
+      <div class="item-acts">
+        <button class="act-btn restore-btn" onclick="restore(${item.id})">↩️ Restore</button>
+        <button class="act-btn del-btn" onclick="delPermanent(${item.id})">🗑️ Delete</button>
+      </div>
+    </div>`).join('');
+}
 
-        function deletePermanently(index) {
-            if (confirm('Permanently delete this item?')) {
-                deletedItems.splice(index, 1);
-                save();
-            }
-        }
-
-        function emptyBin() {
-            if (confirm('Empty the entire Recycle Bin? This cannot be undone!')) {
-                deletedItems = [];
-                save();
-            }
-        }
-
-        function save() {
-            localStorage.setItem('serverplexos_recycle_bin', JSON.stringify(deletedItems));
-            render();
-        }
-
-        render();
-    </script>
+render();
+</script>
 </body>
 </html>

@@ -84,7 +84,7 @@
         .desktop-icon { width: 80px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; padding: 8px; transition: all 0.2s ease; position: absolute; }
         .desktop-icon.dragging { opacity: 0.7; transition: none; }
         .desktop-icon:not(.dragging) { transition: left 0.2s ease, top 0.2s ease, background 0.2s ease, transform 0.2s ease; }
-        .desktop-icon:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+        .desktop-icon:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
         .desktop-icon:active { transform: scale(0.95); }
         .desktop-icon.selected { background: rgba(0, 120, 212, 0.3); border: 1px solid var(--accent); animation: pulse 0.5s ease; }
         .icon-image { font-size: 48px; margin-bottom: 4px; transition: transform 0.2s ease; }
@@ -109,8 +109,35 @@
             background: rgba(255, 59, 48, 0.1);
         }
 
+
+        /* Window snapping */
+        .window.snap-left  { top: 0 !important; left: 0 !important; width: 50% !important; height: calc(100% - 48px) !important; border-radius: 0; transition: all 0.2s ease; }
+        .window.snap-right { top: 0 !important; left: 50% !important; width: 50% !important; height: calc(100% - 48px) !important; border-radius: 0; transition: all 0.2s ease; }
+        .snap-preview { position: fixed; background: rgba(0,120,212,0.2); border: 2px solid rgba(0,120,212,0.6); border-radius: 6px; pointer-events: none; z-index: 99999; display: none; transition: all 0.1s ease; }
+
+        /* Desktop context menu */
+        .desktop-ctx-menu { position: fixed; background: var(--window-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 0; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 99999; display: none; }
+        .desktop-ctx-menu.open { display: block; animation: scaleIn 0.15s ease; }
+        .ctx-item { padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; color: var(--text-primary); }
+        .ctx-item:hover { background: var(--bg-secondary); }
+        .ctx-sep { height: 1px; background: var(--border-color); margin: 4px 0; }
+
+        /* Desktop widgets */
+        .desktop-widget { position: absolute; z-index: 50; user-select: none; }
+        .widget-clock { background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 12px 18px; color: white; text-align: center; cursor: move; min-width: 140px; }
+        .widget-clock .wc-time { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+        .widget-clock .wc-date { font-size: 11px; opacity: 0.6; margin-top: 4px; letter-spacing: 1px; }
+        .widget-stats { background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 12px 16px; color: white; cursor: move; min-width: 160px; }
+        .widget-stats .ws-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 3px 0; }
+        .widget-stats .ws-label { opacity: 0.6; }
+        .widget-stats .ws-val { font-weight: 700; }
+        .widget-sticky { background: #fef08a; border-radius: 10px; padding: 10px 12px; cursor: move; min-width: 160px; min-height: 100px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .widget-sticky textarea { width: 100%; height: 80px; border: none; background: transparent; resize: none; outline: none; font-family: 'Oxanium', sans-serif; font-size: 13px; color: rgba(0,0,0,0.7); }
+        .widget-close { position: absolute; top: 6px; right: 8px; background: rgba(0,0,0,0.15); border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+        .desktop-widget:hover .widget-close { opacity: 1; }
+
         /* Windows */
-        .window { position: absolute; background: var(--window-bg); border: 1px solid var(--border-color); border-radius: 8px 8px 0 0; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; min-width: 400px; min-height: 300px; z-index: 100; animation: windowOpen 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .window { position: absolute; background: var(--window-bg); border: 1px solid var(--border-color); border-radius: 8px 8px 0 0; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; min-width: 400px; min-height: 300px; z-index: 100; animation: windowOpen 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .window.closing { animation: windowClose 0.2s ease-out forwards; }
         .window.maximized { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(100% - 48px) !important; border-radius: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .window.minimizing { animation: windowMinimize 0.3s ease-out forwards; }
@@ -138,17 +165,27 @@
         /* Taskbar */
         .taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 48px; background: var(--taskbar-bg); border-top: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 8px; z-index: 10000; }
         .start-button { width: 48px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border: none; cursor: pointer; font-size: 20px; border-radius: 4px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .start-button:hover { background: var(--bg-tertiary); transform: scale(1.1); }
+        .start-button:hover { background: var(--bg-tertiary); transform: scale(1.12) rotate(8deg); }
         .start-button:active { transform: scale(0.95); }
         .taskbar-apps { flex: 1; display: flex; gap: 4px; padding: 0 8px; overflow-x: auto; }
-        .taskbar-app { min-width: 160px; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 12px; background: var(--bg-secondary); border: none; border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 13px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; animation: slideUp 0.3s ease; }
+        .taskbar-app {
+            min-width: 150px; max-width: 220px; height: 36px;
+            display: flex; align-items: center; gap: 8px; padding: 0 10px;
+            background: var(--bg-secondary); border: none;
+            border-radius: 6px; cursor: pointer; color: var(--text-primary);
+            font-size: 13px; font-weight: 600;
+            transition: all 0.2s ease;
+            position: relative;
+            animation: slideUp 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
         .taskbar-app:hover { background: var(--bg-tertiary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .taskbar-app:active { transform: translateY(0); }
-        .taskbar-app.active { background: var(--accent); color: white; }
+        .taskbar-app.active { background: var(--accent); color: white; border-bottom-color: rgba(255,255,255,0.5); }
         .taskbar-app-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .taskbar-close-btn { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 2px; font-size: 10px; opacity: 0; transition: all 0.2s ease; }
+        .taskbar-close-btn { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 11px; opacity: 0; transition: all 0.15s ease; flex-shrink: 0; }
         .taskbar-app:hover .taskbar-close-btn { opacity: 1; }
-        .taskbar-close-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.2); }
+        .taskbar-close-btn:hover { background: rgba(220, 53, 69, 0.7); color: white; transform: scale(1.1); }
         .system-tray { display: flex; align-items: center; gap: 12px; padding: 0 12px; color: var(--text-primary); font-size: 13px; }
         .tray-icon { cursor: pointer; padding: 4px; border-radius: 2px; transition: all 0.2s ease; }
         .tray-icon:hover { background: var(--bg-tertiary); transform: scale(1.1); }
@@ -171,7 +208,7 @@
         .app-section-title { color: var(--text-secondary); font-size: 12px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; }
         .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
         .start-app-item { padding: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .start-app-item:hover { background: var(--bg-tertiary); transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .start-app-item:hover { background: var(--bg-tertiary); transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.25); border-color: var(--accent); }
         .start-app-item:active { transform: translateY(-2px) scale(0.98); }
         .start-app-icon { font-size: 32px; transition: transform 0.3s ease; }
         .start-app-item:hover .start-app-icon { transform: scale(1.2) rotate(5deg); }
@@ -241,8 +278,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 </head>
 <body class="theme-white">
+    <div class="snap-preview" id="snapPreview"></div>
+    <div class="desktop-ctx-menu" id="desktopCtxMenu"></div>
     <div class="desktop" id="desktop">
         <div class="desktop-icons" id="desktopIcons"></div>
+        <div id="widgetContainer"></div>
         <div class="grid-preview" id="gridPreview"></div>
     </div>
 
@@ -293,48 +333,72 @@
         })();
 
         // ===== APP REGISTRY =====
-        // IMPORTANT: Replace YOUR_USERNAME with your GitHub username
-        // IMPORTANT: Replace eclipseos-apps with your repo name
         const apps = {
-            // External apps (loaded from GitHub via jsDelivr CDN)
             browser: {
                 name: 'Browser',
                 icon: '🌐',
                 file: 'os-apps/browser.html',
                 category: 'Internet'
             },
-            games: {
-                name: 'Games',
-                icon: '🎮',
-                file: 'https://cdn.jsdelivr.net/gh/YOUR_USERNAME/eclipseos-apps@main/games-app.html',
-                category: 'Entertainment'
-            },
-            tools: {
-                name: 'Tools',
-                icon: '🔧',
-                file: 'https://cdn.jsdelivr.net/gh/YOUR_USERNAME/eclipseos-apps@main/tools-app.html',
-                category: 'Utilities'
-            },
-            
             // Local apps
-            notepad: { name: 'Notepad', icon: '📝', file: 'os-apps/notepad.html', category: 'Productivity' },
-            calculator: { name: 'Calculator', icon: '🧮', file: 'os-apps/calculator.html', category: 'Utilities', width: 360, height: 520 },
-            calendar: { name: 'Calendar', icon: '📅', file: 'os-apps/calendar.html', category: 'Productivity' },
-            terminal: { name: 'Terminal', icon: '💻', file: 'os-apps/terminal.html', category: 'System' },
-            code: { name: 'Code Editor', icon: '👨‍💻', file: 'os-apps/code.html', category: 'Development', width: 1200, height: 700 },
-            paint: { name: 'Paint', icon: '🎨', file: 'os-apps/paint.html', category: 'Creative' },
-            taskmanager: { name: 'Task Manager', icon: '📊', file: 'os-apps/taskmanager.html', category: 'System' },
-            todolist: { name: 'To-Do List', icon: '📋', file: 'os-apps/todolist.html', category: 'Productivity' },
-            stickynotes: { name: 'Sticky Notes', icon: '📌', file: 'os-apps/stickynotes.html', category: 'Productivity' },
-            imageviewer: { name: 'Image Viewer', icon: '🖼️', file: 'os-apps/imageviewer.html', category: 'Media' },
-            clock: { name: 'Clock', icon: '⏰', file: 'os-apps/clock.html', category: 'Utilities' },
-            recyclebin: { name: 'Recycle Bin', icon: '🗑️', file: 'os-apps/recyclebin.html', category: 'System' },
-            search: { name: 'Search', icon: '🔍', file: 'os-apps/search.html', category: 'System' },
-            musicplayer: { name: 'Music Player', icon: '🎵', file: 'os-apps/musicplayer.html', category: 'Media' },
-            markdowneditor: { name: 'Markdown Editor', icon: '📄', file: 'os-apps/markdowneditor.html', category: 'Productivity' },
-            notifications: { name: 'Notifications', icon: '🔔', file: 'os-apps/notifications.html', category: 'System' },
-            settings: { name: 'Settings', icon: '⚙️', file: 'settings/settings-main.html', category: 'System' }
+            notepad:        { name: 'Notepad',         icon: '📝', file: 'os-apps/notepad.html',         category: 'Productivity' },
+            calculator:     { name: 'Calculator',      icon: '🧮', file: 'os-apps/calculator.html',      category: 'Utilities', width: 360, height: 520 },
+            calendar:       { name: 'Calendar',        icon: '📅', file: 'os-apps/calendar.html',        category: 'Productivity' },
+            terminal:       { name: 'Terminal',        icon: '💻', file: 'os-apps/terminal.html',        category: 'System' },
+            code:           { name: 'Code Editor',     icon: '👨‍💻', file: 'os-apps/code.html',            category: 'Development', width: 1200, height: 700 },
+            paint:          { name: 'Paint',           icon: '🎨', file: 'os-apps/paint.html',           category: 'Creative' },
+            todolist:       { name: 'To-Do List',      icon: '📋', file: 'os-apps/todolist.html',        category: 'Productivity' },
+            stickynotes:    { name: 'Sticky Notes',    icon: '📌', file: 'os-apps/stickynotes.html',     category: 'Productivity' },
+            imageviewer:    { name: 'Image Viewer',    icon: '🖼️', file: 'os-apps/imageviewer.html',     category: 'Media' },
+            clock:          { name: 'Clock',           icon: '⏰', file: 'os-apps/clock.html',           category: 'Utilities' },
+            recyclebin:     { name: 'Recycle Bin',     icon: '🗑️', file: 'os-apps/recyclebin.html',      category: 'System' },
+            search:         { name: 'Search',          icon: '🔍', file: 'os-apps/search.html',          category: 'System' },
+            musicplayer:    { name: 'Music Player',    icon: '🎵', file: 'os-apps/musicplayer.html',     category: 'Media' },
+            markdowneditor: { name: 'Markdown Editor', icon: '📄', file: 'os-apps/markdowneditor.html',  category: 'Productivity' },
+            settings:       { name: 'Settings',       icon: '⚙️', file: 'settings/settings-main.html', category: 'System' },
+            filemanager:    { name: 'File Manager',    icon: '📁', file: 'os-apps/filemanager.html',     category: 'System' },
+            voicerecorder:  { name: 'Voice Recorder',  icon: '🎙️', file: 'os-apps/voicerecorder.html',   category: 'Media' },
+            screenrecorder: { name: 'Screen Recorder', icon: '📹', file: 'os-apps/screenrecorder.html',  category: 'Media' },
+            appstore:       { name: 'App Store',        icon: '🏪', file: 'os-apps/appstore.html',        category: 'System' },
         };
+
+        // ===== CUSTOM APP ICONS =====
+        // Replace any app's emoji with a custom image URL.
+        // Format:  appId: 'path/to/icon.png'
+        // Example: notepad: 'icons/notepad.png'
+        // Leave empty ({}) to use the default emojis.
+        const CUSTOM_ICONS = {
+            // ── Paste your custom icons below ──
+
+            // browser:        'icons/browser.png',
+            // notepad:        'icons/notepad.png',
+            // calculator:     'icons/calculator.png',
+            // calendar:       'icons/calendar.png',
+            // terminal:       'icons/terminal.png',
+            // code:           'icons/code.png',
+            // paint:          'icons/paint.png',
+            // todolist:       'icons/todolist.png',
+            // stickynotes:    'icons/stickynotes.png',
+            // imageviewer:    'icons/imageviewer.png',
+            // clock:          'icons/clock.png',
+            // recyclebin:     'icons/recyclebin.png',
+            // search:         'icons/search.png',
+            // musicplayer:    'icons/musicplayer.png',
+            // markdowneditor: 'icons/markdowneditor.png',
+            // notifications:  'icons/notifications.png',
+            // settings:       'icons/settings.png',
+            // appstore:       'icons/appstore.png',
+        };
+        // ── End custom icons ──
+
+        // Helper — returns <img> if custom icon set, otherwise the emoji
+        function getIconHtml(app, size) {
+            size = size || 48;
+            if (app && app.customIcon) {
+                return '<img src="' + app.customIcon + '" width="' + size + '" height="' + size + '" style="object-fit:contain;border-radius:' + Math.round(size * 0.18) + 'px" alt="">';
+            }
+            return (app && app.icon) ? app.icon : '';
+        }
 
         // ===== OS STATE =====
         let windows = {};
@@ -395,6 +459,10 @@
         // ===== INITIALIZATION =====
         function init() {
             document.body.className = `theme-${currentTheme}`;
+            var savedFontSize = localStorage.getItem('eclipseos_os_font_size');
+            if (savedFontSize) document.body.style.fontSize = savedFontSize + 'px';
+            var savedAccent = localStorage.getItem('eclipseos_accent');
+            if (savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
             
             const wallpaper = localStorage.getItem('eclipseos_wallpaper');
             if (wallpaper && wallpaper !== 'none') {
@@ -415,6 +483,8 @@
             renderStartMenuApps();
             updateClock();
             setInterval(updateClock, 1000);
+            initContextMenu();
+            initWidgets();
             
             document.getElementById('startButton').addEventListener('click', toggleStartMenu);
             document.addEventListener('click', (e) => {
@@ -479,7 +549,7 @@
                 // Update layout with grid-snapped position
                 desktopLayout[appId] = { x: position.x, y: position.y };
                 
-                icon.innerHTML = `<div class="icon-image">${app.icon}</div><div class="icon-label">${app.name}</div>`;
+                icon.innerHTML = '<div class="icon-image">' + getIconHtml(app, 48) + '</div><div class="icon-label">' + app.name + '</div>';
                 icon.addEventListener('click', (e) => { e.stopPropagation(); selectIcon(icon); });
                 icon.addEventListener('dblclick', () => openApp(appId));
                 makeDraggable(icon);
@@ -585,7 +655,7 @@
                 item.style.animation = `slideUp 0.4s ease forwards`;
                 item.style.animationDelay = `${index * 0.03}s`;
                 
-                item.innerHTML = `<div class="start-app-icon">${app.icon}</div><div class="start-app-name">${app.name}</div>`;
+                item.innerHTML = '<div class="start-app-icon">' + getIconHtml(app, 32) + '</div><div class="start-app-name">' + app.name + '</div>';
                 item.addEventListener('click', () => { openApp(appId); toggleStartMenu(); });
                 container.appendChild(item);
             });
@@ -643,7 +713,7 @@
             
             windowEl.innerHTML = `
                 <div class="window-titlebar">
-                    <span class="window-icon">${app.icon}</span>
+                    <span class="window-icon">${getIconHtml(app, 18)}</span>
                     <span class="window-title">${app.name}</span>
                     <div class="window-controls">
                         <div class="window-control-btn minimize-btn" title="Minimize">−</div>
@@ -840,7 +910,7 @@
                 btn.className = 'taskbar-app';
                 if (parseInt(win.element.style.zIndex) === zIndexCounter) btn.classList.add('active');
                 btn.innerHTML = `
-                    <span>${app.icon}</span>
+                    <span>${getIconHtml(app, 18)}</span>
                     <span class="taskbar-app-text">${app.name}</span>
                     <span class="taskbar-close-btn" onclick="event.stopPropagation(); closeWindow('${appId}')">✕</span>
                 `;
@@ -850,8 +920,6 @@
                         win.element.classList.add('restoring');
                         win.minimized = false;
                         constrainWindowToBounds(win.element);
-                        
-                        // Remove restoring class after animation
                         setTimeout(() => {
                             win.element.classList.remove('restoring');
                         }, 300);
@@ -914,8 +982,210 @@
             document.getElementById('clockDate').textContent = `${month} ${day}, ${year}`;
         }
 
+
+        // ===== WINDOW SNAPPING =====
+        const snapPreview = document.getElementById('snapPreview');
+        let snapZone = null;
+
+        function getSnapZone(x, y) {
+            if (y < 8) return 'top';
+            if (x < 20) return 'left';
+            if (x > window.innerWidth - 20) return 'right';
+            return null;
+        }
+
+        function showSnapPreview(zone) {
+            if (!zone) { snapPreview.style.display = 'none'; return; }
+            const h = window.innerHeight - 48;
+            if (zone === 'left')  { snapPreview.style.cssText = 'display:block;position:fixed;top:0;left:0;width:50%;height:' + h + 'px;background:rgba(0,120,212,0.2);border:2px solid rgba(0,120,212,0.6);border-radius:6px;pointer-events:none;z-index:99999;transition:all 0.1s'; }
+            if (zone === 'right') { snapPreview.style.cssText = 'display:block;position:fixed;top:0;left:50%;width:50%;height:' + h + 'px;background:rgba(0,120,212,0.2);border:2px solid rgba(0,120,212,0.6);border-radius:6px;pointer-events:none;z-index:99999;transition:all 0.1s'; }
+            if (zone === 'top')   { snapPreview.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:' + h + 'px;background:rgba(0,120,212,0.15);border:2px solid rgba(0,120,212,0.5);border-radius:0;pointer-events:none;z-index:99999;transition:all 0.1s'; }
+        }
+
+        function applySnap(windowEl, zone) {
+            windowEl.classList.remove('snap-left', 'snap-right', 'maximized');
+            if (zone === 'left')  windowEl.classList.add('snap-left');
+            if (zone === 'right') windowEl.classList.add('snap-right');
+            if (zone === 'top')   windowEl.classList.add('maximized');
+        }
+
+        // Hook into window dragging — patch makeWindowDraggable to support snapping
+        const _origMakeWindowDraggable = makeWindowDraggable;
+        function makeWindowDraggable(windowEl) {
+            const titlebar = windowEl.querySelector('.window-titlebar');
+            let isDragging = false, startX, startY, initialX, initialY, wasSnapped = false;
+            titlebar.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.window-control-btn') || windowEl.classList.contains('maximized')) return;
+                isDragging = true;
+                startX = e.clientX; startY = e.clientY;
+                initialX = windowEl.offsetLeft; initialY = windowEl.offsetTop;
+                wasSnapped = windowEl.classList.contains('snap-left') || windowEl.classList.contains('snap-right');
+                if (wasSnapped) { windowEl.classList.remove('snap-left','snap-right'); }
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                let newX = initialX + (e.clientX - startX);
+                let newY = initialY + (e.clientY - startY);
+                newX = Math.max(0, Math.min(newX, window.innerWidth - windowEl.offsetWidth));
+                newY = Math.max(0, Math.min(newY, window.innerHeight - 48 - windowEl.offsetHeight));
+                windowEl.style.left = newX + 'px';
+                windowEl.style.top  = newY + 'px';
+                snapZone = getSnapZone(e.clientX, e.clientY);
+                showSnapPreview(snapZone);
+            });
+            document.addEventListener('mouseup', (e) => {
+                if (!isDragging) return;
+                isDragging = false;
+                snapPreview.style.display = 'none';
+                if (snapZone) { applySnap(windowEl, snapZone); snapZone = null; }
+            });
+        }
+
+        // ===== DESKTOP CONTEXT MENU =====
+        function initContextMenu() {
+            const menu = document.getElementById('desktopCtxMenu');
+            document.getElementById('desktop').addEventListener('contextmenu', (e) => {
+                if (e.target.closest('.desktop-icon') || e.target.closest('.desktop-widget')) return;
+                e.preventDefault();
+                menu.innerHTML = `
+                    <div class="ctx-item" onclick="openApp('notepad');closeCtxMenu()">📝 New Note</div>
+                    <div class="ctx-item" onclick="openApp('stickynotes');closeCtxMenu()">📌 New Sticky Note</div>
+                    <div class="ctx-sep"></div>
+                    <div class="ctx-item" onclick="addWidget('clock');closeCtxMenu()">🕐 Add Clock Widget</div>
+                    <div class="ctx-item" onclick="addWidget('weather');closeCtxMenu()">🌤️ Add Weather Widget</div>
+                    <div class="ctx-item" onclick="addWidget('sticky');closeCtxMenu()">📌 Add Sticky Widget</div>
+                    <div class="ctx-sep"></div>
+                    <div class="ctx-item" onclick="openApp('settings');closeCtxMenu()">⚙️ Settings</div>
+                    <div class="ctx-item" onclick="resetDesktopLayout();closeCtxMenu()">↺ Reset Icon Layout</div>
+                    <div class="ctx-sep"></div>
+                    <div class="ctx-item" onclick="changeTheme(currentTheme==='white'?'black':'white');closeCtxMenu()">🎨 Toggle Theme</div>`;
+                const x = Math.min(e.clientX, window.innerWidth - 220);
+                const y = Math.min(e.clientY, window.innerHeight - 280);
+                menu.style.left = x + 'px';
+                menu.style.top  = y + 'px';
+                menu.classList.add('open');
+            });
+            document.addEventListener('click', closeCtxMenu);
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCtxMenu(); });
+        }
+        function closeCtxMenu() {
+            document.getElementById('desktopCtxMenu').classList.remove('open');
+        }
+
+        // ===== DESKTOP WIDGETS =====
+        let widgets = JSON.parse(localStorage.getItem('eclipseos_widgets') || '[]');
+
+        function saveWidgets() {
+            localStorage.setItem('eclipseos_widgets', JSON.stringify(widgets));
+        }
+
+        function addWidget(type) {
+            const w = { id: Date.now(), type, x: 100 + Math.random()*200, y: 100 + Math.random()*100, text: '' };
+            widgets.push(w);
+            saveWidgets();
+            renderWidget(w);
+        }
+
+        function removeWidget(id) {
+            widgets = widgets.filter(w => w.id !== id);
+            saveWidgets();
+            const el = document.getElementById('widget-' + id);
+            if (el) el.remove();
+        }
+
+        function renderWidget(w) {
+            const container = document.getElementById('widgetContainer');
+            const div = document.createElement('div');
+            div.className = 'desktop-widget';
+            div.id = 'widget-' + w.id;
+            div.style.left = w.x + 'px';
+            div.style.top  = w.y + 'px';
+            div.style.position = 'absolute';
+
+            if (w.type === 'clock') {
+                div.innerHTML = `<div class="widget-clock"><div class="wc-time" id="wt-${w.id}">--:--</div><div class="wc-date" id="wd-${w.id}"></div></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+                setInterval(() => {
+                    const now = new Date();
+                    const h = now.getHours().toString().padStart(2,'0');
+                    const m = now.getMinutes().toString().padStart(2,'0');
+                    const el = document.getElementById('wt-' + w.id);
+                    const de = document.getElementById('wd-' + w.id);
+                    if (el) el.textContent = h + ':' + m;
+                    if (de) de.textContent = now.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'});
+                }, 1000);
+            } else if (w.type === 'weather') {
+                div.innerHTML = `<div class="widget-stats" id="weath-${w.id}"><div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.6;margin-bottom:8px;text-transform:uppercase">Weather</div><div id="weath-content-${w.id}" style="font-size:12px;opacity:0.7">Enter city below</div><input id="weath-city-${w.id}" placeholder="City name…" style="margin-top:8px;width:100%;padding:5px 8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:5px;color:white;font-family:Oxanium,sans-serif;font-size:11px;outline:none" onkeydown="if(event.key==='Enter')fetchWidgetWeather(${w.id})"></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+                if (w.city) fetchWidgetWeather(w.id, w.city);
+            } else if (w.type === 'sticky') {
+                div.innerHTML = `<div class="widget-sticky"><textarea placeholder="Widget note..." oninput="updateWidgetText(${w.id},this.value)">${w.text||''}</textarea></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+            }
+
+            makeDraggableWidget(div, w);
+            container.appendChild(div);
+        }
+
+        function updateWidgetText(id, text) {
+            const w = widgets.find(x => x.id === id);
+            if (w) { w.text = text; saveWidgets(); }
+        }
+
+        function makeDraggableWidget(el, w) {
+            let dragging = false, sx, sy, ix, iy;
+            const handle = el.querySelector('.widget-clock, .widget-stats, .widget-sticky div:first-child') || el;
+            el.addEventListener('mousedown', (e) => {
+                if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('widget-close')) return;
+                dragging = true; sx = e.clientX; sy = e.clientY;
+                ix = el.offsetLeft; iy = el.offsetTop;
+                el.style.zIndex = 999;
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!dragging) return;
+                el.style.left = (ix + e.clientX - sx) + 'px';
+                el.style.top  = (iy + e.clientY - sy) + 'px';
+                w.x = ix + e.clientX - sx;
+                w.y = iy + e.clientY - sy;
+            });
+            document.addEventListener('mouseup', () => {
+                if (dragging) { dragging = false; el.style.zIndex = ''; saveWidgets(); }
+            });
+        }
+
+        function fetchWidgetWeather(id, city) {
+            const cityEl = document.getElementById('weath-city-' + id);
+            const c = city || (cityEl && cityEl.value.trim());
+            if (!c) return;
+            const w = widgets.find(x => x.id === id);
+            if (w) w.city = c;
+            saveWidgets();
+            const apiKey = localStorage.getItem('eclipseos_weather_key') || '';
+            if (!apiKey) { const el = document.getElementById('weath-content-' + id); if(el) el.textContent = '🔑 Set API key in Weather app'; return; }
+            fetch('https://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(c) + '&appid=' + apiKey + '&units=metric')
+                .then(r => r.json())
+                .then(d => {
+                    const el = document.getElementById('weath-content-' + id);
+                    if (!el) return;
+                    if (d.cod !== 200) { el.textContent = '❌ ' + (d.message || 'Not found'); return; }
+                    const icons = {'01d':'☀️','01n':'🌙','02d':'⛅','02n':'🌙','03d':'☁️','04d':'☁️','09d':'🌧️','10d':'🌦️','11d':'⛈️','13d':'❄️','50d':'🌫️'};
+                    const icon = icons[d.weather[0].icon] || '🌤️';
+                    el.innerHTML = '<div style="font-size:24px;margin-bottom:4px">' + icon + ' ' + Math.round(d.main.temp) + '°C</div><div>' + d.name + '</div><div style="opacity:0.6;font-size:10px">' + d.weather[0].description + '</div>';
+                    if (cityEl) cityEl.style.display = 'none';
+                })
+                .catch(() => { const el = document.getElementById('weath-content-' + id); if(el) el.textContent = '⚠️ Network error'; });
+        }
+
+        function initWidgets() {
+            widgets.forEach(w => renderWidget(w));
+        }
+
         // ===== START =====
         init();
+
+        // Open startup apps
+        setTimeout(function() {
+            var startupApps = JSON.parse(localStorage.getItem('eclipseos_startup_apps') || '[]');
+            startupApps.forEach(function(id) { if (apps[id]) openApp(id); });
+        }, 800);
     </script>
 
     <!-- Volume popup -->

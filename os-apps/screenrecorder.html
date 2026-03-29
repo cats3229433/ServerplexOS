@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><title>Screen Recorder</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:700}
+.main{flex:1;display:flex;overflow:hidden}
+.controls-panel{width:300px;flex-shrink:0;padding:20px;border-right:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+.section-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;margin-bottom:8px}
+.preview-panel{flex:1;display:flex;flex-direction:column;padding:16px;gap:12px;overflow:hidden}
+.preview-wrap{flex:1;background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
+video{width:100%;height:100%;object-fit:contain}
+.preview-placeholder{text-align:center;color:#8b949e}
+.preview-placeholder div{font-size:52px;margin-bottom:12px}
+.rec-indicator{position:absolute;top:12px;right:12px;background:rgba(239,68,68,0.9);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;display:none;align-items:center;gap:6px;letter-spacing:1px}
+.rec-indicator.show{display:flex}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:white;animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.timer-display{font-size:14px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.timer-display.recording{color:#ef4444}
+.opt-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.opt-row:last-child{border-bottom:none}
+.opt-label{font-size:13px}
+.opt-label small{display:block;font-size:10px;color:#8b949e;margin-top:1px}
+.toggle-wrap{position:relative;width:36px;height:20px;cursor:pointer;flex-shrink:0}
+.toggle-wrap input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:10px;background:rgba(255,255,255,0.1);transition:background .2s}
+.toggle-wrap input:checked + .toggle-track{background:#0078d4}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:white;transition:transform .2s}
+.toggle-wrap input:checked ~ .toggle-thumb{transform:translateX(16px)}
+.quality-select{padding:6px 10px;background:#0d1117;border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:12px;outline:none;width:100%;margin-top:6px}
+.big-btn{width:100%;padding:12px;border-radius:10px;border:none;font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.btn-start{background:#ef4444;color:white;box-shadow:0 4px 16px rgba(239,68,68,.3)}
+.btn-start:hover{background:#dc2626}
+.btn-stop{background:#22c55e;color:white;box-shadow:0 4px 16px rgba(34,197,94,.3)}
+.btn-stop:hover{background:#16a34a}
+.btn-pause{background:#f59e0b;color:#1a1a1a}
+.btn-pause:hover{background:#d97706}
+.btn-row{display:flex;gap:8px}
+.recordings-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.panel-title{padding:14px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.recordings-list{flex:1;overflow-y:auto;padding:10px}
+.rec-item{background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px;margin-bottom:8px}
+.ri-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.ri-name{font-size:13px;font-weight:600}
+.ri-meta{font-size:11px;color:#8b949e}
+.ri-btns{display:flex;gap:5px}
+.ri-btn{padding:4px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:5px;background:rgba(255,255,255,0.04);color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:11px;cursor:pointer}
+.ri-btn:hover{background:rgba(255,255,255,0.1)}
+.ri-btn.danger:hover{color:#f85149;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08)}
+.empty-state{text-align:center;padding:40px;color:#8b949e}
+.empty-state div{font-size:48px;margin-bottom:12px}
+.error-msg{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:12px;font-size:13px;color:#fca5a5;line-height:1.6;display:none}
+.error-msg.show{display:block}
+</style>
+</head>
+<body>
+<div class="header"><div>📹</div><h1>Screen Recorder</h1></div>
+<div class="main">
+  <div class="controls-panel">
+    <div>
+      <div class="section-title">Recording Options</div>
+      <div class="opt-row"><div class="opt-label">Record Audio<small>Capture microphone</small></div><label class="toggle-wrap"><input type="checkbox" id="optAudio"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+      <div class="opt-row"><div class="opt-label">Include Tab Audio<small>Capture browser audio</small></div><label class="toggle-wrap"><input type="checkbox" id="optTabAudio" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+      <div class="opt-row"><div class="opt-label">Show cursor</div><label class="toggle-wrap"><input type="checkbox" id="optCursor" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+    </div>
+    <div>
+      <div class="section-title">Quality</div>
+      <select class="quality-select" id="qualitySelect">
+        <option value="2500000">High (2.5 Mbps)</option>
+        <option value="1500000" selected>Medium (1.5 Mbps)</option>
+        <option value="500000">Low (0.5 Mbps)</option>
+      </select>
+    </div>
+    <div class="timer-display" id="timerDisplay">00:00</div>
+    <div id="errorMsg" class="error-msg"></div>
+    <button class="big-btn btn-start" id="mainBtn" onclick="toggleRecording()">⏺ Start Recording</button>
+    <button class="big-btn btn-pause" id="pauseBtn" onclick="togglePause()" style="display:none">⏸ Pause</button>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+    <div class="preview-panel" style="flex:1;display:flex;flex-direction:column">
+      <div class="preview-wrap">
+        <video id="previewVideo" autoplay muted playsinline style="display:none"></video>
+        <div class="preview-placeholder" id="previewPlaceholder"><div>📹</div><p>Preview will appear here</p></div>
+        <div class="rec-indicator" id="recIndicator"><div class="rec-dot"></div>REC</div>
+      </div>
+    </div>
+    <div style="flex:0;border-top:1px solid rgba(255,255,255,.08)">
+      <div class="panel-title">Saved Recordings</div>
+      <div class="recordings-list" id="recList" style="max-height:200px"></div>
+    </div>
+  </div>
+</div>
+<script>
+let mediaRecorder = null, stream = null, chunks = [], timerInt = null, seconds = 0, paused = false;
+let recordings = [];
+
+function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+
+async function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') { stopRecording(); return; }
+  const err = document.getElementById('errorMsg');
+  err.classList.remove('show');
+  try {
+    const opts = { video: { cursor: document.getElementById('optCursor').checked ? 'always' : 'never' }, audio: document.getElementById('optTabAudio').checked };
+    stream = await navigator.mediaDevices.getDisplayMedia(opts);
+    if (document.getElementById('optAudio').checked) {
+      try {
+        const micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        const ctx = new AudioContext();
+        const dest = ctx.createMediaStreamDestination();
+        ctx.createMediaStreamSource(stream).connect(dest);
+        ctx.createMediaStreamSource(micStream).connect(dest);
+        stream.addTrack(dest.stream.getAudioTracks()[0]);
+      } catch(e) {}
+    }
+    const bitrate = parseInt(document.getElementById('qualitySelect').value);
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: bitrate });
+    mediaRecorder.ondataavailable = e => { if(e.data.size>0) chunks.push(e.data); };
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, {type:'video/webm'});
+      const url = URL.createObjectURL(blob);
+      const srec = { id:Date.now(), name:'Screen Recording '+(recordings.length+1), duration:seconds, date:new Date().toLocaleString(), url, size:blob.size };
+      recordings.unshift(srec);
+      renderRecordings();
+      saveToFileManager(srec.name + '.webm', blob);
+      stream.getTracks().forEach(t => t.stop());
+      document.getElementById('previewVideo').style.display='none';
+      document.getElementById('previewPlaceholder').style.display='block';
+      document.getElementById('recIndicator').classList.remove('show');
+    };
+    chunks = []; seconds = 0;
+    document.getElementById('previewVideo').srcObject = stream;
+    document.getElementById('previewVideo').style.display = 'block';
+    document.getElementById('previewPlaceholder').style.display = 'none';
+    mediaRecorder.start(1000);
+    document.getElementById('mainBtn').textContent = '⏹ Stop';
+    document.getElementById('mainBtn').className = 'big-btn btn-stop';
+    document.getElementById('pauseBtn').style.display = 'block';
+    document.getElementById('recIndicator').classList.add('show');
+    document.getElementById('timerDisplay').classList.add('recording');
+    timerInt = setInterval(() => { if (!paused) { seconds++; document.getElementById('timerDisplay').textContent = fmt(seconds); } }, 1000);
+    stream.getVideoTracks()[0].onended = () => stopRecording();
+  } catch(e) {
+    err.textContent = '⚠️ Could not start screen capture. Your browser may not support this, or permission was denied.';
+    err.classList.add('show');
+  }
+}
+
+function stopRecording() {
+  if (!mediaRecorder) return;
+  clearInterval(timerInt);
+  mediaRecorder.stop();
+  mediaRecorder = null; paused = false;
+  document.getElementById('mainBtn').textContent = '⏺ Start Recording';
+  document.getElementById('mainBtn').className = 'big-btn btn-start';
+  document.getElementById('pauseBtn').style.display = 'none';
+  document.getElementById('pauseBtn').textContent = '⏸ Pause';
+  document.getElementById('timerDisplay').textContent = '00:00';
+  document.getElementById('timerDisplay').classList.remove('recording');
+}
+
+function togglePause() {
+  if (!mediaRecorder) return;
+  if (paused) { mediaRecorder.resume(); paused=false; document.getElementById('pauseBtn').textContent='⏸ Pause'; document.getElementById('recIndicator').classList.add('show'); }
+  else { mediaRecorder.pause(); paused=true; document.getElementById('pauseBtn').textContent='▶ Resume'; document.getElementById('recIndicator').classList.remove('show'); }
+}
+
+function renderRecordings() {
+  const list = document.getElementById('recList');
+  if (!recordings.length) { list.innerHTML='<div class="empty-state"><div>📹</div><p>No recordings yet</p></div>'; return; }
+  list.innerHTML = recordings.map(r => `
+    <div class="rec-item">
+      <div class="ri-row">
+        <div><div class="ri-name">${r.name}</div><div class="ri-meta">${r.date} · ${fmt(r.duration)} · ${r.size?(r.size/1048576).toFixed(1)+'MB':''}</div></div>
+        <div class="ri-btns">
+          <button class="ri-btn" onclick="downloadRec(${r.id})">💾 Save</button>
+          <button class="ri-btn danger" onclick="deleteRec(${r.id})">🗑️</button>
+        </div>
+      </div>
+      <video controls src="${r.url}" style="width:100%;border-radius:6px;margin-top:4px;max-height:120px"></video>
+    </div>`).join('');
+}
+
+function downloadRec(id) { const r=recordings.find(x=>x.id===id); if(!r)return; const a=Object.assign(document.createElement('a'),{href:r.url,download:r.name+'.webm'}); a.click(); }
+function deleteRec(id) { if(!confirm('Delete?'))return; recordings=recordings.filter(x=>x.id!==id); renderRecordings(); }
+
+renderRecordings();
+</script>
+</body>
+</html>

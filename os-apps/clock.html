@@ -1,166 +1,258 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Clock</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; height: 100vh; }
-        .tabs { display: flex; background: #fff; border-bottom: 2px solid #ddd; }
-        .tab { flex: 1; padding: 16px; text-align: center; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-        .tab:hover { background: #f0f0f0; }
-        .tab.active { background: #0078d4; color: white; }
-        .tab-content { display: none; padding: 40px; text-align: center; }
-        .tab-content.active { display: block; }
-        .clock-display { font-size: 64px; font-weight: 700; margin-bottom: 20px; color: #333; font-family: 'Courier New', monospace; }
-        button { padding: 12px 24px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin: 8px; }
-        button:hover { background: #005a9e; }
-        button.stop { background: #ff3b30; }
-        input { padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 6px; margin: 8px; width: 80px; text-align: center; }
-    </style>
+<meta charset="UTF-8"><title>Clock</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.tabs{display:flex;background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0}
+.tab{flex:1;padding:14px;text-align:center;cursor:pointer;font-size:13px;font-weight:600;color:#8b949e;border-bottom:2px solid transparent;transition:all 0.2s}
+.tab:hover{color:#e6edf3;background:rgba(255,255,255,0.04)}
+.tab.active{color:#4db8ff;border-bottom-color:#0078d4}
+.panel{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;overflow:auto}
+.panel.active{display:flex}
+
+/* Clock */
+.clock-face{position:relative;width:220px;height:220px;margin-bottom:28px}
+.clock-svg{width:100%;height:100%}
+.time-digital{font-size:52px;font-weight:700;letter-spacing:2px;text-align:center}
+.date-str{font-size:16px;color:#8b949e;margin-top:8px;text-align:center}
+.format-toggle{margin-top:16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#8b949e;padding:6px 16px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px}
+.format-toggle:hover{background:rgba(255,255,255,0.1);color:#e6edf3}
+
+/* Timer & Stopwatch */
+.big-display{font-size:64px;font-weight:700;letter-spacing:4px;font-variant-numeric:tabular-nums;margin-bottom:30px}
+.big-display.running{color:#4db8ff}
+.big-display.done{color:#3fb950;animation:pulse 0.5s infinite alternate}
+@keyframes pulse{to{opacity:0.5}}
+.controls{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.ctrl-btn{padding:12px 28px;border:none;border-radius:10px;font-family:'Oxanium',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;min-width:100px}
+.ctrl-btn:hover{transform:translateY(-1px)}
+.btn-start{background:#238636;color:white}
+.btn-pause{background:#e3b341;color:#0d1117}
+.btn-stop{background:#da3633;color:white}
+.btn-reset{background:#3e3e42;color:#ccc}
+.timer-inputs{display:flex;gap:8px;margin-bottom:24px;align-items:center}
+.time-input-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.time-input-label{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:1px}
+.time-input{width:70px;padding:10px;background:#161b22;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:20px;text-align:center;outline:none}
+.time-input:focus{border-color:#0078d4}
+.time-sep{font-size:24px;color:#8b949e;margin-bottom:4px}
+.laps{width:100%;max-width:360px;max-height:180px;overflow-y:auto;margin-top:16px}
+.lap-item{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px}
+.lap-num{color:#8b949e}
+.lap-time{color:#e6edf3;font-weight:600}
+.lap-fastest{color:#3fb950}
+.lap-slowest{color:#f85149}
+
+/* Alarm */
+.alarm-display{font-size:42px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+.alarm-status{font-size:14px;color:#8b949e;margin-bottom:24px}
+.alarm-input{padding:12px 20px;background:#161b22;border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:24px;outline:none;margin-bottom:16px;text-align:center}
+.alarm-input:focus{border-color:#0078d4}
+.alarm-list{width:100%;max-width:360px}
+.alarm-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#161b22;border:1px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:8px}
+.alarm-time{font-size:22px;font-weight:700}
+.alarm-label{font-size:11px;color:#8b949e}
+.alarm-del{background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;padding:4px}
+.alarm-del:hover{color:#f85149}
+.alarm-toggle{width:36px;height:20px;border-radius:10px;background:rgba(255,255,255,0.1);border:none;cursor:pointer;position:relative;transition:background 0.2s}
+.alarm-toggle.on{background:#0078d4}
+.alarm-toggle::after{content:'';position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:white;transition:transform 0.2s}
+.alarm-toggle.on::after{transform:translateX(16px)}
+</style>
 </head>
 <body>
-    <div class="tabs">
-        <div class="tab active" onclick="showTab('clock')">🕐 Clock</div>
-        <div class="tab" onclick="showTab('timer')">⏲️ Timer</div>
-        <div class="tab" onclick="showTab('stopwatch')">⏱️ Stopwatch</div>
-        <div class="tab" onclick="showTab('alarm')">⏰ Alarm</div>
-    </div>
+<div class="tabs">
+  <div class="tab active" onclick="showTab('clock')">🕐 Clock</div>
+  <div class="tab" onclick="showTab('timer')">⏲️ Timer</div>
+  <div class="tab" onclick="showTab('stopwatch')">⏱️ Stopwatch</div>
+  <div class="tab" onclick="showTab('alarm')">⏰ Alarm</div>
+</div>
 
-    <div id="clock" class="tab-content active">
-        <div class="clock-display" id="currentTime">12:00:00</div>
-        <div style="font-size: 24px; color: #666;" id="currentDate">Loading...</div>
-    </div>
+<!-- Clock -->
+<div class="panel active" id="panel-clock">
+  <div class="clock-face">
+    <svg class="clock-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="96" fill="#161b22" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+      <g id="hour-markers"></g>
+      <line id="hour-hand" x1="100" y1="100" x2="100" y2="55" stroke="#e6edf3" stroke-width="4" stroke-linecap="round"/>
+      <line id="min-hand" x1="100" y1="100" x2="100" y2="38" stroke="#4db8ff" stroke-width="3" stroke-linecap="round"/>
+      <line id="sec-hand" x1="100" y1="115" x2="100" y2="30" stroke="#da3633" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="100" cy="100" r="4" fill="#e6edf3"/>
+    </svg>
+  </div>
+  <div class="time-digital" id="clockDigital">00:00:00</div>
+  <div class="date-str" id="clockDate"></div>
+  <button class="format-toggle" onclick="toggle12h()">Switch to <span id="fmtLabel">12h</span></button>
+</div>
 
-    <div id="timer" class="tab-content">
-        <div class="clock-display" id="timerDisplay">00:00:00</div>
-        <div>
-            <input type="number" id="timerHours" placeholder="HH" min="0" max="23" value="0">
-            <input type="number" id="timerMinutes" placeholder="MM" min="0" max="59" value="5">
-            <input type="number" id="timerSeconds" placeholder="SS" min="0" max="59" value="0">
-        </div>
-        <button onclick="startTimer()">▶️ Start</button>
-        <button class="stop" onclick="stopTimer()">⏹️ Stop</button>
-        <button onclick="resetTimer()">🔄 Reset</button>
-    </div>
+<!-- Timer -->
+<div class="panel" id="panel-timer">
+  <div class="timer-inputs" id="timerInputs">
+    <div class="time-input-wrap"><div class="time-input-label">Hours</div><input class="time-input" id="tHours" type="number" min="0" max="99" value="0"></div>
+    <div class="time-sep">:</div>
+    <div class="time-input-wrap"><div class="time-input-label">Minutes</div><input class="time-input" id="tMins" type="number" min="0" max="59" value="5"></div>
+    <div class="time-sep">:</div>
+    <div class="time-input-wrap"><div class="time-input-label">Seconds</div><input class="time-input" id="tSecs" type="number" min="0" max="59" value="0"></div>
+  </div>
+  <div class="big-display" id="timerDisplay">00:05:00</div>
+  <div class="controls">
+    <button class="ctrl-btn btn-start" id="timerStartBtn" onclick="timerStart()">▶ Start</button>
+    <button class="ctrl-btn btn-pause" id="timerPauseBtn" onclick="timerPause()" style="display:none">⏸ Pause</button>
+    <button class="ctrl-btn btn-reset" onclick="timerReset()">↺ Reset</button>
+  </div>
+</div>
 
-    <div id="stopwatch" class="tab-content">
-        <div class="clock-display" id="stopwatchDisplay">00:00:00</div>
-        <button onclick="startStopwatch()">▶️ Start</button>
-        <button class="stop" onclick="stopStopwatch()">⏸️ Pause</button>
-        <button onclick="resetStopwatch()">🔄 Reset</button>
-    </div>
+<!-- Stopwatch -->
+<div class="panel" id="panel-stopwatch">
+  <div class="big-display" id="swDisplay">00:00.00</div>
+  <div class="controls">
+    <button class="ctrl-btn btn-start" id="swStartBtn" onclick="swStart()">▶ Start</button>
+    <button class="ctrl-btn btn-pause" id="swPauseBtn" onclick="swPause()" style="display:none">⏸ Pause</button>
+    <button class="ctrl-btn btn-reset" onclick="swReset()">↺ Reset</button>
+    <button class="ctrl-btn" style="background:#0078d4;color:white" onclick="swLap()">⚑ Lap</button>
+  </div>
+  <div class="laps" id="lapList"></div>
+</div>
 
-    <div id="alarm" class="tab-content">
-        <div class="clock-display" id="alarmDisplay">--:--</div>
-        <div>
-            <input type="time" id="alarmTime" style="width: 200px;">
-        </div>
-        <button onclick="setAlarm()">⏰ Set Alarm</button>
-        <button class="stop" onclick="clearAlarm()">✕ Clear</button>
-    </div>
+<!-- Alarm -->
+<div class="panel" id="panel-alarm">
+  <input class="alarm-input" type="time" id="alarmTimeInput">
+  <button class="ctrl-btn btn-start" onclick="addAlarm()" style="margin-bottom:20px">+ Add Alarm</button>
+  <div class="alarm-list" id="alarmList"></div>
+</div>
 
-    <script>
-        let timerInterval, stopwatchInterval, alarmInterval;
-        let timerSeconds = 0, stopwatchSeconds = 0, alarmTime = null;
+<script>
+// Tabs
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tab:nth-child(${['clock','timer','stopwatch','alarm'].indexOf(t)+1})`).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+}
 
-        function showTab(tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById(tab).classList.add('active');
-        }
+// Clock
+let use24=false;
+function toggle12h(){use24=!use24;document.getElementById('fmtLabel').textContent=use24?'24h':'12h';}
+function addHourMarkers(){
+  const g=document.getElementById('hour-markers');
+  for(let i=0;i<12;i++){
+    const a=(i*30-90)*Math.PI/180;
+    const r1=i%3===0?78:84,r2=92;
+    const x1=100+Math.cos(a)*r1,y1=100+Math.sin(a)*r1;
+    const x2=100+Math.cos(a)*r2,y2=100+Math.sin(a)*r2;
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);
+    line.setAttribute('stroke',i%3===0?'#8b949e':'rgba(255,255,255,0.15)');
+    line.setAttribute('stroke-width',i%3===0?'2':'1');
+    g.appendChild(line);
+  }
+}
+function rotLine(id,deg){const el=document.getElementById(id);el.setAttribute('transform',`rotate(${deg},100,100)`);}
+function updateClock(){
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  rotLine('hour-hand',(h%12+m/60)*30);
+  rotLine('min-hand',m*6+s*0.1);
+  rotLine('sec-hand',s*6);
+  const hd=use24?h:h%12||12;
+  const ampm=use24?'':(h<12?' AM':' PM');
+  document.getElementById('clockDigital').textContent=`${String(hd).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}${ampm}`;
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('clockDate').textContent=`${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  checkAlarms(now);
+}
+addHourMarkers();
+setInterval(updateClock,1000);
+updateClock();
 
-        function updateClock() {
-            const now = new Date();
-            const time = now.toLocaleTimeString('en-US', { hour12: false });
-            const date = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('currentTime').textContent = time;
-            document.getElementById('currentDate').textContent = date;
-        }
+// Timer
+let timerInt=null,timerSecs=0,timerRunning=false;
+function fmt(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;return`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;}
+function timerStart(){
+  if(!timerRunning){
+    if(timerSecs===0){
+      timerSecs=parseInt(document.getElementById('tHours').value||0)*3600+parseInt(document.getElementById('tMins').value||0)*60+parseInt(document.getElementById('tSecs').value||0);
+      if(!timerSecs)return;
+    }
+    document.getElementById('timerInputs').style.opacity='0.3';
+    document.getElementById('timerStartBtn').style.display='none';
+    document.getElementById('timerPauseBtn').style.display='block';
+    timerRunning=true;
+    timerInt=setInterval(()=>{
+      timerSecs--;
+      document.getElementById('timerDisplay').textContent=fmt(timerSecs);
+      if(timerSecs<=0){clearInterval(timerInt);timerRunning=false;document.getElementById('timerDisplay').classList.add('done');playBeep();timerReset(true);}
+    },1000);
+  }
+}
+function timerPause(){clearInterval(timerInt);timerRunning=false;document.getElementById('timerStartBtn').style.display='block';document.getElementById('timerPauseBtn').style.display='none';}
+function timerReset(fin=false){
+  clearInterval(timerInt);timerRunning=false;timerSecs=0;
+  document.getElementById('timerDisplay').textContent='00:00:00';
+  document.getElementById('timerDisplay').classList.remove('done','running');
+  document.getElementById('timerInputs').style.opacity='1';
+  document.getElementById('timerStartBtn').style.display='block';
+  document.getElementById('timerPauseBtn').style.display='none';
+}
+function playBeep(){try{const ctx=new AudioContext();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+1);o.start();o.stop(ctx.currentTime+1);}catch(e){}}
 
-        function formatTime(seconds) {
-            const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-            const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            return `${h}:${m}:${s}`;
-        }
+// Stopwatch
+let swInt=null,swMs=0,swRunning=false,laps=[];
+function fmtSW(ms){const m=Math.floor(ms/60000),s=Math.floor((ms%60000)/1000),cs=Math.floor((ms%1000)/10);return`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`;}
+function swStart(){
+  swRunning=true;
+  document.getElementById('swStartBtn').style.display='none';
+  document.getElementById('swPauseBtn').style.display='block';
+  const start=Date.now()-swMs;
+  swInt=setInterval(()=>{swMs=Date.now()-start;document.getElementById('swDisplay').textContent=fmtSW(swMs);},10);
+}
+function swPause(){clearInterval(swInt);swRunning=false;document.getElementById('swStartBtn').style.display='block';document.getElementById('swPauseBtn').style.display='none';}
+function swReset(){clearInterval(swInt);swRunning=false;swMs=0;laps=[];document.getElementById('swDisplay').textContent='00:00.00';document.getElementById('swStartBtn').style.display='block';document.getElementById('swPauseBtn').style.display='none';renderLaps();}
+function swLap(){if(!swRunning)return;laps.push(swMs);renderLaps();}
+function renderLaps(){
+  const list=document.getElementById('lapList');
+  if(!laps.length){list.innerHTML='';return;}
+  const min=Math.min(...laps.map((l,i)=>i===0?l:l-laps[i-1]));
+  const max=Math.max(...laps.map((l,i)=>i===0?l:l-laps[i-1]));
+  list.innerHTML=laps.map((l,i)=>{
+    const split=i===0?l:l-laps[i-1];
+    const cls=split===min&&laps.length>1?' lap-fastest':split===max&&laps.length>1?' lap-slowest':'';
+    return`<div class="lap-item"><span class="lap-num">Lap ${i+1}</span><span class="lap-time${cls}">${fmtSW(split)}</span><span class="lap-time" style="color:#8b949e">${fmtSW(l)}</span></div>`;
+  }).reverse().join('');
+}
 
-        function startTimer() {
-            stopTimer();
-            const h = parseInt(document.getElementById('timerHours').value) || 0;
-            const m = parseInt(document.getElementById('timerMinutes').value) || 0;
-            const s = parseInt(document.getElementById('timerSeconds').value) || 0;
-            timerSeconds = h * 3600 + m * 60 + s;
-            if (timerSeconds > 0) {
-                timerInterval = setInterval(() => {
-                    timerSeconds--;
-                    document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
-                    if (timerSeconds <= 0) {
-                        stopTimer();
-                        alert('Timer finished!');
-                    }
-                }, 1000);
-            }
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        function resetTimer() {
-            stopTimer();
-            timerSeconds = 0;
-            document.getElementById('timerDisplay').textContent = '00:00:00';
-        }
-
-        function startStopwatch() {
-            stopwatchInterval = setInterval(() => {
-                stopwatchSeconds++;
-                document.getElementById('stopwatchDisplay').textContent = formatTime(stopwatchSeconds);
-            }, 1000);
-        }
-
-        function stopStopwatch() {
-            clearInterval(stopwatchInterval);
-        }
-
-        function resetStopwatch() {
-            stopStopwatch();
-            stopwatchSeconds = 0;
-            document.getElementById('stopwatchDisplay').textContent = '00:00:00';
-        }
-
-        function setAlarm() {
-            const time = document.getElementById('alarmTime').value;
-            if (time) {
-                alarmTime = time;
-                document.getElementById('alarmDisplay').textContent = time;
-                alert('Alarm set for ' + time);
-                checkAlarm();
-            }
-        }
-
-        function checkAlarm() {
-            alarmInterval = setInterval(() => {
-                if (alarmTime) {
-                    const now = new Date().toTimeString().slice(0, 5);
-                    if (now === alarmTime) {
-                        alert('⏰ ALARM! ' + alarmTime);
-                        clearAlarm();
-                    }
-                }
-            }, 1000);
-        }
-
-        function clearAlarm() {
-            clearInterval(alarmInterval);
-            alarmTime = null;
-            document.getElementById('alarmDisplay').textContent = '--:--';
-        }
-
-        updateClock();
-        setInterval(updateClock, 1000);
-    </script>
+// Alarms
+let alarms=JSON.parse(localStorage.getItem('eclipseos_alarms')||'[]');
+function saveAlarms(){localStorage.setItem('eclipseos_alarms',JSON.stringify(alarms));}
+function addAlarm(){
+  const t=document.getElementById('alarmTimeInput').value;
+  if(!t)return;
+  alarms.push({id:Date.now(),time:t,on:true});
+  saveAlarms();renderAlarms();
+}
+function renderAlarms(){
+  const list=document.getElementById('alarmList');
+  list.innerHTML=alarms.length?alarms.map(a=>`
+    <div class="alarm-item">
+      <div><div class="alarm-time">${a.time}</div><div class="alarm-label">${a.on?'Active':'Off'}</div></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="alarm-toggle ${a.on?'on':''}" onclick="toggleAlarm(${a.id})"></button>
+        <button class="alarm-del" onclick="deleteAlarm(${a.id})">×</button>
+      </div>
+    </div>`).join(''):`<div style="color:#8b949e;font-size:13px">No alarms set</div>`;
+}
+function toggleAlarm(id){const a=alarms.find(x=>x.id===id);if(a){a.on=!a.on;saveAlarms();renderAlarms();}}
+function deleteAlarm(id){alarms=alarms.filter(x=>x.id!==id);saveAlarms();renderAlarms();}
+function checkAlarms(now){
+  const t=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  if(now.getSeconds()!==0)return;
+  alarms.filter(a=>a.on&&a.time===t).forEach(a=>{playBeep();alert(`⏰ Alarm: ${a.time}`);});
+}
+renderAlarms();
+</script>
 </body>
 </html>

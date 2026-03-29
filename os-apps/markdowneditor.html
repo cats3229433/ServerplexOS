@@ -1,101 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Markdown Editor</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        .toolbar { height: 50px; background: #f0f0f0; border-bottom: 1px solid #ccc; display: flex; align-items: center; padding: 0 12px; gap: 8px; }
-        button { padding: 8px 16px; background: #0078d4; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        button:hover { background: #005a9e; }
-        .editor-container { flex: 1; display: flex; }
-        .editor-pane { flex: 1; display: flex; flex-direction: column; }
-        .editor-pane:first-child { border-right: 2px solid #ccc; }
-        .pane-title { background: #f9f9f9; padding: 8px 16px; font-size: 13px; font-weight: 600; color: #666; border-bottom: 1px solid #ddd; }
-        textarea { flex: 1; padding: 16px; border: none; font-family: 'Consolas', monospace; font-size: 14px; resize: none; outline: none; }
-        .preview { flex: 1; padding: 16px; overflow-y: auto; background: #fff; }
-        .preview h1, .preview h2, .preview h3 { margin-top: 16px; margin-bottom: 8px; }
-        .preview p { margin-bottom: 12px; line-height: 1.6; }
-        .preview code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: 'Consolas', monospace; }
-        .preview pre { background: #f4f4f4; padding: 12px; border-radius: 6px; overflow-x: auto; margin-bottom: 12px; }
-        .preview ul, .preview ol { margin-left: 24px; margin-bottom: 12px; }
-    </style>
+<meta charset="UTF-8"><title>Markdown Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.tb-btn{padding:5px 10px;border:1px solid rgba(255,255,255,0.08);border-radius:6px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.1)}
+.sep{width:1px;height:20px;background:rgba(255,255,255,0.1)}
+.spacer{flex:1}
+.view-toggle{display:flex;border:1px solid rgba(255,255,255,0.08);border-radius:6px;overflow:hidden}
+.view-btn{padding:5px 12px;background:none;border:none;color:#8b949e;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.15s}
+.view-btn:hover{background:rgba(255,255,255,0.06)}
+.view-btn.active{background:#0078d4;color:white}
+.editor-wrap{flex:1;display:flex;overflow:hidden}
+.pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.pane-title{background:#161b22;padding:5px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0}
+.editor-ta{flex:1;width:100%;background:#0d1117;border:none;resize:none;outline:none;font-family:'Courier New',monospace;font-size:14px;line-height:1.7;color:#e6edf3;padding:20px;border-right:1px solid rgba(255,255,255,0.06)}
+.preview{flex:1;overflow-y:auto;padding:20px;background:#0d1117;font-family:'Oxanium',sans-serif;line-height:1.8;font-size:14px;border-left:1px solid rgba(255,255,255,0.06)}
+.preview h1,.preview h2,.preview h3,.preview h4{font-weight:700;margin:24px 0 12px;color:#e6edf3}
+.preview h1{font-size:28px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:12px}
+.preview h2{font-size:22px;border-bottom:1px solid rgba(255,255,255,0.06);padding-bottom:8px}
+.preview h3{font-size:18px}
+.preview p{margin-bottom:14px;color:#c9d1d9}
+.preview code{background:#161b22;padding:2px 7px;border-radius:4px;font-family:'Courier New',monospace;font-size:13px;color:#f0883e;border:1px solid rgba(255,255,255,0.06)}
+.preview pre{background:#161b22;padding:16px;border-radius:8px;overflow-x:auto;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06)}
+.preview pre code{background:none;padding:0;border:none;color:#e6edf3}
+.preview blockquote{border-left:4px solid #0078d4;padding-left:16px;margin:16px 0;color:#8b949e}
+.preview ul,.preview ol{margin:0 0 14px 24px;color:#c9d1d9}
+.preview li{margin-bottom:4px}
+.preview a{color:#58a6ff;text-decoration:none}
+.preview a:hover{text-decoration:underline}
+.preview table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.preview th,.preview td{padding:8px 12px;border:1px solid rgba(255,255,255,0.1)}
+.preview th{background:#161b22;font-weight:700}
+.preview img{max-width:100%;border-radius:8px}
+.preview hr{border:none;border-top:1px solid rgba(255,255,255,0.1);margin:20px 0}
+.status-bar{background:#161b22;border-top:1px solid rgba(255,255,255,0.08);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:#8b949e;flex-shrink:0}
+.pane.hidden{display:none}
+</style>
 </head>
 <body>
-    <div class="toolbar">
-        <button onclick="saveMarkdown()">💾 Save</button>
-        <button onclick="clearMarkdown()">🗑️ Clear</button>
-        <button onclick="downloadMarkdown()">📥 Download</button>
-    </div>
-    <div class="editor-container">
-        <div class="editor-pane">
-            <div class="pane-title">✏️ Markdown</div>
-            <textarea id="markdown" placeholder="# Start writing markdown...
+<div class="toolbar">
+  <button class="tb-btn" onclick="ins('**','**')" title="Bold"><b>B</b></button>
+  <button class="tb-btn" onclick="ins('*','*')" title="Italic"><i>I</i></button>
+  <button class="tb-btn" onclick="ins('~~','~~')" title="Strikethrough"><s>S</s></button>
+  <button class="tb-btn" onclick="ins('`','`')" title="Inline code">` `</button>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="insLine('# ')">H1</button>
+  <button class="tb-btn" onclick="insLine('## ')">H2</button>
+  <button class="tb-btn" onclick="insLine('### ')">H3</button>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="insLine('- ')">• List</button>
+  <button class="tb-btn" onclick="insLine('1. ')">1. List</button>
+  <button class="tb-btn" onclick="insLine('> ')">❝ Quote</button>
+  <button class="tb-btn" onclick="insBlock('```\n','\n```')">Code Block</button>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="insLine('---')">─ Rule</button>
+  <button class="tb-btn" onclick="insLink()">🔗 Link</button>
+  <button class="tb-btn" onclick="insTable()">📊 Table</button>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="saveDoc()">💾 Save</button>
+  <button class="tb-btn" onclick="downloadMd()">⬇️ .md</button>
+  <button class="tb-btn" onclick="downloadHtml()">⬇️ .html</button>
+  <button class="tb-btn" onclick="clearDoc()">🗑️ Clear</button>
+  <div class="spacer"></div>
+  <div class="view-toggle">
+    <button class="view-btn active" id="vBoth" onclick="setView('both')">Split</button>
+    <button class="view-btn" id="vEdit" onclick="setView('edit')">Editor</button>
+    <button class="view-btn" id="vPrev" onclick="setView('preview')">Preview</button>
+  </div>
+</div>
+<div class="editor-wrap" id="editorWrap">
+  <div class="pane" id="editPane">
+    <div class="pane-title">✏️ Markdown</div>
+    <textarea class="editor-ta" id="editor" placeholder="# Start writing markdown…&#10;&#10;Type your content here. The preview updates live."></textarea>
+  </div>
+  <div class="pane" id="prevPane">
+    <div class="pane-title">👁️ Preview</div>
+    <div class="preview" id="preview"></div>
+  </div>
+</div>
+<div class="status-bar">
+  <span id="statWords">Words: 0</span>
+  <span id="statChars">Chars: 0</span>
+  <span id="statLines">Lines: 0</span>
+  <span id="saveStatus" style="margin-left:auto">Auto-saved</span>
+</div>
+<script>
+const editor=document.getElementById('editor');
+const preview=document.getElementById('preview');
+let saveTimer;
+editor.value=localStorage.getItem('eclipseos_markdown')||'';
+update();
+editor.addEventListener('input',()=>{update();clearTimeout(saveTimer);saveTimer=setTimeout(()=>{localStorage.setItem('eclipseos_markdown',editor.value);document.getElementById('saveStatus').textContent='Saved ✓';},600);});
 
-## Headings
-Use # for headings
-
-## Lists
-- Item 1
-- Item 2
-
-## Code
-`inline code`
-
-```
-code block
-```
-
-## Links
-[Link text](https://example.com)"></textarea>
-        </div>
-        <div class="editor-pane">
-            <div class="pane-title">👁️ Preview</div>
-            <div class="preview" id="preview"></div>
-        </div>
-    </div>
-
-    <script>
-        const textarea = document.getElementById('markdown');
-        const preview = document.getElementById('preview');
-        
-        // Load saved markdown
-        textarea.value = localStorage.getItem('serverplexos_markdown') || '';
-        updatePreview();
-        
-        textarea.addEventListener('input', () => {
-            updatePreview();
-            localStorage.setItem('serverplexos_markdown', textarea.value);
-        });
-        
-        function updatePreview() {
-            preview.innerHTML = marked.parse(textarea.value || '*No content yet...*');
-        }
-        
-        function saveMarkdown() {
-            localStorage.setItem('serverplexos_markdown', textarea.value);
-            alert('Markdown saved!');
-        }
-        
-        function clearMarkdown() {
-            if (confirm('Clear all markdown?')) {
-                textarea.value = '';
-                localStorage.setItem('serverplexos_markdown', '');
-                updatePreview();
-            }
-        }
-        
-        function downloadMarkdown() {
-            const blob = new Blob([textarea.value], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `markdown-${Date.now()}.md`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-    </script>
+function update(){
+  preview.innerHTML=marked.parse(editor.value||'*Nothing to preview yet*');
+  const text=editor.value;
+  document.getElementById('statWords').textContent='Words: '+(text.trim()?text.trim().split(/\s+/).length:0);
+  document.getElementById('statChars').textContent='Chars: '+text.length;
+  document.getElementById('statLines').textContent='Lines: '+text.split('\n').length;
+}
+function ins(before,after){
+  const s=editor.selectionStart,e=editor.selectionEnd;
+  const sel=editor.value.substring(s,e)||'text';
+  editor.value=editor.value.substring(0,s)+before+sel+after+editor.value.substring(e);
+  editor.setSelectionRange(s+before.length,s+before.length+sel.length);
+  editor.focus();update();
+}
+function insLine(prefix){
+  const s=editor.selectionStart;
+  const lineStart=editor.value.lastIndexOf('\n',s-1)+1;
+  editor.value=editor.value.substring(0,lineStart)+prefix+editor.value.substring(lineStart);
+  editor.setSelectionRange(lineStart+prefix.length,lineStart+prefix.length);
+  editor.focus();update();
+}
+function insBlock(before,after){
+  const s=editor.selectionStart,e=editor.selectionEnd;
+  const sel=editor.value.substring(s,e);
+  editor.value=editor.value.substring(0,s)+before+sel+after+editor.value.substring(e);
+  editor.focus();update();
+}
+function insLink(){const url=prompt('URL:','https://');if(!url)return;const text=prompt('Link text:','Link');ins(`[${text}](`,'${url})'+'');const t=`[${text||'Link'}](${url})`;const s=editor.selectionStart;editor.value=editor.value.substring(0,s)+t+editor.value.substring(editor.selectionEnd);editor.focus();update();}
+function insTable(){const rows=prompt('Rows:',3),cols=prompt('Cols:',3);if(!rows||!cols)return;let t='\n';const h=Array(parseInt(cols)).fill('Header').join(' | ');const sep=Array(parseInt(cols)).fill('---').join(' | ');t+=`| ${h} |\n| ${sep} |\n`;for(let i=0;i<parseInt(rows);i++)t+=`| ${Array(parseInt(cols)).fill('Cell').join(' | ')} |\n`;t+='\n';editor.value+=t;editor.focus();update();}
+function setView(v){
+  document.getElementById('editPane').classList.toggle('hidden',v==='preview');
+  document.getElementById('prevPane').classList.toggle('hidden',v==='edit');
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(v==='both'?'vBoth':v==='edit'?'vEdit':'vPrev').classList.add('active');
+}
+function saveDoc(){localStorage.setItem('eclipseos_markdown',editor.value);document.getElementById('saveStatus').textContent='Saved ✓';}
+function clearDoc(){if(confirm('Clear all markdown?')){editor.value='';localStorage.removeItem('eclipseos_markdown');update();}}
+function downloadMd(){const b=new Blob([editor.value],{type:'text/markdown'});const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(b),download:`document-${Date.now()}.md`});a.click();}
+function downloadHtml(){const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px;line-height:1.7;color:#1a1a1a}h1,h2,h3{color:#111}code{background:#f4f4f4;padding:2px 6px;border-radius:3px}pre{background:#f4f4f4;padding:16px;border-radius:6px;overflow-x:auto}blockquote{border-left:4px solid #0078d4;padding-left:16px;color:#666}</style></head><body>${preview.innerHTML}</body></html>`;const b=new Blob([html],{type:'text/html'});const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(b),download:`document-${Date.now()}.html`});a.click();}
+</script>
 </body>
 </html>

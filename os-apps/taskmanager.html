@@ -1,74 +1,239 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Task Manager</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; height: 100vh; }
-        h1 { font-size: 24px; margin-bottom: 20px; color: #333; }
-        table { width: 100%; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        th, td { padding: 16px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #0078d4; color: white; font-weight: 600; }
-        button { padding: 6px 12px; background: #ff3b30; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
-        button:hover { background: #cc2f26; }
-        .no-processes { text-align: center; padding: 40px; color: #999; }
-    </style>
+<meta charset="UTF-8"><title>Task Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:12px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0}
+.header h1{font-size:18px;font-weight:700}
+.tabs{display:flex;gap:2px;margin-left:auto}
+.tab{padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:7px;background:rgba(255,255,255,0.04);color:#8b949e;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s}
+.tab.active{background:#0078d4;border-color:#0078d4;color:white}
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.panel{display:none;flex:1;overflow:auto;padding:16px}
+.panel.active{display:block}
+
+/* Processes */
+.proc-table{width:100%;border-collapse:collapse}
+.proc-table th{background:#161b22;padding:10px 14px;text-align:left;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid rgba(255,255,255,0.08);position:sticky;top:0;cursor:pointer;user-select:none}
+.proc-table th:hover{color:#e6edf3}
+.proc-table td{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;vertical-align:middle}
+.proc-table tr:hover td{background:rgba(255,255,255,0.03)}
+.proc-name{font-weight:600;display:flex;align-items:center;gap:8px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#238636;display:inline-block}
+.status-dot.suspended{background:#e3b341}
+.bar-wrap{width:80px;height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden}
+.bar{height:100%;border-radius:3px;transition:width 0.5s}
+.bar-cpu{background:#0078d4}
+.bar-mem{background:#8957e5}
+.end-btn{padding:4px 10px;background:rgba(218,54,51,0.12);border:1px solid rgba(218,54,51,0.25);border-radius:4px;color:#f85149;font-family:'Oxanium',sans-serif;font-size:11px;cursor:pointer}
+.end-btn:hover{background:rgba(218,54,51,0.25)}
+
+/* Performance */
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.perf-card{background:#161b22;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px}
+.perf-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.perf-value{font-size:32px;font-weight:700;margin-bottom:4px}
+.perf-sub{font-size:12px;color:#8b949e}
+.mini-graph{height:60px;background:#0d1117;border-radius:6px;margin-top:10px;overflow:hidden;position:relative}
+.graph-svg{width:100%;height:100%}
+
+/* Users */
+.user-list{display:flex;flex-direction:column;gap:8px}
+.user-card{background:#161b22;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px}
+.user-avatar{width:40px;height:40px;border-radius:50%;background:#0078d4;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.user-info{flex:1}
+.user-name{font-size:15px;font-weight:700}
+.user-role{font-size:12px;color:#8b949e}
+.user-status{font-size:11px;color:#3fb950;margin-top:2px}
+</style>
 </head>
 <body>
-    <h1>Task Manager</h1>
-    <table id="processTable">
-        <thead>
-            <tr>
-                <th>App Name</th>
-                <th>Icon</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody id="processList"></tbody>
+<div class="header">
+  <div style="font-size:22px">📊</div>
+  <h1>Task Manager</h1>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('processes')">Processes</button>
+    <button class="tab" onclick="showTab('performance')">Performance</button>
+    <button class="tab" onclick="showTab('users')">Users</button>
+  </div>
+</div>
+<div class="content">
+  <div class="panel active" id="panel-processes">
+    <table class="proc-table">
+      <thead><tr>
+        <th onclick="sortBy('name')">Name ↕</th>
+        <th>Status</th>
+        <th onclick="sortBy('cpu')">CPU ↕</th>
+        <th>CPU Graph</th>
+        <th onclick="sortBy('mem')">Memory ↕</th>
+        <th>Mem Graph</th>
+        <th>Action</th>
+      </tr></thead>
+      <tbody id="procBody"></tbody>
     </table>
+  </div>
+  <div class="panel" id="panel-performance">
+    <div class="perf-grid">
+      <div class="perf-card">
+        <div class="perf-title">CPU Usage <span id="cpuPct">0%</span></div>
+        <div class="perf-value" id="cpuVal">0%</div>
+        <div class="perf-sub">Browser (JavaScript runtime)</div>
+        <div class="mini-graph"><svg class="graph-svg" id="cpuGraph"></svg></div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-title">Memory <span id="memPct">—</span></div>
+        <div class="perf-value" id="memVal">—</div>
+        <div class="perf-sub">JS Heap used</div>
+        <div class="mini-graph"><svg class="graph-svg" id="memGraph"></svg></div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-title">Storage</div>
+        <div class="perf-value" id="storVal">—</div>
+        <div class="perf-sub">LocalStorage used</div>
+        <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;margin-top:12px;overflow:hidden"><div id="storBar" style="height:100%;background:#3fb950;border-radius:3px;width:0%;transition:width 0.5s"></div></div>
+      </div>
+      <div class="perf-card">
+        <div class="perf-title">Open Windows</div>
+        <div class="perf-value" id="winVal">—</div>
+        <div class="perf-sub">Running apps</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" id="panel-users">
+    <div class="user-list" id="userList"></div>
+  </div>
+</div>
+<script>
+const APPS_META={
+  browser:{name:'Browser',icon:'🌐'},notepad:{name:'Notepad',icon:'📝'},calculator:{name:'Calculator',icon:'🧮'},
+  calendar:{name:'Calendar',icon:'📅'},terminal:{name:'Terminal',icon:'💻'},code:{name:'Code Editor',icon:'👨‍💻'},
+  paint:{name:'Paint',icon:'🎨'},taskmanager:{name:'Task Manager',icon:'📊'},todolist:{name:'To-Do List',icon:'📋'},
+  stickynotes:{name:'Sticky Notes',icon:'📌'},imageviewer:{name:'Image Viewer',icon:'🖼️'},clock:{name:'Clock',icon:'⏰'},
+  recyclebin:{name:'Recycle Bin',icon:'🗑️'},search:{name:'Search',icon:'🔍'},musicplayer:{name:'Music Player',icon:'🎵'},
+  markdowneditor:{name:'Markdown Editor',icon:'📄'},notifications:{name:'Notifications',icon:'🔔'},settings:{name:'Settings',icon:'⚙️'},
+};
+let sortKey='cpu',sortDir=-1;
+let cpuHistory=[],memHistory=[];
 
-    <script>
-        function updateProcesses() {
-            const tbody = document.getElementById('processList');
-            tbody.innerHTML = '';
-            
-            // Try to get windows from parent OS
-            if (window.parent && window.parent.windows) {
-                const windows = window.parent.windows;
-                const apps = window.parent.apps;
-                
-                if (Object.keys(windows).length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="no-processes">No running processes</td></tr>';
-                    return;
-                }
-                
-                Object.keys(windows).forEach(appId => {
-                    const app = apps[appId];
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${app.name}</td>
-                        <td style="font-size: 24px;">${app.icon}</td>
-                        <td><span style="color: #34c759;">●</span> Running</td>
-                        <td><button onclick="endTask('${appId}')">End Task</button></td>
-                    `;
-                    tbody.appendChild(row);
-                });
-            } else {
-                tbody.innerHTML = '<tr><td colspan="4" class="no-processes">Cannot access OS process list</td></tr>';
-            }
-        }
-        
-        function endTask(appId) {
-            if (window.parent && window.parent.closeWindow) {
-                window.parent.closeWindow(appId);
-                updateProcesses();
-            }
-        }
-        
-        updateProcesses();
-        setInterval(updateProcesses, 2000);
-    </script>
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.tab:nth-child(${['processes','performance','users'].indexOf(t)+1})`).classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+}
+
+function getProcesses(){
+  // Real: running windows from parent
+  let procs=[];
+  if(window.parent&&window.parent.windows){
+    const wins=window.parent.windows;
+    Object.keys(wins).forEach(id=>{
+      const meta=APPS_META[id]||{name:id,icon:'📄'};
+      procs.push({id,name:meta.name,icon:meta.icon,status:'running',cpu:Math.random()*5,mem:Math.round(Math.random()*40+10)});
+    });
+  }
+  // Add system processes
+  procs.push(
+    {id:'sys-os',name:'EclipseOS Shell',icon:'💠',status:'running',cpu:0.1,mem:8,system:true},
+    {id:'sys-render',name:'Render Engine',icon:'⚙️',status:'running',cpu:Math.random()*2,mem:15,system:true},
+    {id:'sys-store',name:'Storage Manager',icon:'💾',status:'running',cpu:0,mem:5,system:true},
+  );
+  return procs;
+}
+
+function sortBy(k){if(sortKey===k)sortDir*=-1;else{sortKey=k;sortDir=-1;}updateProcesses();}
+
+function updateProcesses(){
+  const procs=getProcesses();
+  procs.sort((a,b)=>{
+    if(sortKey==='name')return sortDir*a.name.localeCompare(b.name);
+    if(sortKey==='cpu')return sortDir*(b.cpu-a.cpu);
+    if(sortKey==='mem')return sortDir*(b.mem-a.mem);
+    return 0;
+  });
+  const body=document.getElementById('procBody');
+  body.innerHTML=procs.map(p=>`
+    <tr>
+      <td><div class="proc-name">${p.icon} ${p.name}</div></td>
+      <td><span class="status-dot"></span> Running</td>
+      <td>${p.cpu.toFixed(1)}%</td>
+      <td><div class="bar-wrap"><div class="bar bar-cpu" style="width:${Math.min(p.cpu*20,100)}%"></div></div></td>
+      <td>${p.mem} MB</td>
+      <td><div class="bar-wrap"><div class="bar bar-mem" style="width:${Math.min(p.mem*2,100)}%"></div></div></td>
+      <td>${!p.system&&p.id?`<button class="end-btn" onclick="endTask('${p.id}')">End</button>`:'—'}</td>
+    </tr>`).join('');
+}
+
+function endTask(id){
+  if(window.parent&&window.parent.closeWindow){window.parent.closeWindow(id);updateProcesses();}
+}
+
+function updatePerformance(){
+  // Simulate CPU
+  const cpu=Math.random()*15+2;
+  cpuHistory.push(cpu);if(cpuHistory.length>20)cpuHistory.shift();
+  document.getElementById('cpuVal').textContent=cpu.toFixed(1)+'%';
+  document.getElementById('cpuPct').textContent=cpu.toFixed(1)+'%';
+  drawGraph('cpuGraph',cpuHistory,'#0078d4',20);
+
+  // Memory
+  if(performance.memory){
+    const used=(performance.memory.usedJSHeapSize/1048576).toFixed(1);
+    const total=(performance.memory.jsHeapSizeLimit/1048576).toFixed(0);
+    memHistory.push(parseFloat(used));if(memHistory.length>20)memHistory.shift();
+    document.getElementById('memVal').textContent=used+' MB';
+    document.getElementById('memPct').textContent=`${Math.round(used/total*100)}%`;
+    drawGraph('memGraph',memHistory,'#8957e5',parseFloat(total)||200);
+  } else {
+    document.getElementById('memVal').textContent='N/A';
+  }
+
+  // Storage
+  let sz=0;for(let k in localStorage)sz+=localStorage[k].length+k.length;
+  const kb=(sz/1024).toFixed(1);
+  document.getElementById('storVal').textContent=kb+' KB';
+  document.getElementById('storBar').style.width=Math.min(sz/5120*100,100)+'%';
+
+  // Windows
+  const wins=window.parent&&window.parent.windows?Object.keys(window.parent.windows).length:'—';
+  document.getElementById('winVal').textContent=wins;
+}
+
+function drawGraph(id,data,color,max){
+  const svg=document.getElementById(id);if(!data.length)return;
+  const w=svg.clientWidth||200,h=svg.clientHeight||60;
+  const pts=data.map((v,i)=>`${(i/(data.length-1||1))*w},${h-(v/max)*h}`).join(' ');
+  svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"/><polygon points="0,${h} ${pts} ${w},${h}" fill="${color}" fill-opacity="0.1"/>`;
+}
+
+function updateUsers(){
+  const name=localStorage.getItem('eclipseos_username')||'User';
+  const avatar=localStorage.getItem('eclipseos_avatar')||'👤';
+  document.getElementById('userList').innerHTML=`
+    <div class="user-card">
+      <div class="user-avatar">${avatar}</div>
+      <div class="user-info">
+        <div class="user-name">${name}</div>
+        <div class="user-role">Local Administrator</div>
+        <div class="user-status">● Active — Logged in</div>
+      </div>
+    </div>
+    <div class="user-card" style="opacity:0.5">
+      <div class="user-avatar" style="background:#3e3e42">👤</div>
+      <div class="user-info">
+        <div class="user-name">Guest</div>
+        <div class="user-role">Standard User</div>
+        <div class="user-status" style="color:#8b949e">○ Inactive</div>
+      </div>
+    </div>`;
+}
+
+function tick(){updateProcesses();updatePerformance();updateUsers();}
+tick();
+setInterval(tick,2000);
+</script>
 </body>
 </html>

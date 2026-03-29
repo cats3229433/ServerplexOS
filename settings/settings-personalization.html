@@ -14,50 +14,10 @@
         .theme-card.active { border-color: #0078d4; background: #e3f2fd; }
         .theme-preview { width: 100%; height: 80px; border-radius: 8px; margin-bottom: 12px; }
         .theme-name { font-weight: 600; font-size: 16px; }
-        button { padding: 10px 20px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 12px; font-family: 'Oxanium', sans-serif; }
+        .wallpaper-picker { margin-top: 16px; }
+        input[type="color"] { width: 100%; height: 60px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; }
+        button { padding: 10px 20px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 12px; }
         button:hover { background: #005a9e; }
-
-        /* Wallpaper */
-        .wp-tabs { display: flex; gap: 0; margin-bottom: 16px; background: #f0f0f0; border-radius: 8px; padding: 4px; }
-        .wp-tab { flex: 1; padding: 9px 0; text-align: center; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; color: #888; font-family: 'Oxanium', sans-serif; }
-        .wp-tab.active { background: #0078d4; color: white; box-shadow: 0 2px 8px rgba(0,120,212,0.3); }
-        .wp-panel { display: none; }
-        .wp-panel.active { display: block; }
-
-        .wp-preview {
-            width: 100%; height: 140px; border-radius: 10px; border: 2px solid #ddd;
-            margin-bottom: 14px; background: #f5f5f5;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; color: #aaa; overflow: hidden; position: relative;
-        }
-        .wp-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; display: none; }
-        .wp-preview.has-image img { display: block; }
-        .wp-preview.has-image span { display: none; }
-
-        .upload-zone {
-            border: 2px dashed #ddd; border-radius: 10px; padding: 28px 20px;
-            text-align: center; cursor: pointer; transition: all 0.2s;
-            position: relative; background: #fafafa; margin-bottom: 12px;
-        }
-        .upload-zone:hover { border-color: #0078d4; background: #e3f2fd; }
-        .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-        .upload-zone .uz-icon { font-size: 28px; margin-bottom: 6px; }
-        .upload-zone p { font-size: 13px; color: #888; }
-        .upload-zone p span { color: #0078d4; font-weight: 600; }
-
-        .url-row { display: flex; gap: 8px; margin-bottom: 12px; }
-        .url-row input { flex: 1; padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: 'Oxanium', sans-serif; outline: none; }
-        .url-row input:focus { border-color: #0078d4; box-shadow: 0 0 0 3px rgba(0,120,212,0.1); }
-        .url-row button { margin-top: 0; }
-
-        .color-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
-        .color-row input[type=color] { width: 60px; height: 42px; border: 2px solid #ddd; border-radius: 6px; cursor: pointer; padding: 2px; }
-        .color-row label { font-size: 14px; color: #555; flex: 1; }
-
-        .wp-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-        .wp-actions button { margin-top: 0; }
-        .btn-reset { background: #666 !important; }
-        .btn-reset:hover { background: #444 !important; }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,50 +44,23 @@
         </div>
     </div>
 
+        <div class="section">
+        <div class="section-title">Accent Color</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px" id="accentPicker"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:13px">Custom:</span>
+            <input type="color" id="customAccent" value="#0078d4" style="width:44px;height:36px;border-radius:6px;border:1px solid #ddd;cursor:pointer">
+            <button onclick="applyAccent(document.getElementById('customAccent').value)" style="padding:7px 14px;background:#0078d4;border:none;border-radius:6px;color:white;font-family:inherit;cursor:pointer">Apply</button>
+        </div>
+    </div>
+
     <div class="section">
         <div class="section-title">Wallpaper</div>
-
-        <!-- Preview -->
-        <div class="wp-preview" id="wpPreview">
-            <img id="wpPreviewImg" src="" alt="">
-            <span>No wallpaper set</span>
-        </div>
-
-        <!-- Tabs -->
-        <div class="wp-tabs">
-            <div class="wp-tab active" id="wpTabUpload" onclick="switchWpTab('upload')">📁 Upload</div>
-            <div class="wp-tab" id="wpTabUrl"    onclick="switchWpTab('url')">🔗 URL</div>
-            <div class="wp-tab" id="wpTabColor"  onclick="switchWpTab('color')">🎨 Color</div>
-        </div>
-
-        <!-- Upload panel -->
-        <div class="wp-panel active" id="wpPanelUpload">
-            <div class="upload-zone">
-                <input type="file" id="wpFileInput" accept="image/*" onchange="handleWpUpload(event)">
-                <div class="uz-icon">🖼️</div>
-                <p>Drag & drop or <span>click to browse</span></p>
-            </div>
-        </div>
-
-        <!-- URL panel -->
-        <div class="wp-panel" id="wpPanelUrl">
-            <div class="url-row">
-                <input type="text" id="wpUrlInput" placeholder="https://example.com/image.jpg">
-                <button onclick="applyWpUrl()">Apply</button>
-            </div>
-        </div>
-
-        <!-- Color panel -->
-        <div class="wp-panel" id="wpPanelColor">
-            <div class="color-row">
-                <input type="color" id="wallpaperColor" value="#1a1a2e">
-                <label>Pick a solid background color</label>
-            </div>
-            <button onclick="applyWpColor()">Apply Color</button>
-        </div>
-
-        <div class="wp-actions" style="margin-top:14px;">
-            <button class="btn-reset" onclick="resetWallpaper()">↩ Reset to Default</button>
+        <div class="wallpaper-picker">
+            <label for="wallpaperColor" style="display: block; margin-bottom: 8px; font-weight: 600;">Desktop Background Color:</label>
+            <input type="color" id="wallpaperColor" value="#ffffff">
+            <button onclick="applyWallpaper()">Apply Wallpaper</button>
+            <button onclick="resetWallpaper()" style="background: #666;">Reset to Default</button>
         </div>
     </div>
 
@@ -137,6 +70,21 @@
     </div>
 
     <script>
+
+        const ACCENTS = ['#0078d4','#5856d6','#34c759','#ff9500','#ff3b30','#af52de','#00bcd4','#e91e63','#ff6b35','#1a73e8'];
+        const savedAccent = localStorage.getItem('eclipseos_accent') || '#0078d4';
+        function renderAccents() {
+            const p = document.getElementById('accentPicker');
+            p.innerHTML = ACCENTS.map(c => `<div onclick="applyAccent('${c}')" style="width:32px;height:32px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${c===savedAccent?'white':'transparent'};box-shadow:${c===savedAccent?'0 0 0 2px '+c:'none'};transition:all .15s"></div>`).join('');
+        }
+        function applyAccent(color) {
+            localStorage.setItem('eclipseos_accent', color);
+            if (window.parent) { window.parent.document.querySelectorAll('.window-titlebar,.taskbar-app.active,.start-button').forEach(el => el.style.setProperty('--accent', color)); window.parent.document.documentElement.style.setProperty('--accent',color); }
+            renderAccents();
+            document.getElementById('customAccent').value = color;
+        }
+        renderAccents();
+
         function setTheme(theme) {
             if (window.parent && window.parent.changeTheme) {
                 window.parent.changeTheme(theme);
@@ -151,70 +99,18 @@
             });
         }
 
-        // ── Wallpaper tab switching ──
-        function switchWpTab(tab) {
-            ['upload','url','color'].forEach(t => {
-                document.getElementById('wpTab' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
-                document.getElementById('wpPanel' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
-            });
-        }
-
-        function setWpPreview(value) {
-            const preview = document.getElementById('wpPreview');
-            const img = document.getElementById('wpPreviewImg');
-            if (value && value !== 'none' && (value.startsWith('url(') || value.startsWith('http') || value.startsWith('data:'))) {
-                const src = value.startsWith('url(') ? value.slice(5, -2) : value;
-                img.src = src;
-                img.onload = () => preview.classList.add('has-image');
-                img.onerror = () => { preview.classList.remove('has-image'); };
-            } else if (value && value !== 'none') {
-                // solid color - show as background
-                preview.style.background = value;
-                preview.classList.remove('has-image');
-                document.querySelector('#wpPreview span').textContent = value;
-            } else {
-                preview.classList.remove('has-image');
-                preview.style.background = '#f5f5f5';
-                document.querySelector('#wpPreview span').textContent = 'No wallpaper set';
-            }
-        }
-
-        function applyWallpaper(value) {
-            if (window.parent && window.parent.setWallpaper) {
-                window.parent.setWallpaper(value);
-            } else {
-                // fallback: save directly
-                localStorage.setItem('eclipseos_wallpaper', value);
-            }
-            setWpPreview(value);
-        }
-
-        function handleWpUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const dataUrl = e.target.result;
-                applyWallpaper(dataUrl);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function applyWpUrl() {
-            const url = document.getElementById('wpUrlInput').value.trim();
-            if (!url) return;
-            applyWallpaper(url);
-        }
-
-        function applyWpColor() {
+        function applyWallpaper() {
             const color = document.getElementById('wallpaperColor').value;
-            applyWallpaper(color);
+            if (window.parent && window.parent.setWallpaper) {
+                window.parent.setWallpaper(color);
+            }
         }
 
         function resetWallpaper() {
-            applyWallpaper('none');
-            document.getElementById('wallpaperColor').value = '#1a1a2e';
-            document.getElementById('wpUrlInput').value = '';
+            if (window.parent && window.parent.setWallpaper) {
+                window.parent.setWallpaper('none');
+                document.getElementById('wallpaperColor').value = '#ffffff';
+            }
         }
 
         function resetLayout() {
@@ -227,9 +123,11 @@
         const currentTheme = localStorage.getItem('eclipseos_theme') || 'white';
         updateActiveTheme(currentTheme);
 
-        // Load current wallpaper preview
+        // Load current wallpaper
         const wallpaper = localStorage.getItem('eclipseos_wallpaper');
-        if (wallpaper && wallpaper !== 'none') setWpPreview(wallpaper);
+        if (wallpaper && wallpaper !== 'none') {
+            document.getElementById('wallpaperColor').value = wallpaper;
+        }
     </script>
 </body>
 </html>

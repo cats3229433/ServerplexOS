@@ -1,116 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Sticky Notes</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; height: 100vh; overflow: hidden; }
-        .header { margin-bottom: 20px; }
-        button { padding: 12px 20px; background: #ffeb3b; color: #333; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; }
-        button:hover { background: #fdd835; }
-        .notes-container { position: relative; width: 100%; height: calc(100% - 60px); }
-        .note { position: absolute; width: 200px; background: #ffeb3b; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); overflow: hidden; }
-        .note-header { background: #fbc02d; padding: 8px; cursor: move; display: flex; justify-content: space-between; align-items: center; }
-        .note-title { font-size: 12px; font-weight: 600; color: #333; }
-        .note-close { cursor: pointer; font-size: 16px; color: #333; }
-        .note-content { padding: 12px; }
-        .note-content textarea { width: 100%; height: 150px; border: none; background: transparent; resize: none; font-family: Arial, sans-serif; font-size: 13px; outline: none; }
-    </style>
+<meta charset="UTF-8"><title>Sticky Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.toolbar h2{font-size:15px;font-weight:700;color:#e6edf3}
+.spacer{flex:1}
+.tb-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:7px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s}
+.tb-btn:hover{background:rgba(255,255,255,0.1)}
+.color-btn{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.15s;flex-shrink:0}
+.color-btn:hover{transform:scale(1.2)}
+.color-btn.selected{border-color:white;transform:scale(1.15)}
+.canvas{flex:1;position:relative;overflow:hidden}
+.note{position:absolute;min-width:180px;min-height:140px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;transition:box-shadow 0.2s;cursor:default}
+.note:hover{box-shadow:0 12px 36px rgba(0,0,0,0.6)}
+.note.dragging{box-shadow:0 20px 50px rgba(0,0,0,0.7);z-index:999;transform:rotate(1deg)}
+.note-header{height:32px;display:flex;align-items:center;padding:0 10px;gap:6px;cursor:move;border-radius:10px 10px 0 0;flex-shrink:0}
+.note-close{background:rgba(0,0,0,0.2);border:none;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:rgba(0,0,0,0.6);transition:all 0.15s;margin-left:auto}
+.note-close:hover{background:rgba(0,0,0,0.35);color:#000}
+.note-pin{background:rgba(0,0,0,0.15);border:none;border-radius:4px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;transition:all 0.15s}
+.note-pin:hover{background:rgba(0,0,0,0.3)}
+.note-ta{flex:1;border:none;background:transparent;resize:none;outline:none;padding:10px 12px;font-family:'Oxanium',sans-serif;font-size:13px;line-height:1.6;color:rgba(0,0,0,0.8);border-radius:0 0 10px 10px}
+.note-ta::placeholder{color:rgba(0,0,0,0.35)}
+.note-resize{position:absolute;bottom:0;right:0;width:14px;height:14px;cursor:se-resize;opacity:0.4}
+.note-resize::after{content:'';position:absolute;bottom:3px;right:3px;width:6px;height:6px;border-right:2px solid rgba(0,0,0,0.5);border-bottom:2px solid rgba(0,0,0,0.5)}
+.note-footer{padding:4px 10px;font-size:10px;color:rgba(0,0,0,0.4);text-align:right;flex-shrink:0}
+.empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.1);pointer-events:none}
+.empty div{font-size:64px;margin-bottom:16px}
+.empty p{font-size:16px}
+</style>
 </head>
 <body>
-    <div class="header">
-        <button onclick="createNote()">➕ New Note</button>
+<div class="toolbar">
+  <h2>📌 Sticky Notes</h2>
+  <div style="display:flex;gap:6px;margin-left:12px" id="colorPicker"></div>
+  <div class="spacer"></div>
+  <button class="tb-btn" onclick="addNote()">+ New Note</button>
+  <button class="tb-btn" onclick="clearAll()">🗑️ Clear All</button>
+</div>
+<div class="canvas" id="canvas">
+  <div class="empty" id="emptyState"><div>📌</div><p>Click "+ New Note" to start</p></div>
+</div>
+<script>
+const COLORS=[
+  {bg:'#fef08a',header:'#fde047'},
+  {bg:'#bbf7d0',header:'#86efac'},
+  {bg:'#bfdbfe',header:'#93c5fd'},
+  {bg:'#fecaca',header:'#fca5a5'},
+  {bg:'#e9d5ff',header:'#d8b4fe'},
+  {bg:'#fed7aa',header:'#fdba74'},
+  {bg:'#f1f5f9',header:'#e2e8f0'},
+];
+let notes=JSON.parse(localStorage.getItem('eclipseos_sticky_v2')||'[]');
+let selColor=0;
+const canvas=document.getElementById('canvas');
+
+// Color picker
+const cp=document.getElementById('colorPicker');
+COLORS.forEach((c,i)=>{
+  const b=document.createElement('div');
+  b.className='color-btn'+(i===0?' selected':'');
+  b.style.background=c.bg;
+  b.onclick=()=>{selColor=i;document.querySelectorAll('.color-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');};
+  cp.appendChild(b);
+});
+
+function save(){localStorage.setItem('eclipseos_sticky_v2',JSON.stringify(notes));}
+function updateEmpty(){document.getElementById('emptyState').style.display=notes.length?'none':'flex';}
+
+function addNote(data=null){
+  const id=data?.id||Date.now();
+  const note=data||{id,x:Math.random()*300+40,y:Math.random()*200+40,w:200,h:180,text:'',color:selColor,pinned:false,created:new Date().toLocaleString()};
+  if(!data)notes.push(note);
+  renderNote(note);
+  updateEmpty();
+  if(!data)save();
+}
+
+function renderNote(note){
+  const c=COLORS[note.color]||COLORS[0];
+  const div=document.createElement('div');
+  div.className='note';
+  div.id='note-'+note.id;
+  div.style.cssText=`left:${note.x}px;top:${note.y}px;width:${note.w}px;height:${note.h}px;background:${c.bg}`;
+  div.innerHTML=`
+    <div class="note-header" style="background:${c.header}">
+      <button class="note-pin" title="Pin">${note.pinned?'📌':'📍'}</button>
+      <button class="note-close" onclick="delNote(${note.id})">×</button>
     </div>
-    <div class="notes-container" id="notesContainer"></div>
+    <textarea class="note-ta" placeholder="Type your note…">${note.text}</textarea>
+    <div class="note-footer">${note.created||''}</div>
+    <div class="note-resize"></div>`;
+  const ta=div.querySelector('.note-ta');
+  ta.oninput=()=>{note.text=ta.value;save();};
+  const pin=div.querySelector('.note-pin');
+  pin.onclick=()=>{note.pinned=!note.pinned;pin.textContent=note.pinned?'📌':'📍';save();};
+  makeDraggable(div,note);
+  makeResizable(div.querySelector('.note-resize'),div,note);
+  canvas.appendChild(div);
+}
 
-    <script>
-        let notes = JSON.parse(localStorage.getItem('serverplexos_sticky_notes') || '[]');
-        let noteIdCounter = notes.length;
+function delNote(id){
+  const el=document.getElementById('note-'+id);
+  if(el){el.style.transform='scale(0.8)';el.style.opacity='0';el.style.transition='all 0.2s';setTimeout(()=>el.remove(),200);}
+  notes=notes.filter(n=>n.id!==id);
+  save();updateEmpty();
+}
 
-        function createNote() {
-            const note = {
-                id: noteIdCounter++,
-                x: Math.random() * 400 + 50,
-                y: Math.random() * 300 + 50,
-                text: ''
-            };
-            notes.push(note);
-            renderNote(note);
-            save();
-        }
+function clearAll(){if(!notes.length)return;if(confirm('Delete all sticky notes?')){notes=[];canvas.querySelectorAll('.note').forEach(n=>{n.style.transform='scale(0.8)';n.style.opacity='0';n.style.transition='all 0.15s';setTimeout(()=>n.remove(),150);});save();updateEmpty();}}
 
-        function renderNote(note) {
-            const div = document.createElement('div');
-            div.className = 'note';
-            div.style.left = note.x + 'px';
-            div.style.top = note.y + 'px';
-            div.innerHTML = `
-                <div class="note-header">
-                    <span class="note-title">Note ${note.id + 1}</span>
-                    <span class="note-close" onclick="deleteNote(${note.id})">✕</span>
-                </div>
-                <div class="note-content">
-                    <textarea oninput="updateNote(${note.id}, this.value)">${note.text}</textarea>
-                </div>
-            `;
-            makeDraggable(div, note);
-            document.getElementById('notesContainer').appendChild(div);
-        }
+function makeDraggable(el,note){
+  const header=el.querySelector('.note-header');
+  let dx=0,dy=0,dragging=false;
+  header.addEventListener('mousedown',e=>{
+    if(e.target.tagName==='BUTTON')return;
+    dragging=true;dx=e.clientX-el.offsetLeft;dy=e.clientY-el.offsetTop;
+    el.classList.add('dragging');el.style.zIndex=Date.now()%10000+100;
+  });
+  document.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const x=Math.max(0,Math.min(e.clientX-dx,canvas.offsetWidth-el.offsetWidth));
+    const y=Math.max(0,Math.min(e.clientY-dy,canvas.offsetHeight-el.offsetHeight));
+    el.style.left=x+'px';el.style.top=y+'px';note.x=x;note.y=y;
+  });
+  document.addEventListener('mouseup',()=>{if(dragging){dragging=false;el.classList.remove('dragging');save();}});
+}
 
-        function makeDraggable(element, note) {
-            const header = element.querySelector('.note-header');
-            let isDragging = false, startX, startY, initialX, initialY;
-            
-            header.addEventListener('mousedown', (e) => {
-                if (e.target.classList.contains('note-close')) return;
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = element.offsetLeft;
-                initialY = element.offsetTop;
-                element.style.zIndex = 1000;
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                const x = initialX + (e.clientX - startX);
-                const y = initialY + (e.clientY - startY);
-                element.style.left = x + 'px';
-                element.style.top = y + 'px';
-                note.x = x;
-                note.y = y;
-            });
-            
-            document.addEventListener('mouseup', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    element.style.zIndex = '';
-                    save();
-                }
-            });
-        }
+function makeResizable(handle,el,note){
+  let resizing=false,sx=0,sy=0,sw=0,sh=0;
+  handle.addEventListener('mousedown',e=>{e.stopPropagation();resizing=true;sx=e.clientX;sy=e.clientY;sw=el.offsetWidth;sh=el.offsetHeight;});
+  document.addEventListener('mousemove',e=>{
+    if(!resizing)return;
+    el.style.width=Math.max(160,sw+(e.clientX-sx))+'px';
+    el.style.height=Math.max(120,sh+(e.clientY-sy))+'px';
+    note.w=el.offsetWidth;note.h=el.offsetHeight;
+  });
+  document.addEventListener('mouseup',()=>{if(resizing){resizing=false;save();}});
+}
 
-        function updateNote(id, text) {
-            const note = notes.find(n => n.id === id);
-            if (note) {
-                note.text = text;
-                save();
-            }
-        }
-
-        function deleteNote(id) {
-            notes = notes.filter(n => n.id !== id);
-            save();
-            location.reload();
-        }
-
-        function save() {
-            localStorage.setItem('serverplexos_sticky_notes', JSON.stringify(notes));
-        }
-
-        notes.forEach(note => renderNote(note));
-    </script>
+notes.forEach(n=>addNote(n));
+updateEmpty();
+</script>
 </body>
 </html>

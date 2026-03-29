@@ -1,62 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Image Viewer</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #2a2a2a; height: 100vh; display: flex; flex-direction: column; }
-        .toolbar { height: 50px; background: #1e1e1e; border-bottom: 1px solid #444; display: flex; align-items: center; padding: 0 12px; gap: 12px; }
-        button { padding: 8px 16px; background: #0078d4; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        button:hover { background: #005a9e; }
-        .viewer { flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px; }
-        img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .placeholder { color: #999; font-size: 18px; }
-        input[type="file"] { display: none; }
-    </style>
+<meta charset="UTF-8"><title>Image Viewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.tb-btn{padding:6px 12px;border:1px solid rgba(255,255,255,0.08);border-radius:6px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.15s}
+.tb-btn:hover{background:rgba(255,255,255,0.1)}
+.tb-btn:disabled{opacity:0.3;cursor:default}
+.sep{width:1px;height:20px;background:rgba(255,255,255,0.1)}
+.spacer{flex:1}
+.zoom-display{font-size:12px;color:#8b949e;min-width:48px;text-align:center}
+.main{flex:1;display:flex;overflow:hidden}
+.viewer{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%,transparent 0% 50%) 0 0/24px 24px;cursor:grab;position:relative}
+.viewer.grabbing{cursor:grabbing}
+.img-wrap{position:relative;transform-origin:center;transition:transform 0.1s}
+.viewer img{display:block;max-width:none;image-rendering:auto;user-select:none;border-radius:4px}
+.sidebar{width:200px;background:#161b22;border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-title{padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid rgba(255,255,255,0.06)}
+.info-list{padding:10px 14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
+.info-row{display:flex;flex-direction:column;gap:2px}
+.info-label{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:1px}
+.info-val{font-size:13px;color:#e6edf3;word-break:break-all}
+.thumb-strip{height:90px;background:#0d1117;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;padding:8px;gap:6px;overflow-x:auto;flex-shrink:0;scrollbar-width:thin}
+.thumb{width:68px;height:68px;flex-shrink:0;border-radius:6px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:all 0.15s;opacity:0.6}
+.thumb:hover{opacity:0.9;border-color:rgba(255,255,255,0.3)}
+.thumb.active{opacity:1;border-color:#0078d4}
+.placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:rgba(255,255,255,0.1)}
+.placeholder div{font-size:64px}
+.placeholder p{font-size:15px}
+input[type=file]{display:none}
+.status-bar{background:#161b22;border-top:1px solid rgba(255,255,255,0.08);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:#8b949e;flex-shrink:0}
+</style>
 </head>
 <body>
-    <div class="toolbar">
-        <button onclick="document.getElementById('fileInput').click()">📁 Open Image</button>
-        <button onclick="rotateImage()">🔄 Rotate</button>
-        <button onclick="clearImage()">✕ Close</button>
-        <input type="file" id="fileInput" accept="image/*" onchange="loadImage(event)">
+<div class="toolbar">
+  <label class="tb-btn" for="fileInput">📂 Open</label>
+  <input type="file" id="fileInput" accept="image/*" multiple onchange="loadImages(event)">
+  <div class="sep"></div>
+  <button class="tb-btn" id="prevBtn" onclick="navigate(-1)" disabled>←</button>
+  <button class="tb-btn" id="nextBtn" onclick="navigate(1)" disabled>→</button>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="zoomIn()">🔍+</button>
+  <button class="tb-btn" onclick="zoomOut()">🔍−</button>
+  <button class="tb-btn" onclick="fitToScreen()">⤢ Fit</button>
+  <button class="tb-btn" onclick="actualSize()">1:1</button>
+  <span class="zoom-display" id="zoomDisplay">—</span>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="rotate(-90)">↺ 90°</button>
+  <button class="tb-btn" onclick="rotate(90)">↻ 90°</button>
+  <button class="tb-btn" onclick="flipH()">↔ Flip</button>
+  <button class="tb-btn" onclick="flipV()">↕ Flip</button>
+  <div class="sep"></div>
+  <button class="tb-btn" onclick="downloadCurrent()">💾 Save</button>
+  <button class="tb-btn" id="fullBtn" onclick="toggleFullscreen()">⛶ Full</button>
+</div>
+<div class="main">
+  <div class="viewer" id="viewer">
+    <div class="placeholder" id="placeholder">
+      <div>🖼️</div>
+      <p>Open images to view them</p>
     </div>
-    <div class="viewer" id="viewer">
-        <div class="placeholder">No image loaded. Click "Open Image" to start.</div>
+    <div class="img-wrap" id="imgWrap" style="display:none">
+      <img id="mainImg" src="" alt="">
     </div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-title">Image Info</div>
+    <div class="info-list" id="infoList">
+      <div style="color:#8b949e;font-size:12px;padding-top:4px">No image loaded</div>
+    </div>
+  </div>
+</div>
+<div class="thumb-strip" id="thumbStrip" style="display:none"></div>
+<div class="status-bar">
+  <span id="statFile">No file</span>
+  <span id="statSize">—</span>
+  <span id="statZoom">Zoom: —</span>
+  <span id="statRot">Rotation: 0°</span>
+</div>
+<script>
+let images=[],curIdx=0,zoom=1,rotation=0,flipHState=1,flipVState=1;
+let panX=0,panY=0,panning=false,panStart={x:0,y:0};
+const viewer=document.getElementById('viewer');
+const imgWrap=document.getElementById('imgWrap');
+const mainImg=document.getElementById('mainImg');
 
-    <script>
-        let rotation = 0;
-        let currentImage = null;
+function loadImages(e){
+  const files=[...e.target.files];
+  images=[];
+  files.forEach(f=>{
+    const url=URL.createObjectURL(f);
+    images.push({name:f.name,url,size:f.size,type:f.type,lastModified:f.lastModified});
+  });
+  e.target.value='';
+  if(images.length){showImage(0);renderThumbs();}
+}
+function showImage(idx){
+  curIdx=idx;const img=images[idx];
+  document.getElementById('placeholder').style.display='none';
+  imgWrap.style.display='block';
+  mainImg.src=img.url;
+  rotation=0;flipHState=1;flipVState=1;
+  zoom=1;panX=0;panY=0;
+  mainImg.onload=()=>{
+    fitToScreen();
+    updateInfo(img);
+    updateThumb();
+  };
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx===images.length-1;
+  document.getElementById('statFile').textContent=img.name;
+  document.getElementById('statSize').textContent=fmtSize(img.size);
+  document.getElementById('thumbStrip').style.display='flex';
+}
+function updateInfo(img){
+  document.getElementById('infoList').innerHTML=`
+    <div class="info-row"><div class="info-label">Filename</div><div class="info-val">${img.name}</div></div>
+    <div class="info-row"><div class="info-label">Dimensions</div><div class="info-val" id="infoDim">Loading…</div></div>
+    <div class="info-row"><div class="info-label">File size</div><div class="info-val">${fmtSize(img.size)}</div></div>
+    <div class="info-row"><div class="info-label">Type</div><div class="info-val">${img.type}</div></div>
+    <div class="info-row"><div class="info-label">Modified</div><div class="info-val">${new Date(img.lastModified).toLocaleDateString()}</div></div>`;
+  mainImg.onload=()=>{
+    const el=document.getElementById('infoDim');
+    if(el)el.textContent=`${mainImg.naturalWidth} × ${mainImg.naturalHeight}`;
+    fitToScreen();
+  };
+}
+function renderThumbs(){
+  const strip=document.getElementById('thumbStrip');
+  strip.innerHTML='';
+  images.forEach((img,i)=>{
+    const t=document.createElement('img');
+    t.src=img.url;t.className='thumb'+(i===curIdx?' active':'');
+    t.onclick=()=>showImage(i);
+    strip.appendChild(t);
+  });
+}
+function updateThumb(){document.querySelectorAll('.thumb').forEach((t,i)=>t.classList.toggle('active',i===curIdx));}
+function navigate(d){const ni=curIdx+d;if(ni>=0&&ni<images.length)showImage(ni);}
+function applyTransform(){
+  imgWrap.style.transform=`translate(${panX}px,${panY}px) scale(${zoom}) rotate(${rotation}deg) scaleX(${flipHState}) scaleY(${flipVState})`;
+  document.getElementById('zoomDisplay').textContent=Math.round(zoom*100)+'%';
+  document.getElementById('statZoom').textContent='Zoom: '+Math.round(zoom*100)+'%';
+  document.getElementById('statRot').textContent='Rotation: '+rotation+'°';
+}
+function zoomIn(){zoom=Math.min(zoom*1.2,10);applyTransform();}
+function zoomOut(){zoom=Math.max(zoom/1.2,0.05);applyTransform();}
+function fitToScreen(){
+  if(!mainImg.naturalWidth)return;
+  const vw=viewer.offsetWidth-40,vh=viewer.offsetHeight-40;
+  const sx=vw/mainImg.naturalWidth,sy=vh/mainImg.naturalHeight;
+  zoom=Math.min(sx,sy,1);panX=0;panY=0;applyTransform();
+}
+function actualSize(){zoom=1;panX=0;panY=0;applyTransform();}
+function rotate(d){rotation=(rotation+d+360)%360;applyTransform();}
+function flipH(){flipHState*=-1;applyTransform();}
+function flipV(){flipVState*=-1;applyTransform();}
+function downloadCurrent(){if(!images.length)return;const a=Object.assign(document.createElement('a'),{href:images[curIdx].url,download:images[curIdx].name});a.click();}
+function toggleFullscreen(){if(!document.fullscreenElement)viewer.requestFullscreen();else document.exitFullscreen();}
+function fmtSize(b){if(b<1024)return b+'B';if(b<1048576)return(b/1024).toFixed(1)+'KB';return(b/1048576).toFixed(1)+'MB';}
 
-        function loadImage(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const viewer = document.getElementById('viewer');
-                    viewer.innerHTML = `<img id="displayImage" src="${e.target.result}" style="transform: rotate(0deg);">`;
-                    currentImage = e.target.result;
-                    rotation = 0;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
+// Pan
+viewer.addEventListener('mousedown',e=>{if(e.button!==0)return;panning=true;panStart={x:e.clientX-panX,y:e.clientY-panY};viewer.classList.add('grabbing');});
+document.addEventListener('mousemove',e=>{if(!panning)return;panX=e.clientX-panStart.x;panY=e.clientY-panStart.y;applyTransform();});
+document.addEventListener('mouseup',()=>{panning=false;viewer.classList.remove('grabbing');});
 
-        function rotateImage() {
-            const img = document.getElementById('displayImage');
-            if (img) {
-                rotation = (rotation + 90) % 360;
-                img.style.transform = `rotate(${rotation}deg)`;
-            }
-        }
+// Scroll zoom
+viewer.addEventListener('wheel',e=>{e.preventDefault();const d=e.deltaY<0?1.1:0.9;zoom=Math.max(0.05,Math.min(zoom*d,10));applyTransform();},{passive:false});
 
-        function clearImage() {
-            document.getElementById('viewer').innerHTML = '<div class="placeholder">No image loaded. Click "Open Image" to start.</div>';
-            currentImage = null;
-            rotation = 0;
-        }
-    </script>
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft')navigate(-1);
+  if(e.key==='ArrowRight')navigate(1);
+  if(e.key==='+')zoomIn();
+  if(e.key==='-')zoomOut();
+  if(e.key==='0')fitToScreen();
+  if(e.key==='1')actualSize();
+  if(e.key==='r')rotate(90);
+});
+</script>
 </body>
 </html>

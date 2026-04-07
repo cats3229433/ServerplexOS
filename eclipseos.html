@@ -357,6 +357,7 @@
             markdowneditor: { name: 'Markdown Editor', icon: '📄', file: 'os-apps/markdowneditor.html',  category: 'Productivity' },
             settings:       { name: 'Settings',       icon: '⚙️', file: 'settings/settings-main.html', category: 'System' },
             filemanager:    { name: 'File Manager',    icon: '📁', file: 'os-apps/filemanager.html',     category: 'System' },
+            games:          { name: 'Games',            icon: '🎮', file: 'os-apps/games.html',            category: 'Entertainment' },
             voicerecorder:  { name: 'Voice Recorder',  icon: '🎙️', file: 'os-apps/voicerecorder.html',   category: 'Media' },
             screenrecorder: { name: 'Screen Recorder', icon: '📹', file: 'os-apps/screenrecorder.html',  category: 'Media' },
             appstore:       { name: 'App Store',        icon: '🏪', file: 'os-apps/appstore.html',        category: 'System' },
@@ -406,6 +407,16 @@
         let selectedIcon = null;
         let currentTheme = localStorage.getItem('eclipseos_theme') || 'white';
         let desktopLayout = JSON.parse(localStorage.getItem('eclipseos_desktop_layout') || '{}');
+
+        // Immediately purge any stale desktop layout entries for apps that no longer exist
+        (function purgeStaleLayout() {
+            var changed = false;
+            // Remove any layout entry whose app is not in the current registry
+            Object.keys(desktopLayout).forEach(function(id) {
+                if (!apps[id]) { delete desktopLayout[id]; changed = true; }
+            });
+            if (changed) localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
+        })();
         
         // Grid system for desktop icons
         const GRID_SIZE = 100; // 100px grid cells
@@ -479,6 +490,12 @@
             document.getElementById('startMenuUsername').textContent = userName;
             document.getElementById('startMenuAvatar').textContent = userAvatar;
             
+            // Load apps installed via the App Store
+            const storeInstalled = JSON.parse(localStorage.getItem('eclipseos_store_installed') || '{}');
+            Object.values(storeInstalled).forEach(function(a) {
+                apps[a.id] = { name: a.name, icon: a.icon, file: a.url, category: a.category || 'Other' };
+            });
+
             renderDesktopIcons();
             renderStartMenuApps();
             updateClock();
@@ -506,10 +523,23 @@
         }
 
         // ===== DESKTOP ICONS =====
+        // Hard cleanup on load — wipe any stale layout entries for removed apps
+        (function() {
+            var changed = false;
+            Object.keys(desktopLayout).forEach(function(id) {
+                if (!apps[id]) { delete desktopLayout[id]; changed = true; }
+            });
+            if (changed) localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
+        })();
+
         function renderDesktopIcons() {
             const container = document.getElementById('desktopIcons');
             container.innerHTML = '';
-            
+            // Remove any remaining orphaned layout entries
+            Object.keys(desktopLayout).forEach(id => {
+                if (!apps[id]) delete desktopLayout[id];
+            });
+
             let gridIndex = 0;
             
             Object.keys(apps).forEach((appId, index) => {
@@ -556,6 +586,10 @@
                 container.appendChild(icon);
             });
             
+            // Remove orphaned layout entries (apps that no longer exist)
+            Object.keys(desktopLayout).forEach(id => {
+                if (!apps[id]) delete desktopLayout[id];
+            });
             // Save the updated layout
             localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
         }

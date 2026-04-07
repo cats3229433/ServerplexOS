@@ -44,16 +44,6 @@
         </div>
     </div>
 
-        <div class="section">
-        <div class="section-title">Accent Color</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px" id="accentPicker"></div>
-        <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:13px">Custom:</span>
-            <input type="color" id="customAccent" value="#0078d4" style="width:44px;height:36px;border-radius:6px;border:1px solid #ddd;cursor:pointer">
-            <button onclick="applyAccent(document.getElementById('customAccent').value)" style="padding:7px 14px;background:#0078d4;border:none;border-radius:6px;color:white;font-family:inherit;cursor:pointer">Apply</button>
-        </div>
-    </div>
-
     <div class="section">
         <div class="section-title">Wallpaper</div>
         <div class="wallpaper-picker">
@@ -70,21 +60,6 @@
     </div>
 
     <script>
-
-        const ACCENTS = ['#0078d4','#5856d6','#34c759','#ff9500','#ff3b30','#af52de','#00bcd4','#e91e63','#ff6b35','#1a73e8'];
-        const savedAccent = localStorage.getItem('eclipseos_accent') || '#0078d4';
-        function renderAccents() {
-            const p = document.getElementById('accentPicker');
-            p.innerHTML = ACCENTS.map(c => `<div onclick="applyAccent('${c}')" style="width:32px;height:32px;border-radius:50%;background:${c};cursor:pointer;border:3px solid ${c===savedAccent?'white':'transparent'};box-shadow:${c===savedAccent?'0 0 0 2px '+c:'none'};transition:all .15s"></div>`).join('');
-        }
-        function applyAccent(color) {
-            localStorage.setItem('eclipseos_accent', color);
-            if (window.parent) { window.parent.document.querySelectorAll('.window-titlebar,.taskbar-app.active,.start-button').forEach(el => el.style.setProperty('--accent', color)); window.parent.document.documentElement.style.setProperty('--accent',color); }
-            renderAccents();
-            document.getElementById('customAccent').value = color;
-        }
-        renderAccents();
-
         function setTheme(theme) {
             if (window.parent && window.parent.changeTheme) {
                 window.parent.changeTheme(theme);

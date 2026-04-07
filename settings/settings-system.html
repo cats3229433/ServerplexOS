@@ -54,43 +54,6 @@
         </div>
     </div>
 
-
-    <div class="section">
-        <div class="section-title">Startup Apps</div>
-        <div class="setting-item" id="startupAppsContainer">
-            <div class="setting-label">Open on Login</div>
-            <div class="setting-desc">Choose apps that open automatically when EclipseOS starts</div>
-            <div id="startupAppsList" style="margin-top:12px;display:flex;flex-direction:column;gap:8px"></div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Accessibility</div>
-        <div class="setting-item">
-            <div class="setting-label">UI Font Size</div>
-            <div class="setting-desc">Adjusts text size across the OS</div>
-            <div style="display:flex;align-items:center;gap:10px;margin-top:10px">
-                <input type="range" id="osFontSize" min="10" max="18" value="13" style="flex:1;accent-color:#0078d4">
-                <span id="osFontSizeVal" style="min-width:40px;font-weight:600">13px</span>
-                <button onclick="applyOsFontSize()" style="padding:6px 14px;background:#0078d4;border:none;border-radius:6px;color:white;font-family:inherit;cursor:pointer">Apply</button>
-            </div>
-        </div>
-        <div class="setting-item">
-            <div class="setting-label">Language & Region</div>
-            <div class="setting-desc">Display language (affects date/time formatting)</div>
-            <select id="langSelect" style="margin-top:8px;padding:8px 12px;background:#f9f9f9;border:1px solid #ddd;border-radius:6px;font-family:inherit;width:100%">
-                <option value="en-US">English (United States)</option>
-                <option value="en-GB">English (United Kingdom)</option>
-                <option value="es-ES">Español</option>
-                <option value="fr-FR">Français</option>
-                <option value="de-DE">Deutsch</option>
-                <option value="ja-JP">日本語</option>
-                <option value="zh-CN">中文 (简体)</option>
-                <option value="pt-BR">Português (Brasil)</option>
-            </select>
-            <button onclick="saveLang()" style="margin-top:8px;padding:7px 16px;background:#0078d4;border:none;border-radius:6px;color:white;font-family:inherit;cursor:pointer">Save Language</button>
-        </div>
-    </div>
     <script>
         // Display info
         document.getElementById('resolution').textContent = `${window.screen.width} × ${window.screen.height}`;
@@ -125,38 +88,6 @@
         // Load notification setting
         const notifEnabled = localStorage.getItem('eclipseos_notifications_enabled') !== 'false';
         document.getElementById('notifToggle').checked = notifEnabled;
-
-
-        // Startup apps
-        const ALL_APPS = {browser:'🌐 Browser',notepad:'📝 Notepad',calculator:'🧮 Calculator',calendar:'📅 Calendar',terminal:'💻 Terminal',code:'👨‍💻 Code Editor',paint:'🎨 Paint',todolist:'📋 To-Do',clock:'⏰ Clock',musicplayer:'🎵 Music',filemanager:'📁 File Manager'};
-        let startupApps = JSON.parse(localStorage.getItem('eclipseos_startup_apps') || '[]');
-        function renderStartupApps() {
-            const c = document.getElementById('startupAppsList');
-            c.innerHTML = Object.entries(ALL_APPS).map(([id,name]) => `
-                <label style="display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer">
-                    <input type="checkbox" ${startupApps.includes(id)?'checked':''} onchange="toggleStartup('${id}',this.checked)" style="width:16px;height:16px;accent-color:#0078d4">
-                    <span style="font-size:14px">${name}</span>
-                </label>`).join('');
-        }
-        function toggleStartup(id, on) { if(on){if(!startupApps.includes(id))startupApps.push(id);}else{startupApps=startupApps.filter(x=>x!==id);} localStorage.setItem('eclipseos_startup_apps',JSON.stringify(startupApps)); }
-        renderStartupApps();
-
-        // Font size
-        const savedFs = localStorage.getItem('eclipseos_os_font_size') || '13';
-        document.getElementById('osFontSize').value = savedFs;
-        document.getElementById('osFontSizeVal').textContent = savedFs + 'px';
-        document.getElementById('osFontSize').oninput = function() { document.getElementById('osFontSizeVal').textContent = this.value+'px'; };
-        function applyOsFontSize() {
-            const v = document.getElementById('osFontSize').value;
-            localStorage.setItem('eclipseos_os_font_size', v);
-            if (window.parent && window.parent.document.body) window.parent.document.body.style.fontSize = v+'px';
-            alert('Font size applied: ' + v + 'px');
-        }
-
-        // Language
-        const savedLang = localStorage.getItem('eclipseos_language') || 'en-US';
-        document.getElementById('langSelect').value = savedLang;
-        function saveLang() { localStorage.setItem('eclipseos_language', document.getElementById('langSelect').value); alert('Language saved. Reload to apply.'); }
 
         updateStorage();
     </script>

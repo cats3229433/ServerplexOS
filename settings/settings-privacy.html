@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; padding: 20px; background: #fff; }
+        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
         h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
         .section { margin-bottom: 40px; }
         .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
@@ -18,6 +18,9 @@
         input[type="file"] { display: none; }
         .warning { padding: 12px; background: #fff3cd; color: #856404; border-radius: 6px; margin-bottom: 12px; font-size: 14px; }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 </head>
 <body>
     <h1>🔒 Privacy & Security</h1>
@@ -87,35 +90,35 @@
     <script>
         function clearNotepad() {
             if (confirm('Clear all notepad text?')) {
-                localStorage.removeItem('serverplexos_notepad_text');
+                localStorage.removeItem('eclipseos_notepad_text');
                 alert('✅ Notepad cleared');
             }
         }
 
         function clearTodos() {
             if (confirm('Clear all tasks?')) {
-                localStorage.removeItem('serverplexos_tasks');
+                localStorage.removeItem('eclipseos_tasks');
                 alert('✅ Tasks cleared');
             }
         }
 
         function clearStickyNotes() {
             if (confirm('Clear all sticky notes?')) {
-                localStorage.removeItem('serverplexos_sticky_notes');
+                localStorage.removeItem('eclipseos_sticky_notes');
                 alert('✅ Sticky notes cleared');
             }
         }
 
         function clearMarkdown() {
             if (confirm('Clear markdown content?')) {
-                localStorage.removeItem('serverplexos_markdown');
+                localStorage.removeItem('eclipseos_markdown');
                 alert('✅ Markdown cleared');
             }
         }
 
         function clearRecycleBin() {
             if (confirm('Empty recycle bin?')) {
-                localStorage.removeItem('serverplexos_recycle_bin');
+                localStorage.removeItem('eclipseos_recycle_bin');
                 alert('✅ Recycle bin emptied');
             }
         }
@@ -124,7 +127,7 @@
             const data = {};
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key.startsWith('serverplexos_')) {
+                if (key.startsWith('eclipseos_')) {
                     data[key] = localStorage.getItem(key);
                 }
             }
@@ -139,7 +142,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `serverplexos-settings-${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `eclipseos-settings-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
             
@@ -191,11 +194,11 @@
                 return;
             }
             
-            // Clear all serverplexos data
+            // Clear all eclipseos data
             const keys = [];
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
-                if (key.startsWith('serverplexos_')) {
+                if (key.startsWith('eclipseos_')) {
                     keys.push(key);
                 }
             }

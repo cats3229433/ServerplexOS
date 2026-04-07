@@ -357,9 +357,32 @@
     }
 
     // ── Load URL ──
+    // SW-based engines can't run inside iframes — open them in a real new tab instead
+    const SW_ENGINES = ['uv', 'sj'];
+
     function loadUrl(url, addHistory = true) {
       const t = activeTab(); if (!t) return;
       const isLocal = /^(os-apps|browser|\.\/|settings)/.test(url);
+      const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
+
+      // For SW engines, build the proxied URL and open it in a real browser tab
+      if (!isLocal && SW_ENGINES.includes(mode)) {
+        const keys = { uv: 'eclipseos_uv_base', sj: 'eclipseos_sj_base' };
+        const base = localStorage.getItem(keys[mode]) || '';
+        if (!base) {
+          // No relay configured — show message in the iframe area
+          iframeWrap.innerHTML = `<div style="position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:white;font-family:'Oxanium',sans-serif;text-align:center;padding:40px;">
+            <div style="font-size:48px">⚠️</div>
+            <div style="font-size:16px;font-weight:700">No relay configured</div>
+            <div style="font-size:13px;opacity:0.5;max-width:360px;line-height:1.6">The <strong>${mode}</strong> engine needs a relay URL. Go back to the home tab and set one.</div>
+          </div>`;
+          return;
+        }
+        const proxied = base.includes('%s') ? base.replace('%s', encodeURIComponent(url)) : base + encodeURIComponent(url);
+        window.open(proxied, '_blank');
+        return;
+      }
+
       loadingBar.classList.add('active');
       if (t.iframe) t.iframe.remove();
 

@@ -379,7 +379,10 @@
     function unlock() {
       document.getElementById('loginScreen').style.transition = 'opacity 0.4s ease';
       document.getElementById('loginScreen').style.opacity = '0';
-      setTimeout(() => sessionStorage.setItem('eclipseos_authed', 'true'); window.location.href = 'eclipseos.html', 400);
+      setTimeout(() => {
+        sessionStorage.setItem('eclipseos_authed', 'true');
+        window.location.href = 'eclipseos.html';
+      }, 400);
     }
 
     // Keyboard support for PIN

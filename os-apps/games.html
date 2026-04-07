@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+body.theme-white{--bg:#f0f2f5;--bg3:#e4e7ed;--surface:#fff;--surface2:#f7f8fa;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.14);--text:#0d0f14;--text2:#55606e;--text3:#8a95a3;--shadow:0 4px 20px rgba(0,0,0,.10);--shadow-lg:0 12px 48px rgba(0,0,0,.14)}
+body.theme-black{--bg:#060811;--bg3:#111420;--surface:#12151f;--surface2:#1a1e2e;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8edf5;--text2:#8b97b0;--text3:#5a6478;--shadow:0 4px 20px rgba(0,0,0,.5);--shadow-lg:0 16px 60px rgba(0,0,0,.7)}
+body.theme-grey{--bg:#3a3e4a;--bg3:#4e535e;--surface:#484c57;--surface2:#545862;--border:rgba(255,255,255,0.10);--border2:rgba(255,255,255,0.18);--text:#eef0f4;--text2:#b8bec8;--text3:#858ea0;--shadow:0 4px 20px rgba(0,0,0,.35);--shadow-lg:0 12px 48px rgba(0,0,0,.5)}
+:root{--accent:#0078d4;--glow:rgba(0,120,212,0.3);--r:12px;--spring:0.22s cubic-bezier(0.34,1.56,0.64,1)}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;gap:12px;padding:0 18px;height:50px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:200}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px var(--glow);flex-shrink:0}
+.logo-text{font-size:15px;font-weight:800;letter-spacing:.5px}
+.logo-sub{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.spacer{flex:1}
+.search-wrap{position:relative}
+.search-wrap input{padding:7px 14px 7px 32px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;width:200px;outline:none;transition:all .2s}
+.search-wrap input:focus{border-color:var(--accent);background:var(--surface2);width:230px}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none}
+.tb-btn{padding:6px 14px;border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s}
+.tb-btn:hover{color:var(--text);background:var(--bg3);border-color:var(--border2)}
+.tb-btn.active{background:rgba(0,120,212,0.15);border-color:rgba(0,120,212,0.4);color:var(--accent)}
+.tb-refresh{padding:6px 10px;font-size:15px;color:var(--text3)}
+
+/* Main */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:196px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sb-label{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text3);padding:6px 10px 4px}
+.sb-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);border:none;background:transparent;font-family:'Oxanium',sans-serif;width:100%;text-align:left;transition:all .15s;position:relative}
+.sb-btn:hover{background:var(--bg3);color:var(--text)}
+.sb-btn.active{background:rgba(0,120,212,0.12);color:var(--accent)}
+.sb-btn.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 2px 2px 0;background:var(--accent)}
+.sb-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-pill{font-size:10px;font-weight:700;background:rgba(255,255,255,0.07);color:var(--text3);padding:1px 7px;border-radius:20px;margin-left:auto}
+.sb-btn.active .sb-pill{background:rgba(0,120,212,0.2);color:var(--accent)}
+.sb-divider{height:1px;background:var(--border);margin:5px 10px}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:20px 22px}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* Featured */
+.featured-wrap{margin-bottom:26px;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;animation:fadeUp .35s ease}
+.featured-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1e3a5f,#1a1040 60%,#0f1a35)}
+.featured-glow{position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,120,212,.28),transparent 70%)}
+.featured-content{position:relative;padding:22px 26px;display:flex;align-items:center;gap:20px}
+.feat-img-wrap{position:relative;flex-shrink:0}
+.feat-img{width:82px;height:82px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 28px rgba(0,0,0,.4);display:block}
+.feat-img-fall{width:82px;height:82px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:42px}
+.feat-badge{position:absolute;top:-7px;right:-7px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.feat-info{flex:1}
+.feat-eye{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(147,197,253,.7);margin-bottom:4px}
+.feat-name{font-size:22px;font-weight:800;color:#fff;margin-bottom:5px}
+.feat-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:13px;max-width:420px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.feat-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.feat-meta{font-size:12px;color:rgba(255,255,255,.3)}
+.btn-feat{padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.2);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .2s;background:rgba(255,255,255,.14);color:#fff}
+.btn-feat:hover{background:rgba(255,255,255,.24);transform:translateY(-1px)}
+.btn-feat.fav{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d}
+
+/* Section */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sec-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+.sec-count{font-size:12px;color:var(--text3)}
+
+/* Game grid */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:12px;margin-bottom:28px}
+.game-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all var(--spring);position:relative;box-shadow:var(--shadow);animation:fadeUp .3s ease}
+.game-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:var(--shadow-lg);border-color:var(--border2)}
+.game-card:hover .card-overlay{opacity:1}
+.game-card:hover .card-fav-btn{opacity:1}
+.game-cover{width:100%;height:154px;object-fit:cover;display:block;background:var(--bg3)}
+.game-cover-fall{width:100%;height:154px;display:flex;align-items:center;justify-content:center;font-size:46px;background:linear-gradient(135deg,var(--bg3),var(--surface2))}
+.card-overlay{position:absolute;top:0;left:0;right:0;height:154px;background:linear-gradient(to top,rgba(0,0,0,.72),transparent 60%);opacity:0;transition:opacity .2s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px}
+.play-circle{width:42px;height:42px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 14px var(--glow)}
+.card-fav-btn{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;opacity:0;transition:all .15s;backdrop-filter:blur(6px)}
+.card-fav-btn.is-fav{opacity:1;background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.5)}
+.card-body{padding:10px 12px 13px}
+.card-name{font-size:13px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{display:flex;align-items:center;gap:5px}
+.cat-tag{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:rgba(0,120,212,.12);color:var(--accent);border:1px solid rgba(0,120,212,.2)}
+
+/* State */
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 30px;text-align:center;color:var(--text3);grid-column:1/-1}
+.state-icon{font-size:50px}
+.state-msg{font-size:14px}
+.spin{animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Detail overlay */
+.detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px}
+.detail-overlay.open{display:flex;animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.detail-modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:490px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)}
+.detail-hero{padding:20px 20px 16px;background:linear-gradient(180deg,var(--surface2),var(--surface));border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start}
+.detail-cover{width:76px;height:76px;border-radius:14px;border:1px solid var(--border2);flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:38px;overflow:hidden}
+.detail-cover img{width:100%;height:100%;object-fit:cover}
+.detail-title{font-size:19px;font-weight:800;margin-bottom:3px}
+.detail-byline{font-size:12px;color:var(--text3);margin-bottom:8px}
+.detail-body{flex:1;overflow-y:auto;padding:16px 20px}
+.detail-body::-webkit-scrollbar{width:4px}
+.detail-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.dsec{margin-bottom:16px}
+.dsec-title{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.dsec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.detail-desc{font-size:13px;color:var(--text2);line-height:1.75}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.detail-cell{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px}
+.detail-key{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.detail-val{font-size:13px;font-weight:600}
+.detail-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:7px;background:var(--surface);flex-shrink:0}
+.btn-play{flex:1;padding:10px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px var(--glow)}
+.btn-play:hover{transform:translateY(-1px);box-shadow:0 8px 22px var(--glow)}
+.btn-fav{padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:'Oxanium',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-fav.is-fav{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:#fcd34d}
+.btn-close{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-close:hover{background:var(--bg3);color:var(--text)}
+
+/* Statusbar */
+.statusbar{background:var(--surface);border-top:1px solid var(--border);padding:3px 16px;display:flex;gap:14px;font-size:10px;color:var(--text3);flex-shrink:0;letter-spacing:.5px}
+
+/* Toast */
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface);border:1px solid var(--border2);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);z-index:99999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body class="theme-black">
+<div class="app">
+
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="logo-icon">🎮</div>
+      <div><div class="logo-text">Games</div><div class="logo-sub">EclipseOS</div></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search games…" oninput="render()">
+    </div>
+    <button class="tb-btn" id="favBtn" onclick="toggleFavFilter()">⭐ Favourites</button>
+    <button class="tb-btn tb-refresh" onclick="loadGames()" title="Refresh">↻</button>
+  </div>
+
+  <div class="main">
+    <div class="sidebar">
+      <div class="sb-label">Library</div>
+      <button class="sb-btn active" data-cat="all"         onclick="setCat('all')">        <span class="sb-icon">✦</span>All Games   <span class="sb-pill" id="cnt-all">0</span></button>
+      <div class="sb-divider"></div>
+      <div class="sb-label">Categories</div>
+      <button class="sb-btn" data-cat="Action"      onclick="setCat('Action')">      <span class="sb-icon">⚔️</span>Action      <span class="sb-pill" id="cnt-Action">0</span></button>
+      <button class="sb-btn" data-cat="Puzzle"      onclick="setCat('Puzzle')">      <span class="sb-icon">🧩</span>Puzzle      <span class="sb-pill" id="cnt-Puzzle">0</span></button>
+      <button class="sb-btn" data-cat="Adventure"   onclick="setCat('Adventure')">   <span class="sb-icon">🗺️</span>Adventure  <span class="sb-pill" id="cnt-Adventure">0</span></button>
+      <button class="sb-btn" data-cat="Arcade"      onclick="setCat('Arcade')">      <span class="sb-icon">👾</span>Arcade      <span class="sb-pill" id="cnt-Arcade">0</span></button>
+      <button class="sb-btn" data-cat="Sports"      onclick="setCat('Sports')">      <span class="sb-icon">⚽</span>Sports      <span class="sb-pill" id="cnt-Sports">0</span></button>
+      <button class="sb-btn" data-cat="Strategy"    onclick="setCat('Strategy')">    <span class="sb-icon">♟️</span>Strategy   <span class="sb-pill" id="cnt-Strategy">0</span></button>
+      <button class="sb-btn" data-cat="Multiplayer" onclick="setCat('Multiplayer')"> <span class="sb-icon">👥</span>Multiplayer<span class="sb-pill" id="cnt-Multiplayer">0</span></button>
+      <button class="sb-btn" data-cat="Other"       onclick="setCat('Other')">       <span class="sb-icon">📦</span>Other       <span class="sb-pill" id="cnt-Other">0</span></button>
+    </div>
+    <div class="content" id="content">
+      <div class="game-grid">
+        <div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Loading games…</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <span id="statusText">Connecting…</span>
+    <span style="margin-left:auto" id="statusFavs"></span>
+  </div>
+
+</div>
+
+<!-- Detail overlay -->
+<div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-modal">
+    <div class="detail-hero">
+      <div class="detail-cover" id="dCover"></div>
+      <div style="flex:1;min-width:0">
+        <div class="detail-title" id="dTitle"></div>
+        <div class="detail-byline" id="dByline"></div>
+        <div id="dTags"></div>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="dsec"><div class="dsec-title">Description</div><div class="detail-desc" id="dDesc"></div></div>
+      <div class="dsec"><div class="dsec-title">Details</div><div class="detail-grid" id="dGrid"></div></div>
+    </div>
+    <div class="detail-footer">
+      <button class="btn-play" onclick="launchGame()">▶ Play Now</button>
+      <button class="btn-fav" id="dFavBtn" onclick="toggleFavDetail()">☆</button>
+      <button class="btn-close" onclick="closeDetail()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG — point this at your GitHub repo
+// ─────────────────────────────────────────────
+const REGISTRY = 'https://cdn.jsdelivr.net/gh/YOUR_USERNAME/YOUR_REPO@main/games.json';
+
+// Theme
+const theme = localStorage.getItem('eclipseos_theme') || 'black';
+document.body.className = 'theme-' + theme;
+const acc = localStorage.getItem('eclipseos_accent');
+if (acc) document.documentElement.style.setProperty('--accent', acc);
+
+// State
+let games      = [];
+let favs       = JSON.parse(localStorage.getItem('eclipseos_game_favs') || '[]');
+let currentCat = 'all';
+let showFavs   = false;
+let activeGame = null;
+
+function saveFavs() { localStorage.setItem('eclipseos_game_favs', JSON.stringify(favs)); }
+function isFav(id)  { return favs.includes(id); }
+
+// Load
+async function loadGames() {
+  document.getElementById('content').innerHTML = '<div class="game-grid"><div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Connecting to games library…</p></div></div>';
+  document.getElementById('statusText').textContent = 'Connecting…';
+  try {
+    const r = await fetch(REGISTRY + '?t=' + Date.now());
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    games = d.games || [];
+    document.getElementById('statusText').textContent = games.length + ' games available';
+  } catch(e) {
+    document.getElementById('statusText').textContent = '⚠️ Connection failed';
+    document.getElementById('content').innerHTML = `
+      <div class="game-grid">
+        <div class="state-box">
+          <span class="state-icon">🔌</span>
+          <div style="font-size:17px;font-weight:700;color:var(--text2)">Connection Error</div>
+          <div style="font-size:13px;line-height:1.6;max-width:320px">
+            Could not reach the games registry.<br>
+            Check that <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:12px">REGISTRY</code> is set to a valid jsDelivr URL and that your repo is public.
+          </div>
+          <button onclick="loadGames()" style="padding:10px 22px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">
+            ↻ Try Again
+          </button>
+        </div>
+      </div>`;
+    return;
+  }
+  updateCounts(); render();
+}
+
+// Sidebar
+function setCat(cat) {
+  currentCat = cat; showFavs = false;
+  document.getElementById('favBtn').classList.remove('active');
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  render();
+}
+function toggleFavFilter() {
+  showFavs = !showFavs;
+  document.getElementById('favBtn').classList.toggle('active', showFavs);
+  if (showFavs) document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  else document.querySelector('[data-cat="' + currentCat + '"]')?.classList.add('active');
+  render();
+}
+
+// Counts
+function updateCounts() {
+  ['all','Action','Puzzle','Adventure','Arcade','Sports','Strategy','Multiplayer','Other'].forEach(c => {
+    const el = document.getElementById('cnt-' + c);
+    if (el) el.textContent = c === 'all' ? games.length : games.filter(g => g.category === c).length;
+  });
+}
+
+// Render
+function render() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let list = [...games];
+  if (showFavs)              list = list.filter(g => isFav(g.id));
+  else if (currentCat !== 'all') list = list.filter(g => g.category === currentCat);
+  if (q) list = list.filter(g =>
+    g.name.toLowerCase().includes(q) ||
+    (g.description||'').toLowerCase().includes(q) ||
+    (g.author||'').toLowerCase().includes(q)
+  );
+
+  document.getElementById('statusFavs').textContent = favs.length ? '⭐ ' + favs.length + ' favourited' : '';
+
+  const c = document.getElementById('content');
+  if (!list.length) {
+    c.innerHTML = `<div class="game-grid"><div class="state-box">
+      <span class="state-icon">${showFavs?'⭐':'🔍'}</span>
+      <p class="state-msg">${showFavs?'No favourites yet':'No games found'}</p>
+    </div></div>`;
+    return;
+  }
+
+  let html = '';
+
+  // Featured banner
+  const feat = list.find(g => g.featured);
+  if (feat && !q && currentCat === 'all' && !showFavs) {
+    const f = isFav(feat.id);
+    const img = feat.cover
+      ? `<img class="feat-img" src="${feat.cover}" onerror="this.outerHTML='<div class=\\'feat-img-fall\\'>${feat.icon||'🎮'}</div>'">`
+      : `<div class="feat-img-fall">${feat.icon||'🎮'}</div>`;
+    html += `<div class="featured-wrap" onclick="openDetail('${feat.id}')">
+      <div class="featured-bg"></div><div class="featured-glow"></div>
+      <div class="featured-content">
+        <div class="feat-img-wrap">${img}<div class="feat-badge">⭐ Featured</div></div>
+        <div class="feat-info">
+          <div class="feat-eye">Featured Game</div>
+          <div class="feat-name">${feat.name}</div>
+          <div class="feat-desc">${feat.description||''}</div>
+          <div class="feat-row">
+            <span class="feat-meta">${feat.author?'by '+feat.author:''}</span>
+            <button class="btn-feat ${f?'fav':''}" onclick="event.stopPropagation();toggleFav('${feat.id}')">${f?'⭐ Favourited':'☆ Favourite'}</button>
+            <button class="btn-feat" onclick="event.stopPropagation();openDetail('${feat.id}');launchGame()">▶ Play</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+    list = list.filter(g => g.id !== feat.id);
+  }
+
+  if (list.length) {
+    const label = showFavs ? 'Favourites' : currentCat === 'all' ? 'All Games' : currentCat;
+    html += `<div class="sec-head"><div class="sec-title">${label}</div><div class="sec-count">${list.length} game${list.length!==1?'s':''}</div></div>
+    <div class="game-grid">`;
+    list.forEach(g => {
+      const f = isFav(g.id);
+      html += `<div class="game-card" onclick="openDetail('${g.id}')">
+        ${g.cover?`<img class="game-cover" src="${g.cover}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''} 
+        <div class="game-cover-fall" style="${g.cover?'display:none':''}">${g.icon||'🎮'}</div>
+        <div class="card-overlay"><div class="play-circle">▶</div></div>
+        <div class="card-fav-btn ${f?'is-fav':''}" onclick="event.stopPropagation();toggleFav('${g.id}')">${f?'⭐':'☆'}</div>
+        <div class="card-body">
+          <div class="card-name">${g.name}</div>
+          <div class="card-meta"><span class="cat-tag">${g.category||'Other'}</span></div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  c.innerHTML = html;
+}
+
+// Favourite
+function toggleFav(id) {
+  if (isFav(id)) { favs = favs.filter(f => f !== id); showToast('Removed from favourites','☆'); }
+  else           { favs.push(id); showToast('Added to favourites!','⭐'); }
+  saveFavs(); render();
+  if (activeGame?.id === id) refreshFavBtn();
+}
+function toggleFavDetail() { if (activeGame) toggleFav(activeGame.id); }
+function refreshFavBtn() {
+  const f = isFav(activeGame?.id);
+  document.getElementById('dFavBtn').textContent = f ? '⭐' : '☆';
+  document.getElementById('dFavBtn').classList.toggle('is-fav', f);
+}
+
+// Detail
+function openDetail(id) {
+  const g = games.find(x => x.id === id); if (!g) return;
+  activeGame = g;
+  const dc = document.getElementById('dCover');
+  dc.innerHTML = g.cover
+    ? `<img src="${g.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.parentElement.textContent='${g.icon||'🎮'}'">` 
+    : (g.icon || '🎮');
+  document.getElementById('dTitle').textContent  = g.name;
+  document.getElementById('dByline').textContent = [g.author ? 'by ' + g.author : '', g.category].filter(Boolean).join(' · ');
+  document.getElementById('dTags').innerHTML = `<span class="cat-tag">${g.category||'Other'}</span>${g.featured?'<span class="cat-tag" style="background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.3);margin-left:4px">⭐ Featured</span>':''}`;
+  document.getElementById('dDesc').textContent = g.description || 'No description.';
+  document.getElementById('dGrid').innerHTML = `
+    <div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">${g.category||'—'}</div></div>
+    <div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">${g.author||'—'}</div></div>
+    <div class="detail-cell"><div class="detail-key">Favourite</div><div class="detail-val">${isFav(g.id)?'⭐ Yes':'☆ No'}</div></div>
+    <div class="detail-cell"><div class="detail-key">Download</div><div class="detail-val">${g.downloadUrl?`<a href="${g.downloadUrl}" target="_blank" style="color:var(--accent)">Available</a>`:'—'}</div></div>`;
+  refreshFavBtn();
+  document.getElementById('detailOverlay').classList.add('open');
+}
+function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
+
+// Launch — opens os-apps/game-player.html with game data in URL params
+function launchGame() {
+  if (!activeGame) return;
+  closeDetail();
+  const g = activeGame;
+  const params = new URLSearchParams({
+    url:         g.url         || '',
+    name:        g.name        || '',
+    cover:       g.cover       || '',
+    icon:        g.icon        || '🎮',
+    category:    g.category    || '',
+    author:      g.author      || '',
+    description: g.description || '',
+    downloadUrl: g.downloadUrl || '',
+  });
+  // Navigate the parent OS window to the player
+  window.location.href = 'os-apps/game-player.html?' + params.toString();
+}
+
+// Toast
+let toastT;
+function showToast(msg, icon='✓') {
+  clearTimeout(toastT);
+  document.getElementById('toastMsg').textContent  = msg;
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toast').classList.add('show');
+  toastT = setTimeout(() => document.getElementById('toast').classList.remove('show'), 2500);
+}
+
+loadGames();
+</script>
+</body>
+</html>

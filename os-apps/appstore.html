@@ -279,28 +279,32 @@ function isInstalled(id) { return !!installed[id]; }
 
 // Load registry
 async function loadRegistry() {
-  document.getElementById('content').innerHTML = '<div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Loading registry…</p></div>';
+  document.getElementById('content').innerHTML = '<div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Connecting to App Store…</p></div>';
+  document.getElementById('statusText').textContent = 'Connecting…';
   try {
     const r = await fetch(REGISTRY_URL + '?t=' + Date.now());
-    if (!r.ok) throw 0;
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     const d = await r.json();
     apps = d.apps || d || [];
     document.getElementById('statusText').textContent = apps.length + ' apps in store';
   } catch(e) {
-    apps = getDemoApps();
-    document.getElementById('statusText').textContent = 'Demo mode — set REGISTRY_URL to go live';
+    apps = [];
+    document.getElementById('statusText').textContent = '⚠️ Connection failed';
+    document.getElementById('content').innerHTML = `
+      <div class="state-box">
+        <span class="state-icon">🔌</span>
+        <div style="font-size:17px;font-weight:700;color:#e8edf5">Connection Error</div>
+        <div style="font-size:13px;line-height:1.6;max-width:340px;color:#6b7a99">
+          Could not reach the App Store registry.<br>
+          Make sure <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;font-size:12px">REGISTRY_URL</code> points to a valid public jsDelivr URL.
+        </div>
+        <button onclick="loadRegistry()" style="padding:10px 22px;border-radius:10px;border:none;background:#3b82f6;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">
+          ↻ Try Again
+        </button>
+      </div>`;
+    return;
   }
   updateCounts(); render(); updateInstCount();
-}
-
-function getDemoApps() {
-  return [
-    { id:'weather',    name:'Weather',        icon:'🌤️', category:'Utilities',      version:'2.0', author:'EclipseOS Team', description:'Current weather and 7-day forecast for any city.',         url:'', featured:true  },
-    { id:'pomodoro',   name:'Pomodoro Timer', icon:'🍅', category:'Productivity',   version:'1.0', author:'DevGroup',       description:'Boost productivity with 25-minute focus sessions.',        url:'', featured:false },
-    { id:'colorpick',  name:'Color Picker',   icon:'🎨', category:'Developer Tools',version:'1.1', author:'ToolsMaker',     description:'Pick colors, convert HEX/RGB/HSL, export palettes.',     url:'', featured:false },
-    { id:'converter',  name:'Unit Converter', icon:'📐', category:'Utilities',      version:'1.0', author:'EclipseOS Team', description:'Convert length, weight, temperature, volume and more.',   url:'', featured:false },
-    { id:'flashcards', name:'Flashcards',     icon:'🃏', category:'Productivity',   version:'1.0', author:'StudyApps',      description:'Create and study flashcard decks with spaced repetition.',url:'', featured:false },
-  ];
 }
 
 // Category

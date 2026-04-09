@@ -45,13 +45,11 @@
 
     <script>
         // ── Detect if we are the cloaked popup ──
-        // The cloaked popup has ?cloaked=1 in the URL
         const isCloaked = location.search.includes('cloaked=1');
 
         if (isCloaked) {
-            // We are the popup — just show the OS normally
+            // We are the popup — load the OS (eclipseos.html handles login routing internally)
             document.getElementById('mainFrame').src = 'eclipseos.html';
-            // Prevent the popup from being closed accidentally
             window.addEventListener('beforeunload', e => { e.preventDefault(); e.returnValue = ''; });
         } else {
             // We are the original tab — attempt cloaking
@@ -59,15 +57,13 @@
         }
 
         function attemptCloak() {
-            // Open a popup of this same page with ?cloaked=1 so it knows it's the real one
-            const popup = window.open(location.href.split('?')[0] + '?cloaked=1', '_blank',
-                'width=' + screen.availWidth + ',height=' + screen.availHeight + ',left=0,top=0,toolbar=0,menubar=0,scrollbars=0');
-
+            const popup = window.open(
+                location.href.split('?')[0] + '?cloaked=1', '_blank',
+                'width=' + screen.availWidth + ',height=' + screen.availHeight + ',left=0,top=0,toolbar=0,menubar=0,scrollbars=0'
+            );
             if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-                // Popups blocked — show the notice and fall back to inline
                 showBlockedNotice();
             } else {
-                // Popup opened — redirect this tab to Google to act as the "cloak"
                 window.location.replace('https://www.google.com');
             }
         }
@@ -80,7 +76,8 @@
         function showBlockedNotice() {
             document.getElementById('popupSteps').innerText = getInstructions();
             document.getElementById('popupBlocked').classList.add('show');
-            // Still show the OS in the background iframe so it's usable
+            // Still load the OS — eclipseos.html will redirect to account.html/welcome.html as needed
+            document.getElementById('mainFrame').src = 'eclipseos.html';
             document.getElementById('mainFrame').style.opacity = '1';
         }
 
@@ -95,12 +92,7 @@
             return '1. Click the lock/info icon in your address bar\n2. Find "Pop-ups and redirects"\n3. Set it to Allow\n4. Click "Try Again" above';
         }
 
-        // ── Anti-close on the cloaked popup ──
-        if (isCloaked) {
-            window.addEventListener('beforeunload', e => { e.preventDefault(); e.returnValue = ''; });
-        }
-
-        // ── Message relay between OS iframe and parent ──
+        // Message relay between OS iframe and parent
         window.addEventListener('message', e => {
             if (e.data && e.data.type === 'navigate') {
                 const f = document.getElementById('mainFrame');

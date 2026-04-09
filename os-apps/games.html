@@ -203,7 +203,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
       <div class="dsec"><div class="dsec-title">Details</div><div class="detail-grid" id="dGrid"></div></div>
     </div>
     <div class="detail-footer">
-      <button class="btn-play" onclick="launchGame()">▶ Play Now</button>
+      <button class="btn-play" id="dPlayBtn" onclick="launchGame()">▶ Play Now</button>
       <button class="btn-fav" id="dFavBtn" onclick="toggleFavDetail()">☆</button>
       <button class="btn-close" onclick="closeDetail()">Close</button>
     </div>
@@ -216,7 +216,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 // ─────────────────────────────────────────────
 //  CONFIG — point this at your GitHub repo
 // ─────────────────────────────────────────────
-const REGISTRY = 'https://cdn.jsdelivr.net/gh/Serverplex/eclipseos-games/games.json';
+const REGISTRY = 'https://cdn.jsdelivr.net/gh/Serverplex/EclipseOS-Games/games.json';
 
 // Theme
 const theme = localStorage.getItem('eclipseos_theme') || 'black';
@@ -233,6 +233,16 @@ let activeGame = null;
 
 function saveFavs() { localStorage.setItem('eclipseos_game_favs', JSON.stringify(favs)); }
 function isFav(id)  { return favs.includes(id); }
+
+// Strip Discord links and mentions from any string before displaying
+function clean(str) {
+  if (!str) return '';
+  return str
+    .replace(/https?:\/\/(www\.)?(discord\.gg|discord\.com|discordapp\.com)\S*/gi, '')
+    .replace(/\bdiscord\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
 
 // Load
 async function loadGames() {
@@ -316,8 +326,9 @@ function render() {
   // Featured banner
   const feat = list.find(g => g.featured);
   if (feat && !q && currentCat === 'all' && !showFavs) {
-    const f = isFav(feat.id);
-    const img = feat.cover
+    const f      = isFav(feat.id);
+    const hasUrl = !!feat.url;
+    const img    = feat.cover
       ? `<img class="feat-img" src="${feat.cover}" onerror="this.outerHTML='<div class=\\'feat-img-fall\\'>${feat.icon||'🎮'}</div>'">`
       : `<div class="feat-img-fall">${feat.icon||'🎮'}</div>`;
     html += `<div class="featured-wrap" onclick="openDetail('${feat.id}')">
@@ -326,12 +337,12 @@ function render() {
         <div class="feat-img-wrap">${img}<div class="feat-badge">⭐ Featured</div></div>
         <div class="feat-info">
           <div class="feat-eye">Featured Game</div>
-          <div class="feat-name">${feat.name}</div>
-          <div class="feat-desc">${feat.description||''}</div>
+          <div class="feat-name">${clean(feat.name)}</div>
+          <div class="feat-desc">${clean(feat.description)||''}</div>
           <div class="feat-row">
-            <span class="feat-meta">${feat.author?'by '+feat.author:''}</span>
+            <span class="feat-meta">${feat.author?'by '+clean(feat.author):''}</span>
             <button class="btn-feat ${f?'fav':''}" onclick="event.stopPropagation();toggleFav('${feat.id}')">${f?'⭐ Favourited':'☆ Favourite'}</button>
-            <button class="btn-feat" onclick="event.stopPropagation();openDetail('${feat.id}');launchGame()">▶ Play</button>
+            <button class="btn-feat" style="${hasUrl?'':'opacity:0.4;cursor:not-allowed'}" title="${hasUrl?'':'No game file set'}" onclick="event.stopPropagation();${hasUrl?`openDetail('${feat.id}');launchGame()`:''}">▶ Play</button>
           </div>
         </div>
       </div>
@@ -344,15 +355,23 @@ function render() {
     html += `<div class="sec-head"><div class="sec-title">${label}</div><div class="sec-count">${list.length} game${list.length!==1?'s':''}</div></div>
     <div class="game-grid">`;
     list.forEach(g => {
-      const f = isFav(g.id);
+      const f      = isFav(g.id);
+      const hasUrl = !!g.url;
       html += `<div class="game-card" onclick="openDetail('${g.id}')">
         ${g.cover?`<img class="game-cover" src="${g.cover}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`:''} 
         <div class="game-cover-fall" style="${g.cover?'display:none':''}">${g.icon||'🎮'}</div>
-        <div class="card-overlay"><div class="play-circle">▶</div></div>
+        <div class="card-overlay">
+          <div class="play-circle" style="${hasUrl?'':'opacity:0.4;cursor:not-allowed'" title="${hasUrl?'':'No game file set'}">
+            ${hasUrl?'▶':'⚠️'}
+          </div>
+        </div>
         <div class="card-fav-btn ${f?'is-fav':''}" onclick="event.stopPropagation();toggleFav('${g.id}')">${f?'⭐':'☆'}</div>
         <div class="card-body">
-          <div class="card-name">${g.name}</div>
-          <div class="card-meta"><span class="cat-tag">${g.category||'Other'}</span></div>
+          <div class="card-name">${clean(g.name)}</div>
+          <div class="card-meta">
+            <span class="cat-tag">${g.category||'Other'}</span>
+            ${!hasUrl?'<span class="cat-tag" style="background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.2)">No file</span>':''}
+          </div>
         </div>
       </div>`;
     });
@@ -383,26 +402,31 @@ function openDetail(id) {
   dc.innerHTML = g.cover
     ? `<img src="${g.cover}" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.parentElement.textContent='${g.icon||'🎮'}'">` 
     : (g.icon || '🎮');
-  document.getElementById('dTitle').textContent  = g.name;
-  document.getElementById('dByline').textContent = [g.author ? 'by ' + g.author : '', g.category].filter(Boolean).join(' · ');
+  document.getElementById('dTitle').textContent   = clean(g.name);
+  document.getElementById('dByline').textContent  = [g.author ? 'by ' + clean(g.author) : '', g.category].filter(Boolean).join(' · ');
   document.getElementById('dTags').innerHTML = `<span class="cat-tag">${g.category||'Other'}</span>${g.featured?'<span class="cat-tag" style="background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.3);margin-left:4px">⭐ Featured</span>':''}`;
-  document.getElementById('dDesc').textContent = g.description || 'No description.';
+  document.getElementById('dDesc').textContent = clean(g.description) || 'No description.';
   document.getElementById('dGrid').innerHTML = `
     <div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">${g.category||'—'}</div></div>
     <div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">${g.author||'—'}</div></div>
     <div class="detail-cell"><div class="detail-key">Favourite</div><div class="detail-val">${isFav(g.id)?'⭐ Yes':'☆ No'}</div></div>
     <div class="detail-cell"><div class="detail-key">Download</div><div class="detail-val">${g.downloadUrl?`<a href="${g.downloadUrl}" target="_blank" style="color:var(--accent)">Available</a>`:'—'}</div></div>`;
   refreshFavBtn();
+  const playBtn = document.getElementById('dPlayBtn');
+  if (g.url) { playBtn.disabled = false; playBtn.style.opacity = '1'; playBtn.title = ''; }
+  else        { playBtn.disabled = true;  playBtn.style.opacity = '0.4'; playBtn.title = 'No game file set'; }
   document.getElementById('detailOverlay').classList.add('open');
 }
 function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
 
-// Launch — opens os-apps/game-player.html with game data in URL params
+// Launch — stores game data in sessionStorage then opens player (clean URL, no params)
 function launchGame() {
   if (!activeGame) return;
+  if (!activeGame.url) { showToast('No game file set for this game.','⚠️'); return; }
   closeDetail();
   const g = activeGame;
-  const params = new URLSearchParams({
+  // Store game data in sessionStorage so the player can read it without URL pollution
+  sessionStorage.setItem('eclipseos_current_game', JSON.stringify({
     url:         g.url         || '',
     name:        g.name        || '',
     cover:       g.cover       || '',
@@ -410,10 +434,8 @@ function launchGame() {
     category:    g.category    || '',
     author:      g.author      || '',
     description: g.description || '',
-    downloadUrl: g.downloadUrl || '',
-  });
-  // Navigate the parent OS window to the player
-  window.location.href = 'os-apps/game-player.html?' + params.toString();
+  }));
+  window.location.href = 'os-apps/game-player.html';
 }
 
 // Toast

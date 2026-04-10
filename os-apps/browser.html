@@ -6,94 +6,153 @@
   <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
   <title>Browser</title>
   <style>
-    :root { --header-bg: #ffffff; }
+    :root { --hbg: #ffffff; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; font-family: 'Oxanium', sans-serif; overflow: hidden; }
-    body { display: flex; flex-direction: column; background: #000; }
+    body { display: flex; flex-direction: column; background: #1a1a2e; }
 
-    .header { background: var(--header-bg); display: flex; flex-direction: column; position: relative; z-index: 1000; transition: transform 0.3s ease; flex-shrink: 0; }
-    .header.collapsed { transform: translateY(-100%); margin-bottom: calc(-1 * var(--header-h, 120px)); }
+    /* ── Header ── */
+    .header { background: var(--hbg); display: flex; flex-direction: column; position: relative; z-index: 1000; flex-shrink: 0; transition: transform 0.3s ease; }
+    .header.collapsed { transform: translateY(-100%); margin-bottom: calc(-1 * var(--hh, 90px)); }
 
-    .tab-bar { display: flex; align-items: center; gap: 6px; padding: 8px 56px 0 8px; overflow-x: auto; scrollbar-width: thin; }
+    .tab-bar { display: flex; align-items: center; gap: 4px; padding: 8px 56px 0 8px; overflow-x: auto; scrollbar-width: thin; }
     .tab-bar::-webkit-scrollbar { height: 3px; }
     .tab-bar::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
-
-    .tab { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: #e8e8e8; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; min-width: 140px; max-width: 200px; color: #333; font-size: 13px; border: 1px solid transparent; border-bottom: none; }
+    .tab { display: flex; align-items: center; gap: 6px; padding: 7px 12px; background: #e8e8e8; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; min-width: 130px; max-width: 200px; color: #333; font-size: 13px; border: 1px solid transparent; border-bottom: none; transition: background .15s; }
     .tab:hover { background: #ddd; }
     .tab.active { background: #fff; border-color: #ccc; }
     .tab-favicon { width: 14px; height: 14px; flex-shrink: 0; }
     .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-    .tab-close { width: 14px; height: 14px; cursor: pointer; opacity: 0.5; flex-shrink: 0; }
-    .tab-close:hover { opacity: 1; }
-    .tab-close svg { width: 100%; height: 100%; fill: currentColor; }
-    .new-tab-btn { padding: 6px 12px; background: #333; border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0; }
+    .tab-close { width: 16px; height: 16px; cursor: pointer; opacity: 0.4; flex-shrink: 0; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.1); }
+    .tab.external-tab { background: #e8f4fd; border-color: #b3d9f5; }
+    .tab.external-tab.active { background: #d0eafb; }
+    .tab.external-tab .tab-ext-badge { font-size: 9px; color: #0078d4; font-weight: 800; letter-spacing: .5px; flex-shrink: 0; }
+    .new-tab-btn { padding: 5px 11px; background: #333; border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0; }
     .new-tab-btn:hover { background: #555; }
 
-    .top-row { display: flex; align-items: center; gap: 10px; padding: 10px 56px 10px 12px; }
-    .nav-btn { width: 28px; height: 28px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
+    .top-row { display: flex; align-items: center; gap: 8px; padding: 8px 56px 8px 10px; }
+    .nav-btn { width: 28px; height: 28px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0; }
     .nav-btn:hover { background: #f0f0f0; }
     .nav-btn.disabled { opacity: 0.3; cursor: not-allowed; }
     .nav-btn.disabled:hover { background: transparent; }
     .nav-btn svg { width: 18px; height: 18px; fill: #333; }
 
-    .url-bar { flex: 1; display: flex; align-items: center; gap: 8px; background: #f3f3f3; border: 1.5px solid #ddd; border-radius: 20px; padding: 7px 14px; transition: all 0.2s; }
-    .url-bar:focus-within { background: #fff; border-color: #999; box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+    .url-bar { flex: 1; display: flex; align-items: center; gap: 8px; background: #f3f3f3; border: 1.5px solid #ddd; border-radius: 20px; padding: 7px 14px; transition: all .2s; }
+    .url-bar:focus-within { background: #fff; border-color: #999; box-shadow: 0 0 0 3px rgba(0,0,0,.06); }
     .favicon { width: 16px; height: 16px; flex-shrink: 0; }
     .url-input { flex: 1; border: none; background: transparent; font-family: 'Oxanium', sans-serif; font-size: 14px; color: #000; outline: none; }
     .url-input::placeholder { color: #999; }
+    .url-badge { font-size: 10px; font-weight: 800; letter-spacing: .5px; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
+    .url-badge.direct { background: rgba(34,197,94,.15); color: #15803d; }
+    .url-badge.proxied { background: rgba(0,120,212,.12); color: #0078d4; }
+    .url-badge.external { background: rgba(245,158,11,.15); color: #b45309; }
 
     .menu-btn { width: 32px; height: 32px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
     .menu-btn:hover { background: #f0f0f0; }
-    .menu-btn svg { width: 18px; height: 18px; fill: #333; }
+    .menu-btn > svg { width: 18px; height: 18px; fill: #333; }
 
-    .toggle-btn { position: fixed; top: 8px; right: 10px; width: 40px; height: 40px; background: #333; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .toggle-btn { position: fixed; top: 8px; right: 10px; width: 40px; height: 40px; background: #333; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
     .toggle-btn:hover { background: #555; }
-    .toggle-btn svg { width: 20px; height: 20px; fill: white; transition: transform 0.3s; }
+    .toggle-btn svg { width: 20px; height: 20px; fill: white; transition: transform .3s; }
     .toggle-btn.collapsed svg { transform: rotate(180deg); }
 
     .loading-bar { height: 2px; background: transparent; position: relative; overflow: hidden; }
-    .loading-bar.active::after { content: ''; position: absolute; left: -50%; width: 50%; height: 100%; background: #0078d4; animation: loadAnim 1.2s ease-in-out infinite; }
-    @keyframes loadAnim { 0%{left:-50%} 100%{left:110%} }
+    .loading-bar.active::after { content: ''; position: absolute; left: -50%; width: 50%; height: 100%; background: #0078d4; animation: load 1.2s ease-in-out infinite; }
+    @keyframes load { 0%{left:-50%} 100%{left:110%} }
 
-    .bookmarks-bar { background: var(--header-bg); padding: 5px 12px; display: flex; gap: 4px; align-items: center; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; border-bottom: 2px solid #000; }
+    .bookmarks-bar { background: var(--hbg); padding: 4px 10px; display: flex; gap: 4px; align-items: center; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; border-bottom: 1px solid #ddd; }
     .bookmarks-bar::-webkit-scrollbar { display: none; }
-    .bm-item { padding: 4px 12px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-weight: 600; color: #333; cursor: pointer; white-space: nowrap; transition: background 0.15s; display: flex; align-items: center; gap: 4px; }
+    .bm-item { padding: 3px 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-weight: 600; color: #333; cursor: pointer; white-space: nowrap; transition: background .15s; display: flex; align-items: center; gap: 4px; user-select: none; }
     .bm-item:hover { background: #e8e8e8; }
 
-    .dropdown { position: fixed; background: #fff; border: 1px solid #ddd; border-radius: 8px; z-index: 99999; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.2); min-width: 200px; max-height: 360px; overflow-y: auto; }
-    .dropdown.open { display: block; }
-    #menuDropdown { right: 12px; min-width: 220px; }
-    #bookmarksDropdown, #historyDropdown { left: 12px; right: 12px; }
+    /* ── Dropdowns ── */
+    .dropdown { position: fixed; background: #fff; border: 1px solid #ddd; border-radius: 8px; z-index: 99999; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); min-width: 200px; max-height: 400px; overflow-y: auto; }
+    .dropdown.open { display: block; animation: ddIn .1s ease; }
+    @keyframes ddIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+    #menuDropdown { right: 12px; min-width: 230px; }
+    #bookmarksDropdown, #historyDropdown { left: 10px; right: 10px; }
     .dd-item { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; }
     .dd-item:last-child { border-bottom: none; }
     .dd-item:hover { background: #f5f5f5; }
     .dd-item svg { width: 16px; height: 16px; fill: #555; flex-shrink: 0; }
+    .dd-sep { height: 1px; background: #f0f0f0; margin: 2px 0; }
 
-    .content { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
-    .iframe-wrap { flex: 1; position: relative; overflow: hidden; }
-    .iframe-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 0.3s; }
-    .iframe-wrap iframe.loaded { opacity: 1; }
+    /* ── Content ── */
+    .content { flex: 1; position: relative; overflow: hidden; }
+    .page { position: absolute; inset: 0; }
+    .page.hidden { display: none; }
 
-    .new-tab-page { position: absolute; inset: 0; background: linear-gradient(135deg,#1a1a2e,#16213e 50%,#0f3460); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: white; padding: 40px; }
-    .ntp-title { font-size: 26px; font-weight: 700; letter-spacing: 2px; opacity: 0.9; }
+    /* ── New tab page ── */
+    .ntp { position: absolute; inset: 0; background: linear-gradient(135deg,#1a1a2e,#16213e 50%,#0f3460); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: white; padding: 40px; overflow-y: auto; }
+    .ntp-logo { font-size: 48px; }
+    .ntp-title { font-size: 24px; font-weight: 700; letter-spacing: 2px; opacity: .9; }
     .ntp-search { display: flex; width: 500px; max-width: 90vw; }
-    .ntp-search input { flex: 1; padding: 13px 18px; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-right: none; border-radius: 10px 0 0 10px; color: white; font-family: 'Oxanium', sans-serif; font-size: 14px; outline: none; }
-    .ntp-search input::placeholder { color: rgba(255,255,255,0.4); }
-    .ntp-search input:focus { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); }
-    .ntp-search button { padding: 13px 20px; background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.2); border-left: none; border-radius: 0 10px 10px 0; color: white; font-size: 16px; cursor: pointer; transition: background 0.2s; }
-    .ntp-search button:hover { background: rgba(255,255,255,0.25); }
+    .ntp-search input { flex: 1; padding: 12px 16px; background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.2); border-right: none; border-radius: 10px 0 0 10px; color: white; font-family: 'Oxanium',sans-serif; font-size: 14px; outline: none; }
+    .ntp-search input::placeholder { color: rgba(255,255,255,.4); }
+    .ntp-search input:focus { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.5); }
+    .ntp-search button { padding: 12px 18px; background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.2); border-left: none; border-radius: 0 10px 10px 0; color: white; font-size: 16px; cursor: pointer; }
+    .ntp-search button:hover { background: rgba(255,255,255,.25); }
 
-    .proxy-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.45); letter-spacing: 1px; }
-    .proxy-row select { padding: 5px 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: white; font-family: 'Oxanium', sans-serif; font-size: 12px; outline: none; cursor: pointer; }
+    /* Proxy selector on NTP */
+    .proxy-section { width: 500px; max-width: 90vw; display: flex; flex-direction: column; gap: 8px; }
+    .proxy-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,.5); }
+    .proxy-row select { padding: 5px 10px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; cursor: pointer; flex: 1; }
     .proxy-row select option { background: #1a1a2e; }
-    .proxy-endpoint { display: none; flex-direction: column; gap: 6px; width: 500px; max-width: 90vw; }
-    .proxy-endpoint.show { display: flex; }
-    .proxy-endpoint input { padding: 9px 14px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white; font-family: 'Oxanium', sans-serif; font-size: 13px; outline: none; }
-    .proxy-endpoint input::placeholder { color: rgba(255,255,255,0.25); }
-    .proxy-endpoint button { align-self: flex-end; padding: 6px 14px; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: white; font-family: 'Oxanium', sans-serif; font-size: 12px; cursor: pointer; }
-    .proxy-endpoint button:hover { background: rgba(255,255,255,0.2); }
-    .proxy-endpoint select { padding: 8px 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; color: white; font-family: 'Oxanium', sans-serif; font-size: 13px; outline: none; cursor: pointer; }
-    .proxy-endpoint select option { background: #1a1a2e; }
+    .proxy-note { font-size: 11px; color: rgba(255,255,255,.35); text-align: center; line-height: 1.5; }
+    .relay-section { display: none; flex-direction: column; gap: 6px; }
+    .relay-section.show { display: flex; }
+    .relay-row { display: flex; gap: 6px; }
+    .relay-row select { flex: 1; padding: 8px 10px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; cursor: pointer; }
+    .relay-row select option { background: #1a1a2e; }
+    .relay-input { flex: 2; padding: 8px 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; }
+    .relay-input::placeholder { color: rgba(255,255,255,.25); }
+    .relay-save { padding: 8px 14px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; cursor: pointer; white-space: nowrap; }
+    .relay-save:hover { background: rgba(255,255,255,.2); }
+
+    /* ── External tab placeholder ── */
+    .ext-page { position: absolute; inset: 0; background: linear-gradient(135deg,#0d1b2a,#1a1040); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: white; text-align: center; padding: 40px; }
+    .ext-icon { font-size: 56px; }
+    .ext-title { font-size: 18px; font-weight: 700; }
+    .ext-url { font-size: 12px; color: rgba(255,255,255,.4); word-break: break-all; max-width: 500px; }
+    .ext-note { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.6; max-width: 420px; }
+    .ext-open { padding: 10px 24px; background: #0078d4; border: none; border-radius: 10px; color: white; font-family: 'Oxanium',sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .ext-open:hover { background: #006bbf; transform: translateY(-1px); }
+
+    /* ── Direct iframe ── */
+    .direct-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; opacity: 0; transition: opacity .3s; }
+    .direct-iframe.loaded { opacity: 1; }
+
+    /* ── Settings page ── */
+    .settings-page { position: absolute; inset: 0; background: #1e2130; color: #e8edf5; overflow-y: auto; font-family: 'Oxanium',sans-serif; }
+    .settings-page::-webkit-scrollbar { width: 6px; }
+    .settings-page::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
+    .settings-inner { max-width: 600px; margin: 0 auto; padding: 32px 24px; }
+    .settings-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; letter-spacing: -.3px; }
+    .settings-section { margin-bottom: 28px; }
+    .settings-sec-label { font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 12px; }
+    .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; margin-bottom: 8px; }
+    .settings-row-label { font-size: 13px; font-weight: 600; }
+    .settings-row-sub { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 2px; }
+    .s-select { padding: 6px 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; cursor: pointer; }
+    .s-select option { background: #1e2130; }
+    .s-input { padding: 8px 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; color: white; font-family: 'Oxanium',sans-serif; font-size: 13px; outline: none; width: 260px; }
+    .s-input::placeholder { color: rgba(255,255,255,.25); }
+    .s-input:focus { border-color: #0078d4; background: rgba(0,120,212,.08); }
+    .s-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.07); color: rgba(255,255,255,.8); font-family: 'Oxanium',sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .s-btn:hover { background: rgba(255,255,255,.12); color: white; }
+    .s-btn.danger { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.3); color: #fca5a5; }
+    .s-btn.danger:hover { background: rgba(239,68,68,.2); }
+    .s-btn.primary { background: #0078d4; border-color: #0078d4; color: white; }
+    .s-btn.primary:hover { background: #006bbf; }
+    .relay-config { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; }
+    .relay-config input { padding: 8px 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; }
+    .relay-config input::placeholder { color: rgba(255,255,255,.25); }
+    .relay-config input:focus { border-color: #0078d4; }
+    .s-toggle { width: 40px; height: 22px; border-radius: 11px; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; background: rgba(255,255,255,.15); }
+    .s-toggle.on { background: #0078d4; }
+    .s-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: left .2s; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+    .s-toggle.on::after { left: 21px; }
   </style>
 </head>
 <body>
@@ -108,431 +167,742 @@
     </div>
     <div class="top-row">
       <div class="nav-btn disabled" id="backBtn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div>
-      <div class="nav-btn disabled" id="forwardBtn"><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></div>
+      <div class="nav-btn disabled" id="fwdBtn"><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></div>
       <div class="nav-btn" id="homeBtn"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
       <div class="nav-btn" id="refreshBtn"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
       <div class="url-bar">
         <img class="favicon" id="favicon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3C/svg%3E" alt="">
-        <input class="url-input" id="urlInput" type="text" placeholder="Enter URL or search...">
+        <input class="url-input" id="urlInput" type="text" placeholder="Enter URL or search…">
+        <span class="url-badge" id="urlBadge" style="display:none"></span>
       </div>
       <div class="menu-btn" id="menuBtn">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
         <div class="dropdown" id="menuDropdown">
-          <div class="dd-item" id="ddBookmark"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>Bookmark this page</div>
-          <div class="dd-item" id="ddBookmarks"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>Show bookmarks</div>
-          <div class="dd-item" id="ddHistory"><svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>History</div>
-          <div class="dd-item" id="ddSettings"><svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>Settings</div>
+          <div class="dd-item" id="ddBookmark">🔖 Bookmark this page</div>
+          <div class="dd-item" id="ddBookmarks">📚 Show bookmarks</div>
+          <div class="dd-item" id="ddHistory">🕐 History</div>
+          <div class="dd-sep"></div>
+          <div class="dd-item" id="ddSettings">⚙️ Settings</div>
         </div>
       </div>
     </div>
     <div class="loading-bar" id="loadingBar"></div>
   </div>
 
-  <div class="dropdown" id="bookmarksDropdown"></div>
-  <div class="dropdown" id="historyDropdown"></div>
-
-  <div class="bookmarks-bar">
-    <span class="bm-item" onclick="showHomepage()">🏠 Home</span>
+  <div class="bookmarks-bar" id="bookmarksBar">
     <span class="bm-item" onclick="navigate('https://google.com')">🔍 Google</span>
     <span class="bm-item" onclick="navigate('https://wikipedia.org')">📖 Wikipedia</span>
     <span class="bm-item" onclick="navigate('https://github.com')">💻 GitHub</span>
     <span class="bm-item" onclick="navigate('https://youtube.com')">▶️ YouTube</span>
   </div>
 
-  <div class="content">
-    <div class="iframe-wrap" id="iframeWrap"></div>
-  </div>
+  <div class="dropdown" id="bookmarksDropdown"></div>
+  <div class="dropdown" id="historyDropdown"></div>
 
-  <script>
-    // ── State ──
-    let tabs = [];
-    let activeId = 0, tabCounter = 0, isCollapsed = false;
-    let globalHistory = JSON.parse(sessionStorage.getItem('bw_history') || '[]');
+  <div class="content" id="content"></div>
 
-    const header     = document.getElementById('header');
-    const tabBar     = document.getElementById('tabBar');
-    const urlInput   = document.getElementById('urlInput');
-    const iframeWrap = document.getElementById('iframeWrap');
-    const loadingBar = document.getElementById('loadingBar');
-    const favicon    = document.getElementById('favicon');
-    const backBtn    = document.getElementById('backBtn');
-    const forwardBtn = document.getElementById('forwardBtn');
-    const menuBtn    = document.getElementById('menuBtn');
-    const menuDD     = document.getElementById('menuDropdown');
-    const bmDD       = document.getElementById('bookmarksDropdown');
-    const histDD     = document.getElementById('historyDropdown');
+<script>
+// ════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════
+const DEF_FAV = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3C/svg%3E";
 
-    const DEFAULT_FAVICON = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3C/svg%3E";
+// Tab types:
+//  'ntp'      — new tab / home page
+//  'direct'   — loaded in iframe (Direct mode)
+//  'external' — opened via window.open in proxy modes, shows placeholder card
+//  'settings' — settings page (kept alive, never reloaded)
+let tabs = [];
+let activeId = 0, tabCounter = 0, isCollapsed = false;
+let globalHistory = JSON.parse(sessionStorage.getItem('bw_hist') || '[]');
 
-    // ── Toggle header ──
-    document.getElementById('toggleBtn').onclick = () => {
-      isCollapsed = !isCollapsed;
-      header.classList.toggle('collapsed', isCollapsed);
-      document.getElementById('toggleBtn').classList.toggle('collapsed', isCollapsed);
-      header.style.marginBottom = isCollapsed ? '-' + header.offsetHeight + 'px' : '0';
+// Settings iframe kept alive so it never reloads
+let settingsPage = null;
+
+const $  = id => document.getElementById(id);
+const header    = $('header');
+const tabBar    = $('tabBar');
+const content   = $('content');
+const urlInput  = $('urlInput');
+const loadingBar= $('loadingBar');
+const favicon   = $('favicon');
+const backBtn   = $('backBtn');
+const fwdBtn    = $('fwdBtn');
+const menuDD    = $('menuDropdown');
+const bmDD      = $('bookmarksDropdown');
+const histDD    = $('historyDropdown');
+
+function getTab(id)  { return tabs.find(t => t.id === id); }
+function activeTab() { return getTab(activeId); }
+function mode()      { return localStorage.getItem('bw_proxy_mode') || 'cors'; }
+
+// ════════════════════════════════════════════════════
+//  HEADER TOGGLE
+// ════════════════════════════════════════════════════
+$('toggleBtn').onclick = () => {
+  isCollapsed = !isCollapsed;
+  header.classList.toggle('collapsed', isCollapsed);
+  $('toggleBtn').classList.toggle('collapsed', isCollapsed);
+  header.style.marginBottom = isCollapsed ? '-' + header.offsetHeight + 'px' : '0';
+};
+
+// ════════════════════════════════════════════════════
+//  PROXY URL BUILDER
+// ════════════════════════════════════════════════════
+const WORKER_URL = 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+const RELAY_PRESETS = {
+  cors: [
+    { label:'EclipseOS Proxy (recommended)', value: WORKER_URL },
+  ],
+  uv: [
+    { label:'EclipseOS Proxy (recommended)', value: WORKER_URL },
+    { label:'Holy Unblocker UV',             value:'https://uv.holyubofficial.net/uv/q%s' },
+    { label:'Cryo UV',                       value:'https://uv.cryo.lol/uv/q%s' },
+  ],
+  sj: [
+    { label:'EclipseOS Proxy (recommended)', value: WORKER_URL },
+    { label:'Holy Unblocker SJ',             value:'https://sj.holyubofficial.net/scramjet/q%s' },
+  ],
+};
+
+function buildProxiedUrl(url) {
+  const m = mode();
+  if (m === 'direct') return { proxied: url, isExternal: false };
+  const apply = (base, u) => base.includes('%s') ? base.replace('%s', encodeURIComponent(u)) : base + encodeURIComponent(u);
+  if (m === 'cors') {
+    const base = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+    return { proxied: apply(base, url), isExternal: true };
+  }
+  if (m === 'uv' || m === 'sj') {
+    const base = localStorage.getItem('bw_' + m + '_base') || '';
+    return { proxied: base ? apply(base, url) : null, isExternal: true, needsRelay: !base };
+  }
+  return { proxied: url, isExternal: false };
+}
+
+// ════════════════════════════════════════════════════
+//  PAGES — kept in DOM, shown/hidden
+// ════════════════════════════════════════════════════
+function showPage(id) {
+  content.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  const p = content.querySelector('[data-page="' + id + '"]');
+  if (p) p.classList.remove('hidden');
+}
+
+function ensureSettingsPage() {
+  if (settingsPage) return settingsPage;
+  const div = document.createElement('div');
+  div.className = 'page settings-page';
+  div.setAttribute('data-page', 'settings');
+  div.innerHTML = buildSettingsHTML();
+  content.appendChild(div);
+  settingsPage = div;
+  initSettings(div);
+  return div;
+}
+
+// ════════════════════════════════════════════════════
+//  TAB MANAGEMENT
+// ════════════════════════════════════════════════════
+function updateNavBtns() {
+  const t = activeTab();
+  const canBack = t && t.type === 'direct' && t.histIdx > 0;
+  const canFwd  = t && t.type === 'direct' && t.histIdx < (t.history||[]).length - 1;
+  backBtn.classList.toggle('disabled', !canBack);
+  fwdBtn.classList.toggle('disabled',  !canFwd);
+}
+
+function updateUrlBar() {
+  const t = activeTab();
+  const badge = $('urlBadge');
+  favicon.src = DEF_FAV;
+  if (!t || t.type === 'ntp') {
+    urlInput.value = ''; badge.style.display = 'none'; return;
+  }
+  if (t.type === 'settings') {
+    urlInput.value = 'browser://settings'; badge.style.display = 'none'; return;
+  }
+  urlInput.value = t.url || '';
+  const m = mode();
+  if (t.type === 'direct') {
+    badge.className = 'url-badge direct'; badge.textContent = 'DIRECT'; badge.style.display = '';
+    try { favicon.src = new URL(t.url).origin + '/favicon.ico'; } catch(e) {}
+  } else if (t.type === 'external') {
+    badge.className = 'url-badge ' + (m === 'cors' ? 'proxied' : 'external');
+    badge.textContent = m.toUpperCase(); badge.style.display = '';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function saveTabs() {
+  sessionStorage.setItem('bw_tabs',   JSON.stringify(tabs.map(t => ({ id:t.id, type:t.type, url:t.url, title:t.title, proxiedUrl:t.proxiedUrl, history:t.history||[], histIdx:t.histIdx||0 }))));
+  sessionStorage.setItem('bw_active', activeId);
+  sessionStorage.setItem('bw_ctr',    tabCounter);
+}
+
+function renderTabs() {
+  tabBar.querySelectorAll('.tab').forEach(el => el.remove());
+  tabs.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (t.id === activeId ? ' active' : '') + (t.type === 'external' ? ' external-tab' : '');
+    el.dataset.id = t.id;
+    const icon = t.type === 'settings' ? '⚙️' : t.type === 'external' ? '🔗' : '🌐';
+    el.innerHTML = `<span class="tab-favicon">${icon}</span>
+      <span class="tab-title">${t.title || 'New Tab'}</span>
+      ${t.type === 'external' ? '<span class="tab-ext-badge">EXT</span>' : ''}
+      <span class="tab-close">✕</span>`;
+    el.querySelector('.tab-close').onclick = e => { e.stopPropagation(); closeTab(t.id); };
+    el.onclick = e => { if (!e.target.classList.contains('tab-close')) switchTab(t.id); };
+    tabBar.insertBefore(el, $('newTabBtn'));
+  });
+  saveTabs();
+}
+
+function switchTab(id) {
+  activeId = id;
+  const t = activeTab();
+  if (!t) return;
+
+  // Show the right page
+  if (t.type === 'settings') {
+    ensureSettingsPage();
+    showPage('settings');
+  } else {
+    showPage('tab-' + id);
+  }
+
+  updateNavBtns();
+  updateUrlBar();
+  renderTabs();
+}
+
+function createTab(url) {
+  const id = tabCounter++;
+  const t = { id, type: 'ntp', url: '', title: 'New Tab', history: [], histIdx: -1, proxiedUrl: '' };
+  tabs.push(t);
+  activeId = id;
+
+  // Create the page container
+  const div = document.createElement('div');
+  div.className = 'page';
+  div.setAttribute('data-page', 'tab-' + id);
+  content.appendChild(div);
+
+  renderTabs();
+  if (url) { loadUrl(url); }
+  else { showHomepage(div); switchTab(id); }
+  return t;
+}
+
+function closeTab(id) {
+  if (tabs.length === 1) return;
+  const idx = tabs.findIndex(t => t.id === id);
+  // Remove page from DOM
+  const page = content.querySelector('[data-page="tab-' + id + '"]');
+  if (page) page.remove();
+  tabs.splice(idx, 1);
+  if (activeId === id) {
+    activeId = tabs[Math.max(0, idx - 1)].id;
+    switchTab(activeId);
+  } else renderTabs();
+}
+
+// ════════════════════════════════════════════════════
+//  HOME PAGE (new tab)
+// ════════════════════════════════════════════════════
+function showHomepage(container) {
+  const t = activeTab();
+  if (t) { t.type = 'ntp'; t.url = ''; t.title = 'New Tab'; }
+  const m = mode();
+
+  container.innerHTML = `<div class="ntp">
+    <div class="ntp-logo">🌐</div>
+    <div class="ntp-title">EclipseOS Browser</div>
+    <div class="ntp-search">
+      <input id="ntpQ" type="text" placeholder="Enter a URL or search…">
+      <button id="ntpGo">→</button>
+    </div>
+    <div class="proxy-section">
+      <div class="proxy-row">
+        <span>Mode:</span>
+        <select id="proxyModeSelect">
+          <option value="cors"   ${m==='cors'  ?'selected':''}>CORS Proxy (opens in real tab)</option>
+          <option value="uv"     ${m==='uv'    ?'selected':''}>Ultraviolet (opens in real tab)</option>
+          <option value="sj"     ${m==='sj'    ?'selected':''}>ScramJet (opens in real tab)</option>
+          <option value="direct" ${m==='direct'?'selected':''}>Direct (loads here, most sites block)</option>
+        </select>
+      </div>
+      <div class="relay-section ${m!=='cors'&&m!=='direct'?'show':''}" id="relaySection">
+        <div class="relay-row">
+          <select id="relayPreset"><option value="">— Quick presets —</option></select>
+          <input class="relay-input" id="relayInput" placeholder="https://relay.example.com/prefix/%s"
+            value="${localStorage.getItem('bw_' + m + '_base')||''}">
+          <button class="relay-save" id="relaySave">Save</button>
+        </div>
+      </div>
+      <div class="proxy-note" id="proxyNote"></div>
+    </div>
+  </div>`;
+
+  // Wire up
+  const ntpQ = container.querySelector('#ntpQ');
+  container.querySelector('#ntpGo').onclick = () => navigate(ntpQ.value.trim());
+  ntpQ.onkeydown = e => { if (e.key === 'Enter') navigate(ntpQ.value.trim()); };
+  setTimeout(() => ntpQ.focus(), 50);
+
+  const modeSelect = container.querySelector('#proxyModeSelect');
+  const relaySection = container.querySelector('#relaySection');
+  const relayInput = container.querySelector('#relayInput');
+  const relayPreset = container.querySelector('#relayPreset');
+  const proxyNote = container.querySelector('#proxyNote');
+
+  function updateNote(m) {
+    const notes = {
+      cors:   '🔗 URLs will open in a new browser tab via a CORS proxy.',
+      uv:     '🔗 URLs will open in a new browser tab via Ultraviolet.',
+      sj:     '🔗 URLs will open in a new browser tab via ScramJet.',
+      direct: '⚠️ Direct mode loads pages here. Most sites block this with X-Frame-Options.',
     };
+    proxyNote.textContent = notes[m] || '';
+  }
+  updateNote(m);
 
-    // ── Tabs ──
-    function getTab(id)  { return tabs.find(t => t.id === id); }
-    function activeTab() { return getTab(activeId); }
+  function populatePresets(m) {
+    relayPreset.innerHTML = '<option value="">— Quick presets —</option>';
+    (RELAY_PRESETS[m] || []).forEach(p => {
+      const o = document.createElement('option');
+      o.value = p.value; o.textContent = p.label; relayPreset.appendChild(o);
+    });
+  }
+  populatePresets(m);
 
-    function updateNavBtns() {
-      const t = activeTab();
-      backBtn.classList.toggle('disabled',    !t || t.histIdx <= 0);
-      forwardBtn.classList.toggle('disabled', !t || t.histIdx >= t.history.length - 1);
+  relayPreset.onchange = () => { if (relayPreset.value) relayInput.value = relayPreset.value; };
+  container.querySelector('#relaySave').onclick = () => {
+    const val = relayInput.value.trim();
+    const cm = localStorage.getItem('bw_proxy_mode') || 'cors';
+    if (val) { localStorage.setItem('bw_' + cm + '_base', val); alert('Relay saved!'); }
+  };
+
+  modeSelect.onchange = function() {
+    localStorage.setItem('bw_proxy_mode', this.value);
+    const show = this.value !== 'cors' && this.value !== 'direct';
+    relaySection.classList.toggle('show', show);
+    relayInput.value = localStorage.getItem('bw_' + this.value + '_base') || '';
+    populatePresets(this.value);
+    updateNote(this.value);
+    // Also update CORS relay section visibility
+    if (this.value === 'cors') {
+      relaySection.classList.add('show');
+      relayInput.placeholder = 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+      relayInput.value = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+      populatePresets('cors');
     }
+  };
 
-    function saveTabs() {
-      sessionStorage.setItem('bw_tabs',     JSON.stringify(tabs.map(t => ({ id: t.id, url: t.url, title: t.title, history: t.history, histIdx: t.histIdx }))));
-      sessionStorage.setItem('bw_activeId', activeId);
-      sessionStorage.setItem('bw_counter',  tabCounter);
+  // Show CORS relay config too
+  if (m === 'cors') {
+    relaySection.classList.add('show');
+    relayInput.placeholder = 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+    relayInput.value = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+  }
+
+  updateUrlBar();
+}
+
+// ════════════════════════════════════════════════════
+//  NAVIGATE
+// ════════════════════════════════════════════════════
+function navigate(raw) {
+  if (!raw) return;
+  let url = raw.trim();
+  if (!url.includes('.') || url.includes(' ')) {
+    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+  } else if (!/^https?:\/\//i.test(url)) {
+    url = 'https://' + url;
+  }
+  loadUrl(url);
+}
+
+function loadUrl(url) {
+  const t = activeTab(); if (!t) return;
+  const m = mode();
+  const isLocal = /^(os-apps|browser|\.\/|settings\/)/.test(url);
+
+  t.url = url;
+  t.history = (t.history || []).slice(0, (t.histIdx||0) + 1);
+  t.history.push(url);
+  t.histIdx = t.history.length - 1;
+  try {
+    globalHistory.unshift({ url, title: new URL(url.startsWith('http') ? url : 'https://' + url).hostname.replace('www.','') });
+    if (globalHistory.length > 200) globalHistory.pop();
+    sessionStorage.setItem('bw_hist', JSON.stringify(globalHistory));
+  } catch(e) {}
+
+  const container = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (!container) return;
+
+  if (isLocal || m === 'direct') {
+    // Direct — iframe the raw URL
+    t.type = 'direct';
+    try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
+    loadDirectIframe(container, t, url);
+  } else {
+    // Proxy mode — build the proxied URL and iframe it directly
+    const { proxied, needsRelay } = buildProxiedUrl(url);
+    if (needsRelay) {
+      container.innerHTML = `<div class="ext-page">
+        <div class="ext-icon">⚠️</div>
+        <div class="ext-title">No relay configured</div>
+        <div class="ext-note">Set a relay URL for <strong>${m.toUpperCase()}</strong> in Settings before navigating.</div>
+        <button class="ext-open" onclick="showHomepageCurrent()">← Go Home</button>
+      </div>`;
+      t.type = 'ntp'; t.title = 'Error';
+    } else {
+      // Load the proxied URL directly in the iframe
+      t.type = 'direct';
+      try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
+      loadDirectIframe(container, t, proxied);
     }
+  }
 
-    function renderTabs() {
-      tabBar.querySelectorAll('.tab').forEach(el => el.remove());
-      tabs.forEach(t => {
-        const el = document.createElement('div');
-        el.className = 'tab' + (t.id === activeId ? ' active' : '');
-        el.dataset.id = t.id;
-        el.innerHTML = `
-          <img class="tab-favicon" src="${DEFAULT_FAVICON}" alt="">
-          <span class="tab-title">${t.title}</span>
-          <div class="tab-close" data-close="${t.id}"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></div>`;
-        el.onclick = e => {
-          if (e.target.closest('.tab-close')) { closeTab(t.id); return; }
-          switchTab(t.id);
-        };
-        tabBar.insertBefore(el, document.getElementById('newTabBtn'));
-      });
-      saveTabs();
-    }
+  showPage('tab-' + t.id);
+  updateNavBtns(); updateUrlBar(); renderTabs();
+}
 
-    function switchTab(id) {
-      activeId = id;
-      const t = activeTab();
-      iframeWrap.innerHTML = '';
-      if (t && t.iframe) iframeWrap.appendChild(t.iframe);
-      else { showHomepage(); return; }
-      urlInput.value = t.url || '';
-      updateNavBtns(); renderTabs();
-    }
+function loadDirectIframe(container, t, url) {
+  loadingBar.classList.add('active');
+  container.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.className = 'direct-iframe';
+  iframe.src = url;
+  // Don't use sandbox for local files — let them run fully
+  if (!/^(os-apps|browser|\.\/|settings\/)/.test(url)) {
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-presentation allow-downloads');
+    iframe.setAttribute('allow', 'autoplay; fullscreen');
+  }
+  iframe.onload = () => {
+    iframe.classList.add('loaded');
+    loadingBar.classList.remove('active');
+  };
+  container.appendChild(iframe);
+  showPage('tab-' + t.id);
+  setTimeout(() => loadingBar.classList.remove('active'), 6000);
+}
 
-    function createTab(url) {
-      const id = tabCounter++;
-      const t = { id, url: '', title: 'New Tab', history: [], histIdx: -1, iframe: null };
-      tabs.push(t); activeId = id;
-      renderTabs();
-      if (url) loadUrl(url);
-      else showHomepage();
-      return t;
-    }
+function showHomepageCurrent() {
+  const t = activeTab(); if (!t) return;
+  const container = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (container) showHomepage(container);
+  switchTab(t.id);
+}
 
-    function closeTab(id) {
-      if (tabs.length === 1) return;
-      const idx = tabs.findIndex(t => t.id === id);
-      const t = tabs[idx];
-      if (t.iframe) t.iframe.remove();
-      tabs.splice(idx, 1);
-      if (activeId === id) { activeId = tabs[Math.max(0, idx - 1)].id; switchTab(activeId); }
-      else renderTabs();
-    }
+// ════════════════════════════════════════════════════
+//  POPUPS — intercept from direct iframes
+//  (Cross-origin frames can't be intercepted — best effort)
+// ════════════════════════════════════════════════════
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'bw-open-tab') {
+    createTab(e.data.url);
+  }
+});
 
-    // ── Restore tabs from sessionStorage ──
-    function restoreTabs() {
+// ════════════════════════════════════════════════════
+//  BOOKMARKS
+// ════════════════════════════════════════════════════
+function getBookmarks() { return JSON.parse(localStorage.getItem('bw_bookmarks') || '[]'); }
+function saveBookmarks(bm) { localStorage.setItem('bw_bookmarks', JSON.stringify(bm)); }
+
+function addBookmark() {
+  const t = activeTab();
+  if (!t || !t.url) { alert('No page loaded.'); return; }
+  const bm = getBookmarks();
+  if (bm.find(b => b.url === t.url)) { alert('Already bookmarked!'); return; }
+  bm.unshift({ id: Date.now(), url: t.url, title: t.title || t.url });
+  saveBookmarks(bm); alert('Bookmarked!');
+}
+
+function posDD(el) {
+  const r = header.getBoundingClientRect();
+  const bkBar = document.querySelector('.bookmarks-bar');
+  el.style.top = (r.bottom + (bkBar ? bkBar.offsetHeight : 0) + 2) + 'px';
+}
+
+function showBookmarksDD() {
+  closeAllDD(); posDD(bmDD);
+  const bm = getBookmarks();
+  bmDD.innerHTML = bm.length
+    ? bm.map(b => `<div class="dd-item" data-url="${b.url}">🔖 <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${b.title}</span><span style="color:#f44;padding:0 4px" data-del="${b.id}">✕</span></div>`).join('')
+    : '<div class="dd-item" style="color:#aaa;pointer-events:none">No bookmarks yet</div>';
+  bmDD.classList.add('open');
+  bmDD.onclick = e => {
+    const del = e.target.closest('[data-del]');
+    if (del) { saveBookmarks(getBookmarks().filter(b => b.id != del.dataset.del)); showBookmarksDD(); return; }
+    const item = e.target.closest('[data-url]');
+    if (item) { navigate(item.dataset.url); closeAllDD(); }
+  };
+}
+
+function showHistoryDD() {
+  closeAllDD(); posDD(histDD);
+  histDD.innerHTML = globalHistory.length
+    ? `<div class="dd-item" style="color:#888;cursor:default;justify-content:space-between"><span>History</span><span style="cursor:pointer;color:#f44" onclick="clearHistory()">Clear</span></div>` +
+      globalHistory.slice(0,50).map(h => `<div class="dd-item" data-url="${h.url}">🕐 <div style="overflow:hidden;min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.title||h.url}</div><div style="font-size:11px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.url}</div></div></div>`).join('')
+    : '<div class="dd-item" style="color:#aaa;pointer-events:none">No history yet</div>';
+  histDD.classList.add('open');
+  histDD.onclick = e => {
+    const item = e.target.closest('[data-url]');
+    if (item) { navigate(item.dataset.url); closeAllDD(); }
+  };
+}
+
+function clearHistory() {
+  globalHistory = []; sessionStorage.removeItem('bw_hist'); closeAllDD();
+}
+
+function closeAllDD() { [menuDD, bmDD, histDD].forEach(d => d.classList.remove('open')); }
+
+// ════════════════════════════════════════════════════
+//  SETTINGS PAGE (kept alive — never reloads)
+// ════════════════════════════════════════════════════
+function buildSettingsHTML() {
+  const m = mode();
+  const corsBase = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
+  const uvBase   = localStorage.getItem('bw_uv_base')   || '';
+  const sjBase   = localStorage.getItem('bw_sj_base')   || '';
+  return `<div class="settings-inner">
+    <div class="settings-title">⚙️ Browser Settings</div>
+
+    <div class="settings-section">
+      <div class="settings-sec-label">Proxy Mode</div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Navigation Mode</div>
+          <div class="settings-row-sub">Direct loads pages here. All other modes open in a real tab.</div></div>
+        <select class="s-select" id="s-mode">
+          <option value="cors"   ${m==='cors'  ?'selected':''}>CORS Proxy</option>
+          <option value="uv"     ${m==='uv'    ?'selected':''}>Ultraviolet</option>
+          <option value="sj"     ${m==='sj'    ?'selected':''}>ScramJet</option>
+          <option value="direct" ${m==='direct'?'selected':''}>Direct</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-sec-label">Relay URLs</div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <div class="settings-row-label">CORS Proxy Base URL</div>
+        <div class="settings-row-sub">Use %s as the placeholder for the target URL. e.g. https://sproxy.higginsaxel01.workers.dev/?url=%s</div>
+        <div style="display:flex;gap:8px;width:100%">
+          <input class="s-input" style="flex:1" id="s-cors" type="text" value="${corsBase}" placeholder="https://sproxy.higginsaxel01.workers.dev/?url=%s">
+          <button class="s-btn primary" onclick="saveSetting('bw_cors_base','s-cors')">Save</button>
+        </div>
+      </div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <div class="settings-row-label">Ultraviolet Relay</div>
+        <div style="display:flex;gap:8px;width:100%">
+          <input class="s-input" style="flex:1" id="s-uv" type="text" value="${uvBase}" placeholder="https://uv.holyubofficial.net/uv/q%s">
+          <button class="s-btn primary" onclick="saveSetting('bw_uv_base','s-uv')">Save</button>
+        </div>
+      </div>
+      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+        <div class="settings-row-label">ScramJet Relay</div>
+        <div style="display:flex;gap:8px;width:100%">
+          <input class="s-input" style="flex:1" id="s-sj" type="text" value="${sjBase}" placeholder="https://sj.holyubofficial.net/scramjet/q%s">
+          <button class="s-btn primary" onclick="saveSetting('bw_sj_base','s-sj')">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-sec-label">Data</div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Export Browser Data</div>
+          <div class="settings-row-sub">Download your bookmarks, history and settings as a JSON file</div></div>
+        <button class="s-btn primary" onclick="exportData()">⬇ Export</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Import Browser Data</div>
+          <div class="settings-row-sub">Restore from a previously exported JSON file</div></div>
+        <button class="s-btn" onclick="importData()">⬆ Import</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Clear History</div>
+          <div class="settings-row-sub">Remove all browsing history for this session</div></div>
+        <button class="s-btn danger" onclick="clearHistorySettings()">Clear</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Clear Bookmarks</div>
+          <div class="settings-row-sub">Permanently delete all saved bookmarks</div></div>
+        <button class="s-btn danger" onclick="clearBookmarks()">Clear</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function initSettings(div) {
+  // Mode select live update
+  div.querySelector('#s-mode').onchange = function() {
+    localStorage.setItem('bw_proxy_mode', this.value);
+  };
+}
+
+function saveSetting(key, inputId) {
+  const val = document.getElementById(inputId).value.trim();
+  if (val) { localStorage.setItem(key, val); alert('Saved!'); }
+}
+
+function exportData() {
+  const data = {
+    exported: new Date().toISOString(),
+    version: 1,
+    settings: {
+      proxy_mode: mode(),
+      cors_base:  localStorage.getItem('bw_cors_base') || '',
+      uv_base:    localStorage.getItem('bw_uv_base')   || '',
+      sj_base:    localStorage.getItem('bw_sj_base')   || '',
+    },
+    bookmarks: getBookmarks(),
+    history:   globalHistory,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'eclipseos-browser-data.json' });
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+function importData() {
+  const input = Object.assign(document.createElement('input'), { type: 'file', accept: '.json' });
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
       try {
-        const saved = JSON.parse(sessionStorage.getItem('bw_tabs') || '[]');
-        if (!saved.length) return false;
-        tabCounter = parseInt(sessionStorage.getItem('bw_counter') || '0');
-        activeId   = parseInt(sessionStorage.getItem('bw_activeId') || '0');
-        tabs = saved.map(t => ({ ...t, iframe: null }));
-        renderTabs();
-        const t = activeTab();
-        if (t && t.url) loadUrl(t.url, false);
-        else showHomepage();
-        return true;
-      } catch(e) { return false; }
-    }
-
-    // ── Homepage / new tab ──
-    function showHomepage() {
-      const t = activeTab();
-      if (t) { t.url = ''; t.title = 'New Tab'; t.iframe = null; }
-      urlInput.value = '';
-      favicon.src = DEFAULT_FAVICON;
-
-      const proxyMode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
-
-      const PRESETS = {
-        uv: [
-          { label: 'Holy Unblocker (uv)',  value: 'https://uv.holyubofficial.net/uv/q%s' },
-          { label: 'Cryo (uv)',            value: 'https://uv.cryo.lol/uv/q%s' },
-        ],
-        sj: [
-          { label: 'Holy Unblocker (sj)', value: 'https://sj.holyubofficial.net/scramjet/q%s' },
-        ],
-      };
-
-      const div = document.createElement('div');
-      div.className = 'new-tab-page';
-      div.innerHTML = `
-        <div style="font-size:48px">🌐</div>
-        <div class="ntp-title">EclipseOS Browser</div>
-        <div class="ntp-search">
-          <input id="ntpInput" type="text" placeholder="Enter a URL or search…">
-          <button id="ntpGo">→</button>
-        </div>
-        <div class="proxy-row">
-          <span>BACKEND:</span>
-          <select id="proxySelect">
-            <option value="cors"   ${proxyMode==='cors'   ?'selected':''}>Standard (CORS proxy)</option>
-            <option value="uv"     ${proxyMode==='uv'     ?'selected':''}>Ultraviolet</option>
-            <option value="sj"     ${proxyMode==='sj'     ?'selected':''}>ScramJet</option>
-            <option value="direct" ${proxyMode==='direct' ?'selected':''}>Direct (no proxy)</option>
-          </select>
-        </div>
-        <div class="proxy-endpoint ${proxyMode!=='cors'&&proxyMode!=='direct'?'show':''}" id="proxyEndpoint">
-          <select id="proxyPreset"><option value="">— Select a relay —</option></select>
-          <input id="proxyEndpointInput" type="text" placeholder="https://relay.example.com/prefix/%s"
-            value="${localStorage.getItem('eclipseos_'+proxyMode+'_base')||''}">
-          <button id="proxyEndpointSave">Save Relay</button>
-        </div>`;
-
-      iframeWrap.innerHTML = '';
-      iframeWrap.appendChild(div);
-
-      // Populate preset dropdown
-      function populatePresets(mode) {
-        const sel = div.querySelector('#proxyPreset');
-        sel.innerHTML = '<option value="">— Select a relay —</option>';
-        (PRESETS[mode] || []).forEach(p => {
-          const o = document.createElement('option');
-          o.value = p.value; o.textContent = p.label; sel.appendChild(o);
-        });
-        sel.onchange = () => { if (sel.value) div.querySelector('#proxyEndpointInput').value = sel.value; };
-      }
-      populatePresets(proxyMode);
-
-      div.querySelector('#proxySelect').onchange = function() {
-        localStorage.setItem('eclipseos_proxy_mode', this.value);
-        const ep = div.querySelector('#proxyEndpoint');
-        ep.classList.toggle('show', this.value !== 'cors' && this.value !== 'direct');
-        div.querySelector('#proxyEndpointInput').value = localStorage.getItem('eclipseos_' + this.value + '_base') || '';
-        populatePresets(this.value);
-      };
-      div.querySelector('#proxyEndpointSave').onclick = () => {
-        const val = div.querySelector('#proxyEndpointInput').value.trim();
-        const m   = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
-        if (val) { localStorage.setItem('eclipseos_' + m + '_base', val); alert('Relay saved!'); }
-      };
-      div.querySelector('#ntpInput').onkeydown = e => { if (e.key === 'Enter') navigate(e.target.value.trim()); };
-      div.querySelector('#ntpGo').onclick = () => navigate(div.querySelector('#ntpInput').value.trim());
-      setTimeout(() => div.querySelector('#ntpInput')?.focus(), 50);
-
-      updateNavBtns(); renderTabs();
-    }
-
-    // ── Navigate ──
-    function navigate(raw) {
-      if (!raw) return;
-      let url = raw.trim();
-      if (!url.includes('.') || url.includes(' ')) {
-        url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-      } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = 'https://' + url;
-      }
-      loadUrl(url);
-    }
-
-    // ── Proxy ──
-    function proxyUrl(url) {
-      const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
-      if (mode === 'direct') return url;
-      const apply = (base, u) => base.includes('%s') ? base.replace('%s', encodeURIComponent(u)) : base + encodeURIComponent(u);
-      const keys = { uv:'eclipseos_uv_base', sj:'eclipseos_sj_base' };
-      if (keys[mode]) {
-        const base = localStorage.getItem(keys[mode]) || '';
-        if (base) return apply(base, url);
-      }
-      return apply(localStorage.getItem('eclipseos_cors_base') || 'https://corsproxy.io/?%s', url);
-    }
-
-    // ── Load URL ──
-    // SW-based engines can't run inside iframes — open them in a real new tab instead
-    const SW_ENGINES = ['uv', 'sj'];
-
-    function loadUrl(url, addHistory = true) {
-      const t = activeTab(); if (!t) return;
-      const isLocal = /^(os-apps|browser|\.\/|settings)/.test(url);
-      const mode = localStorage.getItem('eclipseos_proxy_mode') || 'cors';
-
-      // For SW engines, build the proxied URL and open it in a real browser tab
-      if (!isLocal && SW_ENGINES.includes(mode)) {
-        const keys = { uv: 'eclipseos_uv_base', sj: 'eclipseos_sj_base' };
-        const base = localStorage.getItem(keys[mode]) || '';
-        if (!base) {
-          // No relay configured — show message in the iframe area
-          iframeWrap.innerHTML = `<div style="position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:white;font-family:'Oxanium',sans-serif;text-align:center;padding:40px;">
-            <div style="font-size:48px">⚠️</div>
-            <div style="font-size:16px;font-weight:700">No relay configured</div>
-            <div style="font-size:13px;opacity:0.5;max-width:360px;line-height:1.6">The <strong>${mode}</strong> engine needs a relay URL. Go back to the home tab and set one.</div>
-          </div>`;
-          return;
+        const data = JSON.parse(ev.target.result);
+        if (data.settings) {
+          if (data.settings.proxy_mode) localStorage.setItem('bw_proxy_mode', data.settings.proxy_mode);
+          if (data.settings.cors_base)  localStorage.setItem('bw_cors_base',  data.settings.cors_base);
+          if (data.settings.uv_base)    localStorage.setItem('bw_uv_base',    data.settings.uv_base);
+          if (data.settings.sj_base)    localStorage.setItem('bw_sj_base',    data.settings.sj_base);
         }
-        const proxied = base.includes('%s') ? base.replace('%s', encodeURIComponent(url)) : base + encodeURIComponent(url);
-        window.open(proxied, '_blank');
-        return;
-      }
-
-      loadingBar.classList.add('active');
-      if (t.iframe) t.iframe.remove();
-
-      const iframe = document.createElement('iframe');
-      iframe.src = isLocal ? url : proxyUrl(url);
-      iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;inset:0;';
-      iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-modals allow-presentation');
-      iframe.setAttribute('allow', 'autoplay; fullscreen; clipboard-read; clipboard-write');
-      iframe.onload = () => { iframe.classList.add('loaded'); loadingBar.classList.remove('active'); };
-
-      iframeWrap.innerHTML = '';
-      iframeWrap.appendChild(iframe);
-      t.iframe = iframe; t.url = url;
-      try { t.title = new URL(url).hostname.replace('www.','') || 'Page'; } catch(e) { t.title = url; }
-
-      if (addHistory) {
-        t.history = t.history.slice(0, t.histIdx + 1);
-        t.history.push(url);
-        t.histIdx = t.history.length - 1;
-        globalHistory.unshift({ url, title: t.title });
-        if (globalHistory.length > 100) globalHistory.pop();
-        sessionStorage.setItem('bw_history', JSON.stringify(globalHistory));
-      }
-
-      urlInput.value = url;
-      try { favicon.src = new URL(url).origin + '/favicon.ico'; } catch(e) { favicon.src = DEFAULT_FAVICON; }
-      updateNavBtns(); renderTabs();
-      setTimeout(() => loadingBar.classList.remove('active'), 5000);
-    }
-
-    // ── Bookmarks ──
-    function getBookmarks() { return JSON.parse(localStorage.getItem('eclipseos_bookmarks') || '[]'); }
-    function saveBookmarks(bm) { localStorage.setItem('eclipseos_bookmarks', JSON.stringify(bm)); }
-
-    function addBookmark() {
-      const t = activeTab();
-      if (!t || !t.url) { alert('No page loaded.'); return; }
-      const bm = getBookmarks();
-      if (bm.find(b => b.url === t.url)) { alert('Already bookmarked!'); return; }
-      bm.unshift({ id: Date.now(), url: t.url, title: t.title });
-      saveBookmarks(bm); alert('Bookmark added!');
-    }
-
-    function positionDropdown(el) {
-      const bottom = header.getBoundingClientRect().bottom;
-      const bkBar  = document.querySelector('.bookmarks-bar');
-      el.style.top = (bottom + (bkBar ? bkBar.offsetHeight : 0) + 2) + 'px';
-    }
-
-    function showBookmarksDD() {
-      closeAllDropdowns(); positionDropdown(bmDD);
-      const bm = getBookmarks();
-      bmDD.innerHTML = bm.length
-        ? bm.map(b => `<div class="dd-item" data-url="${b.url}">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#555"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
-            <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${b.title}</span>
-            <span style="color:#f44;cursor:pointer;padding:2px 6px" data-del="${b.id}">✕</span>
-          </div>`).join('')
-        : '<div class="dd-item" style="color:#aaa;pointer-events:none">No bookmarks yet</div>';
-      bmDD.classList.add('open');
-      bmDD.onclick = e => {
-        const del = e.target.closest('[data-del]');
-        if (del) { saveBookmarks(getBookmarks().filter(b => b.id != del.dataset.del)); showBookmarksDD(); return; }
-        const item = e.target.closest('[data-url]');
-        if (item) { navigate(item.dataset.url); closeAllDropdowns(); }
-      };
-    }
-
-    function showHistoryDD() {
-      closeAllDropdowns(); positionDropdown(histDD);
-      histDD.innerHTML = globalHistory.length
-        ? `<div class="dd-item" style="color:#888;cursor:default;justify-content:space-between">
-             <span>Recent History</span>
-             <span style="cursor:pointer;color:#f44" onclick="clearHistory()">Clear all</span>
-           </div>` +
-          globalHistory.slice(0,40).map(h => `<div class="dd-item" data-url="${h.url}">
-            <svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:#555"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/></svg>
-            <div style="overflow:hidden;min-width:0">
-              <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.title}</div>
-              <div style="font-size:11px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.url}</div>
-            </div>
-          </div>`).join('')
-        : '<div class="dd-item" style="color:#aaa;pointer-events:none">No history yet</div>';
-      histDD.classList.add('open');
-      histDD.onclick = e => {
-        const item = e.target.closest('[data-url]');
-        if (item) { navigate(item.dataset.url); closeAllDropdowns(); }
-      };
-    }
-
-    function clearHistory() {
-      globalHistory = []; sessionStorage.removeItem('bw_history'); closeAllDropdowns();
-    }
-
-    function closeAllDropdowns() {
-      [menuDD, bmDD, histDD].forEach(d => d.classList.remove('open'));
-    }
-
-    // ── Events ──
-    document.getElementById('newTabBtn').onclick  = () => createTab();
-    document.getElementById('homeBtn').onclick    = () => showHomepage();
-    document.getElementById('refreshBtn').onclick = () => { const t = activeTab(); if (t && t.url) loadUrl(t.url, false); };
-    backBtn.onclick    = () => { const t = activeTab(); if (t && t.histIdx > 0) { t.histIdx--; loadUrl(t.history[t.histIdx], false); } };
-    forwardBtn.onclick = () => { const t = activeTab(); if (t && t.histIdx < t.history.length - 1) { t.histIdx++; loadUrl(t.history[t.histIdx], false); } };
-    urlInput.onkeydown = e => { if (e.key === 'Enter') { navigate(urlInput.value.trim()); closeAllDropdowns(); } };
-
-    menuBtn.onclick = e => {
-      e.stopPropagation();
-      const open = menuDD.classList.contains('open');
-      closeAllDropdowns();
-      if (!open) {
-        const rect = menuBtn.getBoundingClientRect();
-        menuDD.style.top   = (rect.bottom + 4) + 'px';
-        menuDD.style.right = (window.innerWidth - rect.right) + 'px';
-        menuDD.classList.add('open');
-      }
+        if (data.bookmarks) saveBookmarks(data.bookmarks);
+        if (data.history)   { globalHistory = data.history; sessionStorage.setItem('bw_hist', JSON.stringify(globalHistory)); }
+        alert('Data imported! Reload settings to see changes.');
+      } catch(err) { alert('Invalid file — could not import.'); }
     };
+    reader.readAsText(file);
+  };
+  input.click();
+}
 
-    document.getElementById('ddBookmark').onclick  = () => { addBookmark(); closeAllDropdowns(); };
-    document.getElementById('ddBookmarks').onclick = () => showBookmarksDD();
-    document.getElementById('ddHistory').onclick   = () => showHistoryDD();
-    document.getElementById('ddSettings').onclick  = () => {
-      closeAllDropdowns();
-      const t = activeTab();
-      if (t && t.iframe) t.iframe.remove();
-      const iframe = document.createElement('iframe');
-      iframe.src = 'browser/settings.html';
-      iframe.style.cssText = 'width:100%;height:100%;border:none;position:absolute;inset:0;';
-      iframe.onload = () => iframe.classList.add('loaded');
-      iframeWrap.innerHTML = ''; iframeWrap.appendChild(iframe);
-      if (t) { t.iframe = iframe; t.url = 'browser/settings.html'; t.title = 'Settings'; }
-      urlInput.value = 'browser/settings.html';
-      updateNavBtns(); renderTabs();
-    };
+function clearHistorySettings() {
+  if (!confirm('Clear all history?')) return;
+  globalHistory = []; sessionStorage.removeItem('bw_hist'); alert('History cleared.');
+}
+function clearBookmarks() {
+  if (!confirm('Delete all bookmarks?')) return;
+  saveBookmarks([]); alert('Bookmarks cleared.');
+}
 
-    document.addEventListener('click', e => {
-      if (!e.target.closest('#menuBtn') && !e.target.closest('#bookmarksDropdown') && !e.target.closest('#historyDropdown'))
-        closeAllDropdowns();
+// ════════════════════════════════════════════════════
+//  EVENTS
+// ════════════════════════════════════════════════════
+$('newTabBtn').onclick = () => createTab();
+$('homeBtn').onclick   = () => showHomepageCurrent();
+$('refreshBtn').onclick = () => {
+  const t = activeTab();
+  if (!t || t.type !== 'direct' || !t.url) return;
+  const container = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (container) loadDirectIframe(container, t, t.url);
+};
+backBtn.onclick = () => {
+  const t = activeTab();
+  if (!t || t.type !== 'direct') return;
+  if (t.histIdx > 0) { t.histIdx--; const u = t.history[t.histIdx]; t.url = u; const c = content.querySelector('[data-page="tab-'+t.id+']'); if(c) loadDirectIframe(c,t,u); updateNavBtns(); updateUrlBar(); }
+};
+fwdBtn.onclick = () => {
+  const t = activeTab();
+  if (!t || t.type !== 'direct') return;
+  if (t.histIdx < t.history.length - 1) { t.histIdx++; const u = t.history[t.histIdx]; t.url = u; const c = content.querySelector('[data-page="tab-'+t.id+'"]'); if(c) loadDirectIframe(c,t,u); updateNavBtns(); updateUrlBar(); }
+};
+
+urlInput.onkeydown = e => { if (e.key === 'Enter') { navigate(urlInput.value.trim()); closeAllDD(); } };
+
+$('menuBtn').onclick = e => {
+  e.stopPropagation();
+  const open = menuDD.classList.contains('open');
+  closeAllDD();
+  if (!open) {
+    const rect = $('menuBtn').getBoundingClientRect();
+    menuDD.style.top   = (rect.bottom + 4) + 'px';
+    menuDD.style.right = (window.innerWidth - rect.right) + 'px';
+    menuDD.classList.add('open');
+  }
+};
+
+$('ddBookmark').onclick  = () => { addBookmark(); closeAllDD(); };
+$('ddBookmarks').onclick = () => showBookmarksDD();
+$('ddHistory').onclick   = () => showHistoryDD();
+$('ddSettings').onclick  = () => {
+  closeAllDD();
+  // Open settings as a special tab that stays alive
+  const existing = tabs.find(t => t.type === 'settings');
+  if (existing) { switchTab(existing.id); return; }
+  const id = tabCounter++;
+  const t = { id, type: 'settings', url: 'browser://settings', title: 'Settings', history: [], histIdx: -1 };
+  tabs.push(t);
+  activeId = id;
+  ensureSettingsPage();
+  renderTabs();
+  switchTab(id);
+};
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#menuBtn') && !e.target.closest('#bookmarksDropdown') && !e.target.closest('#historyDropdown')) closeAllDD();
+});
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'l') { e.preventDefault(); urlInput.focus(); urlInput.select(); }
+  if (e.ctrlKey && e.key === 't') { e.preventDefault(); createTab(); }
+  if (e.ctrlKey && e.key === 'w') { e.preventDefault(); closeTab(activeId); }
+  if (e.ctrlKey && e.key === 'r') { e.preventDefault(); const t = activeTab(); if (t && t.type === 'direct' && t.url) { const c = content.querySelector('[data-page="tab-'+t.id+'"]'); if(c) loadDirectIframe(c,t,t.url); } }
+});
+
+// ════════════════════════════════════════════════════
+//  RESTORE / INIT
+// ════════════════════════════════════════════════════
+function restoreTabs() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem('bw_tabs') || '[]');
+    if (!saved.length) return false;
+    tabCounter = parseInt(sessionStorage.getItem('bw_ctr')    || '0');
+    activeId   = parseInt(sessionStorage.getItem('bw_active') || '0');
+    // Rebuild tabs and pages
+    saved.forEach(t => {
+      tabs.push({ ...t });
+      if (t.type !== 'settings') {
+        const div = document.createElement('div');
+        div.className = 'page hidden';
+        div.setAttribute('data-page', 'tab-' + t.id);
+        if (t.type === 'direct' && t.url) {
+          loadDirectIframe(div, t, t.url);
+        } else if (t.type === 'external') {
+          div.innerHTML = `<div class="ext-page"><div class="ext-icon">🔗</div><div class="ext-title">${t.title||t.url}</div><div class="ext-note">This page was opened externally.</div>${t.proxiedUrl?`<button class="ext-open" onclick="window.open('${t.proxiedUrl.replace(/'/g,"\\'")}','_blank')">↗ Re-open</button>`:''}</div>`;
+        } else {
+          showHomepage(div);
+        }
+        content.appendChild(div);
+      }
     });
-    document.addEventListener('keydown', e => {
-      if (e.ctrlKey && e.key === 'l') { e.preventDefault(); urlInput.focus(); urlInput.select(); }
-      if (e.ctrlKey && e.key === 't') { e.preventDefault(); createTab(); }
-      if (e.ctrlKey && e.key === 'w') { e.preventDefault(); closeTab(activeId); }
-      if (e.ctrlKey && e.key === 'r') { e.preventDefault(); const t = activeTab(); if (t && t.url) loadUrl(t.url, false); }
-    });
+    renderTabs();
+    switchTab(activeId);
+    return true;
+  } catch(e) { return false; }
+}
 
-    // ── Init ──
-    if (!localStorage.getItem('eclipseos_cors_base'))
-      localStorage.setItem('eclipseos_cors_base', 'https://corsproxy.io/?%s');
-    if (!restoreTabs()) createTab();
-  </script>
+// Pre-set all relay URLs to the EclipseOS Worker on first load
+if (!localStorage.getItem('bw_cors_base')) localStorage.setItem('bw_cors_base', WORKER_URL);
+if (!localStorage.getItem('bw_uv_base'))   localStorage.setItem('bw_uv_base',   WORKER_URL);
+if (!localStorage.getItem('bw_sj_base'))   localStorage.setItem('bw_sj_base',   WORKER_URL);
+
+if (!restoreTabs()) createTab();
+</script>
 </body>
 </html>

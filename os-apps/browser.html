@@ -247,38 +247,11 @@ $('toggleBtn').onclick = () => {
 };
 
 // ════════════════════════════════════════════════════
-//  PROXY URL BUILDER
+//  SCRAMJET APP URL
+//  After deploying Scramjet-App to CF Pages, paste
+//  the URL in Settings or change this default.
 // ════════════════════════════════════════════════════
-const WORKER_URL = 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-const RELAY_PRESETS = {
-  cors: [
-    { label:'EclipseOS Proxy (recommended)', value: WORKER_URL },
-  ],
-  uv: [
-    { label:'EclipseOS Proxy (recommended)', value: WORKER_URL },
-    { label:'Holy Unblocker UV',             value:'https://uv.holyubofficial.net/uv/q%s' },
-    { label:'Cryo UV',                       value:'https://uv.cryo.lol/uv/q%s' },
-  ],
-  sj: [
-    { label:'EclipseOS Proxy (recommended)', value: WORKER_URL },
-    { label:'Holy Unblocker SJ',             value:'https://sj.holyubofficial.net/scramjet/q%s' },
-  ],
-};
-
-function buildProxiedUrl(url) {
-  const m = mode();
-  if (m === 'direct') return { proxied: url, isExternal: false };
-  const apply = (base, u) => base.includes('%s') ? base.replace('%s', encodeURIComponent(u)) : base + encodeURIComponent(u);
-  if (m === 'cors') {
-    const base = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-    return { proxied: apply(base, url), isExternal: true };
-  }
-  if (m === 'uv' || m === 'sj') {
-    const base = localStorage.getItem('bw_' + m + '_base') || '';
-    return { proxied: base ? apply(base, url) : null, isExternal: true, needsRelay: !base };
-  }
-  return { proxied: url, isExternal: false };
-}
+const SCRAMJET_URL = localStorage.getItem('bw_sj_app') || 'https://scramjet.example.pages.dev';
 
 // ════════════════════════════════════════════════════
 //  PAGES — kept in DOM, shown/hidden
@@ -427,19 +400,9 @@ function showHomepage(container) {
       <div class="proxy-row">
         <span>Mode:</span>
         <select id="proxyModeSelect">
-          <option value="cors"   ${m==='cors'  ?'selected':''}>CORS Proxy (opens in real tab)</option>
-          <option value="uv"     ${m==='uv'    ?'selected':''}>Ultraviolet (opens in real tab)</option>
-          <option value="sj"     ${m==='sj'    ?'selected':''}>ScramJet (opens in real tab)</option>
-          <option value="direct" ${m==='direct'?'selected':''}>Direct (loads here, most sites block)</option>
+          <option value="scramjet" ${m==='scramjet'?'selected':''}>ScramJet ✨ (recommended)</option>
+          <option value="direct"   ${m==='direct'  ?'selected':''}>Direct (most sites block)</option>
         </select>
-      </div>
-      <div class="relay-section ${m!=='cors'&&m!=='direct'?'show':''}" id="relaySection">
-        <div class="relay-row">
-          <select id="relayPreset"><option value="">— Quick presets —</option></select>
-          <input class="relay-input" id="relayInput" placeholder="https://relay.example.com/prefix/%s"
-            value="${localStorage.getItem('bw_' + m + '_base')||''}">
-          <button class="relay-save" id="relaySave">Save</button>
-        </div>
       </div>
       <div class="proxy-note" id="proxyNote"></div>
     </div>
@@ -452,60 +415,21 @@ function showHomepage(container) {
   setTimeout(() => ntpQ.focus(), 50);
 
   const modeSelect = container.querySelector('#proxyModeSelect');
-  const relaySection = container.querySelector('#relaySection');
-  const relayInput = container.querySelector('#relayInput');
-  const relayPreset = container.querySelector('#relayPreset');
-  const proxyNote = container.querySelector('#proxyNote');
+  const proxyNote  = container.querySelector('#proxyNote');
 
   function updateNote(m) {
     const notes = {
-      cors:   '🔗 URLs will open in a new browser tab via a CORS proxy.',
-      uv:     '🔗 URLs will open in a new browser tab via Ultraviolet.',
-      sj:     '🔗 URLs will open in a new browser tab via ScramJet.',
-      direct: '⚠️ Direct mode loads pages here. Most sites block this with X-Frame-Options.',
+      scramjet: '✨ Full ScramJet proxy — handles popups, navigation, YouTube and more.',
+      direct:   '⚠️ Loads pages directly in an iframe. Most sites block this.',
     };
     proxyNote.textContent = notes[m] || '';
   }
   updateNote(m);
 
-  function populatePresets(m) {
-    relayPreset.innerHTML = '<option value="">— Quick presets —</option>';
-    (RELAY_PRESETS[m] || []).forEach(p => {
-      const o = document.createElement('option');
-      o.value = p.value; o.textContent = p.label; relayPreset.appendChild(o);
-    });
-  }
-  populatePresets(m);
-
-  relayPreset.onchange = () => { if (relayPreset.value) relayInput.value = relayPreset.value; };
-  container.querySelector('#relaySave').onclick = () => {
-    const val = relayInput.value.trim();
-    const cm = localStorage.getItem('bw_proxy_mode') || 'cors';
-    if (val) { localStorage.setItem('bw_' + cm + '_base', val); alert('Relay saved!'); }
-  };
-
   modeSelect.onchange = function() {
     localStorage.setItem('bw_proxy_mode', this.value);
-    const show = this.value !== 'cors' && this.value !== 'direct';
-    relaySection.classList.toggle('show', show);
-    relayInput.value = localStorage.getItem('bw_' + this.value + '_base') || '';
-    populatePresets(this.value);
     updateNote(this.value);
-    // Also update CORS relay section visibility
-    if (this.value === 'cors') {
-      relaySection.classList.add('show');
-      relayInput.placeholder = 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-      relayInput.value = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-      populatePresets('cors');
-    }
   };
-
-  // Show CORS relay config too
-  if (m === 'cors') {
-    relaySection.classList.add('show');
-    relayInput.placeholder = 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-    relayInput.value = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-  }
 
   updateUrlBar();
 }
@@ -542,28 +466,16 @@ function loadUrl(url) {
   const container = content.querySelector('[data-page="tab-' + t.id + '"]');
   if (!container) return;
 
+  try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
+
   if (isLocal || m === 'direct') {
-    // Direct — iframe the raw URL
     t.type = 'direct';
-    try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
     loadDirectIframe(container, t, url);
   } else {
-    // Proxy mode — build the proxied URL and iframe it directly
-    const { proxied, needsRelay } = buildProxiedUrl(url);
-    if (needsRelay) {
-      container.innerHTML = `<div class="ext-page">
-        <div class="ext-icon">⚠️</div>
-        <div class="ext-title">No relay configured</div>
-        <div class="ext-note">Set a relay URL for <strong>${m.toUpperCase()}</strong> in Settings before navigating.</div>
-        <button class="ext-open" onclick="showHomepageCurrent()">← Go Home</button>
-      </div>`;
-      t.type = 'ntp'; t.title = 'Error';
-    } else {
-      // Load the proxied URL directly in the iframe
-      t.type = 'direct';
-      try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
-      loadDirectIframe(container, t, proxied);
-    }
+    // ScramJet — default for everything else
+    const sjBase = SCRAMJET_URL.replace(/\/$/, '');
+    t.type = 'scramjet';
+    loadScramjetFrame(container, t, url, sjBase);
   }
 
   showPage('tab-' + t.id);
@@ -576,14 +488,22 @@ function loadDirectIframe(container, t, url) {
   const iframe = document.createElement('iframe');
   iframe.className = 'direct-iframe';
   iframe.src = url;
-  // Don't use sandbox for local files — let them run fully
   if (!/^(os-apps|browser|\.\/|settings\/)/.test(url)) {
-    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-presentation allow-downloads');
+    // No allow-popups — forces everything to stay in the iframe
+    // allow-top-navigation-by-user-activation lets anchor clicks navigate the frame itself
+    iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-modals allow-presentation allow-downloads allow-top-navigation-by-user-activation');
     iframe.setAttribute('allow', 'autoplay; fullscreen');
   }
   iframe.onload = () => {
     iframe.classList.add('loaded');
     loadingBar.classList.remove('active');
+    // Best-effort: for same-origin frames, override window.open to open a new browser tab inside EclipseOS
+    try {
+      iframe.contentWindow.open = function(url) {
+        if (url) createTab(url);
+        return null;
+      };
+    } catch(e) { /* cross-origin — can't touch it, sandbox handles it */ }
   };
   container.appendChild(iframe);
   showPage('tab-' + t.id);
@@ -595,6 +515,19 @@ function showHomepageCurrent() {
   const container = content.querySelector('[data-page="tab-' + t.id + '"]');
   if (container) showHomepage(container);
   switchTab(t.id);
+}
+
+function loadScramjetFrame(container, t, originalUrl, sjBase) {
+  loadingBar.classList.add('active');
+  container.innerHTML = '';
+  const iframe = document.createElement('iframe');
+  iframe.className = 'direct-iframe';
+  iframe.setAttribute('allow', 'autoplay; fullscreen; clipboard-read; clipboard-write');
+  iframe.src = sjBase + '/?url=' + encodeURIComponent(originalUrl);
+  iframe.onload = () => { iframe.classList.add('loaded'); loadingBar.classList.remove('active'); };
+  container.appendChild(iframe);
+  showPage('tab-' + t.id);
+  setTimeout(() => loadingBar.classList.remove('active'), 8000);
 }
 
 // ════════════════════════════════════════════════════
@@ -667,9 +600,6 @@ function closeAllDD() { [menuDD, bmDD, histDD].forEach(d => d.classList.remove('
 // ════════════════════════════════════════════════════
 function buildSettingsHTML() {
   const m = mode();
-  const corsBase = localStorage.getItem('bw_cors_base') || 'https://sproxy.higginsaxel01.workers.dev/?url=%s';
-  const uvBase   = localStorage.getItem('bw_uv_base')   || '';
-  const sjBase   = localStorage.getItem('bw_sj_base')   || '';
   return `<div class="settings-inner">
     <div class="settings-title">⚙️ Browser Settings</div>
 
@@ -677,38 +607,24 @@ function buildSettingsHTML() {
       <div class="settings-sec-label">Proxy Mode</div>
       <div class="settings-row">
         <div><div class="settings-row-label">Navigation Mode</div>
-          <div class="settings-row-sub">Direct loads pages here. All other modes open in a real tab.</div></div>
+          <div class="settings-row-sub">ScramJet is recommended — full proxy, handles popups and navigation.</div></div>
         <select class="s-select" id="s-mode">
-          <option value="cors"   ${m==='cors'  ?'selected':''}>CORS Proxy</option>
-          <option value="uv"     ${m==='uv'    ?'selected':''}>Ultraviolet</option>
-          <option value="sj"     ${m==='sj'    ?'selected':''}>ScramJet</option>
-          <option value="direct" ${m==='direct'?'selected':''}>Direct</option>
+          <option value="scramjet" ${m==='scramjet'?'selected':''}>ScramJet ✨</option>
+          <option value="direct"   ${m==='direct'  ?'selected':''}>Direct</option>
         </select>
       </div>
     </div>
 
     <div class="settings-section">
-      <div class="settings-sec-label">Relay URLs</div>
+      <div class="settings-sec-label">ScramJet</div>
       <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <div class="settings-row-label">CORS Proxy Base URL</div>
-        <div class="settings-row-sub">Use %s as the placeholder for the target URL. e.g. https://sproxy.higginsaxel01.workers.dev/?url=%s</div>
+        <div class="settings-row-label">ScramJet App URL</div>
+        <div class="settings-row-sub">Your deployed Scramjet-App URL. Fork github.com/MercuryWorkshop/Scramjet-App and deploy to CF Pages (output dir: <code>public</code>, no build command).</div>
         <div style="display:flex;gap:8px;width:100%">
-          <input class="s-input" style="flex:1" id="s-cors" type="text" value="${corsBase}" placeholder="https://sproxy.higginsaxel01.workers.dev/?url=%s">
-          <button class="s-btn primary" onclick="saveSetting('bw_cors_base','s-cors')">Save</button>
-        </div>
-      </div>
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <div class="settings-row-label">Ultraviolet Relay</div>
-        <div style="display:flex;gap:8px;width:100%">
-          <input class="s-input" style="flex:1" id="s-uv" type="text" value="${uvBase}" placeholder="https://uv.holyubofficial.net/uv/q%s">
-          <button class="s-btn primary" onclick="saveSetting('bw_uv_base','s-uv')">Save</button>
-        </div>
-      </div>
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <div class="settings-row-label">ScramJet Relay</div>
-        <div style="display:flex;gap:8px;width:100%">
-          <input class="s-input" style="flex:1" id="s-sj" type="text" value="${sjBase}" placeholder="https://sj.holyubofficial.net/scramjet/q%s">
-          <button class="s-btn primary" onclick="saveSetting('bw_sj_base','s-sj')">Save</button>
+          <input class="s-input" style="flex:1" id="s-sjapp" type="text"
+            value="${localStorage.getItem('bw_sj_app')||'https://scramjet.example.pages.dev'}"
+            placeholder="https://your-scramjet.pages.dev">
+          <button class="s-btn primary" onclick="saveSjApp()">Save</button>
         </div>
       </div>
     </div>
@@ -744,6 +660,11 @@ function initSettings(div) {
   div.querySelector('#s-mode').onchange = function() {
     localStorage.setItem('bw_proxy_mode', this.value);
   };
+}
+
+function saveSjApp() {
+  const val = document.getElementById('s-sjapp').value.trim();
+  if (val) { localStorage.setItem('bw_sj_app', val); alert('ScramJet URL saved! Reload the browser app to apply.'); }
 }
 
 function saveSetting(key, inputId) {
@@ -897,10 +818,8 @@ function restoreTabs() {
   } catch(e) { return false; }
 }
 
-// Pre-set all relay URLs to the EclipseOS Worker on first load
-if (!localStorage.getItem('bw_cors_base')) localStorage.setItem('bw_cors_base', WORKER_URL);
-if (!localStorage.getItem('bw_uv_base'))   localStorage.setItem('bw_uv_base',   WORKER_URL);
-if (!localStorage.getItem('bw_sj_base'))   localStorage.setItem('bw_sj_base',   WORKER_URL);
+// Set default mode to scramjet
+if (!localStorage.getItem('bw_proxy_mode')) localStorage.setItem('bw_proxy_mode', 'scramjet');
 
 if (!restoreTabs()) createTab();
 </script>

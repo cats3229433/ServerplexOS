@@ -234,7 +234,6 @@ const histDD    = $('historyDropdown');
 
 function getTab(id)  { return tabs.find(t => t.id === id); }
 function activeTab() { return getTab(activeId); }
-function mode()      { return localStorage.getItem('bw_proxy_mode') || 'cors'; }
 
 // ════════════════════════════════════════════════════
 //  HEADER TOGGLE
@@ -246,12 +245,15 @@ $('toggleBtn').onclick = () => {
   header.style.marginBottom = isCollapsed ? '-' + header.offsetHeight + 'px' : '0';
 };
 
-// ════════════════════════════════════════════════════
-//  SCRAMJET APP URL
-//  After deploying Scramjet-App to CF Pages, paste
-//  the URL in Settings or change this default.
-// ════════════════════════════════════════════════════
-const SCRAMJET_URL = localStorage.getItem('bw_sj_app') || 'https://scramjet.example.pages.dev';
+// Primary and fallback ScramJet URLs
+const SJ_URLS = [
+  localStorage.getItem('bw_sj_app'),
+  'https://holyunblocker.org',
+  'https://cname.holyunblocker.org',
+].filter(Boolean);
+
+let sjUrlIndex = 0;
+const SCRAMJET_URL = SJ_URLS[sjUrlIndex];
 
 // ════════════════════════════════════════════════════
 //  PAGES — kept in DOM, shown/hidden
@@ -387,7 +389,6 @@ function closeTab(id) {
 function showHomepage(container) {
   const t = activeTab();
   if (t) { t.type = 'ntp'; t.url = ''; t.title = 'New Tab'; }
-  const m = mode();
 
   container.innerHTML = `<div class="ntp">
     <div class="ntp-logo">🌐</div>
@@ -396,41 +397,12 @@ function showHomepage(container) {
       <input id="ntpQ" type="text" placeholder="Enter a URL or search…">
       <button id="ntpGo">→</button>
     </div>
-    <div class="proxy-section">
-      <div class="proxy-row">
-        <span>Mode:</span>
-        <select id="proxyModeSelect">
-          <option value="scramjet" ${m==='scramjet'?'selected':''}>ScramJet ✨ (recommended)</option>
-          <option value="direct"   ${m==='direct'  ?'selected':''}>Direct (most sites block)</option>
-        </select>
-      </div>
-      <div class="proxy-note" id="proxyNote"></div>
-    </div>
   </div>`;
 
-  // Wire up
   const ntpQ = container.querySelector('#ntpQ');
   container.querySelector('#ntpGo').onclick = () => navigate(ntpQ.value.trim());
   ntpQ.onkeydown = e => { if (e.key === 'Enter') navigate(ntpQ.value.trim()); };
   setTimeout(() => ntpQ.focus(), 50);
-
-  const modeSelect = container.querySelector('#proxyModeSelect');
-  const proxyNote  = container.querySelector('#proxyNote');
-
-  function updateNote(m) {
-    const notes = {
-      scramjet: '✨ Full ScramJet proxy — handles popups, navigation, YouTube and more.',
-      direct:   '⚠️ Loads pages directly in an iframe. Most sites block this.',
-    };
-    proxyNote.textContent = notes[m] || '';
-  }
-  updateNote(m);
-
-  modeSelect.onchange = function() {
-    localStorage.setItem('bw_proxy_mode', this.value);
-    updateNote(this.value);
-  };
-
   updateUrlBar();
 }
 
@@ -450,7 +422,6 @@ function navigate(raw) {
 
 function loadUrl(url) {
   const t = activeTab(); if (!t) return;
-  const m = mode();
   const isLocal = /^(os-apps|browser|\.\/|settings\/)/.test(url);
 
   t.url = url;
@@ -468,14 +439,12 @@ function loadUrl(url) {
 
   try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
 
-  if (isLocal || m === 'direct') {
+  if (isLocal) {
     t.type = 'direct';
     loadDirectIframe(container, t, url);
   } else {
-    // ScramJet — default for everything else
-    const sjBase = SCRAMJET_URL.replace(/\/$/, '');
     t.type = 'scramjet';
-    loadScramjetFrame(container, t, url, sjBase);
+    loadScramjetFrame(container, t, url, SCRAMJET_URL.replace(/\/$/, ''));
   }
 
   showPage('tab-' + t.id);
@@ -525,6 +494,21 @@ function loadScramjetFrame(container, t, originalUrl, sjBase) {
   iframe.setAttribute('allow', 'autoplay; fullscreen; clipboard-read; clipboard-write');
   iframe.src = sjBase + '/?url=' + encodeURIComponent(originalUrl);
   iframe.onload = () => { iframe.classList.add('loaded'); loadingBar.classList.remove('active'); };
+  iframe.onerror = () => {
+    // Try next fallback URL
+    sjUrlIndex++;
+    if (sjUrlIndex < SJ_URLS.length) {
+      iframe.src = SJ_URLS[sjUrlIndex] + '/?url=' + encodeURIComponent(originalUrl);
+    } else {
+      loadingBar.classList.remove('active');
+      container.innerHTML = `<div class="ext-page">
+        <div class="ext-icon">⚠️</div>
+        <div class="ext-title">ScramJet unavailable</div>
+        <div class="ext-note">All proxy servers appear to be down. Try again later or set a custom ScramJet URL in Settings.</div>
+        <button class="ext-open" onclick="showHomepageCurrent()">← Go Home</button>
+      </div>`;
+    }
+  };
   container.appendChild(iframe);
   showPage('tab-' + t.id);
   setTimeout(() => loadingBar.classList.remove('active'), 8000);
@@ -599,27 +583,14 @@ function closeAllDD() { [menuDD, bmDD, histDD].forEach(d => d.classList.remove('
 //  SETTINGS PAGE (kept alive — never reloads)
 // ════════════════════════════════════════════════════
 function buildSettingsHTML() {
-  const m = mode();
   return `<div class="settings-inner">
     <div class="settings-title">⚙️ Browser Settings</div>
-
-    <div class="settings-section">
-      <div class="settings-sec-label">Proxy Mode</div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Navigation Mode</div>
-          <div class="settings-row-sub">ScramJet is recommended — full proxy, handles popups and navigation.</div></div>
-        <select class="s-select" id="s-mode">
-          <option value="scramjet" ${m==='scramjet'?'selected':''}>ScramJet ✨</option>
-          <option value="direct"   ${m==='direct'  ?'selected':''}>Direct</option>
-        </select>
-      </div>
-    </div>
 
     <div class="settings-section">
       <div class="settings-sec-label">ScramJet</div>
       <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
         <div class="settings-row-label">ScramJet App URL</div>
-        <div class="settings-row-sub">Your deployed Scramjet-App URL. Fork github.com/MercuryWorkshop/Scramjet-App and deploy to CF Pages (output dir: <code>public</code>, no build command).</div>
+        <div class="settings-row-sub">Fork github.com/MercuryWorkshop/Scramjet-App, deploy to CF Pages (output dir: <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px">public</code>, no build command), paste URL here.</div>
         <div style="display:flex;gap:8px;width:100%">
           <input class="s-input" style="flex:1" id="s-sjapp" type="text"
             value="${localStorage.getItem('bw_sj_app')||'https://scramjet.example.pages.dev'}"
@@ -633,7 +604,7 @@ function buildSettingsHTML() {
       <div class="settings-sec-label">Data</div>
       <div class="settings-row">
         <div><div class="settings-row-label">Export Browser Data</div>
-          <div class="settings-row-sub">Download your bookmarks, history and settings as a JSON file</div></div>
+          <div class="settings-row-sub">Download bookmarks, history and settings as JSON</div></div>
         <button class="s-btn primary" onclick="exportData()">⬇ Export</button>
       </div>
       <div class="settings-row">
@@ -656,10 +627,7 @@ function buildSettingsHTML() {
 }
 
 function initSettings(div) {
-  // Mode select live update
-  div.querySelector('#s-mode').onchange = function() {
-    localStorage.setItem('bw_proxy_mode', this.value);
-  };
+  // nothing to init — settings are saved on button click
 }
 
 function saveSjApp() {
@@ -817,9 +785,6 @@ function restoreTabs() {
     return true;
   } catch(e) { return false; }
 }
-
-// Set default mode to scramjet
-if (!localStorage.getItem('bw_proxy_mode')) localStorage.setItem('bw_proxy_mode', 'scramjet');
 
 if (!restoreTabs()) createTab();
 </script>

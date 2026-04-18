@@ -4,259 +4,721 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-  <title>Browser</title>
+  <title>ServerplexOS Browser</title>
   <style>
-    :root { --hbg: #ffffff; }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; font-family: 'Oxanium', sans-serif; overflow: hidden; }
-    body { display: flex; flex-direction: column; background: #1a1a2e; }
+    :root {
+      --accent: #0078d4;
+      --accent-glow: rgba(0,120,212,0.35);
+      --bg: #07090f;
+      --surface: #0e1420;
+      --surface2: #141c2e;
+      --surface3: #1a2238;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.13);
+      --text: #e8edf5;
+      --text2: #8b97b0;
+      --text3: #4a5568;
+      --red: #ef4444;
+      --green: #22c55e;
+      --yellow: #f59e0b;
+      --hh: 88px;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html,body { height:100%; font-family:'Oxanium',sans-serif; overflow:hidden; background:var(--bg); color:var(--text); }
+    body { display:flex; flex-direction:column; }
 
-    /* ── Header ── */
-    .header { background: var(--hbg); display: flex; flex-direction: column; position: relative; z-index: 1000; flex-shrink: 0; transition: transform 0.3s ease; }
-    .header.collapsed { transform: translateY(-100%); margin-bottom: calc(-1 * var(--hh, 90px)); }
+    /* ══ SCROLLBARS ══ */
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:transparent; }
+    ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:3px; }
 
-    .tab-bar { display: flex; align-items: center; gap: 4px; padding: 8px 56px 0 8px; overflow-x: auto; scrollbar-width: thin; }
-    .tab-bar::-webkit-scrollbar { height: 3px; }
-    .tab-bar::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
-    .tab { display: flex; align-items: center; gap: 6px; padding: 7px 12px; background: #e8e8e8; border-radius: 8px 8px 0 0; cursor: pointer; white-space: nowrap; min-width: 130px; max-width: 200px; color: #333; font-size: 13px; border: 1px solid transparent; border-bottom: none; transition: background .15s; }
-    .tab:hover { background: #ddd; }
-    .tab.active { background: #fff; border-color: #ccc; }
-    .tab-favicon { width: 14px; height: 14px; flex-shrink: 0; }
-    .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-    .tab-close { width: 16px; height: 16px; cursor: pointer; opacity: 0.4; flex-shrink: 0; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-    .tab-close:hover { opacity: 1; background: rgba(0,0,0,0.1); }
-    .tab.external-tab { background: #e8f4fd; border-color: #b3d9f5; }
-    .tab.external-tab.active { background: #d0eafb; }
-    .tab.external-tab .tab-ext-badge { font-size: 9px; color: #0078d4; font-weight: 800; letter-spacing: .5px; flex-shrink: 0; }
-    .new-tab-btn { padding: 5px 11px; background: #333; border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 16px; flex-shrink: 0; }
-    .new-tab-btn:hover { background: #555; }
+    /* ══ HEADER ══ */
+    .header {
+      background: rgba(14,20,32,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      flex-shrink:0;
+      position:relative;
+      z-index:1000;
+      transition: transform 0.3s ease, margin 0.3s ease;
+    }
+    .header.collapsed { transform:translateY(-100%); margin-bottom:calc(-1 * var(--hh)); }
 
-    .top-row { display: flex; align-items: center; gap: 8px; padding: 8px 56px 8px 10px; }
-    .nav-btn { width: 28px; height: 28px; cursor: pointer; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: background .15s; flex-shrink: 0; }
-    .nav-btn:hover { background: #f0f0f0; }
-    .nav-btn.disabled { opacity: 0.3; cursor: not-allowed; }
-    .nav-btn.disabled:hover { background: transparent; }
-    .nav-btn svg { width: 18px; height: 18px; fill: #333; }
+    /* Tab bar */
+    .tab-bar {
+      display:flex; align-items:flex-end; gap:3px;
+      padding:10px 44px 0 10px;
+      overflow-x:auto; scrollbar-width:none;
+      min-height:42px;
+    }
+    .tab-bar::-webkit-scrollbar { display:none; }
 
-    .url-bar { flex: 1; display: flex; align-items: center; gap: 8px; background: #f3f3f3; border: 1.5px solid #ddd; border-radius: 20px; padding: 7px 14px; transition: all .2s; }
-    .url-bar:focus-within { background: #fff; border-color: #999; box-shadow: 0 0 0 3px rgba(0,0,0,.06); }
-    .favicon { width: 16px; height: 16px; flex-shrink: 0; }
-    .url-input { flex: 1; border: none; background: transparent; font-family: 'Oxanium', sans-serif; font-size: 14px; color: #000; outline: none; }
-    .url-input::placeholder { color: #999; }
-    .url-badge { font-size: 10px; font-weight: 800; letter-spacing: .5px; padding: 2px 7px; border-radius: 20px; flex-shrink: 0; }
-    .url-badge.direct { background: rgba(34,197,94,.15); color: #15803d; }
-    .url-badge.proxied { background: rgba(0,120,212,.12); color: #0078d4; }
-    .url-badge.external { background: rgba(245,158,11,.15); color: #b45309; }
+    .tab {
+      display:flex; align-items:center; gap:7px;
+      padding:7px 12px 7px 10px;
+      background: var(--surface2);
+      border:1px solid var(--border);
+      border-bottom:none;
+      border-radius:10px 10px 0 0;
+      cursor:pointer;
+      min-width:130px; max-width:200px;
+      color:var(--text2);
+      font-size:12px; font-weight:600;
+      transition:all 0.18s ease;
+      position:relative;
+      user-select:none;
+      flex-shrink:0;
+    }
+    .tab:hover { background:var(--surface3); color:var(--text); }
+    .tab.active {
+      background:var(--surface);
+      border-color:var(--border2);
+      color:var(--text);
+      box-shadow:0 -2px 0 var(--accent) inset;
+    }
+    .tab.pinned { min-width:40px; max-width:44px; justify-content:center; padding:7px 10px; }
+    .tab.pinned .tab-title, .tab.pinned .tab-close { display:none; }
+    .tab-favicon { width:14px; height:14px; flex-shrink:0; font-size:13px; line-height:1; }
+    .tab-title { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .tab-close {
+      width:16px; height:16px; border-radius:4px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; opacity:0; transition:all 0.15s; flex-shrink:0;
+      color:var(--text2);
+    }
+    .tab:hover .tab-close { opacity:1; }
+    .tab-close:hover { background:rgba(239,68,68,0.25); color:#fca5a5; opacity:1 !important; }
+    .tab.settings-tab .tab-favicon { font-size:14px; }
 
-    .menu-btn { width: 32px; height: 32px; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
-    .menu-btn:hover { background: #f0f0f0; }
-    .menu-btn > svg { width: 18px; height: 18px; fill: #333; }
+    .new-tab-btn {
+      width:28px; height:28px; border-radius:8px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      color:var(--text2); font-size:18px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:all 0.2s; flex-shrink:0; margin-bottom:2px;
+    }
+    .new-tab-btn:hover { background:rgba(255,255,255,0.1); color:var(--text); transform:scale(1.1); }
 
-    .toggle-btn { position: fixed; top: 8px; right: 10px; width: 40px; height: 40px; background: #333; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 99999; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
-    .toggle-btn:hover { background: #555; }
-    .toggle-btn svg { width: 20px; height: 20px; fill: white; transition: transform .3s; }
-    .toggle-btn.collapsed svg { transform: rotate(180deg); }
+    /* Top row */
+    .top-row {
+      display:flex; align-items:center; gap:7px;
+      padding:7px 50px 7px 10px;
+    }
+    .nav-btn {
+      width:30px; height:30px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; transition:all 0.15s; flex-shrink:0;
+      color:var(--text2); font-size:16px;
+      border:1px solid transparent;
+    }
+    .nav-btn:hover { background:var(--surface2); border-color:var(--border); color:var(--text); }
+    .nav-btn:active { transform:scale(0.93); }
+    .nav-btn.disabled { opacity:0.3; pointer-events:none; }
 
-    .loading-bar { height: 2px; background: transparent; position: relative; overflow: hidden; }
-    .loading-bar.active::after { content: ''; position: absolute; left: -50%; width: 50%; height: 100%; background: #0078d4; animation: load 1.2s ease-in-out infinite; }
-    @keyframes load { 0%{left:-50%} 100%{left:110%} }
+    .url-bar {
+      flex:1; display:flex; align-items:center; gap:8px;
+      background:var(--surface2); border:1px solid var(--border);
+      border-radius:12px; padding:7px 14px;
+      transition:all 0.2s;
+    }
+    .url-bar:focus-within {
+      border-color:rgba(0,120,212,0.5);
+      background:rgba(0,120,212,0.06);
+      box-shadow:0 0 0 3px var(--accent-glow);
+    }
+    .url-security { font-size:14px; flex-shrink:0; color:var(--text3); }
+    .url-input {
+      flex:1; border:none; background:transparent;
+      font-family:'Oxanium',sans-serif; font-size:13px;
+      color:var(--text); outline:none; letter-spacing:0.2px;
+    }
+    .url-input::placeholder { color:var(--text3); }
+    .url-input::selection { background:rgba(0,120,212,0.3); }
+    .url-badge {
+      font-size:9px; font-weight:800; letter-spacing:1px;
+      padding:2px 8px; border-radius:20px; flex-shrink:0; text-transform:uppercase;
+    }
+    .url-badge.direct { background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.25); }
+    .url-badge.proxied { background:rgba(0,120,212,0.15); color:#60a5fa; border:1px solid rgba(0,120,212,0.3); }
+    .url-badge.blocked { background:rgba(239,68,68,0.15); color:#fca5a5; border:1px solid rgba(239,68,68,0.25); }
 
-    .bookmarks-bar { background: var(--hbg); padding: 4px 10px; display: flex; gap: 4px; align-items: center; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; border-bottom: 1px solid #ddd; }
-    .bookmarks-bar::-webkit-scrollbar { display: none; }
-    .bm-item { padding: 3px 10px; background: #f5f5f5; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-weight: 600; color: #333; cursor: pointer; white-space: nowrap; transition: background .15s; display: flex; align-items: center; gap: 4px; user-select: none; }
-    .bm-item:hover { background: #e8e8e8; }
+    /* Ad block badge */
+    .adblocker-btn {
+      width:28px; height:28px; border-radius:8px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:15px; cursor:pointer; flex-shrink:0;
+      border:1px solid transparent; transition:all 0.2s;
+      position:relative;
+    }
+    .adblocker-btn:hover { background:var(--surface2); border-color:var(--border); }
+    .adblocker-btn.enabled { color:#4ade80; }
+    .adblocker-btn.disabled-state { color:var(--text3); }
+    .adblocker-count {
+      position:absolute; top:-4px; right:-4px;
+      background:var(--accent); color:#fff;
+      font-size:8px; font-weight:800; min-width:15px; height:15px;
+      border-radius:10px; display:flex; align-items:center; justify-content:center;
+      padding:0 3px; pointer-events:none;
+    }
 
-    /* ── Dropdowns ── */
-    .dropdown { position: fixed; background: #fff; border: 1px solid #ddd; border-radius: 8px; z-index: 99999; display: none; box-shadow: 0 8px 24px rgba(0,0,0,.2); min-width: 200px; max-height: 400px; overflow-y: auto; }
-    .dropdown.open { display: block; animation: ddIn .1s ease; }
-    @keyframes ddIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
-    #menuDropdown { right: 12px; min-width: 230px; }
-    #bookmarksDropdown, #historyDropdown { left: 10px; right: 10px; }
-    .dd-item { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #333; border-bottom: 1px solid #f0f0f0; }
-    .dd-item:last-child { border-bottom: none; }
-    .dd-item:hover { background: #f5f5f5; }
-    .dd-item svg { width: 16px; height: 16px; fill: #555; flex-shrink: 0; }
-    .dd-sep { height: 1px; background: #f0f0f0; margin: 2px 0; }
+    .toggle-btn {
+      position:fixed; top:8px; right:10px;
+      width:36px; height:36px; border-radius:9px;
+      background:var(--surface2); border:1px solid var(--border2);
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      z-index:99999; box-shadow:0 4px 16px rgba(0,0,0,0.4);
+      color:var(--text2); font-size:16px; transition:all 0.2s;
+    }
+    .toggle-btn:hover { background:var(--surface3); color:var(--text); }
+    .toggle-btn.collapsed { transform:rotate(180deg); }
 
-    /* ── Content ── */
-    .content { flex: 1; position: relative; overflow: hidden; }
-    .page { position: absolute; inset: 0; }
-    .page.hidden { display: none; }
+    .loading-bar { height:2px; background:transparent; position:relative; overflow:hidden; }
+    .loading-bar.active::after {
+      content:''; position:absolute; left:-40%; width:40%; height:100%;
+      background:linear-gradient(90deg,transparent,var(--accent),transparent);
+      animation:load 1.1s ease-in-out infinite;
+    }
+    @keyframes load { to { left:110%; } }
 
-    /* ── New tab page ── */
-    .ntp { position: absolute; inset: 0; background: linear-gradient(135deg,#1a1a2e,#16213e 50%,#0f3460); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: white; padding: 40px; overflow-y: auto; }
-    .ntp-logo { font-size: 48px; }
-    .ntp-title { font-size: 24px; font-weight: 700; letter-spacing: 2px; opacity: .9; }
-    .ntp-search { display: flex; width: 500px; max-width: 90vw; }
-    .ntp-search input { flex: 1; padding: 12px 16px; background: rgba(255,255,255,.1); border: 2px solid rgba(255,255,255,.2); border-right: none; border-radius: 10px 0 0 10px; color: white; font-family: 'Oxanium',sans-serif; font-size: 14px; outline: none; }
-    .ntp-search input::placeholder { color: rgba(255,255,255,.4); }
-    .ntp-search input:focus { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.5); }
-    .ntp-search button { padding: 12px 18px; background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.2); border-left: none; border-radius: 0 10px 10px 0; color: white; font-size: 16px; cursor: pointer; }
-    .ntp-search button:hover { background: rgba(255,255,255,.25); }
+    /* Bookmarks bar */
+    .bookmarks-bar {
+      background:rgba(14,20,32,0.9);
+      border-bottom:1px solid var(--border);
+      padding:4px 10px;
+      display:flex; gap:4px; align-items:center;
+      overflow-x:auto; scrollbar-width:none; flex-shrink:0;
+    }
+    .bookmarks-bar::-webkit-scrollbar { display:none; }
+    .bm-item {
+      padding:3px 10px; background:var(--surface2);
+      border:1px solid var(--border); border-radius:6px;
+      font-size:11px; font-weight:600; color:var(--text2);
+      cursor:pointer; white-space:nowrap;
+      transition:all 0.15s; display:flex; align-items:center; gap:4px;
+    }
+    .bm-item:hover { background:var(--surface3); color:var(--text); border-color:var(--border2); }
 
-    /* Proxy selector on NTP */
-    .proxy-section { width: 500px; max-width: 90vw; display: flex; flex-direction: column; gap: 8px; }
-    .proxy-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,.5); }
-    .proxy-row select { padding: 5px 10px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 6px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; cursor: pointer; flex: 1; }
-    .proxy-row select option { background: #1a1a2e; }
-    .proxy-note { font-size: 11px; color: rgba(255,255,255,.35); text-align: center; line-height: 1.5; }
-    .relay-section { display: none; flex-direction: column; gap: 6px; }
-    .relay-section.show { display: flex; }
-    .relay-row { display: flex; gap: 6px; }
-    .relay-row select { flex: 1; padding: 8px 10px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; cursor: pointer; }
-    .relay-row select option { background: #1a1a2e; }
-    .relay-input { flex: 2; padding: 8px 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 8px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; }
-    .relay-input::placeholder { color: rgba(255,255,255,.25); }
-    .relay-save { padding: 8px 14px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; cursor: pointer; white-space: nowrap; }
-    .relay-save:hover { background: rgba(255,255,255,.2); }
+    /* ══ DROPDOWNS ══ */
+    .dropdown {
+      position:fixed; background:var(--surface);
+      border:1px solid var(--border2); border-radius:12px;
+      z-index:99999; display:none;
+      box-shadow:0 16px 48px rgba(0,0,0,0.6);
+      min-width:220px; max-height:420px; overflow-y:auto;
+      animation:ddIn 0.15s ease;
+    }
+    .dropdown.open { display:block; }
+    @keyframes ddIn { from{opacity:0;transform:translateY(-6px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .dd-header {
+      padding:10px 14px 6px;
+      font-size:9px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
+      color:var(--text3); border-bottom:1px solid var(--border);
+    }
+    .dd-item {
+      padding:10px 14px; cursor:pointer;
+      display:flex; align-items:center; gap:10px;
+      font-size:13px; color:var(--text2);
+      transition:all 0.1s;
+    }
+    .dd-item:hover { background:var(--surface2); color:var(--text); }
+    .dd-item .dd-sub { font-size:10px; color:var(--text3); margin-top:1px; }
+    .dd-sep { height:1px; background:var(--border); margin:3px 0; }
+    .dd-item.danger:hover { background:rgba(239,68,68,0.1); color:#fca5a5; }
+    .dd-item.success-item { color:#4ade80; }
+    .dd-item.success-item:hover { background:rgba(34,197,94,0.1); }
 
-    /* ── External tab placeholder ── */
-    .ext-page { position: absolute; inset: 0; background: linear-gradient(135deg,#0d1b2a,#1a1040); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: white; text-align: center; padding: 40px; }
-    .ext-icon { font-size: 56px; }
-    .ext-title { font-size: 18px; font-weight: 700; }
-    .ext-url { font-size: 12px; color: rgba(255,255,255,.4); word-break: break-all; max-width: 500px; }
-    .ext-note { font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.6; max-width: 420px; }
-    .ext-open { padding: 10px 24px; background: #0078d4; border: none; border-radius: 10px; color: white; font-family: 'Oxanium',sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; }
-    .ext-open:hover { background: #006bbf; transform: translateY(-1px); }
+    /* ══ CONTENT ══ */
+    .content { flex:1; position:relative; overflow:hidden; }
+    .page { position:absolute; inset:0; }
+    .page.hidden { display:none; }
 
-    /* ── Direct iframe ── */
-    .direct-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; opacity: 0; transition: opacity .3s; }
-    .direct-iframe.loaded { opacity: 1; }
+    /* ══ NEW TAB PAGE ══ */
+    .ntp {
+      position:absolute; inset:0;
+      background:radial-gradient(ellipse 70% 60% at 30% 30%, rgba(0,120,212,0.08) 0%, transparent 65%), var(--bg);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:0; overflow-y:auto; padding:40px 20px;
+    }
+    .ntp-greeting {
+      font-size:13px; font-weight:600; letter-spacing:3px; text-transform:uppercase;
+      color:var(--text3); margin-bottom:6px;
+    }
+    .ntp-time {
+      font-size:64px; font-weight:800; letter-spacing:-2px;
+      color:var(--text); line-height:1;
+      text-shadow:0 0 60px rgba(0,120,212,0.3);
+      margin-bottom:4px;
+    }
+    .ntp-date {
+      font-size:13px; color:var(--text2); letter-spacing:1px;
+      margin-bottom:36px;
+    }
+    .ntp-search-wrap {
+      display:flex; width:520px; max-width:90vw;
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:16px; overflow:hidden;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4);
+      transition:all 0.2s;
+      margin-bottom:32px;
+    }
+    .ntp-search-wrap:focus-within {
+      border-color:rgba(0,120,212,0.5);
+      box-shadow:0 8px 32px rgba(0,0,0,0.4), 0 0 0 3px var(--accent-glow);
+    }
+    .ntp-engine {
+      padding:0 14px; background:var(--surface2);
+      border:none; border-right:1px solid var(--border);
+      color:var(--text2); font-family:'Oxanium',sans-serif;
+      font-size:12px; cursor:pointer; outline:none;
+    }
+    .ntp-engine option { background:var(--surface); }
+    .ntp-input {
+      flex:1; padding:14px 16px;
+      background:transparent; border:none;
+      color:var(--text); font-family:'Oxanium',sans-serif;
+      font-size:14px; outline:none;
+    }
+    .ntp-input::placeholder { color:var(--text3); }
+    .ntp-go {
+      padding:0 20px; background:var(--accent);
+      border:none; color:#fff; font-family:'Oxanium',sans-serif;
+      font-size:14px; font-weight:700; cursor:pointer; transition:background 0.2s;
+    }
+    .ntp-go:hover { background:#0090ff; }
 
-    /* ── Settings page ── */
-    .settings-page { position: absolute; inset: 0; background: #1e2130; color: #e8edf5; overflow-y: auto; font-family: 'Oxanium',sans-serif; }
-    .settings-page::-webkit-scrollbar { width: 6px; }
-    .settings-page::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
-    .settings-inner { max-width: 600px; margin: 0 auto; padding: 32px 24px; }
-    .settings-title { font-size: 22px; font-weight: 800; margin-bottom: 28px; letter-spacing: -.3px; }
-    .settings-section { margin-bottom: 28px; }
-    .settings-sec-label { font-size: 9px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 12px; }
-    .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; margin-bottom: 8px; }
-    .settings-row-label { font-size: 13px; font-weight: 600; }
-    .settings-row-sub { font-size: 11px; color: rgba(255,255,255,.35); margin-top: 2px; }
-    .s-select { padding: 6px 12px; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; cursor: pointer; }
-    .s-select option { background: #1e2130; }
-    .s-input { padding: 8px 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; color: white; font-family: 'Oxanium',sans-serif; font-size: 13px; outline: none; width: 260px; }
-    .s-input::placeholder { color: rgba(255,255,255,.25); }
-    .s-input:focus { border-color: #0078d4; background: rgba(0,120,212,.08); }
-    .s-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.07); color: rgba(255,255,255,.8); font-family: 'Oxanium',sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; transition: all .15s; }
-    .s-btn:hover { background: rgba(255,255,255,.12); color: white; }
-    .s-btn.danger { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.3); color: #fca5a5; }
-    .s-btn.danger:hover { background: rgba(239,68,68,.2); }
-    .s-btn.primary { background: #0078d4; border-color: #0078d4; color: white; }
-    .s-btn.primary:hover { background: #006bbf; }
-    .relay-config { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 8px; }
-    .relay-config input { padding: 8px 12px; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 7px; color: white; font-family: 'Oxanium',sans-serif; font-size: 12px; outline: none; }
-    .relay-config input::placeholder { color: rgba(255,255,255,.25); }
-    .relay-config input:focus { border-color: #0078d4; }
-    .s-toggle { width: 40px; height: 22px; border-radius: 11px; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; background: rgba(255,255,255,.15); }
-    .s-toggle.on { background: #0078d4; }
-    .s-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: left .2s; box-shadow: 0 1px 4px rgba(0,0,0,.3); }
-    .s-toggle.on::after { left: 21px; }
+    /* Quick tiles */
+    .ntp-tiles-label {
+      font-size:9px; font-weight:800; letter-spacing:3px;
+      text-transform:uppercase; color:var(--text3); margin-bottom:12px; align-self:flex-start;
+      width:520px; max-width:90vw;
+    }
+    .ntp-tiles {
+      display:grid; grid-template-columns:repeat(5,1fr);
+      gap:10px; width:520px; max-width:90vw; margin-bottom:28px;
+    }
+    .ntp-tile {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:14px 8px;
+      display:flex; flex-direction:column; align-items:center; gap:7px;
+      cursor:pointer; transition:all 0.2s; font-size:11px;
+      font-weight:600; color:var(--text2); text-align:center;
+    }
+    .ntp-tile:hover { background:var(--surface2); border-color:var(--border2); color:var(--text); transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .ntp-tile-icon { font-size:22px; }
+
+    /* Recent history */
+    .ntp-hist-label {
+      font-size:9px; font-weight:800; letter-spacing:3px;
+      text-transform:uppercase; color:var(--text3); margin-bottom:10px; align-self:flex-start;
+      width:520px; max-width:90vw;
+    }
+    .ntp-hist-row { display:flex; flex-direction:column; gap:4px; width:520px; max-width:90vw; }
+    .ntp-hist-item {
+      display:flex; align-items:center; gap:10px;
+      padding:8px 12px; background:var(--surface);
+      border:1px solid var(--border); border-radius:10px;
+      cursor:pointer; transition:all 0.15s; font-size:12px; color:var(--text2);
+    }
+    .ntp-hist-item:hover { background:var(--surface2); color:var(--text); border-color:var(--border2); }
+    .ntp-hist-item-url { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ntp-hist-item-time { font-size:10px; color:var(--text3); flex-shrink:0; }
+
+    /* ══ DIRECT IFRAME ══ */
+    .direct-iframe { position:absolute; inset:0; width:100%; height:100%; border:none; opacity:0; transition:opacity 0.3s; }
+    .direct-iframe.loaded { opacity:1; }
+
+    /* ══ SETTINGS PAGE ══ */
+    .settings-page {
+      position:absolute; inset:0;
+      background:var(--bg); overflow-y:auto;
+    }
+    .settings-inner { max-width:640px; margin:0 auto; padding:32px 24px 60px; }
+    .settings-hero {
+      display:flex; align-items:center; gap:14px; margin-bottom:32px;
+    }
+    .settings-hero-icon {
+      width:48px; height:48px; background:linear-gradient(135deg,var(--accent),#7c3aed);
+      border-radius:14px; display:flex; align-items:center; justify-content:center;
+      font-size:24px; box-shadow:0 4px 20px var(--accent-glow);
+    }
+    .settings-hero-title { font-size:22px; font-weight:800; }
+    .settings-hero-sub { font-size:12px; color:var(--text3); margin-top:2px; letter-spacing:0.5px; }
+
+    .settings-tabs {
+      display:flex; gap:4px; margin-bottom:24px;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:4px;
+    }
+    .settings-tab {
+      flex:1; padding:9px 12px; border-radius:9px;
+      font-size:12px; font-weight:700; cursor:pointer;
+      text-align:center; transition:all 0.2s; color:var(--text3);
+      border:none; background:transparent; font-family:'Oxanium',sans-serif;
+      letter-spacing:0.3px;
+    }
+    .settings-tab:hover { color:var(--text2); }
+    .settings-tab.active {
+      background:var(--accent); color:#fff;
+      box-shadow:0 2px 12px var(--accent-glow);
+    }
+
+    .settings-panel { display:none; }
+    .settings-panel.active { display:block; animation:panelIn 0.2s ease; }
+    @keyframes panelIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+    .s-section { margin-bottom:24px; }
+    .s-section-label {
+      font-size:9px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
+      color:var(--text3); margin-bottom:10px; padding-left:2px;
+    }
+    .s-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 16px; background:var(--surface);
+      border:1px solid var(--border); border-radius:12px; margin-bottom:6px;
+    }
+    .s-row-info { flex:1; min-width:0; }
+    .s-row-label { font-size:13px; font-weight:600; }
+    .s-row-sub { font-size:11px; color:var(--text3); margin-top:2px; line-height:1.5; }
+    .s-input {
+      padding:8px 12px; background:var(--surface2);
+      border:1px solid var(--border2); border-radius:8px;
+      color:var(--text); font-family:'Oxanium',sans-serif; font-size:13px; outline:none;
+      transition:all 0.2s; width:240px;
+    }
+    .s-input:focus { border-color:rgba(0,120,212,0.6); background:rgba(0,120,212,0.06); }
+    .s-input::placeholder { color:var(--text3); }
+    .s-select {
+      padding:8px 12px; background:var(--surface2);
+      border:1px solid var(--border2); border-radius:8px;
+      color:var(--text); font-family:'Oxanium',sans-serif; font-size:12px;
+      outline:none; cursor:pointer;
+    }
+    .s-select option { background:var(--surface); }
+    .s-btn {
+      padding:8px 18px; border-radius:9px;
+      font-family:'Oxanium',sans-serif; font-size:12px; font-weight:700;
+      cursor:pointer; transition:all 0.2s; border:1px solid var(--border2);
+      background:var(--surface2); color:var(--text2); letter-spacing:0.3px;
+    }
+    .s-btn:hover { background:var(--surface3); color:var(--text); }
+    .s-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 4px 14px var(--accent-glow); }
+    .s-btn.primary:hover { background:#0090ff; }
+    .s-btn.danger { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#fca5a5; }
+    .s-btn.danger:hover { background:rgba(239,68,68,0.2); }
+    .s-toggle {
+      width:44px; height:24px; border-radius:12px;
+      position:relative; cursor:pointer; transition:background 0.25s; flex-shrink:0;
+      background:rgba(255,255,255,0.12); border:none;
+    }
+    .s-toggle.on { background:var(--accent); }
+    .s-toggle::after {
+      content:''; position:absolute; top:3px; left:3px;
+      width:18px; height:18px; border-radius:50%;
+      background:#fff; transition:left 0.25s; box-shadow:0 1px 6px rgba(0,0,0,0.4);
+    }
+    .s-toggle.on::after { left:23px; }
+    .s-blocklist-textarea {
+      width:100%; height:140px; padding:10px 12px;
+      background:var(--surface2); border:1px solid var(--border2);
+      border-radius:8px; color:var(--text); font-family:monospace;
+      font-size:11px; outline:none; resize:vertical;
+      line-height:1.6; letter-spacing:0.3px;
+    }
+    .s-blocklist-textarea:focus { border-color:rgba(0,120,212,0.5); }
+    .s-full { width:100%; margin-top:8px; }
+    .s-row.vertical { flex-direction:column; align-items:flex-start; gap:10px; }
+    .s-shortcuts-grid {
+      display:grid; grid-template-columns:1fr 1fr; gap:6px;
+    }
+    .s-shortcut {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 12px; background:var(--surface2);
+      border:1px solid var(--border); border-radius:8px; font-size:12px;
+    }
+    .s-shortcut-desc { color:var(--text2); }
+    .s-shortcut-key {
+      background:var(--surface3); border:1px solid var(--border2);
+      border-radius:5px; padding:2px 8px; font-size:11px;
+      color:var(--text); font-family:monospace; letter-spacing:0.5px;
+    }
+
+    /* ══ KEYBOARD SHORTCUTS MODAL ══ */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.7);
+      backdrop-filter:blur(10px); z-index:99998;
+      display:none; align-items:center; justify-content:center; padding:20px;
+    }
+    .modal-overlay.open { display:flex; animation:modalIn 0.2s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes modalIn { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
+    .modal-box {
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:20px; width:100%; max-width:560px;
+      max-height:80vh; overflow:hidden; display:flex; flex-direction:column;
+      box-shadow:0 32px 80px rgba(0,0,0,0.7);
+    }
+    .modal-header {
+      padding:20px 24px 16px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; gap:12px;
+    }
+    .modal-title { font-size:17px; font-weight:800; flex:1; }
+    .modal-close-btn {
+      width:30px; height:30px; border-radius:8px;
+      background:var(--surface2); border:1px solid var(--border);
+      color:var(--text2); cursor:pointer; font-size:16px;
+      display:flex; align-items:center; justify-content:center; transition:all 0.15s;
+    }
+    .modal-close-btn:hover { background:var(--surface3); color:var(--text); }
+    .modal-search {
+      padding:12px 20px; border-bottom:1px solid var(--border);
+    }
+    .modal-search input {
+      width:100%; padding:9px 14px; background:var(--surface2);
+      border:1px solid var(--border2); border-radius:10px;
+      color:var(--text); font-family:'Oxanium',sans-serif; font-size:13px; outline:none;
+    }
+    .modal-search input:focus { border-color:rgba(0,120,212,0.5); }
+    .modal-search input::placeholder { color:var(--text3); }
+    .modal-body { overflow-y:auto; padding:16px 20px 24px; }
+    .shortcut-group { margin-bottom:20px; }
+    .shortcut-group-title {
+      font-size:9px; font-weight:800; letter-spacing:3px; text-transform:uppercase;
+      color:var(--text3); margin-bottom:10px;
+    }
+    .shortcut-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:9px 12px; border-radius:9px; font-size:13px; color:var(--text2);
+      transition:background 0.1s;
+    }
+    .shortcut-row:hover { background:var(--surface2); color:var(--text); }
+    .shortcut-keys { display:flex; gap:4px; }
+    .key-chip {
+      background:var(--surface3); border:1px solid var(--border2);
+      border-radius:5px; padding:2px 8px;
+      font-size:11px; font-family:monospace; color:var(--text); letter-spacing:0.5px;
+    }
+
+    /* ══ AD BLOCKER TOAST ══ */
+    .block-toast {
+      position:fixed; bottom:16px; left:50%;
+      transform:translateX(-50%) translateY(60px);
+      background:var(--surface); border:1px solid var(--border2);
+      padding:10px 18px; border-radius:12px;
+      font-size:13px; font-weight:600; display:flex; align-items:center; gap:10px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.5); z-index:99999;
+      opacity:0; pointer-events:none;
+      transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .block-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .block-toast-dot { width:8px; height:8px; border-radius:50%; background:var(--green); }
+
+    /* ══ MENU DROPDOWN ══ */
+    #menuDropdown { right:12px; min-width:240px; }
+
+    /* ══ EXT PAGE ══ */
+    .ext-page {
+      position:absolute; inset:0;
+      background:var(--bg);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      gap:14px; color:var(--text); text-align:center; padding:40px;
+    }
+    .ext-icon { font-size:52px; }
+    .ext-title { font-size:18px; font-weight:700; }
+    .ext-url { font-size:11px; color:var(--text3); word-break:break-all; max-width:480px; }
+    .ext-note { font-size:13px; color:var(--text2); line-height:1.65; max-width:400px; }
+    .ext-open {
+      padding:10px 24px; background:var(--accent); border:none;
+      border-radius:10px; color:#fff; font-family:'Oxanium',sans-serif;
+      font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s;
+      box-shadow:0 4px 16px var(--accent-glow);
+    }
+    .ext-open:hover { background:#0090ff; transform:translateY(-2px); }
   </style>
 </head>
 <body>
 
-  <button class="toggle-btn" id="toggleBtn">
-    <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
-  </button>
+  <!-- Toggle header button -->
+  <button class="toggle-btn" id="toggleBtn" title="Toggle browser bar (Alt+H)">▲</button>
 
+  <!-- Header -->
   <div class="header" id="header">
     <div class="tab-bar" id="tabBar">
-      <button class="new-tab-btn" id="newTabBtn">+</button>
+      <button class="new-tab-btn" id="newTabBtn" title="New Tab (Ctrl+T)">+</button>
     </div>
     <div class="top-row">
-      <div class="nav-btn disabled" id="backBtn"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></div>
-      <div class="nav-btn disabled" id="fwdBtn"><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></div>
-      <div class="nav-btn" id="homeBtn"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></div>
-      <div class="nav-btn" id="refreshBtn"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></div>
+      <div class="nav-btn disabled" id="backBtn" title="Back (Alt+←)">◀</div>
+      <div class="nav-btn disabled" id="fwdBtn" title="Forward (Alt+→)">▶</div>
+      <div class="nav-btn" id="homeBtn" title="Home (Alt+Home)">⌂</div>
+      <div class="nav-btn" id="refreshBtn" title="Reload (Ctrl+R)">↻</div>
       <div class="url-bar">
-        <img class="favicon" id="favicon" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3C/svg%3E" alt="">
-        <input class="url-input" id="urlInput" type="text" placeholder="Enter URL or search…">
+        <span class="url-security" id="urlSecurity">🔒</span>
+        <input class="url-input" id="urlInput" type="text" placeholder="Search or enter URL…" spellcheck="false" autocomplete="off">
         <span class="url-badge" id="urlBadge" style="display:none"></span>
       </div>
-      <div class="menu-btn" id="menuBtn">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+      <div class="adblocker-btn enabled" id="adBlockBtn" title="Ad Blocker (Ctrl+Shift+A)">🛡️<span class="adblocker-count" id="blockCount" style="display:none">0</span></div>
+      <div class="nav-btn" id="menuBtn" title="Menu (Alt+M)" style="font-size:18px; position:relative;">⋮
         <div class="dropdown" id="menuDropdown">
-          <div class="dd-item" id="ddBookmark">🔖 Bookmark this page</div>
-          <div class="dd-item" id="ddBookmarks">📚 Show bookmarks</div>
-          <div class="dd-item" id="ddHistory">🕐 History</div>
+          <div class="dd-header">ServerplexOS Browser</div>
+          <div class="dd-item" id="ddBookmark">🔖 <div><div>Bookmark this page</div></div></div>
+          <div class="dd-item" id="ddBookmarks">📚 <div><div>Bookmarks</div></div></div>
+          <div class="dd-item" id="ddHistory">🕐 <div><div>History</div></div></div>
           <div class="dd-sep"></div>
-          <div class="dd-item" id="ddSettings">⚙️ Settings</div>
+          <div class="dd-item" id="ddPinTab">📌 <div><div>Pin Tab</div></div></div>
+          <div class="dd-item" id="ddDuplicate">⧉ <div><div>Duplicate Tab</div></div></div>
+          <div class="dd-item" id="ddCloseOthers">✕ <div><div>Close Other Tabs</div></div></div>
+          <div class="dd-sep"></div>
+          <div class="dd-item" id="ddShortcuts">⌨️ <div><div>Keyboard Shortcuts</div><div class="dd-sub">Press ? anytime</div></div></div>
+          <div class="dd-item" id="ddSettings">⚙️ <div><div>Settings</div></div></div>
         </div>
       </div>
     </div>
     <div class="loading-bar" id="loadingBar"></div>
   </div>
 
+  <!-- Bookmarks bar -->
   <div class="bookmarks-bar" id="bookmarksBar">
     <span class="bm-item" onclick="navigate('https://google.com')">🔍 Google</span>
     <span class="bm-item" onclick="navigate('https://wikipedia.org')">📖 Wikipedia</span>
     <span class="bm-item" onclick="navigate('https://github.com')">💻 GitHub</span>
     <span class="bm-item" onclick="navigate('https://youtube.com')">▶️ YouTube</span>
+    <span class="bm-item" onclick="navigate('https://reddit.com')">🤖 Reddit</span>
   </div>
 
+  <!-- Dropdowns (outside header to avoid clipping) -->
   <div class="dropdown" id="bookmarksDropdown"></div>
   <div class="dropdown" id="historyDropdown"></div>
 
+  <!-- Content area -->
   <div class="content" id="content"></div>
 
+  <!-- Keyboard shortcuts modal -->
+  <div class="modal-overlay" id="shortcutsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span style="font-size:20px">⌨️</span>
+        <div class="modal-title">Keyboard Shortcuts</div>
+        <button class="modal-close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-search">
+        <input type="text" id="shortcutSearch" placeholder="Search shortcuts…" oninput="filterShortcuts()">
+      </div>
+      <div class="modal-body" id="shortcutsList"></div>
+    </div>
+  </div>
+
+  <!-- Ad block toast -->
+  <div class="block-toast" id="blockToast">
+    <div class="block-toast-dot"></div>
+    <span id="blockToastMsg">Ad blocked</span>
+  </div>
+
 <script>
+'use strict';
+
+// ════════════════════════════════════════════════════
+//  AD BLOCKER LISTS
+// ════════════════════════════════════════════════════
+const DEFAULT_BLOCKLIST = [
+  'doubleclick.net','googlesyndication.com','googletagmanager.com','googletagservices.com',
+  'googleadservices.com','adnxs.com','adsrvr.org','casalemedia.com','rubiconproject.com',
+  'pubmatic.com','openx.net','criteo.com','taboola.com','outbrain.com','revcontent.com',
+  'advertising.com','adfox.ru','moatads.com','scorecardresearch.com','quantserve.com',
+  'chartbeat.com','hotjar.com','optimizely.com','mouseflow.com','fullstory.com',
+  'analytics.google.com','facebook.net','connect.facebook.net','amazon-adsystem.com',
+  'ads.yahoo.com','syndication.twitter.com','static.ads-twitter.com','ads.linkedin.com',
+  'bat.bing.com','t.co','pixel.quantserve.com','ib.adnxs.com','ads.pubmatic.com',
+  'prebid.org','yieldmo.com','appnexus.com','adroll.com','bluekai.com','mathtag.com',
+  'demdex.net','exelator.com','adsymptotic.com','adzerk.net','bidswitch.net',
+];
+
+let adBlockEnabled = localStorage.getItem('spl_adb_enabled') !== 'false';
+let adBlockList    = JSON.parse(localStorage.getItem('spl_adb_list') || 'null') || DEFAULT_BLOCKLIST;
+let blockedCount   = 0;
+let sessionBlockCount = 0;
+
+function isBlocked(url) {
+  if (!adBlockEnabled) return false;
+  try {
+    const host = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+    return adBlockList.some(d => host === d || host.endsWith('.' + d));
+  } catch(e) { return false; }
+}
+
+function updateBlockBadge() {
+  const el = document.getElementById('blockCount');
+  const btn = document.getElementById('adBlockBtn');
+  btn.className = 'adblocker-btn ' + (adBlockEnabled ? 'enabled' : 'disabled-state');
+  if (adBlockEnabled && sessionBlockCount > 0) {
+    el.style.display = '';
+    el.textContent = sessionBlockCount > 99 ? '99+' : sessionBlockCount;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function showBlockToast(domain) {
+  const el = document.getElementById('blockToast');
+  document.getElementById('blockToastMsg').textContent = 'Blocked: ' + domain;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+document.getElementById('adBlockBtn').onclick = (e) => {
+  e.stopPropagation();
+  adBlockEnabled = !adBlockEnabled;
+  localStorage.setItem('spl_adb_enabled', adBlockEnabled);
+  sessionBlockCount = 0;
+  updateBlockBadge();
+};
+
 // ════════════════════════════════════════════════════
 //  STATE
 // ════════════════════════════════════════════════════
-const DEF_FAV = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23999' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z'/%3E%3C/svg%3E";
+// Only use a user-configured ScramJet URL — no public fallbacks (they block iframing)
+function getSjUrl() { return (localStorage.getItem('spl_sj_app') || '').trim().replace(/\/$/, ''); }
+let sjUrlIndex = 0;
 
-// Tab types:
-//  'ntp'      — new tab / home page
-//  'direct'   — loaded in iframe (Direct mode)
-//  'external' — opened via window.open in proxy modes, shows placeholder card
-//  'settings' — settings page (kept alive, never reloaded)
-let tabs = [];
-let activeId = 0, tabCounter = 0, isCollapsed = false;
-let globalHistory = JSON.parse(sessionStorage.getItem('bw_hist') || '[]');
-
-// Settings iframe kept alive so it never reloads
+let tabs        = [];
+let activeId    = 0;
+let tabCounter  = 0;
+let isCollapsed = false;
 let settingsPage = null;
+let globalHistory = JSON.parse(sessionStorage.getItem('spl_hist') || '[]');
 
-const $  = id => document.getElementById(id);
-const header    = $('header');
-const tabBar    = $('tabBar');
-const content   = $('content');
-const urlInput  = $('urlInput');
-const loadingBar= $('loadingBar');
-const favicon   = $('favicon');
-const backBtn   = $('backBtn');
-const fwdBtn    = $('fwdBtn');
-const menuDD    = $('menuDropdown');
-const bmDD      = $('bookmarksDropdown');
-const histDD    = $('historyDropdown');
+const $ = id => document.getElementById(id);
+const header     = $('header');
+const tabBar     = $('tabBar');
+const content    = $('content');
+const urlInput   = $('urlInput');
+const loadingBar = $('loadingBar');
+const backBtn    = $('backBtn');
+const fwdBtn     = $('fwdBtn');
+const menuDD     = $('menuDropdown');
+const bmDD       = $('bookmarksDropdown');
+const histDD     = $('historyDropdown');
 
-function getTab(id)  { return tabs.find(t => t.id === id); }
+function getTab(id) { return tabs.find(t => t.id === id); }
 function activeTab() { return getTab(activeId); }
 
 // ════════════════════════════════════════════════════
 //  HEADER TOGGLE
 // ════════════════════════════════════════════════════
-$('toggleBtn').onclick = () => {
+$('toggleBtn').onclick = toggleHeader;
+function toggleHeader() {
   isCollapsed = !isCollapsed;
   header.classList.toggle('collapsed', isCollapsed);
+  $('toggleBtn').textContent = isCollapsed ? '▼' : '▲';
   $('toggleBtn').classList.toggle('collapsed', isCollapsed);
-  header.style.marginBottom = isCollapsed ? '-' + header.offsetHeight + 'px' : '0';
-};
-
-// Primary and fallback ScramJet URLs
-const SJ_URLS = [
-  localStorage.getItem('bw_sj_app'),
-  'https://holyunblocker.org',
-  'https://cname.holyunblocker.org',
-].filter(Boolean);
-
-let sjUrlIndex = 0;
-const SCRAMJET_URL = SJ_URLS[sjUrlIndex];
+  if (isCollapsed) {
+    header.style.marginBottom = '-' + header.offsetHeight + 'px';
+  } else {
+    header.style.marginBottom = '0';
+  }
+}
 
 // ════════════════════════════════════════════════════
-//  PAGES — kept in DOM, shown/hidden
+//  PAGES
 // ════════════════════════════════════════════════════
 function showPage(id) {
   content.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
@@ -272,7 +734,7 @@ function ensureSettingsPage() {
   div.innerHTML = buildSettingsHTML();
   content.appendChild(div);
   settingsPage = div;
-  initSettings(div);
+  initSettingsListeners(div);
   return div;
 }
 
@@ -289,46 +751,71 @@ function updateNavBtns() {
 
 function updateUrlBar() {
   const t = activeTab();
-  const badge = $('urlBadge');
-  favicon.src = DEF_FAV;
+  const badge    = $('urlBadge');
+  const security = $('urlSecurity');
+
   if (!t || t.type === 'ntp') {
-    urlInput.value = ''; badge.style.display = 'none'; return;
+    urlInput.value = '';
+    badge.style.display = 'none';
+    security.textContent = '🌐';
+    return;
   }
   if (t.type === 'settings') {
-    urlInput.value = 'browser://settings'; badge.style.display = 'none'; return;
+    urlInput.value = 'serverplex://settings';
+    badge.style.display = 'none';
+    security.textContent = '⚙️';
+    return;
   }
+
   urlInput.value = t.url || '';
-  const m = mode();
+
+  // Security icon
+  if (t.url && t.url.startsWith('https://')) {
+    security.textContent = '🔒';
+    security.title = 'Secure (HTTPS)';
+  } else if (t.url && t.url.startsWith('http://')) {
+    security.textContent = '⚠️';
+    security.title = 'Not secure (HTTP)';
+  } else {
+    security.textContent = '🌐';
+    security.title = '';
+  }
+
   if (t.type === 'direct') {
     badge.className = 'url-badge direct'; badge.textContent = 'DIRECT'; badge.style.display = '';
-    try { favicon.src = new URL(t.url).origin + '/favicon.ico'; } catch(e) {}
-  } else if (t.type === 'external') {
-    badge.className = 'url-badge ' + (m === 'cors' ? 'proxied' : 'external');
-    badge.textContent = m.toUpperCase(); badge.style.display = '';
+  } else if (t.type === 'scramjet') {
+    badge.className = 'url-badge proxied'; badge.textContent = 'PROXY'; badge.style.display = '';
   } else {
     badge.style.display = 'none';
   }
 }
 
 function saveTabs() {
-  sessionStorage.setItem('bw_tabs',   JSON.stringify(tabs.map(t => ({ id:t.id, type:t.type, url:t.url, title:t.title, proxiedUrl:t.proxiedUrl, history:t.history||[], histIdx:t.histIdx||0 }))));
-  sessionStorage.setItem('bw_active', activeId);
-  sessionStorage.setItem('bw_ctr',    tabCounter);
+  try {
+    sessionStorage.setItem('spl_tabs', JSON.stringify(tabs.map(t => ({
+      id:t.id, type:t.type, url:t.url, title:t.title,
+      history:t.history||[], histIdx:t.histIdx||0, pinned:!!t.pinned
+    }))));
+    sessionStorage.setItem('spl_active', activeId);
+    sessionStorage.setItem('spl_ctr', tabCounter);
+  } catch(e) {}
 }
 
 function renderTabs() {
   tabBar.querySelectorAll('.tab').forEach(el => el.remove());
   tabs.forEach(t => {
     const el = document.createElement('div');
-    el.className = 'tab' + (t.id === activeId ? ' active' : '') + (t.type === 'external' ? ' external-tab' : '');
+    el.className = 'tab' + (t.id === activeId ? ' active' : '') + (t.pinned ? ' pinned' : '') + (t.type === 'settings' ? ' settings-tab' : '');
     el.dataset.id = t.id;
-    const icon = t.type === 'settings' ? '⚙️' : t.type === 'external' ? '🔗' : '🌐';
+    const icon = t.type === 'settings' ? '⚙️' : t.type === 'ntp' ? '🏠' : '🌐';
+    const titleText = t.pinned ? '' : (t.title || 'New Tab');
     el.innerHTML = `<span class="tab-favicon">${icon}</span>
-      <span class="tab-title">${t.title || 'New Tab'}</span>
-      ${t.type === 'external' ? '<span class="tab-ext-badge">EXT</span>' : ''}
-      <span class="tab-close">✕</span>`;
-    el.querySelector('.tab-close').onclick = e => { e.stopPropagation(); closeTab(t.id); };
-    el.onclick = e => { if (!e.target.classList.contains('tab-close')) switchTab(t.id); };
+      <span class="tab-title" title="${t.title||''}">${titleText}</span>
+      ${!t.pinned ? '<span class="tab-close" title="Close (Ctrl+W)">✕</span>' : ''}`;
+    el.querySelector('.tab-close')?.addEventListener('click', e => { e.stopPropagation(); closeTab(t.id); });
+    el.addEventListener('click', e => { if (!e.target.classList.contains('tab-close')) switchTab(t.id); });
+    // Middle-click to close
+    el.addEventListener('auxclick', e => { if (e.button === 2) closeTab(t.id); });
     tabBar.insertBefore(el, $('newTabBtn'));
   });
   saveTabs();
@@ -338,15 +825,12 @@ function switchTab(id) {
   activeId = id;
   const t = activeTab();
   if (!t) return;
-
-  // Show the right page
   if (t.type === 'settings') {
     ensureSettingsPage();
     showPage('settings');
   } else {
     showPage('tab-' + id);
   }
-
   updateNavBtns();
   updateUrlBar();
   renderTabs();
@@ -354,56 +838,169 @@ function switchTab(id) {
 
 function createTab(url) {
   const id = tabCounter++;
-  const t = { id, type: 'ntp', url: '', title: 'New Tab', history: [], histIdx: -1, proxiedUrl: '' };
+  const t = { id, type:'ntp', url:'', title:'New Tab', history:[], histIdx:-1, pinned:false };
   tabs.push(t);
   activeId = id;
-
-  // Create the page container
   const div = document.createElement('div');
   div.className = 'page';
   div.setAttribute('data-page', 'tab-' + id);
   content.appendChild(div);
-
   renderTabs();
   if (url) { loadUrl(url); }
-  else { showHomepage(div); switchTab(id); }
+  else { showNTP(div, t); switchTab(id); }
   return t;
 }
 
 function closeTab(id) {
-  if (tabs.length === 1) return;
+  if (tabs.length === 1) { createTab(); }
   const idx = tabs.findIndex(t => t.id === id);
-  // Remove page from DOM
   const page = content.querySelector('[data-page="tab-' + id + '"]');
   if (page) page.remove();
   tabs.splice(idx, 1);
+  if (tabs.length === 0) { createTab(); return; }
   if (activeId === id) {
     activeId = tabs[Math.max(0, idx - 1)].id;
     switchTab(activeId);
   } else renderTabs();
 }
 
+function pinTab(id) {
+  const t = getTab(id || activeId);
+  if (!t) return;
+  t.pinned = !t.pinned;
+  // Move pinned tabs to front
+  tabs.sort((a,b) => (b.pinned?1:0) - (a.pinned?1:0));
+  renderTabs();
+}
+
+function duplicateTab(id) {
+  const t = getTab(id || activeId);
+  if (!t || !t.url) { createTab(); return; }
+  createTab(t.url);
+}
+
+function closeOtherTabs(id) {
+  const keep = id || activeId;
+  [...tabs].forEach(t => { if (t.id !== keep) closeTab(t.id); });
+}
+
 // ════════════════════════════════════════════════════
-//  HOME PAGE (new tab)
+//  NEW TAB PAGE
 // ════════════════════════════════════════════════════
-function showHomepage(container) {
-  const t = activeTab();
-  if (t) { t.type = 'ntp'; t.url = ''; t.title = 'New Tab'; }
+const QUICK_TILES = [
+  {icon:'🔍', label:'Google',    url:'https://google.com'},
+  {icon:'▶️', label:'YouTube',   url:'https://youtube.com'},
+  {icon:'💻', label:'GitHub',    url:'https://github.com'},
+  {icon:'📖', label:'Wikipedia', url:'https://wikipedia.org'},
+  {icon:'🤖', label:'Reddit',    url:'https://reddit.com'},
+];
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
+function showNTP(container, t) {
+  t.type = 'ntp'; t.url = ''; t.title = 'New Tab';
+  const userName = localStorage.getItem('eclipseos_username') || localStorage.getItem('serverplex_username') || '';
+
+  const recentHist = globalHistory.slice(0, 4);
+  const histHTML = recentHist.length ? recentHist.map(h => {
+    const ago = h.ts ? timeAgo(h.ts) : '';
+    return `<div class="ntp-hist-item" onclick="navigate('${h.url.replace(/'/g,"\\'")}')">
+      🕐 <span class="ntp-hist-item-url">${h.url}</span>
+      ${ago ? `<span class="ntp-hist-item-time">${ago}</span>` : ''}
+    </div>`;
+  }).join('') : '<div style="font-size:12px;color:var(--text3);padding:8px 12px;">No recent history</div>';
 
   container.innerHTML = `<div class="ntp">
-    <div class="ntp-logo">🌐</div>
-    <div class="ntp-title">EclipseOS Browser</div>
-    <div class="ntp-search">
-      <input id="ntpQ" type="text" placeholder="Enter a URL or search…">
-      <button id="ntpGo">→</button>
+    <div class="ntp-greeting">${getGreeting()}${userName ? ', ' + userName : ''}</div>
+    <div class="ntp-time" id="ntpClock">--:--</div>
+    <div class="ntp-date" id="ntpDate"></div>
+    <div class="ntp-search-wrap">
+      <select class="ntp-engine" id="ntpEngine">
+        <option value="https://google.com/search?q=" ${(localStorage.getItem('spl_engine')||'google')==='google'?'selected':''}>Google</option>
+        <option value="https://duckduckgo.com/?q=" ${(localStorage.getItem('spl_engine')||'')==='ddg'?'selected':''}>DuckDuckGo</option>
+        <option value="https://www.bing.com/search?q=" ${(localStorage.getItem('spl_engine')||'')==='bing'?'selected':''}>Bing</option>
+        <option value="https://search.brave.com/search?q=" ${(localStorage.getItem('spl_engine')||'')==='brave'?'selected':''}>Brave</option>
+      </select>
+      <input class="ntp-input" id="ntpQ" placeholder="Search the web or enter a URL…" autocomplete="off" spellcheck="false">
+      <button class="ntp-go" id="ntpGo">Go →</button>
     </div>
+    <div class="ntp-tiles-label">Quick Access</div>
+    <div class="ntp-tiles">
+      ${QUICK_TILES.map(tile => `
+        <div class="ntp-tile" onclick="navigate('${tile.url}')">
+          <div class="ntp-tile-icon">${tile.icon}</div>
+          <div>${tile.label}</div>
+        </div>`).join('')}
+    </div>
+    <div class="ntp-hist-label">Recent History</div>
+    <div class="ntp-hist-row">${histHTML}</div>
   </div>`;
 
+  // Clock
+  function tickNTP() {
+    const now  = new Date();
+    const fmt  = localStorage.getItem('spl_clock_fmt') || localStorage.getItem('eclipseos_clock_format') || '12';
+    let h = now.getHours(), m = String(now.getMinutes()).padStart(2,'0'), timeStr;
+    if (fmt === '24') {
+      timeStr = String(h).padStart(2,'0') + ':' + m;
+    } else {
+      const ap = h >= 12 ? 'PM' : 'AM'; h = h%12||12;
+      timeStr = h + ':' + m + ' ' + ap;
+    }
+    const cl = container.querySelector('#ntpClock');
+    const dl = container.querySelector('#ntpDate');
+    if (cl) cl.textContent = timeStr;
+    if (dl) {
+      const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      dl.textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate() + ' ' + now.getFullYear();
+    }
+  }
+  tickNTP();
+  const ntpTick = setInterval(() => {
+    if (!document.contains(container)) { clearInterval(ntpTick); return; }
+    tickNTP();
+  }, 1000);
+
   const ntpQ = container.querySelector('#ntpQ');
-  container.querySelector('#ntpGo').onclick = () => navigate(ntpQ.value.trim());
-  ntpQ.onkeydown = e => { if (e.key === 'Enter') navigate(ntpQ.value.trim()); };
-  setTimeout(() => ntpQ.focus(), 50);
+  const ntpEngine = container.querySelector('#ntpEngine');
+  container.querySelector('#ntpGo').onclick = () => doNTPSearch();
+  ntpQ.onkeydown = e => { if (e.key === 'Enter') doNTPSearch(); };
+  ntpEngine.onchange = () => {
+    const map = {
+      'https://google.com/search?q=':'google',
+      'https://duckduckgo.com/?q=':'ddg',
+      'https://www.bing.com/search?q=':'bing',
+      'https://search.brave.com/search?q=':'brave',
+    };
+    localStorage.setItem('spl_engine', map[ntpEngine.value] || 'google');
+  };
+  function doNTPSearch() {
+    const q = ntpQ.value.trim();
+    if (!q) return;
+    if (q.includes('.') && !q.includes(' ') && !q.startsWith('http')) {
+      navigate('https://' + q);
+    } else if (/^https?:\/\//.test(q)) {
+      navigate(q);
+    } else {
+      navigate(ntpEngine.value + encodeURIComponent(q));
+    }
+  }
+  setTimeout(() => ntpQ.focus(), 100);
   updateUrlBar();
+}
+
+function timeAgo(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60000)   return 'just now';
+  if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+  if (diff < 86400000)return Math.floor(diff/3600000) + 'h ago';
+  return Math.floor(diff/86400000) + 'd ago';
 }
 
 // ════════════════════════════════════════════════════
@@ -413,7 +1010,12 @@ function navigate(raw) {
   if (!raw) return;
   let url = raw.trim();
   if (!url.includes('.') || url.includes(' ')) {
-    url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+    const eng = localStorage.getItem('spl_engine') || 'google';
+    const engines = {
+      google:'https://google.com/search?q=', ddg:'https://duckduckgo.com/?q=',
+      bing:'https://www.bing.com/search?q=', brave:'https://search.brave.com/search?q=',
+    };
+    url = (engines[eng]||engines.google) + encodeURIComponent(url);
   } else if (!/^https?:\/\//i.test(url)) {
     url = 'https://' + url;
   }
@@ -422,33 +1024,54 @@ function navigate(raw) {
 
 function loadUrl(url) {
   const t = activeTab(); if (!t) return;
-  const isLocal = /^(os-apps|browser|\.\/|settings\/)/.test(url);
+  if (isBlocked(url)) {
+    try {
+      const host = new URL(url).hostname;
+      sessionBlockCount++;
+      updateBlockBadge();
+      showBlockToast(host);
+    } catch(e) {}
+    return;
+  }
 
   t.url = url;
   t.history = (t.history || []).slice(0, (t.histIdx||0) + 1);
   t.history.push(url);
   t.histIdx = t.history.length - 1;
+
+  // History entry
   try {
-    globalHistory.unshift({ url, title: new URL(url.startsWith('http') ? url : 'https://' + url).hostname.replace('www.','') });
-    if (globalHistory.length > 200) globalHistory.pop();
-    sessionStorage.setItem('bw_hist', JSON.stringify(globalHistory));
+    const hostname = new URL(url).hostname.replace('www.','');
+    globalHistory.unshift({ url, title: hostname, ts: Date.now() });
+    if (globalHistory.length > 500) globalHistory.pop();
+    sessionStorage.setItem('spl_hist', JSON.stringify(globalHistory));
   } catch(e) {}
+
+  try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
 
   const container = content.querySelector('[data-page="tab-' + t.id + '"]');
   if (!container) return;
 
-  try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
-
+  const isLocal = /^(os-apps|browser|settings\/|\.\/|serverplex-)/.test(url);
   if (isLocal) {
     t.type = 'direct';
     loadDirectIframe(container, t, url);
   } else {
-    t.type = 'scramjet';
-    loadScramjetFrame(container, t, url, SCRAMJET_URL.replace(/\/$/, ''));
+    const sjUrl = getSjUrl();
+    if (sjUrl) {
+      t.type = 'scramjet';
+      loadScramjetFrame(container, t, url);
+    } else {
+      // No proxy configured — show helpful setup screen
+      t.type = 'noproxy';
+      showNoProxyScreen(container, url);
+    }
   }
 
   showPage('tab-' + t.id);
-  updateNavBtns(); updateUrlBar(); renderTabs();
+  updateNavBtns();
+  updateUrlBar();
+  renderTabs();
 }
 
 function loadDirectIframe(container, t, url) {
@@ -457,36 +1080,63 @@ function loadDirectIframe(container, t, url) {
   const iframe = document.createElement('iframe');
   iframe.className = 'direct-iframe';
   iframe.src = url;
-  if (!/^(os-apps|browser|\.\/|settings\/)/.test(url)) {
-    // No allow-popups — forces everything to stay in the iframe
-    // allow-top-navigation-by-user-activation lets anchor clicks navigate the frame itself
+  if (!/^(os-apps|browser|settings\/)/.test(url)) {
     iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-modals allow-presentation allow-downloads allow-top-navigation-by-user-activation');
     iframe.setAttribute('allow', 'autoplay; fullscreen');
   }
   iframe.onload = () => {
     iframe.classList.add('loaded');
     loadingBar.classList.remove('active');
-    // Best-effort: for same-origin frames, override window.open to open a new browser tab inside EclipseOS
     try {
-      iframe.contentWindow.open = function(url) {
-        if (url) createTab(url);
-        return null;
-      };
-    } catch(e) { /* cross-origin — can't touch it, sandbox handles it */ }
+      iframe.contentWindow.open = (u) => { if(u) createTab(u); return null; };
+    } catch(e) {}
   };
+  iframe.onerror = () => loadingBar.classList.remove('active');
   container.appendChild(iframe);
-  showPage('tab-' + t.id);
-  setTimeout(() => loadingBar.classList.remove('active'), 6000);
+  setTimeout(() => loadingBar.classList.remove('active'), 8000);
 }
 
-function showHomepageCurrent() {
-  const t = activeTab(); if (!t) return;
-  const container = content.querySelector('[data-page="tab-' + t.id + '"]');
-  if (container) showHomepage(container);
-  switchTab(t.id);
+function showNoProxyScreen(container, originalUrl) {
+  loadingBar.classList.remove('active');
+  container.innerHTML = `<div class="ext-page">
+    <div class="ext-icon">🔒</div>
+    <div class="ext-title">No Proxy Configured</div>
+    <div class="ext-url">${originalUrl}</div>
+    <div class="ext-note">
+      External sites require a ScramJet proxy to load here.<br>
+      Public proxies block iframing, so you need your own deployment.
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;max-width:420px;margin-top:4px">
+      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:18px 20px;width:100%;font-size:13px;line-height:2;color:var(--text2)">
+        <div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Setup steps</div>
+        <div>1. Fork <a href="https://github.com/MercuryWorkshop/scramjet" target="_blank" style="color:var(--accent)">MercuryWorkshop/scramjet</a> on GitHub</div>
+        <div>2. Deploy to <strong style="color:var(--text)">Cloudflare Pages</strong></div>
+        <div style="color:var(--text3);font-size:11px;padding-left:14px">Output dir: <code style="background:var(--surface3);padding:1px 6px;border-radius:4px">public</code> · No build command</div>
+        <div>3. Paste your <code style="background:var(--surface3);padding:1px 6px;border-radius:4px">*.pages.dev</code> URL in Settings</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="ext-open" onclick="openSettings()">⚙️ Open Settings</button>
+        <button class="ext-open" style="background:var(--surface2);border:1px solid var(--border2);box-shadow:none" onclick="window.open('${originalUrl.replace(/'/g,"\\'")}','_blank')">↗ Open in New Tab</button>
+      </div>
+    </div>
+  </div>`;
 }
 
-function loadScramjetFrame(container, t, originalUrl, sjBase) {
+function openSettings() {
+  const existing = tabs.find(t => t.type === 'settings');
+  if (existing) { switchTab(existing.id); return; }
+  const id = tabCounter++;
+  const t = { id, type:'settings', url:'serverplex://settings', title:'Settings', history:[], histIdx:-1, pinned:false };
+  tabs.push(t);
+  activeId = id;
+  ensureSettingsPage();
+  renderTabs();
+  switchTab(id);
+}
+
+function loadScramjetFrame(container, t, originalUrl) {
+  const sjBase = getSjUrl();
+  if (!sjBase) { showNoProxyScreen(container, originalUrl); return; }
   loadingBar.classList.add('active');
   container.innerHTML = '';
   const iframe = document.createElement('iframe');
@@ -495,77 +1145,89 @@ function loadScramjetFrame(container, t, originalUrl, sjBase) {
   iframe.src = sjBase + '/?url=' + encodeURIComponent(originalUrl);
   iframe.onload = () => { iframe.classList.add('loaded'); loadingBar.classList.remove('active'); };
   iframe.onerror = () => {
-    // Try next fallback URL
-    sjUrlIndex++;
-    if (sjUrlIndex < SJ_URLS.length) {
-      iframe.src = SJ_URLS[sjUrlIndex] + '/?url=' + encodeURIComponent(originalUrl);
-    } else {
-      loadingBar.classList.remove('active');
-      container.innerHTML = `<div class="ext-page">
-        <div class="ext-icon">⚠️</div>
-        <div class="ext-title">ScramJet unavailable</div>
-        <div class="ext-note">All proxy servers appear to be down. Try again later or set a custom ScramJet URL in Settings.</div>
-        <button class="ext-open" onclick="showHomepageCurrent()">← Go Home</button>
-      </div>`;
-    }
+    loadingBar.classList.remove('active');
+    showNoProxyScreen(container, originalUrl);
   };
   container.appendChild(iframe);
-  showPage('tab-' + t.id);
-  setTimeout(() => loadingBar.classList.remove('active'), 8000);
+  // If it doesn't load in 10s, assume blocked
+  setTimeout(() => {
+    if (!iframe.classList.contains('loaded')) {
+      loadingBar.classList.remove('active');
+    }
+  }, 10000);
 }
 
-// ════════════════════════════════════════════════════
-//  POPUPS — intercept from direct iframes
-//  (Cross-origin frames can't be intercepted — best effort)
-// ════════════════════════════════════════════════════
-window.addEventListener('message', e => {
-  if (e.data && e.data.type === 'bw-open-tab') {
-    createTab(e.data.url);
-  }
-});
+function showNTPCurrent() {
+  const t = activeTab(); if (!t) return;
+  const container = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (container) showNTP(container, t);
+  switchTab(t.id);
+}
 
 // ════════════════════════════════════════════════════
 //  BOOKMARKS
 // ════════════════════════════════════════════════════
-function getBookmarks() { return JSON.parse(localStorage.getItem('bw_bookmarks') || '[]'); }
-function saveBookmarks(bm) { localStorage.setItem('bw_bookmarks', JSON.stringify(bm)); }
+function getBookmarks() { return JSON.parse(localStorage.getItem('spl_bookmarks') || '[]'); }
+function saveBookmarks(bm) { localStorage.setItem('spl_bookmarks', JSON.stringify(bm)); }
 
 function addBookmark() {
   const t = activeTab();
-  if (!t || !t.url) { alert('No page loaded.'); return; }
+  if (!t || !t.url) return;
   const bm = getBookmarks();
-  if (bm.find(b => b.url === t.url)) { alert('Already bookmarked!'); return; }
-  bm.unshift({ id: Date.now(), url: t.url, title: t.title || t.url });
-  saveBookmarks(bm); alert('Bookmarked!');
+  if (bm.find(b => b.url === t.url)) { showBlockToast('Already bookmarked!'); return; }
+  bm.unshift({ id:Date.now(), url:t.url, title:t.title||t.url });
+  saveBookmarks(bm);
+  showBlockToast('Bookmarked!');
+  refreshBookmarksBar();
 }
 
-function posDD(el) {
-  const r = header.getBoundingClientRect();
-  const bkBar = document.querySelector('.bookmarks-bar');
-  el.style.top = (r.bottom + (bkBar ? bkBar.offsetHeight : 0) + 2) + 'px';
+function refreshBookmarksBar() {
+  const bar = $('bookmarksBar');
+  const bm = getBookmarks();
+  // Keep static ones + user bookmarks
+  const statics = bar.querySelectorAll('[data-static]');
+  bar.querySelectorAll('[data-bm]').forEach(el => el.remove());
+  bm.slice(0,8).forEach(b => {
+    const el = document.createElement('span');
+    el.className = 'bm-item'; el.dataset.bm = b.id;
+    el.title = b.url;
+    el.textContent = '🔖 ' + (b.title || b.url).slice(0,20);
+    el.onclick = () => navigate(b.url);
+    bar.appendChild(el);
+  });
+}
+
+function positionDropdown(el, refEl) {
+  const r = refEl ? refEl.getBoundingClientRect() : header.getBoundingClientRect();
+  el.style.top  = (r.bottom + 4) + 'px';
+  el.style.left = '10px';
+  el.style.right = '10px';
+  el.style.maxWidth = '400px';
 }
 
 function showBookmarksDD() {
-  closeAllDD(); posDD(bmDD);
+  closeAllDD();
+  positionDropdown(bmDD);
   const bm = getBookmarks();
-  bmDD.innerHTML = bm.length
-    ? bm.map(b => `<div class="dd-item" data-url="${b.url}">🔖 <span style="flex:1;overflow:hidden;text-overflow:ellipsis">${b.title}</span><span style="color:#f44;padding:0 4px" data-del="${b.id}">✕</span></div>`).join('')
-    : '<div class="dd-item" style="color:#aaa;pointer-events:none">No bookmarks yet</div>';
+  bmDD.innerHTML = '<div class="dd-header">Bookmarks</div>' + (bm.length
+    ? bm.map(b => `<div class="dd-item" data-url="${b.url}">🔖 <div style="flex:1;min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.title}</div><div class="dd-sub" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.url}</div></div><span style="color:var(--red);padding:2px 6px;flex-shrink:0;border-radius:4px" data-del="${b.id}">✕</span></div>`).join('')
+    : '<div class="dd-item" style="pointer-events:none;color:var(--text3)">No bookmarks yet</div>');
   bmDD.classList.add('open');
   bmDD.onclick = e => {
     const del = e.target.closest('[data-del]');
-    if (del) { saveBookmarks(getBookmarks().filter(b => b.id != del.dataset.del)); showBookmarksDD(); return; }
+    if (del) { saveBookmarks(getBookmarks().filter(b=>b.id!=del.dataset.del)); showBookmarksDD(); return; }
     const item = e.target.closest('[data-url]');
     if (item) { navigate(item.dataset.url); closeAllDD(); }
   };
 }
 
 function showHistoryDD() {
-  closeAllDD(); posDD(histDD);
+  closeAllDD();
+  positionDropdown(histDD);
   histDD.innerHTML = globalHistory.length
-    ? `<div class="dd-item" style="color:#888;cursor:default;justify-content:space-between"><span>History</span><span style="cursor:pointer;color:#f44" onclick="clearHistory()">Clear</span></div>` +
-      globalHistory.slice(0,50).map(h => `<div class="dd-item" data-url="${h.url}">🕐 <div style="overflow:hidden;min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.title||h.url}</div><div style="font-size:11px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.url}</div></div></div>`).join('')
-    : '<div class="dd-item" style="color:#aaa;pointer-events:none">No history yet</div>';
+    ? `<div class="dd-header" style="display:flex;align-items:center;justify-content:space-between">History<span style="cursor:pointer;color:var(--red);font-weight:700" onclick="clearHistory()">Clear All</span></div>` +
+      globalHistory.slice(0,40).map(h => `<div class="dd-item" data-url="${h.url}">🕐 <div style="flex:1;min-width:0"><div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.title||h.url}</div><div class="dd-sub" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.url}</div></div>${h.ts?`<span class="dd-sub" style="flex-shrink:0">${timeAgo(h.ts)}</span>`:''}</div>`).join('')
+    : '<div class="dd-item" style="pointer-events:none;color:var(--text3)">No history yet</div>';
   histDD.classList.add('open');
   histDD.onclick = e => {
     const item = e.target.closest('[data-url]');
@@ -574,169 +1236,364 @@ function showHistoryDD() {
 }
 
 function clearHistory() {
-  globalHistory = []; sessionStorage.removeItem('bw_hist'); closeAllDD();
+  globalHistory = []; sessionStorage.removeItem('spl_hist'); closeAllDD();
+  showBlockToast('History cleared');
 }
 
-function closeAllDD() { [menuDD, bmDD, histDD].forEach(d => d.classList.remove('open')); }
+function closeAllDD() {
+  [menuDD, bmDD, histDD].forEach(d => d.classList.remove('open'));
+}
 
 // ════════════════════════════════════════════════════
-//  SETTINGS PAGE (kept alive — never reloads)
+//  KEYBOARD SHORTCUTS MODAL
+// ════════════════════════════════════════════════════
+const ALL_SHORTCUTS = [
+  { group:'Navigation', shortcuts:[
+    { desc:'New tab',           keys:['Ctrl','T'] },
+    { desc:'Close tab',         keys:['Ctrl','W'] },
+    { desc:'Reload page',       keys:['Ctrl','R'] },
+    { desc:'Focus URL bar',     keys:['Ctrl','L'] },
+    { desc:'Go back',           keys:['Alt','←'] },
+    { desc:'Go forward',        keys:['Alt','→'] },
+    { desc:'Go home',           keys:['Alt','Home'] },
+    { desc:'Duplicate tab',     keys:['Ctrl','Shift','D'] },
+  ]},
+  { group:'View', shortcuts:[
+    { desc:'Toggle browser bar',keys:['Alt','H'] },
+    { desc:'Open shortcuts',    keys:['?'] },
+    { desc:'Zoom in',           keys:['Ctrl','+'] },
+    { desc:'Zoom out',          keys:['Ctrl','-'] },
+  ]},
+  { group:'Tools', shortcuts:[
+    { desc:'Toggle ad blocker', keys:['Ctrl','Shift','A'] },
+    { desc:'Open settings',     keys:['Ctrl','Shift','S'] },
+    { desc:'Bookmark page',     keys:['Ctrl','D'] },
+    { desc:'Open history',      keys:['Ctrl','H'] },
+  ]},
+];
+
+function openShortcutsModal() {
+  $('shortcutsModal').classList.add('open');
+  renderShortcuts(ALL_SHORTCUTS);
+  setTimeout(() => $('shortcutSearch').focus(), 100);
+}
+function closeModal() {
+  $('shortcutsModal').classList.remove('open');
+}
+function filterShortcuts() {
+  const q = $('shortcutSearch').value.toLowerCase();
+  if (!q) { renderShortcuts(ALL_SHORTCUTS); return; }
+  const filtered = ALL_SHORTCUTS.map(g => ({
+    group: g.group,
+    shortcuts: g.shortcuts.filter(s => s.desc.toLowerCase().includes(q) || s.keys.join(' ').toLowerCase().includes(q))
+  })).filter(g => g.shortcuts.length);
+  renderShortcuts(filtered);
+}
+function renderShortcuts(groups) {
+  const list = $('shortcutsList');
+  list.innerHTML = groups.map(g => `
+    <div class="shortcut-group">
+      <div class="shortcut-group-title">${g.group}</div>
+      ${g.shortcuts.map(s => `
+        <div class="shortcut-row">
+          <span>${s.desc}</span>
+          <div class="shortcut-keys">${s.keys.map(k=>`<span class="key-chip">${k}</span>`).join('<span style="font-size:11px;color:var(--text3)">+</span>')}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  SETTINGS PAGE
 // ════════════════════════════════════════════════════
 function buildSettingsHTML() {
+  const blockListVal = adBlockList.join('\n');
   return `<div class="settings-inner">
-    <div class="settings-title">⚙️ Browser Settings</div>
+    <div class="settings-hero">
+      <div class="settings-hero-icon">🌐</div>
+      <div>
+        <div class="settings-hero-title">Browser Settings</div>
+        <div class="settings-hero-sub">ServerplexOS Browser · Customise your experience</div>
+      </div>
+    </div>
 
-    <div class="settings-section">
-      <div class="settings-sec-label">ScramJet</div>
-      <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:8px">
-        <div class="settings-row-label">ScramJet App URL</div>
-        <div class="settings-row-sub">Fork github.com/MercuryWorkshop/Scramjet-App, deploy to CF Pages (output dir: <code style="background:rgba(255,255,255,.08);padding:1px 6px;border-radius:4px">public</code>, no build command), paste URL here.</div>
-        <div style="display:flex;gap:8px;width:100%">
-          <input class="s-input" style="flex:1" id="s-sjapp" type="text"
-            value="${localStorage.getItem('bw_sj_app')||'https://scramjet.example.pages.dev'}"
-            placeholder="https://your-scramjet.pages.dev">
-          <button class="s-btn primary" onclick="saveSjApp()">Save</button>
+    <div class="settings-tabs">
+      <button class="settings-tab active" data-panel="general" onclick="switchSettingsTab(this,'general')">General</button>
+      <button class="settings-tab" data-panel="privacy" onclick="switchSettingsTab(this,'privacy')">Privacy</button>
+      <button class="settings-tab" data-panel="proxy" onclick="switchSettingsTab(this,'proxy')">ScramJet</button>
+      <button class="settings-tab" data-panel="data" onclick="switchSettingsTab(this,'data')">Data</button>
+    </div>
+
+    <!-- GENERAL -->
+    <div class="settings-panel active" id="panel-general">
+      <div class="s-section">
+        <div class="s-section-label">Appearance</div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Search Engine</div><div class="s-row-sub">Default search used in the URL bar and new tab page</div></div>
+          <select class="s-select" id="s-engine" onchange="saveEngine()">
+            <option value="google" ${(localStorage.getItem('spl_engine')||'google')==='google'?'selected':''}>Google</option>
+            <option value="ddg"    ${(localStorage.getItem('spl_engine')||'')==='ddg'?'selected':''}>DuckDuckGo</option>
+            <option value="bing"   ${(localStorage.getItem('spl_engine')||'')==='bing'?'selected':''}>Bing</option>
+            <option value="brave"  ${(localStorage.getItem('spl_engine')||'')==='brave'?'selected':''}>Brave</option>
+          </select>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Clock Format</div><div class="s-row-sub">Used on the new tab page</div></div>
+          <select class="s-select" id="s-clockfmt" onchange="saveClockFmt()">
+            <option value="12" ${(localStorage.getItem('spl_clock_fmt')||localStorage.getItem('eclipseos_clock_format')||'12')==='12'?'selected':''}>12-hour</option>
+            <option value="24" ${(localStorage.getItem('spl_clock_fmt')||'')==='24'?'selected':''}>24-hour</option>
+          </select>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Bookmarks Bar</div><div class="s-row-sub">Show the bookmarks bar below the URL bar</div></div>
+          <button class="s-toggle ${localStorage.getItem('spl_bkbar')!=='false'?'on':''}" id="s-bkbar" onclick="toggleSetting('s-bkbar','spl_bkbar',()=>{
+            document.querySelector('.bookmarks-bar').style.display = localStorage.getItem('spl_bkbar')==='false'?'none':'';
+          })"></button>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-section-label">Keyboard Shortcuts</div>
+        <div class="s-shortcuts-grid">
+          ${ALL_SHORTCUTS.flatMap(g=>g.shortcuts).map(s=>`
+            <div class="s-shortcut">
+              <span class="s-shortcut-desc">${s.desc}</span>
+              <span class="s-shortcut-key">${s.keys.join('+')}</span>
+            </div>`).join('')}
         </div>
       </div>
     </div>
 
-    <div class="settings-section">
-      <div class="settings-sec-label">Data</div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Export Browser Data</div>
-          <div class="settings-row-sub">Download bookmarks, history and settings as JSON</div></div>
-        <button class="s-btn primary" onclick="exportData()">⬇ Export</button>
+    <!-- PRIVACY -->
+    <div class="settings-panel" id="panel-privacy">
+      <div class="s-section">
+        <div class="s-section-label">Ad Blocker</div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Enable Ad Blocker</div><div class="s-row-sub">Blocks known ad and tracker domains from loading</div></div>
+          <button class="s-toggle ${adBlockEnabled?'on':''}" id="s-adb" onclick="toggleSetting('s-adb','spl_adb_enabled',()=>{ adBlockEnabled=localStorage.getItem('spl_adb_enabled')!=='false'; updateBlockBadge(); })"></button>
+        </div>
+        <div class="s-row vertical">
+          <div class="s-row-info"><div class="s-row-label">Block List</div><div class="s-row-sub">One domain per line. Changes take effect on next page load.</div></div>
+          <textarea class="s-blocklist-textarea s-full" id="s-blocklist">${blockListVal}</textarea>
+          <div style="display:flex;gap:8px">
+            <button class="s-btn primary" onclick="saveBlockList()">Save Block List</button>
+            <button class="s-btn" onclick="resetBlockList()">Reset to Default</button>
+          </div>
+          <div style="font-size:11px;color:var(--text3)">Session blocked this session: <strong style="color:var(--text2)" id="s-blockCount">${sessionBlockCount}</strong></div>
+        </div>
       </div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Import Browser Data</div>
-          <div class="settings-row-sub">Restore from a previously exported JSON file</div></div>
-        <button class="s-btn" onclick="importData()">⬆ Import</button>
+      <div class="s-section">
+        <div class="s-section-label">Privacy</div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Send Do Not Track</div><div class="s-row-sub">Requests sites not to track you (honoured by few sites)</div></div>
+          <button class="s-toggle ${localStorage.getItem('spl_dnt')==='true'?'on':''}" id="s-dnt" onclick="toggleSetting('s-dnt','spl_dnt')"></button>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Clear History on Close</div><div class="s-row-sub">Automatically clears browsing history when you close the browser</div></div>
+          <button class="s-toggle ${localStorage.getItem('spl_clearonclose')==='true'?'on':''}" id="s-clearonclose" onclick="toggleSetting('s-clearonclose','spl_clearonclose')"></button>
+        </div>
       </div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Clear History</div>
-          <div class="settings-row-sub">Remove all browsing history for this session</div></div>
-        <button class="s-btn danger" onclick="clearHistorySettings()">Clear</button>
+    </div>
+
+    <!-- PROXY -->
+    <div class="settings-panel" id="panel-proxy">
+      <div class="s-section">
+        <div class="s-section-label">ScramJet Configuration</div>
+        <div class="s-row vertical">
+          <div class="s-row-info">
+            <div class="s-row-label">ScramJet App URL</div>
+            <div class="s-row-sub">Deploy the <a href="https://github.com/MercuryWorkshop/scramjet" target="_blank" style="color:var(--accent)">ScramJet</a> app to Cloudflare Pages (output dir: <code style="background:var(--surface2);padding:1px 5px;border-radius:4px;font-size:10px">public</code>, no build command) and paste the URL here.</div>
+          </div>
+          <div style="display:flex;gap:8px;width:100%">
+            <input class="s-input" id="s-sjapp" type="text" style="flex:1"
+              value="${localStorage.getItem('spl_sj_app')||''}"
+              placeholder="https://your-scramjet.pages.dev">
+            <button class="s-btn primary" onclick="saveSjApp()">Save</button>
+          </div>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Proxy Mode</div><div class="s-row-sub">How external sites are loaded</div></div>
+          <select class="s-select" id="s-proxymode" onchange="localStorage.setItem('spl_proxy_mode',this.value)">
+            <option value="scramjet" ${(localStorage.getItem('spl_proxy_mode')||'scramjet')==='scramjet'?'selected':''}>ScramJet</option>
+            <option value="direct"   ${(localStorage.getItem('spl_proxy_mode')||'')==='direct'?'selected':''}>Direct (no proxy)</option>
+          </select>
+        </div>
       </div>
-      <div class="settings-row">
-        <div><div class="settings-row-label">Clear Bookmarks</div>
-          <div class="settings-row-sub">Permanently delete all saved bookmarks</div></div>
-        <button class="s-btn danger" onclick="clearBookmarks()">Clear</button>
+    </div>
+
+    <!-- DATA -->
+    <div class="settings-panel" id="panel-data">
+      <div class="s-section">
+        <div class="s-section-label">Import / Export</div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Export Data</div><div class="s-row-sub">Download bookmarks, history and settings as JSON</div></div>
+          <button class="s-btn primary" onclick="exportData()">⬇ Export</button>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Import Data</div><div class="s-row-sub">Restore from a previously exported JSON file</div></div>
+          <button class="s-btn" onclick="importData()">⬆ Import</button>
+        </div>
+      </div>
+      <div class="s-section">
+        <div class="s-section-label">Clear Data</div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Clear Browsing History</div><div class="s-row-sub">Remove all visited pages from history</div></div>
+          <button class="s-btn danger" onclick="clearHistorySettings()">Clear</button>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Clear Bookmarks</div><div class="s-row-sub">Permanently delete all saved bookmarks</div></div>
+          <button class="s-btn danger" onclick="clearBookmarks()">Clear</button>
+        </div>
+        <div class="s-row">
+          <div class="s-row-info"><div class="s-row-label">Reset All Settings</div><div class="s-row-sub">Restore browser to default settings</div></div>
+          <button class="s-btn danger" onclick="resetAll()">Reset</button>
+        </div>
       </div>
     </div>
   </div>`;
 }
 
-function initSettings(div) {
-  // nothing to init — settings are saved on button click
+function switchSettingsTab(btn, panel) {
+  btn.closest('.settings-inner').querySelectorAll('.settings-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.settings-inner').querySelectorAll('.settings-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-' + panel).classList.add('active');
 }
 
+function initSettingsListeners(div) {}
+
+function toggleSetting(toggleId, storageKey, cb) {
+  const btn = document.getElementById(toggleId);
+  const on  = !btn.classList.contains('on');
+  btn.classList.toggle('on', on);
+  localStorage.setItem(storageKey, on);
+  if (cb) cb();
+}
+function saveEngine() { localStorage.setItem('spl_engine', document.getElementById('s-engine').value); }
+function saveClockFmt() { localStorage.setItem('spl_clock_fmt', document.getElementById('s-clockfmt').value); }
 function saveSjApp() {
-  const val = document.getElementById('s-sjapp').value.trim();
-  if (val) { localStorage.setItem('bw_sj_app', val); alert('ScramJet URL saved! Reload the browser app to apply.'); }
+  const val = document.getElementById('s-sjapp')?.value.trim();
+  if (val) { localStorage.setItem('spl_sj_app', val); showBlockToast('ScramJet URL saved'); }
 }
-
-function saveSetting(key, inputId) {
-  const val = document.getElementById(inputId).value.trim();
-  if (val) { localStorage.setItem(key, val); alert('Saved!'); }
+function saveBlockList() {
+  const val = document.getElementById('s-blocklist')?.value || '';
+  adBlockList = val.split('\n').map(s=>s.trim()).filter(Boolean);
+  localStorage.setItem('spl_adb_list', JSON.stringify(adBlockList));
+  showBlockToast('Block list saved (' + adBlockList.length + ' entries)');
 }
-
-function exportData() {
-  const data = {
-    exported: new Date().toISOString(),
-    version: 1,
-    settings: {
-      proxy_mode: mode(),
-      cors_base:  localStorage.getItem('bw_cors_base') || '',
-      uv_base:    localStorage.getItem('bw_uv_base')   || '',
-      sj_base:    localStorage.getItem('bw_sj_base')   || '',
-    },
-    bookmarks: getBookmarks(),
-    history:   globalHistory,
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'eclipseos-browser-data.json' });
-  a.click(); URL.revokeObjectURL(a.href);
+function resetBlockList() {
+  adBlockList = [...DEFAULT_BLOCKLIST];
+  localStorage.removeItem('spl_adb_list');
+  const el = document.getElementById('s-blocklist');
+  if (el) el.value = DEFAULT_BLOCKLIST.join('\n');
+  showBlockToast('Block list reset');
 }
-
-function importData() {
-  const input = Object.assign(document.createElement('input'), { type: 'file', accept: '.json' });
-  input.onchange = e => {
-    const file = e.target.files[0]; if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      try {
-        const data = JSON.parse(ev.target.result);
-        if (data.settings) {
-          if (data.settings.proxy_mode) localStorage.setItem('bw_proxy_mode', data.settings.proxy_mode);
-          if (data.settings.cors_base)  localStorage.setItem('bw_cors_base',  data.settings.cors_base);
-          if (data.settings.uv_base)    localStorage.setItem('bw_uv_base',    data.settings.uv_base);
-          if (data.settings.sj_base)    localStorage.setItem('bw_sj_base',    data.settings.sj_base);
-        }
-        if (data.bookmarks) saveBookmarks(data.bookmarks);
-        if (data.history)   { globalHistory = data.history; sessionStorage.setItem('bw_hist', JSON.stringify(globalHistory)); }
-        alert('Data imported! Reload settings to see changes.');
-      } catch(err) { alert('Invalid file — could not import.'); }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
 function clearHistorySettings() {
-  if (!confirm('Clear all history?')) return;
-  globalHistory = []; sessionStorage.removeItem('bw_hist'); alert('History cleared.');
+  if (!confirm('Clear all browsing history?')) return;
+  globalHistory = []; sessionStorage.removeItem('spl_hist');
+  showBlockToast('History cleared');
 }
 function clearBookmarks() {
   if (!confirm('Delete all bookmarks?')) return;
-  saveBookmarks([]); alert('Bookmarks cleared.');
+  saveBookmarks([]); refreshBookmarksBar();
+  showBlockToast('Bookmarks cleared');
+}
+function resetAll() {
+  if (!confirm('Reset all browser settings to defaults?')) return;
+  ['spl_engine','spl_clock_fmt','spl_bkbar','spl_dnt','spl_clearonclose','spl_sj_app','spl_proxy_mode','spl_adb_enabled','spl_adb_list'].forEach(k=>localStorage.removeItem(k));
+  showBlockToast('Settings reset — reload to apply');
+}
+function exportData() {
+  const data = {
+    exported: new Date().toISOString(), version:2, browser:'ServerplexOS',
+    settings: { engine: localStorage.getItem('spl_engine'), sj_app: localStorage.getItem('spl_sj_app'), proxy_mode: localStorage.getItem('spl_proxy_mode') },
+    bookmarks: getBookmarks(), history: globalHistory,
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'serverplex-browser-data.json'});
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function importData() {
+  const input = Object.assign(document.createElement('input'),{type:'file',accept:'.json'});
+  input.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try {
+        const d = JSON.parse(ev.target.result);
+        if (d.settings) {
+          if (d.settings.engine)     localStorage.setItem('spl_engine', d.settings.engine);
+          if (d.settings.sj_app)     localStorage.setItem('spl_sj_app', d.settings.sj_app);
+          if (d.settings.proxy_mode) localStorage.setItem('spl_proxy_mode', d.settings.proxy_mode);
+        }
+        if (d.bookmarks) saveBookmarks(d.bookmarks);
+        if (d.history)   { globalHistory = d.history; sessionStorage.setItem('spl_hist', JSON.stringify(globalHistory)); }
+        showBlockToast('Data imported successfully');
+      } catch(e) { alert('Invalid file — could not import.'); }
+    };
+    r.readAsText(file);
+  };
+  input.click();
 }
 
 // ════════════════════════════════════════════════════
 //  EVENTS
 // ════════════════════════════════════════════════════
 $('newTabBtn').onclick = () => createTab();
-$('homeBtn').onclick   = () => showHomepageCurrent();
+$('homeBtn').onclick   = () => showNTPCurrent();
+
 $('refreshBtn').onclick = () => {
   const t = activeTab();
-  if (!t || t.type !== 'direct' || !t.url) return;
-  const container = content.querySelector('[data-page="tab-' + t.id + '"]');
-  if (container) loadDirectIframe(container, t, t.url);
-};
-backBtn.onclick = () => {
-  const t = activeTab();
-  if (!t || t.type !== 'direct') return;
-  if (t.histIdx > 0) { t.histIdx--; const u = t.history[t.histIdx]; t.url = u; const c = content.querySelector('[data-page="tab-'+t.id+']'); if(c) loadDirectIframe(c,t,u); updateNavBtns(); updateUrlBar(); }
-};
-fwdBtn.onclick = () => {
-  const t = activeTab();
-  if (!t || t.type !== 'direct') return;
-  if (t.histIdx < t.history.length - 1) { t.histIdx++; const u = t.history[t.histIdx]; t.url = u; const c = content.querySelector('[data-page="tab-'+t.id+'"]'); if(c) loadDirectIframe(c,t,u); updateNavBtns(); updateUrlBar(); }
+  if (!t || !t.url) return;
+  const c = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (c) loadDirectIframe(c, t, t.url);
 };
 
-urlInput.onkeydown = e => { if (e.key === 'Enter') { navigate(urlInput.value.trim()); closeAllDD(); } };
+backBtn.onclick = () => {
+  const t = activeTab();
+  if (!t || t.histIdx <= 0) return;
+  t.histIdx--;
+  const url = t.history[t.histIdx]; t.url = url;
+  const c = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (c) loadDirectIframe(c, t, url);
+  updateNavBtns(); updateUrlBar();
+};
+
+fwdBtn.onclick = () => {
+  const t = activeTab();
+  if (!t || t.histIdx >= (t.history||[]).length - 1) return;
+  t.histIdx++;
+  const url = t.history[t.histIdx]; t.url = url;
+  const c = content.querySelector('[data-page="tab-' + t.id + '"]');
+  if (c) loadDirectIframe(c, t, url);
+  updateNavBtns(); updateUrlBar();
+};
+
+urlInput.onkeydown = e => {
+  if (e.key === 'Enter') { navigate(urlInput.value.trim()); closeAllDD(); urlInput.blur(); }
+  if (e.key === 'Escape') { urlInput.blur(); updateUrlBar(); }
+};
+urlInput.onfocus = () => { urlInput.select(); };
 
 $('menuBtn').onclick = e => {
   e.stopPropagation();
   const open = menuDD.classList.contains('open');
   closeAllDD();
-  if (!open) {
-    const rect = $('menuBtn').getBoundingClientRect();
-    menuDD.style.top   = (rect.bottom + 4) + 'px';
-    menuDD.style.right = (window.innerWidth - rect.right) + 'px';
-    menuDD.classList.add('open');
-  }
+  if (!open) menuDD.classList.add('open');
 };
 
 $('ddBookmark').onclick  = () => { addBookmark(); closeAllDD(); };
 $('ddBookmarks').onclick = () => showBookmarksDD();
 $('ddHistory').onclick   = () => showHistoryDD();
+$('ddShortcuts').onclick = () => { closeAllDD(); openShortcutsModal(); };
+$('ddPinTab').onclick    = () => { pinTab(activeId); closeAllDD(); };
+$('ddDuplicate').onclick = () => { duplicateTab(activeId); closeAllDD(); };
+$('ddCloseOthers').onclick = () => { closeOtherTabs(activeId); closeAllDD(); };
+
 $('ddSettings').onclick  = () => {
   closeAllDD();
-  // Open settings as a special tab that stays alive
   const existing = tabs.find(t => t.type === 'settings');
   if (existing) { switchTab(existing.id); return; }
   const id = tabCounter++;
-  const t = { id, type: 'settings', url: 'browser://settings', title: 'Settings', history: [], histIdx: -1 };
+  const t = { id, type:'settings', url:'serverplex://settings', title:'Settings', history:[], histIdx:-1, pinned:false };
   tabs.push(t);
   activeId = id;
   ensureSettingsPage();
@@ -744,14 +1601,51 @@ $('ddSettings').onclick  = () => {
   switchTab(id);
 };
 
+$('shortcutsModal').onclick = e => { if (e.target === $('shortcutsModal')) closeModal(); };
+
 document.addEventListener('click', e => {
   if (!e.target.closest('#menuBtn') && !e.target.closest('#bookmarksDropdown') && !e.target.closest('#historyDropdown')) closeAllDD();
 });
+
+// ════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ════════════════════════════════════════════════════
 document.addEventListener('keydown', e => {
-  if (e.ctrlKey && e.key === 'l') { e.preventDefault(); urlInput.focus(); urlInput.select(); }
-  if (e.ctrlKey && e.key === 't') { e.preventDefault(); createTab(); }
-  if (e.ctrlKey && e.key === 'w') { e.preventDefault(); closeTab(activeId); }
-  if (e.ctrlKey && e.key === 'r') { e.preventDefault(); const t = activeTab(); if (t && t.type === 'direct' && t.url) { const c = content.querySelector('[data-page="tab-'+t.id+'"]'); if(c) loadDirectIframe(c,t,t.url); } }
+  const tag = document.activeElement.tagName;
+  const inInput = tag === 'INPUT' || tag === 'TEXTAREA';
+
+  if (e.key === '?' && !inInput) { openShortcutsModal(); return; }
+  if (e.key === 'Escape') { closeModal(); closeAllDD(); return; }
+
+  if (e.ctrlKey) {
+    switch(e.key.toLowerCase()) {
+      case 't': e.preventDefault(); createTab(); break;
+      case 'w': e.preventDefault(); closeTab(activeId); break;
+      case 'r': e.preventDefault();
+        const t = activeTab();
+        if (t && t.url) { const c = content.querySelector('[data-page="tab-'+t.id+'"]'); if(c) loadDirectIframe(c,t,t.url); }
+        break;
+      case 'l': e.preventDefault(); urlInput.focus(); urlInput.select(); break;
+      case 'd': e.preventDefault(); addBookmark(); break;
+      case 'h': e.preventDefault(); showHistoryDD(); break;
+    }
+    if (e.shiftKey) {
+      switch(e.key.toLowerCase()) {
+        case 'a': e.preventDefault(); adBlockEnabled=!adBlockEnabled; localStorage.setItem('spl_adb_enabled',adBlockEnabled); sessionBlockCount=0; updateBlockBadge(); break;
+        case 's': e.preventDefault(); $('ddSettings').onclick(); break;
+        case 'd': e.preventDefault(); duplicateTab(activeId); break;
+      }
+    }
+  }
+  if (e.altKey) {
+    switch(e.key) {
+      case 'h': case 'H': e.preventDefault(); toggleHeader(); break;
+      case 'ArrowLeft':   e.preventDefault(); backBtn.onclick(); break;
+      case 'ArrowRight':  e.preventDefault(); fwdBtn.onclick(); break;
+      case 'Home':        e.preventDefault(); showNTPCurrent(); break;
+      case 'm': case 'M': e.preventDefault(); menuDD.classList.toggle('open'); break;
+    }
+  }
 });
 
 // ════════════════════════════════════════════════════
@@ -759,11 +1653,10 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════════════════
 function restoreTabs() {
   try {
-    const saved = JSON.parse(sessionStorage.getItem('bw_tabs') || '[]');
+    const saved = JSON.parse(sessionStorage.getItem('spl_tabs') || '[]');
     if (!saved.length) return false;
-    tabCounter = parseInt(sessionStorage.getItem('bw_ctr')    || '0');
-    activeId   = parseInt(sessionStorage.getItem('bw_active') || '0');
-    // Rebuild tabs and pages
+    tabCounter = parseInt(sessionStorage.getItem('spl_ctr') || '0');
+    activeId   = parseInt(sessionStorage.getItem('spl_active') || '0');
     saved.forEach(t => {
       tabs.push({ ...t });
       if (t.type !== 'settings') {
@@ -772,20 +1665,34 @@ function restoreTabs() {
         div.setAttribute('data-page', 'tab-' + t.id);
         if (t.type === 'direct' && t.url) {
           loadDirectIframe(div, t, t.url);
-        } else if (t.type === 'external') {
-          div.innerHTML = `<div class="ext-page"><div class="ext-icon">🔗</div><div class="ext-title">${t.title||t.url}</div><div class="ext-note">This page was opened externally.</div>${t.proxiedUrl?`<button class="ext-open" onclick="window.open('${t.proxiedUrl.replace(/'/g,"\\'")}','_blank')">↗ Re-open</button>`:''}</div>`;
+        } else if ((t.type === 'scramjet' || t.type === 'noproxy') && t.url) {
+          const sjUrl = getSjUrl();
+          if (sjUrl) { loadScramjetFrame(div, t, t.url); }
+          else { showNoProxyScreen(div, t.url); }
         } else {
-          showHomepage(div);
+          showNTP(div, t);
         }
         content.appendChild(div);
       }
     });
-    renderTabs();
-    switchTab(activeId);
+    renderTabs(); switchTab(activeId);
     return true;
   } catch(e) { return false; }
 }
 
+// Apply bookmarks bar visibility
+if (localStorage.getItem('spl_bkbar') === 'false') {
+  document.querySelector('.bookmarks-bar').style.display = 'none';
+}
+
+// Clear on close if set
+window.addEventListener('beforeunload', () => {
+  if (localStorage.getItem('spl_clearonclose') === 'true') {
+    globalHistory = []; sessionStorage.removeItem('spl_hist');
+  }
+});
+
+updateBlockBadge();
 if (!restoreTabs()) createTab();
 </script>
 </body>

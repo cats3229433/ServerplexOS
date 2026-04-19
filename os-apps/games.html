@@ -10,19 +10,14 @@ body.theme-white{--bg:#f0f2f5;--bg3:#e4e7ed;--surface:#fff;--surface2:#f7f8fa;--
 body.theme-black{--bg:#060811;--bg3:#111420;--surface:#12151f;--surface2:#1a1e2e;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8edf5;--text2:#8b97b0;--text3:#5a6478;--shadow:0 4px 20px rgba(0,0,0,.5);--shadow-lg:0 16px 60px rgba(0,0,0,.7)}
 body.theme-grey{--bg:#3a3e4a;--bg3:#4e535e;--surface:#484c57;--surface2:#545862;--border:rgba(255,255,255,0.10);--border2:rgba(255,255,255,0.18);--text:#eef0f4;--text2:#b8bec8;--text3:#858ea0;--shadow:0 4px 20px rgba(0,0,0,.35);--shadow-lg:0 12px 48px rgba(0,0,0,.5)}
 :root{--accent:#0078d4;--glow:rgba(0,120,212,0.3);--r:12px;--spring:0.22s cubic-bezier(0.34,1.56,0.64,1)}
-
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
 .app{display:flex;flex-direction:column;height:100vh}
-
-/* Topbar */
 .topbar{display:flex;align-items:center;gap:10px;padding:0 14px;height:50px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:200}
 .logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px var(--glow);flex-shrink:0}
 .logo-text{font-size:15px;font-weight:800;letter-spacing:.5px}
 .logo-sub{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
 .spacer{flex:1}
-
-/* Search */
 .search-wrap{position:relative;display:flex;align-items:center}
 .search-wrap input{padding:7px 30px 7px 32px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;width:200px;outline:none;transition:all .2s}
 .search-wrap input:focus{border-color:var(--accent);background:var(--surface2);width:240px}
@@ -31,22 +26,14 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 .search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:var(--text3);color:var(--bg);font-size:10px;font-weight:900;display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0}
 .search-clear:hover{background:var(--text2)}
 .search-clear.visible{display:flex}
-
-/* Topbar buttons */
 .tb-btn{padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap}
 .tb-btn:hover{color:var(--text);background:var(--bg3);border-color:var(--border2)}
 .tb-btn.active{background:rgba(0,120,212,0.15);border-color:rgba(0,120,212,0.4);color:var(--accent)}
 .tb-refresh{padding:6px 10px;font-size:15px;color:var(--text3)}
-
-/* Sort select */
 .tb-select{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;cursor:pointer;outline:none;transition:all .2s;-webkit-appearance:none;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7a99' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 .tb-select:hover{color:var(--text);border-color:var(--border2)}
 .tb-select option{background:var(--surface);color:var(--text)}
-
-/* Main */
 .main{flex:1;display:flex;overflow:hidden}
-
-/* Sidebar */
 .sidebar{width:196px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .sidebar::-webkit-scrollbar{width:4px}
 .sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
@@ -59,13 +46,9 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 .sb-pill{font-size:10px;font-weight:700;background:rgba(255,255,255,0.07);color:var(--text3);padding:1px 7px;border-radius:20px;margin-left:auto;transition:all .2s}
 .sb-btn.active .sb-pill{background:rgba(0,120,212,0.2);color:var(--accent)}
 .sb-divider{height:1px;background:var(--border);margin:5px 10px}
-
-/* Content */
 .content{flex:1;overflow-y:auto;padding:20px 22px}
 .content::-webkit-scrollbar{width:6px}
 .content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-
-/* Featured */
 .featured-wrap{margin-bottom:26px;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;animation:fadeUp .35s ease}
 .featured-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1e3a5f,#1a1040 60%,#0f1a35)}
 .featured-glow{position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,120,212,.28),transparent 70%)}
@@ -84,13 +67,9 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 .btn-feat:hover:not(:disabled){background:rgba(255,255,255,.24);transform:translateY(-1px)}
 .btn-feat:disabled{opacity:.4;cursor:not-allowed}
 .btn-feat.fav{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d}
-
-/* Section */
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sec-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
 .sec-count{font-size:12px;color:var(--text3)}
-
-/* Game grid */
 .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:12px;margin-bottom:28px}
 .game-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all var(--spring);position:relative;box-shadow:var(--shadow);animation:fadeUp .3s ease}
 .game-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:var(--shadow-lg);border-color:var(--border2)}
@@ -102,23 +81,17 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 .play-circle{width:42px;height:42px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 14px var(--glow)}
 .card-fav-btn{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;opacity:0;transition:all .15s;backdrop-filter:blur(6px)}
 .card-fav-btn.is-fav{opacity:1;background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.5)}
-/* Manual game badge */
 .card-manual-badge{position:absolute;top:7px;left:7px;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:rgba(0,120,212,.3);color:#93c5fd;border:1px solid rgba(0,120,212,.45);backdrop-filter:blur(6px)}
 .card-body{padding:10px 12px 13px}
 .card-name{font-size:13px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .cat-tag{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:rgba(0,120,212,.12);color:var(--accent);border:1px solid rgba(0,120,212,.2)}
-/* Recently played ribbon */
 .card-recent-dot{position:absolute;top:7px;left:7px;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;border:1px solid rgba(255,255,255,.3)}
-
-/* State */
 .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 30px;text-align:center;color:var(--text3);grid-column:1/-1}
 .state-icon{font-size:50px}
 .state-msg{font-size:14px}
 .spin{animation:spin 1s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-
-/* Detail overlay */
 .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px}
 .detail-overlay.open{display:flex;animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
 @keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
@@ -148,23 +121,31 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 .btn-fav.is-fav{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:#fcd34d}
 .btn-close{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
 .btn-close:hover{background:var(--bg3);color:var(--text)}
-
-/* Statusbar */
 .statusbar{background:var(--surface);border-top:1px solid var(--border);padding:3px 16px;display:flex;gap:14px;font-size:10px;color:var(--text3);flex-shrink:0;letter-spacing:.5px}
-
-/* Toast */
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface);border:1px solid var(--border2);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);z-index:99999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Game player overlay ── */
+.game-player-overlay{position:fixed;inset:0;z-index:99998;background:#000;display:none;flex-direction:column}
+.game-player-overlay.open{display:flex;animation:popIn .2s ease}
+.game-player-bar{height:40px;background:#0d0f14;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08)}
+.game-player-title{font-size:13px;font-weight:700;color:#e8edf5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-player-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.game-player-btn:hover{background:rgba(255,255,255,0.12);color:#fff}
+.game-player-btn.exit{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.35);color:#fca5a5}
+.game-player-btn.exit:hover{background:rgba(239,68,68,0.25)}
+/* Script-run container (manual games) */
+.game-player-container{flex:1;width:100%;height:100%;overflow:auto;position:relative;background:#000}
+/* Iframe container (registry games) */
+.game-player-frame{flex:1;border:none;width:100%;height:100%;display:block}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 </style>
 </head>
 <body>
-<!-- Fix theme flash: runs synchronously before any paint -->
 <script>document.body.className='theme-'+(localStorage.getItem('eclipseos_theme')||'black');</script>
 
 <div class="app">
-
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
       <div class="logo-icon">🎮</div>
@@ -195,7 +176,6 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
       <button class="sb-btn" data-cat="manual" onclick="setCat('manual')" id="myGamesSbBtn" style="display:none">
         <span class="sb-icon">⭐</span>My Games<span class="sb-pill" id="cnt-manual">0</span>
       </button>
-
       <div class="sb-divider"></div>
       <div class="sb-label">Categories</div>
       <button class="sb-btn" data-cat="Action"      onclick="setCat('Action')">      <span class="sb-icon">⚔️</span>Action      <span class="sb-pill" id="cnt-Action">0</span></button>
@@ -206,7 +186,6 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
       <button class="sb-btn" data-cat="Strategy"    onclick="setCat('Strategy')">    <span class="sb-icon">♟️</span>Strategy   <span class="sb-pill" id="cnt-Strategy">0</span></button>
       <button class="sb-btn" data-cat="Multiplayer" onclick="setCat('Multiplayer')"> <span class="sb-icon">👥</span>Multiplayer<span class="sb-pill" id="cnt-Multiplayer">0</span></button>
       <button class="sb-btn" data-cat="Other"       onclick="setCat('Other')">       <span class="sb-icon">📦</span>Other       <span class="sb-pill" id="cnt-Other">0</span></button>
-
       <div class="sb-divider"></div>
       <div class="sb-label">History</div>
       <button class="sb-btn" data-cat="recent" onclick="setCat('recent')">
@@ -225,10 +204,9 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
     <span id="statusText">Connecting…</span>
     <span style="margin-left:auto" id="statusFavs"></span>
   </div>
-
 </div>
 
-<!-- Detail overlay -->
+<!-- Detail modal -->
 <div class="detail-overlay" id="detailOverlay" onclick="if(event.target===this)closeDetail()">
   <div class="detail-modal">
     <div class="detail-hero">
@@ -251,16 +229,30 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
   </div>
 </div>
 
+<!-- Game player — script-run for manual games, iframe for registry games -->
+<div class="game-player-overlay" id="gamePlayerOverlay">
+  <div class="game-player-bar">
+    <span id="gpIcon" style="font-size:18px">🎮</span>
+    <span class="game-player-title" id="gpTitle">Game</span>
+    <button class="game-player-btn" onclick="reloadGame()">↻ Reload</button>
+    <button class="game-player-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button class="game-player-btn exit" onclick="closeGamePlayer()">✕ Exit</button>
+  </div>
+  <!-- script-run container (manual games) -->
+  <div class="game-player-container" id="gameContainer" style="display:none"></div>
+  <!-- iframe (registry / external games) -->
+  <iframe class="game-player-frame" id="gamePlayerFrame" style="display:none" allow="autoplay; fullscreen; gamepad"></iframe>
+</div>
+
 <div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  MANUAL GAMES
-//  Add your own games here! They appear at the top in "My Games".
-//  Works with search, filters, sort, favourites & recently played.
+//  Add your own games here — they run as injected scripts (no iframe).
+//  Registry games from the JSON still load in an iframe as before.
 // ═══════════════════════════════════════════════════════════════
 const MANUAL_GAMES = [
-  // Uncomment and fill in an entry to add a game:
 {
   id: '1v1-lol',
   name: '1v1.LOL',
@@ -1605,40 +1597,40 @@ const MANUAL_GAMES = [
   description: 'A pirate-themed battle royale where players collect coins, grow stronger, and slash opponents on shrinking islands. Movement, timing, and positioning decide who becomes the last pirate standing.',
   featured: false,
 },
-
-
 ];
 
 // ═══════════════════════════════════════════════════════════════
-//  REGISTRY — remote games JSON
+//  REGISTRY
 // ═══════════════════════════════════════════════════════════════
-const REGISTRY          = 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games/';
-const REGISTRY_FALLBACK = 'https://raw.githubusercontent.com/Serverplex/ServerplexOS-Games/';
+const REGISTRY          = ''; // Set a URL here to re-enable the registry
+const REGISTRY_FALLBACK = '';
 
-// ── Accent colour ──
-const _acc = localStorage.getItem('eclipseos_accent');
+// Accent colour
+var _acc = localStorage.getItem('eclipseos_accent');
 if (_acc) document.documentElement.style.setProperty('--accent', _acc);
 
-// ── State ──
-let games      = [];
-let favs       = JSON.parse(localStorage.getItem('eclipseos_game_favs')    || '[]');
-let recents    = JSON.parse(localStorage.getItem('eclipseos_game_recents') || '[]');
-let currentCat = 'all';
-let showFavs   = false;
-let activeGame = null;
+// State
+var games      = [];
+var favs       = JSON.parse(localStorage.getItem('eclipseos_game_favs')    || '[]');
+var recents    = JSON.parse(localStorage.getItem('eclipseos_game_recents') || '[]');
+var currentCat = 'all';
+var showFavs   = false;
+var activeGame = null;
 
-// ── Persistence ──
+// Script-injection tracking
+var _injectedNodes = [];
+var _currentGameUrl = '';
+
 function saveFavs()    { localStorage.setItem('eclipseos_game_favs',    JSON.stringify(favs));    }
 function saveRecents() { localStorage.setItem('eclipseos_game_recents', JSON.stringify(recents)); }
 function isFav(id)     { return favs.includes(id); }
 
 function addRecent(id) {
-  recents = [id, ...recents.filter(r => r !== id)].slice(0, 30);
+  recents = [id].concat(recents.filter(function(r){ return r !== id; })).slice(0, 30);
   saveRecents();
   updateCounts();
 }
 
-// ── Sanitise — strip Discord links/mentions ──
 function clean(str) {
   if (!str) return '';
   return str
@@ -1648,9 +1640,9 @@ function clean(str) {
     .trim();
 }
 
-// ── Search ──
+// Search
 function onSearch() {
-  const v = document.getElementById('searchInput').value;
+  var v = document.getElementById('searchInput').value;
   document.getElementById('searchClear').classList.toggle('visible', v.length > 0);
   render();
 }
@@ -1660,14 +1652,14 @@ function clearSearch() {
   render();
 }
 
-// ── Sort ──
+// Sort
 function sortList(list) {
-  const s = document.getElementById('sortSelect').value;
-  if (s === 'az') return [...list].sort((a, b) => a.name.localeCompare(b.name));
-  if (s === 'za') return [...list].sort((a, b) => b.name.localeCompare(a.name));
+  var s = document.getElementById('sortSelect').value;
+  if (s === 'az') return list.slice().sort(function(a,b){ return a.name.localeCompare(b.name); });
+  if (s === 'za') return list.slice().sort(function(a,b){ return b.name.localeCompare(a.name); });
   if (s === 'recent') {
-    return [...list].sort((a, b) => {
-      const ai = recents.indexOf(a.id), bi = recents.indexOf(b.id);
+    return list.slice().sort(function(a,b){
+      var ai = recents.indexOf(a.id), bi = recents.indexOf(b.id);
       if (ai === -1 && bi === -1) return 0;
       if (ai === -1) return 1;
       if (bi === -1) return -1;
@@ -1677,47 +1669,37 @@ function sortList(list) {
   return list;
 }
 
-// ── Load ──
+// Load
 async function loadGames() {
   document.getElementById('content').innerHTML =
     '<div class="game-grid"><div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Connecting to games library…</p></div></div>';
   document.getElementById('statusText').textContent = 'Connecting…';
 
-  let registryGames = [];
+  var registryGames = [];
   try {
-    let r = await fetch(REGISTRY + '?t=' + Date.now());
-    if (!r.ok) r = await fetch(REGISTRY_FALLBACK + '?t=' + Date.now());
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const d = await r.json();
-    registryGames = d.games || [];
-  } catch(e) {
-    if (!MANUAL_GAMES.length) {
-      document.getElementById('statusText').textContent = '⚠️ Connection failed';
-      document.getElementById('content').innerHTML =
-        '<div class="game-grid"><div class="state-box">' +
-        '<span class="state-icon">🔌</span>' +
-        '<div style="font-size:17px;font-weight:700;color:var(--text2)">Connection Error</div>' +
-        '<div style="font-size:13px;line-height:1.6;max-width:320px">Could not reach the games registry.<br>Check that REGISTRY points to a valid jsDelivr URL and your repo is public.</div>' +
-        '<button onclick="loadGames()" style="padding:10px 22px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:Oxanium,sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px">↻ Try Again</button>' +
-        '</div></div>';
-      return;
+    if (REGISTRY) {
+      var r = await fetch(REGISTRY + '?t=' + Date.now());
+      if (!r.ok && REGISTRY_FALLBACK) r = await fetch(REGISTRY_FALLBACK + '?t=' + Date.now());
+      if (r && r.ok) { var d = await r.json(); registryGames = d.games || []; }
     }
-    document.getElementById('statusText').textContent = '⚠️ Registry offline — showing local games';
+  } catch(e) { /* registry silently skipped — does not affect manual games */ }
+  if (!MANUAL_GAMES.length && !registryGames.length) {
+    document.getElementById('statusText').textContent = 'No games found';
+    document.getElementById('content').innerHTML =
+      '<div class="game-grid"><div class="state-box"><span class="state-icon">🎮</span>' +
+      '<div style="font-size:17px;font-weight:700;color:var(--text2)">No Games Yet</div>' +
+      '<div style="font-size:13px;line-height:1.6;max-width:320px">Add games to the MANUAL_GAMES array to get started.</div>' +
+      '</div></div>';
+    return;
   }
 
-  // Merge: manual games first, registry games that don't share an ID follow
-  const manualIds = new Set(MANUAL_GAMES.map(g => g.id));
-  games = [
-    ...MANUAL_GAMES.map(g => Object.assign({}, g, { _manual: true })),
-    ...registryGames.filter(g => !manualIds.has(g.id)),
-  ];
+  var manualIds = new Set(MANUAL_GAMES.map(function(g){ return g.id; }));
+  games = MANUAL_GAMES.map(function(g){ return Object.assign({}, g, {_manual: true}); })
+    .concat(registryGames.filter(function(g){ return !manualIds.has(g.id); }));
 
-  if (registryGames.length) {
-    const localNote = MANUAL_GAMES.length ? ' (' + MANUAL_GAMES.length + ' local)' : '';
-    document.getElementById('statusText').textContent = games.length + ' games available' + localNote;
-  }
+  var localNote = MANUAL_GAMES.length ? ' (' + MANUAL_GAMES.length + ' local)' : '';
+  document.getElementById('statusText').textContent = games.length + ' games available' + localNote;
 
-  // Show/hide "My Games" sidebar entry
   var myBtn = document.getElementById('myGamesSbBtn');
   if (myBtn) myBtn.style.display = MANUAL_GAMES.length ? '' : 'none';
 
@@ -1725,27 +1707,23 @@ async function loadGames() {
   render();
 }
 
-// ── Sidebar / category ──
 function setCat(cat) {
-  currentCat = cat;
-  showFavs = false;
+  currentCat = cat; showFavs = false;
   document.getElementById('favBtn').classList.remove('active');
-  document.querySelectorAll('.sb-btn').forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+  document.querySelectorAll('.sb-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cat === cat); });
   render();
 }
 
 function toggleFavFilter() {
   showFavs = !showFavs;
   document.getElementById('favBtn').classList.toggle('active', showFavs);
-  if (showFavs) document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  if (showFavs) document.querySelectorAll('.sb-btn').forEach(function(b){ b.classList.remove('active'); });
   else { var btn = document.querySelector('[data-cat="' + currentCat + '"]'); if (btn) btn.classList.add('active'); }
   render();
 }
 
-// ── Counts ──
 function updateCounts() {
-  var cats = ['all','Action','Puzzle','Adventure','Arcade','Sports','Strategy','Multiplayer','Other'];
-  cats.forEach(function(c) {
+  ['all','Action','Puzzle','Adventure','Arcade','Sports','Strategy','Multiplayer','Other'].forEach(function(c){
     var el = document.getElementById('cnt-' + c);
     if (el) el.textContent = c === 'all' ? games.length : games.filter(function(g){ return g.category === c; }).length;
   });
@@ -1755,156 +1733,91 @@ function updateCounts() {
   if (manEl) manEl.textContent = games.filter(function(g){ return g._manual; }).length;
 }
 
-// ── Render ──
 function render() {
   var q = document.getElementById('searchInput').value.toLowerCase();
-
   var list = games.slice();
   if (showFavs) {
     list = list.filter(function(g){ return isFav(g.id); });
   } else if (currentCat === 'recent') {
-    // preserve recency order
     list = recents.map(function(id){ return games.find(function(g){ return g.id === id; }); }).filter(Boolean);
   } else if (currentCat === 'manual') {
     list = list.filter(function(g){ return g._manual; });
   } else if (currentCat !== 'all') {
     list = list.filter(function(g){ return g.category === currentCat; });
   }
-
-  if (q) {
-    list = list.filter(function(g){
-      return g.name.toLowerCase().includes(q) ||
-             (g.description||'').toLowerCase().includes(q) ||
-             (g.author||'').toLowerCase().includes(q);
-    });
-  }
-
-  // Apply sort (skip for 'recent' + no search so the recency order is preserved)
+  if (q) list = list.filter(function(g){
+    return g.name.toLowerCase().includes(q) ||
+           (g.description||'').toLowerCase().includes(q) ||
+           (g.author||'').toLowerCase().includes(q);
+  });
   if (currentCat !== 'recent' || q) list = sortList(list);
 
   document.getElementById('statusFavs').textContent = favs.length ? '⭐ ' + favs.length + ' favourited' : '';
 
   var c = document.getElementById('content');
   if (!list.length) {
-    var emptyIcon = showFavs ? '⭐' : currentCat === 'recent' ? '🕐' : '🔍';
-    var emptyMsg  = showFavs ? 'No favourites yet'
-                  : currentCat === 'recent' ? 'No recently played games yet'
-                  : currentCat === 'manual' ? 'No local games added yet'
-                  : 'No games found';
-    c.innerHTML = '<div class="game-grid"><div class="state-box"><span class="state-icon">' + emptyIcon + '</span><p class="state-msg">' + emptyMsg + '</p></div></div>';
+    var ei = showFavs ? '⭐' : currentCat === 'recent' ? '🕐' : '🔍';
+    var em = showFavs ? 'No favourites yet' : currentCat === 'recent' ? 'No recently played games yet' : currentCat === 'manual' ? 'No local games added yet' : 'No games found';
+    c.innerHTML = '<div class="game-grid"><div class="state-box"><span class="state-icon">' + ei + '</span><p class="state-msg">' + em + '</p></div></div>';
     return;
   }
 
   var html = '';
-
-  // Featured banner — only on "All Games" with no search / fav filter
   var feat = !q && currentCat === 'all' && !showFavs ? games.find(function(g){ return g.featured; }) : null;
-  if (feat) {
-    html += renderFeatured(feat);
-    list = list.filter(function(g){ return g.id !== feat.id; });
-  }
+  if (feat) { html += renderFeatured(feat); list = list.filter(function(g){ return g.id !== feat.id; }); }
 
-  // On "All Games" with no filters, split manual vs registry into two sections
   if (currentCat === 'all' && !q && !showFavs) {
     var manual   = list.filter(function(g){ return g._manual; });
     var registry = list.filter(function(g){ return !g._manual; });
     if (manual.length)   html += renderSection('My Games',  manual);
     if (registry.length) html += renderSection('All Games', registry);
   } else {
-    var label = showFavs       ? 'Favourites'
-              : currentCat === 'recent' ? 'Recently Played'
-              : currentCat === 'manual' ? 'My Games'
-              : currentCat === 'all'    ? 'All Games'
-              : currentCat;
+    var label = showFavs ? 'Favourites' : currentCat === 'recent' ? 'Recently Played' : currentCat === 'manual' ? 'My Games' : currentCat === 'all' ? 'All Games' : currentCat;
     html += renderSection(label, list);
   }
-
   c.innerHTML = html;
 }
 
-// ── Featured banner ──
 function renderFeatured(feat) {
-  var f      = isFav(feat.id);
-  var hasUrl = !!feat.url;
-  var imgHtml;
-
-  if (feat.cover) {
-    imgHtml = '<img class="feat-img" src="' + feat.cover + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
-              '<div class="feat-img-fall" style="display:none">' + (feat.icon||'🎮') + '</div>';
-  } else {
-    imgHtml = '<div class="feat-img-fall">' + (feat.icon||'🎮') + '</div>';
-  }
-
-  var playDisabled = hasUrl ? '' : ' disabled';
-  var playClick    = hasUrl ? ' onclick="event.stopPropagation();playGame(\'' + feat.id + '\')"' : '';
-
+  var f = isFav(feat.id), hasUrl = !!feat.url;
+  var imgHtml = feat.cover
+    ? '<img class="feat-img" src="' + feat.cover + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="feat-img-fall" style="display:none">' + (feat.icon||'🎮') + '</div>'
+    : '<div class="feat-img-fall">' + (feat.icon||'🎮') + '</div>';
   var html = '<div class="featured-wrap" onclick="openDetail(\'' + feat.id + '\')">';
-  html += '<div class="featured-bg"></div><div class="featured-glow"></div>';
-  html += '<div class="featured-content">';
+  html += '<div class="featured-bg"></div><div class="featured-glow"></div><div class="featured-content">';
   html += '<div class="feat-img-wrap">' + imgHtml + '<div class="feat-badge">⭐ Featured</div></div>';
-  html += '<div class="feat-info">';
-  html += '<div class="feat-eye">Featured Game</div>';
+  html += '<div class="feat-info"><div class="feat-eye">Featured Game</div>';
   html += '<div class="feat-name">' + clean(feat.name) + '</div>';
   html += '<div class="feat-desc">' + (clean(feat.description)||'') + '</div>';
   html += '<div class="feat-row">';
   if (feat.author) html += '<span class="feat-meta">by ' + clean(feat.author) + '</span>';
   html += '<button class="btn-feat ' + (f?'fav':'') + '" onclick="event.stopPropagation();toggleFav(\'' + feat.id + '\')">' + (f?'⭐ Favourited':'☆ Favourite') + '</button>';
-  html += '<button class="btn-feat"' + playDisabled + playClick + '>▶ Play</button>';
+  html += '<button class="btn-feat"' + (hasUrl ? ' onclick="event.stopPropagation();playGame(\'' + feat.id + '\')"' : ' disabled') + '>▶ Play</button>';
   html += '</div></div></div></div>';
   return html;
 }
 
-// ── Section ──
 function renderSection(label, list) {
-  var html = '<div class="sec-head">';
-  html += '<div class="sec-title">' + label + '</div>';
-  html += '<div class="sec-count">' + list.length + ' game' + (list.length !== 1 ? 's' : '') + '</div>';
-  html += '</div><div class="game-grid">';
+  var html = '<div class="sec-head"><div class="sec-title">' + label + '</div><div class="sec-count">' + list.length + ' game' + (list.length!==1?'s':'') + '</div></div><div class="game-grid">';
   list.forEach(function(g){ html += cardHtml(g); });
-  html += '</div>';
-  return html;
+  return html + '</div>';
 }
 
-// ── Card ──
 function cardHtml(g) {
-  var f        = isFav(g.id);
-  var hasUrl   = !!g.url;
-  var isManual = !!g._manual;
-  var isRecent = recents.includes(g.id);
-
+  var f = isFav(g.id), hasUrl = !!g.url, isManual = !!g._manual, isRecent = recents.includes(g.id);
   var html = '<div class="game-card" onclick="openDetail(\'' + g.id + '\')">';
-
-  // Cover image + emoji fallback
-  if (g.cover) {
-    html += '<img class="game-cover" src="' + g.cover + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
-  }
-  html += '<div class="game-cover-fall" style="' + (g.cover ? 'display:none' : '') + '">' + (g.icon||'🎮') + '</div>';
-
-  // Play overlay — FIXED: style attribute properly closed
-  html += '<div class="card-overlay">';
-  html += '<div class="play-circle"';
-  if (!hasUrl) html += ' style="opacity:0.4;cursor:not-allowed"';
-  html += ' title="' + (hasUrl ? 'Play' : 'No game file set') + '">';
-  html += hasUrl ? '▶' : '⚠️';
-  html += '</div></div>';
-
-  // Fav button
-  html += '<div class="card-fav-btn' + (f ? ' is-fav' : '') + '" onclick="event.stopPropagation();toggleFav(\'' + g.id + '\')">' + (f ? '⭐' : '☆') + '</div>';
-
-  // Badges
-  if (isManual)                 html += '<div class="card-manual-badge">My Game</div>';
-  else if (isRecent && !isManual) html += '<div class="card-recent-dot" title="Recently played"></div>';
-
-  // Body
-  html += '<div class="card-body">';
-  html += '<div class="card-name">' + clean(g.name) + '</div>';
-  html += '<div class="card-meta"><span class="cat-tag">' + (g.category||'Other') + '</span>';
+  if (g.cover) html += '<img class="game-cover" src="' + g.cover + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">';
+  html += '<div class="game-cover-fall" style="' + (g.cover?'display:none':'') + '">' + (g.icon||'🎮') + '</div>';
+  html += '<div class="card-overlay"><div class="play-circle"' + (hasUrl?'':' style="opacity:0.4;cursor:not-allowed"') + '>' + (hasUrl?'▶':'⚠️') + '</div></div>';
+  html += '<div class="card-fav-btn' + (f?' is-fav':'') + '" onclick="event.stopPropagation();toggleFav(\'' + g.id + '\')">' + (f?'⭐':'☆') + '</div>';
+  if (isManual) html += '<div class="card-manual-badge">My Game</div>';
+  else if (isRecent) html += '<div class="card-recent-dot" title="Recently played"></div>';
+  html += '<div class="card-body"><div class="card-name">' + clean(g.name) + '</div><div class="card-meta"><span class="cat-tag">' + (g.category||'Other') + '</span>';
   if (!hasUrl) html += '<span class="cat-tag" style="background:rgba(239,68,68,.12);color:#fca5a5;border-color:rgba(239,68,68,.2)">No file</span>';
   html += '</div></div></div>';
   return html;
 }
 
-// ── Favourite ──
 function toggleFav(id) {
   if (isFav(id)) { favs = favs.filter(function(f){ return f !== id; }); showToast('Removed from favourites','☆'); }
   else           { favs.push(id); showToast('Added to favourites!','⭐'); }
@@ -1918,73 +1831,111 @@ function refreshFavBtn() {
   document.getElementById('dFavBtn').classList.toggle('is-fav', f);
 }
 
-// ── Play directly (Featured banner button) ──
 function playGame(id) {
   var g = games.find(function(x){ return x.id === id; });
-  if (!g) return;
-  if (!g.url) { showToast('No game file set for this game.','⚠️'); return; }
-  activeGame = g;
-  launchGame();
+  if (!g || !g.url) { showToast('No game file set','⚠️'); return; }
+  activeGame = g; launchGame();
 }
 
-// ── Detail modal ──
 function openDetail(id) {
   var g = games.find(function(x){ return x.id === id; });
   if (!g) return;
   activeGame = g;
-
   var dc = document.getElementById('dCover');
-  if (g.cover) {
-    dc.innerHTML = '<img src="' + g.cover + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.parentElement.textContent=\'' + (g.icon||'🎮').replace(/'/g,"\\'") + '\'">';
-  } else {
-    dc.textContent = g.icon || '🎮';
-  }
-
+  dc.innerHTML = g.cover ? '<img src="' + g.cover + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.parentElement.textContent=\'' + (g.icon||'🎮').replace(/'/g,"\\'") + '\'">' : (g.icon||'🎮');
   document.getElementById('dTitle').textContent  = clean(g.name);
-  document.getElementById('dByline').textContent = [g.author ? 'by ' + clean(g.author) : '', g.category].filter(Boolean).join(' · ');
-
-  var tags = '<span class="cat-tag">' + (g.category||'Other') + '</span>';
+  document.getElementById('dByline').textContent = [g.author?'by '+clean(g.author):'',g.category].filter(Boolean).join(' · ');
+  var tags = '<span class="cat-tag">'+(g.category||'Other')+'</span>';
   if (g.featured) tags += '<span class="cat-tag" style="background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.3)">⭐ Featured</span>';
   if (g._manual)  tags += '<span class="cat-tag" style="background:rgba(0,120,212,.15);color:var(--accent);border-color:rgba(0,120,212,.35)">My Game</span>';
   document.getElementById('dTags').innerHTML = tags;
-
-  document.getElementById('dDesc').textContent = clean(g.description) || 'No description.';
+  document.getElementById('dDesc').textContent = clean(g.description)||'No description.';
   document.getElementById('dGrid').innerHTML =
-    '<div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">' + (g.category||'—') + '</div></div>' +
-    '<div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">' + (clean(g.author)||'—') + '</div></div>' +
-    '<div class="detail-cell"><div class="detail-key">Favourite</div><div class="detail-val">' + (isFav(g.id)?'⭐ Yes':'☆ No') + '</div></div>' +
-    '<div class="detail-cell"><div class="detail-key">Last Played</div><div class="detail-val">' + (recents.includes(g.id) ? '#' + (recents.indexOf(g.id)+1) + ' recently' : 'Not yet') + '</div></div>';
-
+    '<div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">'+(g.category||'—')+'</div></div>'+
+    '<div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">'+(clean(g.author)||'—')+'</div></div>'+
+    '<div class="detail-cell"><div class="detail-key">Favourite</div><div class="detail-val">'+(isFav(g.id)?'⭐ Yes':'☆ No')+'</div></div>'+
+    '<div class="detail-cell"><div class="detail-key">Last Played</div><div class="detail-val">'+(recents.includes(g.id)?'#'+(recents.indexOf(g.id)+1)+' recently':'Not yet')+'</div></div>';
   refreshFavBtn();
-
-  var playBtn = document.getElementById('dPlayBtn');
-  if (g.url) { playBtn.disabled = false; playBtn.style.opacity = '1'; playBtn.title = ''; }
-  else        { playBtn.disabled = true;  playBtn.style.opacity = '0.4'; playBtn.title = 'No game file set'; }
-
+  var pb = document.getElementById('dPlayBtn');
+  pb.disabled = !g.url; pb.style.opacity = g.url?'1':'0.4'; pb.title = g.url?'':'No game file set';
   document.getElementById('detailOverlay').classList.add('open');
 }
-
 function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
 
-// ── Launch ──
+// ═══════════════════════════════════════════════════════════════
+//  LAUNCH
+//  All games load into a fully isolated iframe.
+//  Manual games: fetched then turned into a blob URL so they run
+//  in isolation with zero CSS/JS conflict with this page.
+//  Registry games: iframe src set directly.
+// ═══════════════════════════════════════════════════════════════
+var _blobUrl = null;
+
 function launchGame() {
-  if (!activeGame) return;
-  if (!activeGame.url) { showToast('No game file set for this game.','⚠️'); return; }
+  if (!activeGame || !activeGame.url) { showToast('No game file set','⚠️'); return; }
   closeDetail();
-  addRecent(activeGame.id); // Track recently played
-  sessionStorage.setItem('eclipseos_current_game', JSON.stringify({
-    url:         activeGame.url         || '',
-    name:        activeGame.name        || '',
-    cover:       activeGame.cover       || '',
-    icon:        activeGame.icon        || '🎮',
-    category:    activeGame.category    || '',
-    author:      activeGame.author      || '',
-    description: activeGame.description || '',
-  }));
-  window.location.href = 'os-apps/game-player.html';
+  addRecent(activeGame.id);
+  document.getElementById('gpTitle').textContent = clean(activeGame.name) || 'Game';
+  document.getElementById('gpIcon').textContent  = activeGame.icon || '🎮';
+  document.getElementById('gamePlayerOverlay').classList.add('open');
+
+  // Always use the iframe — container div is unused now
+  var container = document.getElementById('gameContainer');
+  var frame     = document.getElementById('gamePlayerFrame');
+  container.style.display = 'none';
+  frame.style.display = '';
+  frame.src = 'about:blank';
+
+  _currentGameUrl = activeGame.url;
+
+  if (activeGame._manual) {
+    // Fetch HTML, rewrite relative paths, wrap in a blob URL.
+    // The iframe loads the blob — fully isolated, no shared CSS/JS.
+    fetch(activeGame.url)
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function(html) {
+        // Inject <base> so relative asset paths still resolve
+        var base = activeGame.url;
+        if (!/<base[\s>]/i.test(html)) {
+          html = html.replace(/(<head[^>]*>)/i, '$1<base href="' + base + '">');
+          if (!/<head/i.test(html)) html = '<base href="' + base + '">' + html;
+        }
+        // Revoke any previous blob to free memory
+        if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
+        _blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        frame.src = _blobUrl;
+      })
+      .catch(function() {
+        frame.srcdoc = '<body style="background:#000;color:#fca5a5;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:14px;margin:0">⚠️ Could not load game — check the URL</body>';
+      });
+  } else {
+    frame.src = activeGame.url;
+  }
 }
 
-// ── Toast ──
+function closeGamePlayer() {
+  document.getElementById('gamePlayerOverlay').classList.remove('open');
+  var frame = document.getElementById('gamePlayerFrame');
+  frame.src = 'about:blank';
+  frame.style.display = 'none';
+  document.getElementById('gameContainer').style.display = 'none';
+  if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
+  render();
+}
+
+function reloadGame() {
+  if (!activeGame) return;
+  // Re-run the full launch flow which handles both manual and registry
+  launchGame();
+}
+
+function toggleFullscreen() {
+  var overlay = document.getElementById('gamePlayerOverlay');
+  if (!document.fullscreenElement) { overlay.requestFullscreen && overlay.requestFullscreen(); }
+  else { document.exitFullscreen && document.exitFullscreen(); }
+}
+
+// Toast
 var toastT;
 function showToast(msg, icon) {
   icon = icon || '✓';
@@ -1995,7 +1946,6 @@ function showToast(msg, icon) {
   toastT = setTimeout(function(){ document.getElementById('toast').classList.remove('show'); }, 2500);
 }
 
-// ── Init ──
 loadGames();
 </script>
 </body>

@@ -1,1249 +1,1450 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EclipseOS</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; overflow: hidden; height: 100vh; width: 100vw; user-select: none; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServerplexOS</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;overflow:hidden;height:100vh;width:100vw;user-select:none}
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes scaleIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-        
-        @keyframes windowOpen {
-            from { 
-                transform: scale(0.95) translateY(10px); 
-                opacity: 0;
-            }
-            to { 
-                transform: scale(1) translateY(0); 
-                opacity: 1;
-            }
-        }
-        
-        @keyframes windowClose {
-            from { 
-                transform: scale(1) translateY(0); 
-                opacity: 1;
-            }
-            to { 
-                transform: scale(0.95) translateY(10px); 
-                opacity: 0;
-            }
-        }
-        
-        @keyframes windowMinimize {
-            from { 
-                transform: scale(1) translateY(0); 
-                opacity: 1;
-            }
-            to { 
-                transform: scale(0.3) translateY(300px); 
-                opacity: 0;
-            }
-        }
-        
-        @keyframes windowRestore {
-            from { 
-                transform: scale(0.3) translateY(300px); 
-                opacity: 0;
-            }
-            to { 
-                transform: scale(1) translateY(0); 
-                opacity: 1;
-            }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
+/* ── Themes ── */
+body.theme-white{--bg:#f0f0f0;--bg2:#e0e0e0;--bg3:#d0d0d0;--text:#000;--text2:#444;--border:#ccc;--win-bg:#fff;--tb-bg:rgba(243,243,243,0.82);--accent:#0078d4;--glass:rgba(255,255,255,0.55)}
+body.theme-black{--bg:#000;--bg2:#1a1a1a;--bg3:#2a2a2a;--text:#fff;--text2:#aaa;--border:#444;--win-bg:#1e1e1e;--tb-bg:rgba(10,10,10,0.82);--accent:#0078d4;--glass:rgba(20,20,20,0.55)}
+body.theme-grey{--bg:#808080;--bg2:#6a6a6a;--bg3:#555;--text:#fff;--text2:#ddd;--border:#999;--win-bg:#707070;--tb-bg:rgba(50,50,50,0.82);--accent:#4a9eff;--glass:rgba(80,80,80,0.55)}
 
-        /* Theme Variables */
-        body.theme-white { --bg-primary: #ffffff; --bg-secondary: #f0f0f0; --bg-tertiary: #e0e0e0; --text-primary: #000000; --text-secondary: #666666; --border-color: #cccccc; --window-bg: #ffffff; --taskbar-bg: #f3f3f3; --accent: #0078d4; }
-        body.theme-black { --bg-primary: #000000; --bg-secondary: #1a1a1a; --bg-tertiary: #2a2a2a; --text-primary: #ffffff; --text-secondary: #aaaaaa; --border-color: #444444; --window-bg: #1e1e1e; --taskbar-bg: #0a0a0a; --accent: #0078d4; }
-        body.theme-grey { --bg-primary: #808080; --bg-secondary: #6a6a6a; --bg-tertiary: #555555; --text-primary: #ffffff; --text-secondary: #dddddd; --border-color: #999999; --window-bg: #707070; --taskbar-bg: #505050; --accent: #4a9eff; }
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes scaleIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes winOpen{from{transform:scale(0.93) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+@keyframes winClose{from{transform:scale(1);opacity:1}to{transform:scale(0.93) translateY(12px);opacity:0}}
+@keyframes winMin{from{transform:scale(1);opacity:1}to{transform:scale(0.2) translateY(400px);opacity:0}}
+@keyframes winRestore{from{transform:scale(0.2) translateY(400px);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes slideRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes slideDown{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes shutdownFade{from{opacity:0}to{opacity:1}}
+@keyframes ticker{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-        /* Desktop */
-        .desktop { position: fixed; top: 0; left: 0; width: 100%; height: calc(100% - 48px); background: var(--bg-primary); background-size: cover; background-position: center; }
-        .desktop-icons { padding: 20px; position: relative; width: 100%; height: 100%; }
-        .desktop-icon { width: 80px; height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; padding: 8px; transition: all 0.2s ease; position: absolute; }
-        .desktop-icon.dragging { opacity: 0.7; transition: none; }
-        .desktop-icon:not(.dragging) { transition: left 0.2s ease, top 0.2s ease, background 0.2s ease, transform 0.2s ease; }
-        .desktop-icon:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-        .desktop-icon:active { transform: scale(0.95); }
-        .desktop-icon.selected { background: rgba(0, 120, 212, 0.3); border: 1px solid var(--accent); animation: pulse 0.5s ease; }
-        .icon-image { font-size: 48px; margin-bottom: 4px; transition: transform 0.2s ease; }
-        .desktop-icon:hover .icon-image { transform: scale(1.1); }
-        .icon-label { color: var(--text-primary); font-size: 12px; text-align: center; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); word-wrap: break-word; width: 100%; }
-        
-        /* Grid preview indicator */
-        .grid-preview { 
-            position: absolute; 
-            width: 80px; 
-            height: 80px; 
-            border: 2px dashed var(--accent); 
-            background: rgba(0, 120, 212, 0.1); 
-            border-radius: 4px; 
-            pointer-events: none; 
-            display: none;
-            z-index: 999;
-            transition: all 0.1s ease;
-        }
-        .grid-preview.occupied {
-            border-color: #ff3b30;
-            background: rgba(255, 59, 48, 0.1);
-        }
+/* ── Desktop ── */
+.desktop{position:fixed;top:0;left:0;width:100%;height:calc(100% - 68px);background:var(--bg);background-size:cover;background-position:center;overflow:hidden}
+.desktop-icons{padding:20px;position:relative;width:100%;height:100%}
+.desktop-icon{width:80px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;padding:8px;position:absolute;transition:background .15s,box-shadow .15s,transform .15s}
+.desktop-icon:not(.dragging){transition:left .2s,top .2s,background .15s,transform .15s}
+.desktop-icon.dragging{opacity:.7;transition:none;z-index:999}
+.desktop-icon:hover{background:rgba(255,255,255,.14);transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.desktop-icon.selected{background:rgba(0,120,212,.3);border:1px solid var(--accent);animation:pulse .5s ease}
+.icon-image{font-size:46px;margin-bottom:3px;transition:transform .2s}
+.desktop-icon:hover .icon-image{transform:scale(1.12)}
+.icon-label{color:var(--text);font-size:11px;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.6);word-break:break-word;width:100%;line-height:1.2}
+.icon-label-edit{font-size:11px;width:76px;text-align:center;background:var(--accent);color:#fff;border:none;border-radius:3px;outline:none;font-family:'Oxanium',sans-serif;padding:1px 3px}
+.grid-preview{position:absolute;width:80px;height:80px;border:2px dashed var(--accent);background:rgba(0,120,212,.1);border-radius:6px;pointer-events:none;display:none;z-index:999}
+.grid-preview.occupied{border-color:#ff3b30;background:rgba(255,59,48,.1)}
+/* Rubber-band selection */
+.rubber-band{position:absolute;border:1px solid var(--accent);background:rgba(0,120,212,.08);pointer-events:none;display:none;z-index:998}
 
+/* ── Window snapping ── */
+.snap-preview{position:fixed;background:rgba(0,120,212,.18);border:2px solid rgba(0,120,212,.55);border-radius:6px;pointer-events:none;z-index:99999;display:none;transition:all .12s}
+.window.snap-left{top:0!important;left:0!important;width:50%!important;height:calc(100% - 68px)!important;border-radius:0;transition:all .2s}
+.window.snap-right{top:0!important;left:50%!important;width:50%!important;height:calc(100% - 68px)!important;border-radius:0;transition:all .2s}
+.window.snap-tl{top:0!important;left:0!important;width:50%!important;height:50%!important;border-radius:0;transition:all .2s}
+.window.snap-tr{top:0!important;left:50%!important;width:50%!important;height:50%!important;border-radius:0;transition:all .2s}
+.window.snap-bl{top:50%!important;left:0!important;width:50%!important;height:calc(50% - 34px)!important;border-radius:0;transition:all .2s}
+.window.snap-br{top:50%!important;left:50%!important;width:50%!important;height:calc(50% - 34px)!important;border-radius:0;transition:all .2s}
 
-        /* Window snapping */
-        .window.snap-left  { top: 0 !important; left: 0 !important; width: 50% !important; height: calc(100% - 48px) !important; border-radius: 0; transition: all 0.2s ease; }
-        .window.snap-right { top: 0 !important; left: 50% !important; width: 50% !important; height: calc(100% - 48px) !important; border-radius: 0; transition: all 0.2s ease; }
-        .snap-preview { position: fixed; background: rgba(0,120,212,0.2); border: 2px solid rgba(0,120,212,0.6); border-radius: 6px; pointer-events: none; z-index: 99999; display: none; transition: all 0.1s ease; }
+/* ── Windows ── */
+.window{position:absolute;background:var(--win-bg);border:1px solid var(--border);border-radius:10px 10px 6px 6px;box-shadow:0 16px 48px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.2);display:flex;flex-direction:column;min-width:360px;min-height:260px;z-index:100;animation:winOpen .22s cubic-bezier(.34,1.56,.64,1)}
+.window.closing{animation:winClose .18s ease-out forwards}
+.window.maximized{top:0!important;left:0!important;width:100%!important;height:calc(100% - 68px)!important;border-radius:0;transition:all .28s cubic-bezier(.34,1.56,.64,1)}
+.window.minimizing{animation:winMin .28s ease-out forwards}
+.window.minimized{display:none}
+.window.restoring{animation:winRestore .28s cubic-bezier(.34,1.56,.64,1)}
+.window-titlebar{height:38px;display:flex;align-items:center;padding:0 12px;cursor:move;border-radius:10px 10px 0 0;user-select:none;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.window-icon{font-size:16px;margin-right:8px}
+.window-title{flex:1;font-size:13px;font-weight:600;letter-spacing:.2px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.window-controls{display:flex;gap:6px}
+.wcb{width:30px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;font-size:15px;font-weight:700;transition:all .15s;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff}
+.wcb:hover{background:rgba(255,255,255,.22);transform:scale(1.08)}
+.wcb.min:hover{background:rgba(255,193,7,.8)}
+.wcb.max:hover{background:rgba(76,175,80,.8)}
+.wcb.cls:hover{background:rgba(244,67,54,.9)}
+.window-content{flex:1;overflow:hidden;background:var(--win-bg);color:var(--text)}
+.window-content iframe{width:100%;height:100%;border:none}
+.resize-handle{position:absolute;background:transparent}
+.resize-handle.right{right:0;top:0;width:5px;height:100%;cursor:ew-resize}
+.resize-handle.bottom{bottom:0;left:0;width:100%;height:5px;cursor:ns-resize}
+.resize-handle.bottom-right{bottom:0;right:0;width:14px;height:14px;cursor:nwse-resize}
+.resize-tooltip{position:fixed;background:rgba(0,0,0,.75);color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;pointer-events:none;z-index:999999;display:none;font-family:'Oxanium',sans-serif;letter-spacing:.5px}
 
-        /* Desktop context menu */
-        .desktop-ctx-menu { position: fixed; background: var(--window-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 4px 0; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); z-index: 99999; display: none; }
-        .desktop-ctx-menu.open { display: block; animation: scaleIn 0.15s ease; }
-        .ctx-item { padding: 8px 16px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 10px; color: var(--text-primary); }
-        .ctx-item:hover { background: var(--bg-secondary); }
-        .ctx-sep { height: 1px; background: var(--border-color); margin: 4px 0; }
+/* ── Taskbar ── */
+.taskbar{position:fixed;bottom:20px;left:0;width:100%;height:48px;background:var(--tb-bg);border-top:1px solid rgba(255,255,255,.12);display:flex;align-items:center;padding:0 8px;z-index:10000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -2px 20px rgba(0,0,0,.15)}
+.start-button{width:44px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:none;cursor:pointer;font-size:20px;border-radius:6px;transition:all .25s cubic-bezier(.34,1.56,.64,1);flex-shrink:0}
+.start-button:hover{background:var(--bg3);transform:scale(1.1) rotate(8deg)}
+/* Virtual desktop switcher */
+.vd-switcher{display:flex;gap:3px;padding:0 6px;flex-shrink:0}
+.vd-btn{width:28px;height:28px;border-radius:5px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);transition:all .18s;font-family:'Oxanium',sans-serif}
+.vd-btn:hover{background:var(--bg2);color:var(--text)}
+.vd-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* Pinned apps */
+.pinned-apps{display:flex;gap:3px;padding:0 4px;border-right:1px solid var(--border);margin-right:4px;flex-shrink:0}
+.pinned-app{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:20px;transition:all .18s;position:relative;border:1px solid transparent}
+.pinned-app:hover{background:var(--bg2);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.pinned-app.running::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--accent)}
+/* Open apps */
+.taskbar-apps{flex:1;display:flex;gap:3px;padding:0 4px;overflow-x:auto;min-width:0}
+.taskbar-apps::-webkit-scrollbar{display:none}
+.taskbar-app{min-width:130px;max-width:200px;height:36px;display:flex;align-items:center;gap:6px;padding:0 8px;background:var(--bg2);border:none;border-radius:6px;cursor:pointer;color:var(--text);font-size:12px;font-weight:600;transition:all .18s;position:relative;animation:slideUp .25s ease;border-bottom:2px solid transparent;flex-shrink:0}
+.taskbar-app:hover{background:var(--bg3);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.taskbar-app.active{background:var(--accent);color:#fff;border-bottom-color:rgba(255,255,255,.5)}
+.taskbar-app-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb-cls{width:14px;height:14px;display:flex;align-items:center;justify-content:center;border-radius:3px;font-size:10px;opacity:0;transition:all .12s;flex-shrink:0}
+.taskbar-app:hover .tb-cls{opacity:1}
+.tb-cls:hover{background:rgba(220,53,69,.7);color:#fff}
+/* System tray */
+.system-tray{display:flex;align-items:center;gap:8px;padding:0 8px;flex-shrink:0}
+.tray-icon{cursor:pointer;padding:4px 6px;border-radius:4px;transition:all .18s;color:var(--text);font-size:13px;display:flex;align-items:center;gap:3px}
+.tray-icon:hover{background:var(--bg2);transform:scale(1.08)}
+.tray-clock{display:flex;flex-direction:column;align-items:center;padding:4px 8px;cursor:pointer}
+.tray-clock:hover{background:var(--bg2);border-radius:4px}
+#clockTime{font-size:13px;font-weight:700;line-height:1.2;color:var(--text)}
+#clockDate{font-size:9px;color:var(--text2);line-height:1.2}
+/* DnD indicator */
+.dnd-dot{width:6px;height:6px;border-radius:50%;background:#ff3b30;display:none;margin-left:-2px}
+.dnd-dot.on{display:block}
 
-        /* Desktop widgets */
-        .desktop-widget { position: absolute; z-index: 50; user-select: none; }
-        .widget-clock { background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 12px 18px; color: white; text-align: center; cursor: move; min-width: 140px; }
-        .widget-clock .wc-time { font-size: 32px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
-        .widget-clock .wc-date { font-size: 11px; opacity: 0.6; margin-top: 4px; letter-spacing: 1px; }
-        .widget-stats { background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 12px 16px; color: white; cursor: move; min-width: 160px; }
-        .widget-stats .ws-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 3px 0; }
-        .widget-stats .ws-label { opacity: 0.6; }
-        .widget-stats .ws-val { font-weight: 700; }
-        .widget-sticky { background: #fef08a; border-radius: 10px; padding: 10px 12px; cursor: move; min-width: 160px; min-height: 100px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .widget-sticky textarea { width: 100%; height: 80px; border: none; background: transparent; resize: none; outline: none; font-family: 'Oxanium', sans-serif; font-size: 13px; color: rgba(0,0,0,0.7); }
-        .widget-close { position: absolute; top: 6px; right: 8px; background: rgba(0,0,0,0.15); border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
-        .desktop-widget:hover .widget-close { opacity: 1; }
+/* ── News ticker ── */
+.news-ticker{position:fixed;bottom:0;left:0;width:100%;height:20px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:flex;align-items:center;overflow:hidden;z-index:9999;border-top:1px solid rgba(255,255,255,.07)}
+.ticker-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);padding:0 10px;white-space:nowrap;flex-shrink:0;border-right:1px solid rgba(255,255,255,.15);margin-right:8px}
+.ticker-track{flex:1;overflow:hidden;position:relative;height:100%}
+.ticker-inner{position:absolute;white-space:nowrap;font-size:10px;color:rgba(255,255,255,.7);top:50%;transform:translateY(-50%);animation:ticker 40s linear infinite}
+.ticker-inner:hover{animation-play-state:paused}
 
-        /* Windows */
-        .window { position: absolute; background: var(--window-bg); border: 1px solid var(--border-color); border-radius: 8px 8px 0 0; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35); display: flex; flex-direction: column; min-width: 400px; min-height: 300px; z-index: 100; animation: windowOpen 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .window.closing { animation: windowClose 0.2s ease-out forwards; }
-        .window.maximized { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(100% - 48px) !important; border-radius: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .window.minimizing { animation: windowMinimize 0.3s ease-out forwards; }
-        .window.minimized { display: none; }
-        .window.restoring { animation: windowRestore 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .window-titlebar { height: 40px; background: var(--accent); color: white; display: flex; align-items: center; padding: 0 16px; cursor: move; border-radius: 8px 8px 0 0; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .window-icon { font-size: 18px; margin-right: 10px; }
-        .window-title { flex: 1; font-size: 14px; font-weight: 600; letter-spacing: 0.3px; }
-        .window-controls { display: flex; gap: 8px; }
-        .window-control-btn { width: 32px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 4px; font-size: 16px; font-weight: bold; transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); }
-        .window-control-btn:hover { background: rgba(255, 255, 255, 0.25); transform: scale(1.1); }
-        .window-control-btn:active { transform: scale(0.95); }
-        .window-control-btn.minimize-btn:hover { background: rgba(255, 193, 7, 0.8); }
-        .window-control-btn.maximize-btn:hover { background: rgba(76, 175, 80, 0.8); }
-        .window-control-btn.close-btn:hover { background: rgba(244, 67, 54, 0.9); }
-        .window-content { flex: 1; overflow: hidden; background: var(--window-bg); color: var(--text-primary); }
-        .window-content iframe { width: 100%; height: 100%; border: none; }
+/* ── Start Menu ── */
+.start-menu{position:fixed;bottom:72px;left:8px;width:580px;height:580px;background:var(--glass);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,.35);display:none;flex-direction:column;z-index:10001;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
+.start-menu.active{display:flex;animation:scaleIn .25s cubic-bezier(.34,1.56,.64,1)}
+.sm-header{padding:18px 20px 14px;border-bottom:1px solid var(--border)}
+.sm-user{display:flex;align-items:center;gap:12px}
+.sm-avatar{width:44px;height:44px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:transform .3s}
+.sm-avatar:hover{transform:rotate(360deg)}
+.sm-name{font-weight:700;font-size:15px;color:var(--text)}
+.sm-status{font-size:11px;color:var(--text2)}
+.sm-apps{flex:1;padding:16px;overflow-y:auto}
+.sm-section{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
+.sm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.sm-item{padding:12px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column;align-items:center;gap:6px}
+.sm-item:hover{background:var(--bg3);transform:translateY(-3px) scale(1.02);box-shadow:0 8px 20px rgba(0,0,0,.25);border-color:var(--accent)}
+.sm-icon{font-size:28px;transition:transform .2s}
+.sm-item:hover .sm-icon{transform:scale(1.15) rotate(5deg)}
+.sm-label{font-size:11px;color:var(--text);font-weight:600;text-align:center}
+.sm-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:8px}
+.sm-btn{padding:7px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);font-size:12px;font-family:'Oxanium',sans-serif;transition:all .2s}
+.sm-btn:hover{background:var(--bg3);transform:scale(1.04)}
 
-        /* Resize handles */
-        .resize-handle { position: absolute; background: transparent; }
-        .resize-handle.right { right: 0; top: 0; width: 5px; height: 100%; cursor: ew-resize; }
-        .resize-handle.bottom { bottom: 0; left: 0; width: 100%; height: 5px; cursor: ns-resize; }
-        .resize-handle.bottom-right { bottom: 0; right: 0; width: 15px; height: 15px; cursor: nwse-resize; }
+/* ── Spotlight search ── */
+.spotlight-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(6px);z-index:99990;display:none;align-items:flex-start;justify-content:center;padding-top:120px}
+.spotlight-overlay.open{display:flex;animation:fadeIn .15s ease}
+.spotlight-box{width:580px;background:var(--glass);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);backdrop-filter:blur(24px);animation:slideDown .2s ease}
+.spotlight-input-row{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.spotlight-input-row span{font-size:18px;flex-shrink:0}
+.spotlight-input{flex:1;background:transparent;border:none;outline:none;font-family:'Oxanium',sans-serif;font-size:16px;color:var(--text)}
+.spotlight-input::placeholder{color:var(--text2)}
+.spotlight-results{max-height:360px;overflow-y:auto;padding:8px}
+.spotlight-result{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .12s}
+.spotlight-result:hover,.spotlight-result.highlighted{background:var(--bg2)}
+.spotlight-result-icon{font-size:24px;width:32px;text-align:center;flex-shrink:0}
+.spotlight-result-name{font-size:14px;font-weight:600;color:var(--text)}
+.spotlight-result-cat{font-size:11px;color:var(--text2)}
+.spotlight-empty{text-align:center;padding:30px;color:var(--text2);font-size:13px}
 
-        /* Taskbar */
-        .taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 48px; background: var(--taskbar-bg); border-top: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 8px; z-index: 10000; }
-        .start-button { width: 48px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--bg-secondary); border: none; cursor: pointer; font-size: 20px; border-radius: 4px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .start-button:hover { background: var(--bg-tertiary); transform: scale(1.12) rotate(8deg); }
-        .start-button:active { transform: scale(0.95); }
-        .taskbar-apps { flex: 1; display: flex; gap: 4px; padding: 0 8px; overflow-x: auto; }
-        .taskbar-app {
-            min-width: 150px; max-width: 220px; height: 36px;
-            display: flex; align-items: center; gap: 8px; padding: 0 10px;
-            background: var(--bg-secondary); border: none;
-            border-radius: 6px; cursor: pointer; color: var(--text-primary);
-            font-size: 13px; font-weight: 600;
-            transition: all 0.2s ease;
-            position: relative;
-            animation: slideUp 0.3s ease;
-            border-bottom: 2px solid transparent;
-        }
-        .taskbar-app:hover { background: var(--bg-tertiary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .taskbar-app:active { transform: translateY(0); }
-        .taskbar-app.active { background: var(--accent); color: white; border-bottom-color: rgba(255,255,255,0.5); }
-        .taskbar-app-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .taskbar-close-btn { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 11px; opacity: 0; transition: all 0.15s ease; flex-shrink: 0; }
-        .taskbar-app:hover .taskbar-close-btn { opacity: 1; }
-        .taskbar-close-btn:hover { background: rgba(220, 53, 69, 0.7); color: white; transform: scale(1.1); }
-        .system-tray { display: flex; align-items: center; gap: 12px; padding: 0 12px; color: var(--text-primary); font-size: 13px; }
-        .tray-icon { cursor: pointer; padding: 4px; border-radius: 2px; transition: all 0.2s ease; }
-        .tray-icon:hover { background: var(--bg-tertiary); transform: scale(1.1); }
-        .tray-icon.clock { display: flex; flex-direction: column; align-items: center; padding: 4px 8px; }
-        .tray-icon.clock:hover { transform: none; }
-        #clockTime { font-size: 13px; font-weight: 600; line-height: 1.2; }
-        #clockDate { font-size: 10px; color: var(--text-secondary); line-height: 1.2; }
+/* ── Virtual desktop preview ── */
+.vd-preview-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:99980;display:none;align-items:center;justify-content:center;gap:20px}
+.vd-preview-overlay.open{display:flex;animation:fadeIn .2s ease}
+.vd-thumb{width:220px;height:140px;background:var(--bg2);border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;position:relative;overflow:hidden}
+.vd-thumb:hover,.vd-thumb.active{border-color:var(--accent);transform:scale(1.04);box-shadow:0 8px 24px rgba(0,120,212,.3)}
+.vd-thumb-label{font-size:13px;font-weight:700;color:var(--text)}
+.vd-thumb-count{font-size:11px;color:var(--text2)}
 
-        /* Start Menu */
-        .start-menu { position: fixed; bottom: 56px; left: 8px; width: 600px; height: 600px; background: var(--window-bg); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); display: none; flex-direction: column; z-index: 10001; }
-        .start-menu.active { display: flex; animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .start-menu-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
-        .start-menu-user { display: flex; align-items: center; gap: 12px; color: var(--text-primary); }
-        .user-avatar { width: 48px; height: 48px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; transition: transform 0.3s ease; }
-        .user-avatar:hover { transform: rotate(360deg); }
-        .user-info { flex: 1; }
-        .user-name { font-weight: 600; font-size: 16px; }
-        .user-status { font-size: 12px; color: var(--text-secondary); }
-        .start-menu-apps { flex: 1; padding: 20px; overflow-y: auto; }
-        .app-section-title { color: var(--text-secondary); font-size: 12px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; }
-        .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-        .start-app-item { padding: 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .start-app-item:hover { background: var(--bg-tertiary); transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 20px rgba(0,0,0,0.25); border-color: var(--accent); }
-        .start-app-item:active { transform: translateY(-2px) scale(0.98); }
-        .start-app-icon { font-size: 32px; transition: transform 0.3s ease; }
-        .start-app-item:hover .start-app-icon { transform: scale(1.2) rotate(5deg); }
-        .start-app-name { font-size: 13px; color: var(--text-primary); font-weight: 600; }
-        .start-menu-footer { padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; }
-        .power-btn { padding: 8px 16px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer; color: var(--text-primary); font-size: 13px; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .power-btn:hover { background: var(--bg-tertiary); transform: scale(1.05); }
+/* ── Notification center ── */
+.notif-panel{position:fixed;top:0;right:0;width:320px;height:calc(100% - 68px);background:var(--glass);border-left:1px solid var(--border);backdrop-filter:blur(24px);z-index:99970;transform:translateX(100%);transition:transform .28s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column}
+.notif-panel.open{transform:translateX(0)}
+.notif-header{padding:18px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.notif-title{font-size:14px;font-weight:700;color:var(--text)}
+.notif-clear{font-size:11px;color:var(--accent);cursor:pointer;padding:3px 8px;border-radius:4px;border:none;background:transparent;font-family:'Oxanium',sans-serif}
+.notif-clear:hover{background:var(--bg2)}
+.notif-list{flex:1;overflow-y:auto;padding:12px 10px;display:flex;flex-direction:column;gap:8px}
+.notif-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;animation:slideDown .2s ease}
+.notif-item-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.notif-item-icon{font-size:16px}
+.notif-item-app{font-size:11px;font-weight:700;color:var(--text2);flex:1;letter-spacing:.5px;text-transform:uppercase}
+.notif-item-time{font-size:10px;color:var(--text2)}
+.notif-item-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.notif-item-body{font-size:12px;color:var(--text2);line-height:1.5}
+.notif-dismiss{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;padding:0 4px;transition:color .15s}
+.notif-dismiss:hover{color:var(--text)}
+.notif-empty{text-align:center;padding:40px 20px;color:var(--text2);font-size:13px}
 
-        /* ── Tray popups ── */
-        .tray-popup {
-            position: fixed; bottom: 56px; right: 12px;
-            background: var(--window-bg); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 16px; width: 260px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            z-index: 10002; display: none;
-            animation: slideUpPop 0.2s cubic-bezier(0.34,1.56,0.64,1);
-        }
-        .tray-popup.active { display: block; }
-        @keyframes slideUpPop {
-            from { opacity:0; transform:translateY(12px) scale(0.96); }
-            to   { opacity:1; transform:translateY(0)    scale(1); }
-        }
-        .tray-popup-title {
-            font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-            color: var(--text-secondary); margin-bottom: 12px; font-weight: 600;
-        }
-        .tray-slider-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
-        }
-        .tray-slider-row span { font-size: 18px; width: 24px; text-align: center; }
-        .tray-slider {
-            flex: 1; -webkit-appearance: none; height: 4px;
-            border-radius: 2px; background: var(--bg-tertiary); outline: none; cursor: pointer;
-        }
-        .tray-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 16px; height: 16px;
-            border-radius: 50%; background: var(--accent); cursor: pointer;
-            box-shadow: 0 0 4px rgba(0,120,212,0.4);
-        }
-        .tray-value {
-            font-size: 13px; font-weight: 600; color: var(--text-primary);
-            width: 36px; text-align: right;
-        }
-        .tray-mute-btn {
-            width: 100%; padding: 8px; margin-top: 6px;
-            background: var(--bg-secondary); border: 1px solid var(--border-color);
-            border-radius: 6px; cursor: pointer; color: var(--text-primary);
-            font-size: 13px; transition: background 0.2s;
-        }
-        .tray-mute-btn:hover { background: var(--bg-tertiary); }
-        .net-status {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 12px; background: var(--bg-secondary);
-            border-radius: 8px; margin-bottom: 8px;
-        }
-        .net-status-dot {
-            width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
-        }
-        .net-status-dot.online  { background: #34c759; box-shadow: 0 0 6px #34c759; }
-        .net-status-dot.offline { background: #ff3b30; box-shadow: 0 0 6px #ff3b30; }
-        .net-status-info { flex: 1; }
-        .net-status-info .ns-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-        .net-status-info .ns-sub   { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+/* ── Quick settings ── */
+.qs-panel{position:fixed;bottom:72px;right:8px;width:280px;background:var(--glass);border:1px solid var(--border);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.35);backdrop-filter:blur(24px);z-index:99971;display:none;padding:16px;animation:scaleIn .2s ease}
+.qs-panel.open{display:block}
+.qs-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:12px}
+.qs-toggles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.qs-toggle{padding:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;cursor:pointer;text-align:center;transition:all .18s;font-size:12px;font-weight:600;color:var(--text)}
+.qs-toggle:hover{background:var(--bg3)}
+.qs-toggle.on{background:rgba(0,120,212,.2);border-color:var(--accent);color:var(--accent)}
+.qs-toggle-icon{font-size:20px;display:block;margin-bottom:4px}
+.qs-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.qs-slider-row span:first-child{font-size:16px;width:22px;text-align:center}
+.qs-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
+.qs-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+.qs-val{font-size:11px;font-weight:700;color:var(--text);width:32px;text-align:right}
+.qs-themes{display:flex;gap:6px;margin-top:12px}
+.qs-theme{flex:1;padding:6px;border-radius:7px;cursor:pointer;border:2px solid var(--border);font-size:11px;font-weight:700;text-align:center;transition:all .18s}
+.qs-theme:hover{transform:scale(1.04)}
+.qs-theme.active{border-color:var(--accent)}
+
+/* ── Calendar popup ── */
+.cal-popup{position:fixed;bottom:72px;right:8px;width:240px;background:var(--glass);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.35);backdrop-filter:blur(24px);z-index:99972;display:none;padding:14px;animation:scaleIn .18s ease}
+.cal-popup.open{display:block}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-month{font-size:13px;font-weight:700;color:var(--text)}
+.cal-nav{background:none;border:none;cursor:pointer;color:var(--text2);font-size:14px;padding:2px 6px;border-radius:4px;transition:background .15s;font-family:'Oxanium',sans-serif}
+.cal-nav:hover{background:var(--bg2);color:var(--text)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+.cal-dow{font-size:9px;font-weight:700;color:var(--text2);padding:2px 0;letter-spacing:1px}
+.cal-day{font-size:11px;padding:4px 2px;border-radius:4px;cursor:default;color:var(--text);transition:background .12s}
+.cal-day.today{background:var(--accent);color:#fff;border-radius:50%;font-weight:700}
+.cal-day.other-month{color:var(--text2);opacity:.4}
+
+/* ── Desktop context menu ── */
+.desk-ctx{position:fixed;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:4px 0;min-width:200px;box-shadow:0 10px 28px rgba(0,0,0,.3);z-index:99999;display:none;backdrop-filter:blur(20px)}
+.desk-ctx.open{display:block;animation:scaleIn .12s ease}
+.ctx-item{padding:8px 14px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:10px;color:var(--text);transition:background .1s}
+.ctx-item:hover{background:var(--bg2)}
+.ctx-sep{height:1px;background:var(--border);margin:3px 0}
+
+/* ── Desktop widgets ── */
+.desktop-widget{position:absolute;z-index:50;user-select:none}
+.widget-clock{background:rgba(0,0,0,.48);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 18px;color:#fff;text-align:center;cursor:move;min-width:140px}
+.widget-clock .wc-time{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1}
+.widget-clock .wc-date{font-size:11px;opacity:.55;margin-top:4px;letter-spacing:1px}
+.widget-stats{background:rgba(0,0,0,.48);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;color:#fff;cursor:move;min-width:160px}
+.widget-stats .ws-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0}
+.widget-stats .ws-label{opacity:.55}
+.widget-stats .ws-val{font-weight:700}
+.widget-stats .ws-bar{height:3px;background:rgba(255,255,255,.15);border-radius:2px;margin:3px 0;overflow:hidden}
+.widget-stats .ws-fill{height:100%;border-radius:2px;transition:width .8s ease}
+.widget-sticky{background:#fef08a;border-radius:10px;padding:10px 12px;cursor:move;min-width:160px;min-height:100px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.widget-sticky textarea{width:100%;height:80px;border:none;background:transparent;resize:none;outline:none;font-family:'Oxanium',sans-serif;font-size:12px;color:rgba(0,0,0,.7)}
+.widget-weather{background:rgba(0,0,0,.48);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 16px;color:#fff;cursor:move;min-width:160px}
+.widget-close{position:absolute;top:5px;right:7px;background:rgba(0,0,0,.18);border:none;border-radius:50%;width:17px;height:17px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .18s}
+.desktop-widget:hover .widget-close{opacity:1}
+
+/* ── Tray popups ── */
+.tray-popup{position:fixed;bottom:72px;right:12px;background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;width:250px;box-shadow:0 10px 32px rgba(0,0,0,.3);z-index:99973;display:none;backdrop-filter:blur(24px);animation:scaleIn .18s ease}
+.tray-popup.active{display:block}
+.tray-popup-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
+.tray-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.tray-slider-row span{font-size:16px;width:22px;text-align:center}
+.tray-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
+.tray-slider::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 4px rgba(0,120,212,.4)}
+.tray-value{font-size:12px;font-weight:700;color:var(--text);width:34px;text-align:right}
+.tray-mute-btn{width:100%;padding:7px;margin-top:5px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);font-size:12px;font-family:'Oxanium',sans-serif;transition:background .15s}
+.tray-mute-btn:hover{background:var(--bg3)}
+.net-status{display:flex;align-items:center;gap:10px;padding:9px 10px;background:var(--bg2);border-radius:8px}
+.net-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.net-dot.online{background:#34c759;box-shadow:0 0 6px #34c759}
+.net-dot.offline{background:#ff3b30;box-shadow:0 0 6px #ff3b30}
+.ns-label{font-size:12px;font-weight:700;color:var(--text)}
+.ns-sub{font-size:10px;color:var(--text2);margin-top:1px}
+
+/* ── Taskbar right-click menu ── */
+.tb-ctx{position:fixed;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:4px 0;min-width:170px;box-shadow:0 10px 28px rgba(0,0,0,.3);z-index:99998;display:none;backdrop-filter:blur(20px)}
+.tb-ctx.open{display:block;animation:scaleIn .12s ease}
+
+/* ── Shutdown overlay ── */
+.shutdown-overlay{position:fixed;inset:0;background:#000;z-index:999999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.shutdown-overlay.open{display:flex;animation:shutdownFade .5s ease}
+.shutdown-logo{font-size:64px;animation:pulse 2s ease infinite}
+.shutdown-text{font-family:'Oxanium',sans-serif;font-size:16px;letter-spacing:4px;color:rgba(255,255,255,.6);text-transform:uppercase}
+.shutdown-dots{display:flex;gap:8px}
+.shutdown-dots span{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 1.2s ease infinite}
+.shutdown-dots span:nth-child(2){animation-delay:.2s}
+.shutdown-dots span:nth-child(3){animation-delay:.4s}
+
+/* ── Scrollbars ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 </head>
-<body class="theme-white">
-    <div class="snap-preview" id="snapPreview"></div>
-    <div class="desktop-ctx-menu" id="desktopCtxMenu"></div>
-    <div class="desktop" id="desktop">
-        <div class="desktop-icons" id="desktopIcons"></div>
-        <div id="widgetContainer"></div>
-        <div class="grid-preview" id="gridPreview"></div>
+<body>
+
+<div class="snap-preview" id="snapPreview"></div>
+<div class="resize-tooltip" id="resizeTooltip"></div>
+<div class="desk-ctx" id="deskCtx"></div>
+<div class="tb-ctx" id="tbCtx"></div>
+
+<!-- Desktop -->
+<div class="desktop" id="desktop">
+  <div class="desktop-icons" id="desktopIcons"></div>
+  <div id="widgetContainer"></div>
+  <div class="grid-preview" id="gridPreview"></div>
+  <div class="rubber-band" id="rubberBand"></div>
+</div>
+
+<!-- Spotlight search -->
+<div class="spotlight-overlay" id="spotlightOverlay" onclick="if(event.target===this)closeSpotlight()">
+  <div class="spotlight-box">
+    <div class="spotlight-input-row">
+      <span>🔍</span>
+      <input class="spotlight-input" id="spotlightInput" placeholder="Search apps…" oninput="spotlightSearch()" onkeydown="spotlightKey(event)">
     </div>
+    <div class="spotlight-results" id="spotlightResults"></div>
+  </div>
+</div>
 
-    <div class="start-menu" id="startMenu">
-        <div class="start-menu-header">
-            <div class="start-menu-user">
-                <div class="user-avatar" id="startMenuAvatar">👤</div>
-                <div class="user-info">
-                    <div class="user-name" id="startMenuUsername">User</div>
-                    <div class="user-status">EclipseOS</div>
-                </div>
-            </div>
-        </div>
-        <div class="start-menu-apps">
-            <div class="app-section-title">All Apps</div>
-            <div class="app-grid" id="startMenuApps"></div>
-        </div>
-        <div class="start-menu-footer">
-            <button class="power-btn" onclick="logOut()">🔒 Log Out</button>
-            <button class="power-btn" onclick="openApp('settings')">⚙️ Settings</button>
-        </div>
+<!-- Virtual desktop preview -->
+<div class="vd-preview-overlay" id="vdPreview" onclick="if(event.target===this)closeVdPreview()"></div>
+
+<!-- Notification panel -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <span class="notif-title">Notifications</span>
+    <button class="notif-clear" onclick="clearNotifs()">Clear All</button>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+</div>
+
+<!-- Quick settings -->
+<div class="qs-panel" id="qsPanel">
+  <div class="qs-title">Quick Settings</div>
+  <div class="qs-toggles">
+    <div class="qs-toggle" id="qsDnd" onclick="toggleDnd()"><span class="qs-toggle-icon">🌙</span>Do Not Disturb</div>
+    <div class="qs-toggle" id="qsNotif" onclick="toggleNotifPanel()"><span class="qs-toggle-icon">🔔</span>Notifications</div>
+    <div class="qs-toggle" id="qsWifi" onclick=""><span class="qs-toggle-icon">📶</span>Wi-Fi</div>
+    <div class="qs-toggle" id="qsNight" onclick="toggleNightMode()"><span class="qs-toggle-icon">🌅</span>Night Mode</div>
+  </div>
+  <div class="qs-title" style="margin-top:4px">Volume</div>
+  <div class="qs-slider-row">
+    <span id="qsVolIcon">🔊</span>
+    <input type="range" class="qs-slider" id="qsVolSlider" min="0" max="100" value="100" oninput="onVolumeChange(this.value)">
+    <span class="qs-val" id="qsVolVal">100%</span>
+  </div>
+  <div class="qs-title" style="margin-top:4px">Brightness</div>
+  <div class="qs-slider-row">
+    <span>☀️</span>
+    <input type="range" class="qs-slider" id="qsBright" min="20" max="100" value="100" oninput="onBrightness(this.value)">
+    <span class="qs-val" id="qsBrightVal">100%</span>
+  </div>
+  <div class="qs-title" style="margin-top:8px">Theme</div>
+  <div class="qs-themes">
+    <div class="qs-theme" id="qt-white" style="background:#f0f0f0;color:#000;border:2px solid #ccc" onclick="changeTheme('white')">White</div>
+    <div class="qs-theme" id="qt-black" style="background:#1a1a1a;color:#fff;border:2px solid #444" onclick="changeTheme('black')">Black</div>
+    <div class="qs-theme" id="qt-grey"  style="background:#808080;color:#fff;border:2px solid #999" onclick="changeTheme('grey')">Grey</div>
+  </div>
+</div>
+
+<!-- Calendar popup -->
+<div class="cal-popup" id="calPopup">
+  <div class="cal-header">
+    <button class="cal-nav" onclick="calNav(-1)">‹</button>
+    <span class="cal-month" id="calMonth"></span>
+    <button class="cal-nav" onclick="calNav(1)">›</button>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+</div>
+
+<!-- Start menu -->
+<div class="start-menu" id="startMenu">
+  <div class="sm-header">
+    <div class="sm-user">
+      <div class="sm-avatar" id="smAvatar">👤</div>
+      <div><div class="sm-name" id="smUsername">User</div><div class="sm-status">ServerplexOS</div></div>
     </div>
+  </div>
+  <div class="sm-apps">
+    <div class="sm-section">All Apps</div>
+    <div class="sm-grid" id="smGrid"></div>
+  </div>
+  <div class="sm-footer">
+    <button class="sm-btn" onclick="logOut()">🔒 Log Out</button>
+    <button class="sm-btn" onclick="openApp('settings')">⚙️ Settings</button>
+    <button class="sm-btn" onclick="showShutdown('restart')">🔄 Restart</button>
+    <button class="sm-btn" onclick="showShutdown('shutdown')">⏻ Shut Down</button>
+  </div>
+</div>
 
-    <div class="taskbar">
-        <button class="start-button" id="startButton">💠</button>
-        <div class="taskbar-apps" id="taskbarApps"></div>
-        <div class="system-tray">
-            <div class="tray-icon" id="volumeIcon" title="Volume" onclick="toggleTray('volume')">🔊</div>
-            <div class="tray-icon" id="networkIcon" title="Network" onclick="toggleTray('network')">📶</div>
-            <div class="tray-icon clock" id="clock">
-                <div id="clockTime">12:00 PM</div>
-                <div id="clockDate">Jan 1, 2024</div>
-            </div>
-        </div>
+<!-- Taskbar -->
+<div class="taskbar" id="taskbar">
+  <button class="start-button" id="startButton">💠</button>
+  <div class="vd-switcher" id="vdSwitcher"></div>
+  <div class="pinned-apps" id="pinnedApps"></div>
+  <div class="taskbar-apps" id="taskbarApps"></div>
+  <div class="system-tray">
+    <div class="tray-icon" onclick="toggleDnd()" title="Do Not Disturb">🌙<span class="dnd-dot" id="dndDot"></span></div>
+    <div class="tray-icon" onclick="toggleNotifPanel()" title="Notifications" id="notifIcon">🔔</div>
+    <div class="tray-icon" onclick="toggleQs()" title="Quick Settings">⚙️</div>
+    <div class="tray-icon" id="volumeIcon" title="Volume" onclick="toggleTray('volume')">🔊</div>
+    <div class="tray-icon" id="networkIcon" title="Network" onclick="toggleTray('network')">📶</div>
+    <div class="tray-clock" onclick="toggleCal()" id="clockWidget">
+      <div id="clockTime">12:00 PM</div>
+      <div id="clockDate">Jan 1</div>
     </div>
+  </div>
+</div>
 
-    <script>
-        // ── Boot routing ──
-        (function() {
-            const setupDone    = localStorage.getItem('eclipseos_setup_complete') === 'true';
-            const hasPin       = !!localStorage.getItem('eclipseos_pin');
-            const hasPassword  = !!localStorage.getItem('eclipseos_password');
-            const authed       = sessionStorage.getItem('eclipseos_authed') === 'true';
+<!-- News ticker -->
+<div class="news-ticker" id="newsTicker">
+  <span class="ticker-label">NEWS</span>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="tickerInner"></div>
+  </div>
+</div>
 
-            if (!setupDone) { window.location.replace('welcome.html'); return; }
-            // Only redirect to login if security is set AND not already authenticated this session
-            if ((hasPin || hasPassword) && !authed) { window.location.replace('account.html'); return; }
-        })();
+<!-- Tray popups -->
+<div class="tray-popup" id="volumePopup">
+  <div class="tray-popup-title">Volume</div>
+  <div class="tray-slider-row">
+    <span id="volEmoji">🔊</span>
+    <input type="range" class="tray-slider" id="volSlider" min="0" max="100" value="100" oninput="onVolumeChange(this.value)">
+    <span class="tray-value" id="volValue">100%</span>
+  </div>
+  <button class="tray-mute-btn" onclick="toggleMute()">🔇 Mute</button>
+</div>
+<div class="tray-popup" id="networkPopup">
+  <div class="tray-popup-title">Network</div>
+  <div class="net-status" id="netStatus">
+    <div class="net-dot" id="netDot"></div>
+    <div><div class="ns-label" id="netLabel">Checking…</div><div class="ns-sub" id="netSub"></div></div>
+  </div>
+</div>
 
-        // ===== APP REGISTRY =====
-        const apps = {
-            browser: {
-                name: 'Browser',
-                icon: '🌐',
-                file: 'os-apps/browser.html',
-                category: 'Internet'
-            },
-            // Local apps
-            notepad:        { name: 'Notepad',         icon: '📝', file: 'os-apps/notepad.html',         category: 'Productivity' },
-            calculator:     { name: 'Calculator',      icon: '🧮', file: 'os-apps/calculator.html',      category: 'Utilities', width: 360, height: 520 },
-            calendar:       { name: 'Calendar',        icon: '📅', file: 'os-apps/calendar.html',        category: 'Productivity' },
-            terminal:       { name: 'Terminal',        icon: '💻', file: 'os-apps/terminal.html',        category: 'System' },
-            code:           { name: 'Code Editor',     icon: '👨‍💻', file: 'os-apps/code.html',            category: 'Development', width: 1200, height: 700 },
-            paint:          { name: 'Paint',           icon: '🎨', file: 'os-apps/paint.html',           category: 'Creative' },
-            todolist:       { name: 'To-Do List',      icon: '📋', file: 'os-apps/todolist.html',        category: 'Productivity' },
-            stickynotes:    { name: 'Sticky Notes',    icon: '📌', file: 'os-apps/stickynotes.html',     category: 'Productivity' },
-            imageviewer:    { name: 'Image Viewer',    icon: '🖼️', file: 'os-apps/imageviewer.html',     category: 'Media' },
-            clock:          { name: 'Clock',           icon: '⏰', file: 'os-apps/clock.html',           category: 'Utilities' },
-            search:         { name: 'Search',          icon: '🔍', file: 'os-apps/search.html',          category: 'System' },
-            musicplayer:    { name: 'Music Player',    icon: '🎵', file: 'os-apps/musicplayer.html',     category: 'Media' },
-            markdowneditor: { name: 'Markdown Editor', icon: '📄', file: 'os-apps/markdowneditor.html',  category: 'Productivity' },
-            settings:       { name: 'Settings',       icon: '⚙️', file: 'settings/settings-main.html', category: 'System' },
-            filemanager:    { name: 'File Manager',    icon: '📁', file: 'os-apps/filemanager.html',     category: 'System' },
-            games:          { name: 'Games',            icon: '🎮', file: 'os-apps/games.html',            category: 'Entertainment' },
-            voicerecorder:  { name: 'Voice Recorder',  icon: '🎙️', file: 'os-apps/voicerecorder.html',   category: 'Media' },
-            screenrecorder: { name: 'Screen Recorder', icon: '📹', file: 'os-apps/screenrecorder.html',  category: 'Media' },
-            appstore:       { name: 'App Store',        icon: '🏪', file: 'os-apps/appstore.html',        category: 'System' },
-        };
+<!-- Shutdown overlay -->
+<div class="shutdown-overlay" id="shutdownOverlay">
+  <div class="shutdown-logo">💻</div>
+  <div class="shutdown-text" id="shutdownText">Shutting down…</div>
+  <div class="shutdown-dots"><span></span><span></span><span></span></div>
+</div>
 
-        // ===== CUSTOM APP ICONS =====
-        // Replace any app's emoji with a custom image URL.
-        // Format:  appId: 'path/to/icon.png'
-        // Example: notepad: 'icons/notepad.png'
-        // Leave empty ({}) to use the default emojis.
-        const CUSTOM_ICONS = {
-            // ── Paste your custom icons below ──
+<script>
+// ══════════════════════════════════════════════
+//  BOOT ROUTING
+// ══════════════════════════════════════════════
+(function(){
+  var setup = localStorage.getItem('eclipseos_setup_complete') === 'true';
+  var hasPin = !!localStorage.getItem('eclipseos_pin');
+  var hasPw  = !!localStorage.getItem('eclipseos_password');
+  var authed = sessionStorage.getItem('eclipseos_authed') === 'true';
+  if (!setup) { window.location.replace('welcome.html'); return; }
+  if ((hasPin || hasPw) && !authed) { window.location.replace('account.html'); return; }
+})();
 
-            // browser:        'icons/browser.png',
-            // notepad:        'icons/notepad.png',
-            // calculator:     'icons/calculator.png',
-            // calendar:       'icons/calendar.png',
-            // terminal:       'icons/terminal.png',
-            // code:           'icons/code.png',
-            // paint:          'icons/paint.png',
-            // todolist:       'icons/todolist.png',
-            // stickynotes:    'icons/stickynotes.png',
-            // imageviewer:    'icons/imageviewer.png',
-            // clock:          'icons/clock.png',
-            // recyclebin:     'icons/recyclebin.png',
-            // search:         'icons/search.png',
-            // musicplayer:    'icons/musicplayer.png',
-            // markdowneditor: 'icons/markdowneditor.png',
-            // notifications:  'icons/notifications.png',
-            // settings:       'icons/settings.png',
-            // appstore:       'icons/appstore.png',
-        };
-        // ── End custom icons ──
+// ══════════════════════════════════════════════
+//  APP REGISTRY + PER-APP COLORS
+// ══════════════════════════════════════════════
+const APP_COLORS = {
+  browser:'#0078d4', notepad:'#ff9500', calculator:'#5856d6', calendar:'#34c759',
+  terminal:'#1c1c1e', code:'#007acc', paint:'#ff2d55', todolist:'#ff9500',
+  stickynotes:'#ffcc00', imageviewer:'#af52de', clock:'#5ac8fa', recyclebin:'#8e8e93',
+  search:'#0078d4', musicplayer:'#fc3158', markdowneditor:'#34c759',
+  settings:'#636366', filemanager:'#0078d4', games:'#ff375f',
+  voicerecorder:'#ff3b30', screenrecorder:'#ff3b30', appstore:'#0078d4',
+};
 
-        // Helper — returns <img> if custom icon set, otherwise the emoji
-        function getIconHtml(app, size) {
-            size = size || 48;
-            if (app && app.customIcon) {
-                return '<img src="' + app.customIcon + '" width="' + size + '" height="' + size + '" style="object-fit:contain;border-radius:' + Math.round(size * 0.18) + 'px" alt="">';
-            }
-            return (app && app.icon) ? app.icon : '';
-        }
+const apps = {
+  browser:        { name:'Browser',         icon:'🌐', file:'os-apps/browser.html',        category:'Internet' },
+  notepad:        { name:'Notepad',          icon:'📝', file:'os-apps/notepad.html',         category:'Productivity' },
+  calculator:     { name:'Calculator',       icon:'🧮', file:'os-apps/calculator.html',      category:'Utilities', width:360, height:520 },
+  calendar:       { name:'Calendar',         icon:'📅', file:'os-apps/calendar.html',        category:'Productivity' },
+  terminal:       { name:'Terminal',         icon:'💻', file:'os-apps/terminal.html',        category:'System' },
+  code:           { name:'Code Editor',      icon:'👨‍💻', file:'os-apps/code.html',            category:'Development', width:1200, height:700 },
+  paint:          { name:'Paint',            icon:'🎨', file:'os-apps/paint.html',           category:'Creative' },
+  todolist:       { name:'To-Do List',       icon:'📋', file:'os-apps/todolist.html',        category:'Productivity' },
+  stickynotes:    { name:'Sticky Notes',     icon:'📌', file:'os-apps/stickynotes.html',     category:'Productivity' },
+  imageviewer:    { name:'Image Viewer',     icon:'🖼️', file:'os-apps/imageviewer.html',     category:'Media' },
+  clock:          { name:'Clock',            icon:'⏰', file:'os-apps/clock.html',           category:'Utilities' },
+  recyclebin:     { name:'Recycle Bin',      icon:'🗑️', file:'os-apps/recyclebin.html',      category:'System' },
+  search:         { name:'Search',           icon:'🔍', file:'os-apps/search.html',          category:'System' },
+  musicplayer:    { name:'Music Player',     icon:'🎵', file:'os-apps/musicplayer.html',     category:'Media' },
+  markdowneditor: { name:'Markdown Editor',  icon:'📄', file:'os-apps/markdowneditor.html',  category:'Productivity' },
+  settings:       { name:'Settings',         icon:'⚙️', file:'settings/settings-main.html', category:'System' },
+  filemanager:    { name:'File Manager',     icon:'📁', file:'os-apps/filemanager.html',     category:'System' },
+  games:          { name:'Games',            icon:'🎮', file:'os-apps/games.html',           category:'Entertainment' },
+  voicerecorder:  { name:'Voice Recorder',   icon:'🎙️', file:'os-apps/voicerecorder.html',  category:'Media' },
+  screenrecorder: { name:'Screen Recorder',  icon:'📹', file:'os-apps/screenrecorder.html', category:'Media' },
+  appstore:       { name:'App Store',        icon:'🏪', file:'os-apps/appstore.html',        category:'System' },
+};
 
-        // ===== OS STATE =====
-        let windows = {};
-        let zIndexCounter = 100;
-        let selectedIcon = null;
-        let currentTheme = localStorage.getItem('eclipseos_theme') || 'white';
-        let desktopLayout = JSON.parse(localStorage.getItem('eclipseos_desktop_layout') || '{}');
+// Custom icons map (add image URLs here per app ID)
+const CUSTOM_ICONS = {};
 
-        // Immediately purge any stale desktop layout entries for apps that no longer exist
-        (function purgeStaleLayout() {
-            var changed = false;
-            // Remove any layout entry whose app is not in the current registry
-            Object.keys(desktopLayout).forEach(function(id) {
-                if (!apps[id]) { delete desktopLayout[id]; changed = true; }
-            });
-            if (changed) localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
-        })();
-        
-        // Grid system for desktop icons
-        const GRID_SIZE = 100; // 100px grid cells
-        const GRID_PADDING = 20; // Padding from edges
-        
-        function getGridPosition(x, y) {
-            // Snap to nearest grid position
-            const col = Math.round((x - GRID_PADDING) / GRID_SIZE);
-            const row = Math.round((y - GRID_PADDING) / GRID_SIZE);
-            return {
-                x: GRID_PADDING + col * GRID_SIZE,
-                y: GRID_PADDING + row * GRID_SIZE,
-                col: col,
-                row: row
-            };
-        }
-        
-        function isGridPositionOccupied(col, row, excludeAppId = null) {
-            // Check if any icon is at this grid position
-            for (let appId in desktopLayout) {
-                if (appId === excludeAppId) continue;
-                const pos = desktopLayout[appId];
-                const grid = getGridPosition(pos.x, pos.y);
-                if (grid.col === col && grid.row === row) {
-                    return true;
-                }
-            }
-            return false;
-        }
-        
-        function findNextAvailableGridPosition(startIndex = 0) {
-            // Find the next available grid position
-            const maxCols = Math.floor((window.innerWidth - GRID_PADDING * 2) / GRID_SIZE);
-            
-            for (let i = startIndex; i < 1000; i++) {
-                const col = i % maxCols;
-                const row = Math.floor(i / maxCols);
-                if (!isGridPositionOccupied(col, row)) {
-                    return {
-                        x: GRID_PADDING + col * GRID_SIZE,
-                        y: GRID_PADDING + row * GRID_SIZE,
-                        col: col,
-                        row: row
-                    };
-                }
-            }
-            // Fallback
-            return { x: GRID_PADDING, y: GRID_PADDING, col: 0, row: 0 };
-        }
+function getIconHtml(app, size) {
+  size = size || 48;
+  if (app && app.customIcon) return '<img src="'+app.customIcon+'" width="'+size+'" height="'+size+'" style="object-fit:contain;border-radius:'+Math.round(size*.18)+'px" alt="">';
+  return (app && app.icon) ? app.icon : '';
+}
 
-        // ===== INITIALIZATION =====
-        function init() {
-            document.body.className = `theme-${currentTheme}`;
-            var savedFontSize = localStorage.getItem('eclipseos_os_font_size');
-            if (savedFontSize) document.body.style.fontSize = savedFontSize + 'px';
-            var savedAccent = localStorage.getItem('eclipseos_accent');
-            if (savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
-            
-            const wallpaper = localStorage.getItem('eclipseos_wallpaper');
-            if (wallpaper && wallpaper !== 'none') {
-                const desktop = document.getElementById('desktop');
-                if (wallpaper.startsWith('http') || wallpaper.startsWith('data:')) {
-                    desktop.style.background = `url('${wallpaper}') center/cover no-repeat`;
-                } else {
-                    desktop.style.background = wallpaper;
-                }
-            }
-            
-            const userName = localStorage.getItem('eclipseos_username') || 'User';
-            const userAvatar = localStorage.getItem('eclipseos_avatar') || '👤';
-            document.getElementById('startMenuUsername').textContent = userName;
-            document.getElementById('startMenuAvatar').textContent = userAvatar;
-            
-            // Load apps installed via the App Store
-            const storeInstalled = JSON.parse(localStorage.getItem('eclipseos_store_installed') || '{}');
-            Object.values(storeInstalled).forEach(function(a) {
-                apps[a.id] = { name: a.name, icon: a.icon, file: a.url, category: a.category || 'Other' };
-            });
+// Apply custom icons from map
+Object.keys(CUSTOM_ICONS).forEach(id => { if (apps[id]) apps[id].customIcon = CUSTOM_ICONS[id]; });
 
-            renderDesktopIcons();
-            renderStartMenuApps();
-            updateClock();
-            setInterval(updateClock, 1000);
-            initContextMenu();
-            initWidgets();
-            
-            document.getElementById('startButton').addEventListener('click', toggleStartMenu);
-            document.addEventListener('click', (e) => {
-                if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) {
-                    document.getElementById('startMenu').classList.remove('active');
-                }
-            });
-            
-            document.getElementById('desktop').addEventListener('click', (e) => {
-                if (e.target.id === 'desktop' || e.target.id === 'desktopIcons') deselectAllIcons();
-            });
-            
-            // Constrain all windows when browser window is resized
-            window.addEventListener('resize', () => {
-                Object.keys(windows).forEach(appId => {
-                    constrainWindowToBounds(windows[appId].element);
-                });
-            });
-        }
+// ══════════════════════════════════════════════
+//  OS STATE
+// ══════════════════════════════════════════════
+let windows = {}, zIdx = 100;
+let selectedIcons = new Set();
+let currentTheme = localStorage.getItem('eclipseos_theme') || 'white';
+let desktopLayout = JSON.parse(localStorage.getItem('eclipseos_desktop_layout') || '{}');
+let currentVd = 0; // virtual desktop index (0-3)
+let dndMode = localStorage.getItem('eclipseos_dnd') === 'true';
+let notifications = JSON.parse(localStorage.getItem('eclipseos_notifs') || '[]');
+let pinnedAppIds = JSON.parse(localStorage.getItem('eclipseos_pinned') || '["browser","games","settings","terminal"]');
+let volLevel = 100, isMuted = false;
+let calDate = new Date();
+const GRID_SIZE = 100, GRID_PAD = 20;
 
-        // ===== DESKTOP ICONS =====
-        // Hard cleanup on load — wipe any stale layout entries for removed apps
-        (function() {
-            var changed = false;
-            Object.keys(desktopLayout).forEach(function(id) {
-                if (!apps[id]) { delete desktopLayout[id]; changed = true; }
-            });
-            if (changed) localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
-        })();
+// Purge stale layout
+Object.keys(desktopLayout).forEach(id => { if (!apps[id]) delete desktopLayout[id]; });
 
-        function renderDesktopIcons() {
-            const container = document.getElementById('desktopIcons');
-            container.innerHTML = '';
-            // Remove any remaining orphaned layout entries
-            Object.keys(desktopLayout).forEach(id => {
-                if (!apps[id]) delete desktopLayout[id];
-            });
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+function init() {
+  document.body.className = 'theme-' + currentTheme;
+  var fs = localStorage.getItem('eclipseos_os_font_size');
+  if (fs) document.body.style.fontSize = fs + 'px';
+  var acc = localStorage.getItem('eclipseos_accent');
+  if (acc) document.documentElement.style.setProperty('--accent', acc);
 
-            let gridIndex = 0;
-            
-            Object.keys(apps).forEach((appId, index) => {
-                const app = apps[appId];
-                const icon = document.createElement('div');
-                icon.className = 'desktop-icon';
-                icon.dataset.appId = appId;
-                
-                // Add staggered fade-in animation
-                icon.style.opacity = '0';
-                icon.style.animation = `fadeIn 0.5s ease forwards`;
-                icon.style.animationDelay = `${index * 0.05}s`;
-                
-                // Use grid-based positioning
-                let position;
-                const savedPos = desktopLayout[appId];
-                
-                if (savedPos) {
-                    // Snap saved position to grid
-                    position = getGridPosition(savedPos.x, savedPos.y);
-                    
-                    // Check if this grid position is occupied by another icon
-                    if (isGridPositionOccupied(position.col, position.row, appId)) {
-                        // Find next available position
-                        position = findNextAvailableGridPosition(gridIndex);
-                        gridIndex++;
-                    }
-                } else {
-                    // New icon - find available position
-                    position = findNextAvailableGridPosition(gridIndex);
-                    gridIndex++;
-                }
-                
-                icon.style.left = position.x + 'px';
-                icon.style.top = position.y + 'px';
-                
-                // Update layout with grid-snapped position
-                desktopLayout[appId] = { x: position.x, y: position.y };
-                
-                icon.innerHTML = '<div class="icon-image">' + getIconHtml(app, 48) + '</div><div class="icon-label">' + app.name + '</div>';
-                icon.addEventListener('click', (e) => { e.stopPropagation(); selectIcon(icon); });
-                icon.addEventListener('dblclick', () => openApp(appId));
-                makeDraggable(icon);
-                container.appendChild(icon);
-            });
-            
-            // Remove orphaned layout entries (apps that no longer exist)
-            Object.keys(desktopLayout).forEach(id => {
-                if (!apps[id]) delete desktopLayout[id];
-            });
-            // Save the updated layout
-            localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
-        }
+  var wp = localStorage.getItem('eclipseos_wallpaper');
+  if (wp && wp !== 'none') {
+    var d = document.getElementById('desktop');
+    d.style.background = (wp.startsWith('http') || wp.startsWith('data:')) ? "url('"+wp+"') center/cover no-repeat" : wp;
+  }
 
-        function selectIcon(icon) { deselectAllIcons(); icon.classList.add('selected'); selectedIcon = icon; }
-        function deselectAllIcons() { document.querySelectorAll('.desktop-icon').forEach(icon => icon.classList.remove('selected')); selectedIcon = null; }
+  var nm = localStorage.getItem('eclipseos_nightmode') === 'true';
+  if (nm) document.body.style.filter = 'sepia(20%) brightness(85%)';
 
-        function makeDraggable(element) {
-            let isDragging = false, startX, startY, initialX, initialY;
-            const gridPreview = document.getElementById('gridPreview');
-            
-            element.addEventListener('mousedown', (e) => {
-                if (e.detail === 2) return;
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = element.offsetLeft;
-                initialY = element.offsetTop;
-                element.style.zIndex = 1000;
-                element.classList.add('dragging');
-            });
-            
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                
-                const newX = initialX + (e.clientX - startX);
-                const newY = initialY + (e.clientY - startY);
-                
-                element.style.left = newX + 'px';
-                element.style.top = newY + 'px';
-                
-                // Show grid preview
-                const gridPos = getGridPosition(newX, newY);
-                const appId = element.dataset.appId;
-                const isOccupied = isGridPositionOccupied(gridPos.col, gridPos.row, appId);
-                
-                gridPreview.style.display = 'block';
-                gridPreview.style.left = gridPos.x + 'px';
-                gridPreview.style.top = gridPos.y + 'px';
-                gridPreview.className = 'grid-preview' + (isOccupied ? ' occupied' : '');
-            });
-            
-            document.addEventListener('mouseup', () => {
-                if (isDragging) {
-                    isDragging = false;
-                    element.style.zIndex = '';
-                    element.classList.remove('dragging');
-                    gridPreview.style.display = 'none';
-                    
-                    // Snap to grid
-                    const currentX = parseInt(element.style.left);
-                    const currentY = parseInt(element.style.top);
-                    const gridPos = getGridPosition(currentX, currentY);
-                    const appId = element.dataset.appId;
-                    
-                    // Check if target position is occupied
-                    if (isGridPositionOccupied(gridPos.col, gridPos.row, appId)) {
-                        // Position occupied - snap back to original or find nearest free spot
-                        const savedPos = desktopLayout[appId];
-                        if (savedPos) {
-                            element.style.left = savedPos.x + 'px';
-                            element.style.top = savedPos.y + 'px';
-                        } else {
-                            const freePos = findNextAvailableGridPosition(0);
-                            element.style.left = freePos.x + 'px';
-                            element.style.top = freePos.y + 'px';
-                        }
-                    } else {
-                        // Position free - snap to grid
-                        element.style.left = gridPos.x + 'px';
-                        element.style.top = gridPos.y + 'px';
-                    }
-                    
-                    saveIconPosition(element);
-                }
-            });
-        }
+  document.getElementById('smUsername').textContent = localStorage.getItem('eclipseos_username') || 'User';
+  document.getElementById('smAvatar').textContent   = localStorage.getItem('eclipseos_avatar')   || '👤';
 
-        function saveIconPosition(icon) {
-            const appId = icon.dataset.appId;
-            desktopLayout[appId] = { x: parseInt(icon.style.left), y: parseInt(icon.style.top) };
-            localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
-        }
+  if (dndMode) { document.getElementById('dndDot').classList.add('on'); document.getElementById('qsDnd').classList.add('on'); }
 
-        // ===== START MENU =====
-        function renderStartMenuApps() {
-            const container = document.getElementById('startMenuApps');
-            container.innerHTML = '';
-            Object.keys(apps).forEach((appId, index) => {
-                const app = apps[appId];
-                const item = document.createElement('div');
-                item.className = 'start-app-item';
-                
-                // Add staggered animation
-                item.style.opacity = '0';
-                item.style.animation = `slideUp 0.4s ease forwards`;
-                item.style.animationDelay = `${index * 0.03}s`;
-                
-                item.innerHTML = '<div class="start-app-icon">' + getIconHtml(app, 32) + '</div><div class="start-app-name">' + app.name + '</div>';
-                item.addEventListener('click', () => { openApp(appId); toggleStartMenu(); });
-                container.appendChild(item);
-            });
-        }
+  renderDesktopIcons();
+  renderPinnedApps();
+  renderStartMenuApps();
+  renderVdSwitcher();
+  updateClock();
+  setInterval(updateClock, 1000);
+  initContextMenu();
+  initWidgets();
+  initRubberBand();
+  initTicker();
+  updateQsTheme();
+  updateNetworkStatus();
+  renderNotifList();
 
-        function toggleStartMenu() { document.getElementById('startMenu').classList.toggle('active'); }
+  document.getElementById('startButton').addEventListener('click', toggleStartMenu);
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.start-menu') && !e.target.closest('.start-button')) closeStartMenu();
+    if (!e.target.closest('.qs-panel') && !e.target.closest('[onclick*="toggleQs"]')) document.getElementById('qsPanel').classList.remove('open');
+    if (!e.target.closest('.cal-popup') && !e.target.closest('.tray-clock')) document.getElementById('calPopup').classList.remove('open');
+    if (!e.target.closest('.tray-popup') && !e.target.closest('[onclick*="toggleTray"]')) document.querySelectorAll('.tray-popup').forEach(p => p.classList.remove('active'));
+    if (!e.target.closest('.tb-ctx')) document.getElementById('tbCtx').classList.remove('open');
+    if (!e.target.closest('.desk-ctx')) document.getElementById('deskCtx').classList.remove('open');
+  });
+  document.getElementById('desktop').addEventListener('click', e => {
+    if (e.target.id === 'desktop' || e.target.id === 'desktopIcons') deselectAllIcons();
+  });
+  window.addEventListener('resize', () => { Object.values(windows).forEach(w => constrainWindow(w.element)); });
 
-        // ===== WINDOW MANAGEMENT =====
-        function openApp(appId) {
-            if (windows[appId]) {
-                bringToFront(appId);
-                if (windows[appId].element.classList.contains('minimized')) {
-                    const windowEl = windows[appId].element;
-                    windowEl.classList.remove('minimized');
-                    windowEl.classList.add('restoring');
-                    windows[appId].minimized = false;
-                    constrainWindowToBounds(windowEl);
-                    
-                    // Remove restoring class after animation
-                    setTimeout(() => {
-                        windowEl.classList.remove('restoring');
-                    }, 300);
-                }
-                return;
-            }
-            
-            const app = apps[appId];
-            const windowEl = document.createElement('div');
-            windowEl.className = 'window';
-            windowEl.dataset.appId = appId;
-            windowEl.style.zIndex = ++zIndexCounter;
-            
-            // Calculate dimensions that fit on screen
-            const maxWidth = window.innerWidth - 40; // 20px padding on each side
-            const maxHeight = window.innerHeight - 48 - 40; // 48px taskbar + 20px padding on each side
-            
-            // Use custom dimensions if provided, otherwise default to 800x600
-            const defaultWidth = app.width || 800;
-            const defaultHeight = app.height || 600;
-            const width = Math.min(defaultWidth, maxWidth);
-            const height = Math.min(defaultHeight, maxHeight);
-            
-            // Center window, ensuring it stays within bounds
-            let left = Math.max(20, (window.innerWidth - width) / 2);
-            let top = Math.max(20, (window.innerHeight - height - 48) / 2);
-            
-            // Double-check constraints
-            left = Math.min(left, window.innerWidth - width - 20);
-            top = Math.min(top, window.innerHeight - height - 48 - 20);
-            
-            windowEl.style.width = width + 'px';
-            windowEl.style.height = height + 'px';
-            windowEl.style.left = left + 'px';
-            windowEl.style.top = top + 'px';
-            
-            windowEl.innerHTML = `
-                <div class="window-titlebar">
-                    <span class="window-icon">${getIconHtml(app, 18)}</span>
-                    <span class="window-title">${app.name}</span>
-                    <div class="window-controls">
-                        <div class="window-control-btn minimize-btn" title="Minimize">−</div>
-                        <div class="window-control-btn maximize-btn" title="Maximize">□</div>
-                        <div class="window-control-btn close-btn" title="Close">×</div>
-                    </div>
-                </div>
-                <div class="window-content"><iframe src="${app.file}"></iframe></div>
-                <div class="resize-handle right"></div>
-                <div class="resize-handle bottom"></div>
-                <div class="resize-handle bottom-right"></div>
-            `;
-            
-            document.body.appendChild(windowEl);
-            windows[appId] = { element: windowEl, minimized: false, maximized: false };
-            
-            // Ensure window is within bounds
-            constrainWindowToBounds(windowEl);
-            
-            windowEl.querySelector('.minimize-btn').addEventListener('click', () => minimizeWindow(appId));
-            windowEl.querySelector('.maximize-btn').addEventListener('click', () => toggleMaximize(appId));
-            windowEl.querySelector('.close-btn').addEventListener('click', () => closeWindow(appId));
-            makeWindowDraggable(windowEl);
-            makeWindowResizable(windowEl);
-            windowEl.addEventListener('mousedown', () => bringToFront(appId));
-            updateTaskbar();
-        }
+  // Keyboard shortcuts
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === ' ') { e.preventDefault(); toggleSpotlight(); }
+    if (e.key === 'Escape') { closeSpotlight(); closeVdPreview(); document.getElementById('notifPanel').classList.remove('open'); }
+    if (e.ctrlKey && e.key >= '1' && e.key <= '4') switchVd(parseInt(e.key) - 1);
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') showVdPreview();
+  });
 
-        function makeWindowDraggable(windowEl) {
-            const titlebar = windowEl.querySelector('.window-titlebar');
-            let isDragging = false, startX, startY, initialX, initialY;
-            titlebar.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.window-control-btn') || windowEl.classList.contains('maximized')) return;
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = windowEl.offsetLeft;
-                initialY = windowEl.offsetTop;
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                
-                // Calculate new position
-                let newX = initialX + (e.clientX - startX);
-                let newY = initialY + (e.clientY - startY);
-                
-                // Get window dimensions
-                const windowWidth = windowEl.offsetWidth;
-                const windowHeight = windowEl.offsetHeight;
-                
-                // Calculate boundaries (with padding)
-                const minX = 0;
-                const minY = 0;
-                const maxX = Math.max(0, window.innerWidth - windowWidth);
-                const maxY = Math.max(0, window.innerHeight - 48 - windowHeight); // 48px for taskbar
-                
-                // Constrain to screen boundaries
-                newX = Math.max(minX, Math.min(newX, maxX));
-                newY = Math.max(minY, Math.min(newY, maxY));
-                
-                windowEl.style.left = newX + 'px';
-                windowEl.style.top = newY + 'px';
-            });
-            document.addEventListener('mouseup', () => isDragging = false);
-        }
+  // Startup chime
+  setTimeout(playStartupChime, 400);
 
-        function makeWindowResizable(windowEl) {
-            const handles = windowEl.querySelectorAll('.resize-handle');
-            handles.forEach(handle => {
-                let isResizing = false, startX, startY, startWidth, startHeight;
-                handle.addEventListener('mousedown', (e) => {
-                    if (windowEl.classList.contains('maximized')) return;
-                    e.stopPropagation();
-                    isResizing = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    startWidth = windowEl.offsetWidth;
-                    startHeight = windowEl.offsetHeight;
-                });
-                document.addEventListener('mousemove', (e) => {
-                    if (!isResizing) return;
-                    e.preventDefault();
-                    const dx = e.clientX - startX, dy = e.clientY - startY;
-                    
-                    // Get current position
-                    const currentLeft = windowEl.offsetLeft;
-                    const currentTop = windowEl.offsetTop;
-                    
-                    // Calculate maximum allowed dimensions
-                    const maxWidth = Math.max(400, window.innerWidth - currentLeft);
-                    const maxHeight = Math.max(300, window.innerHeight - 48 - currentTop); // 48px for taskbar
-                    
-                    // Calculate new dimensions
-                    let newWidth = startWidth + dx;
-                    let newHeight = startHeight + dy;
-                    
-                    // Apply constraints
-                    if (handle.classList.contains('right') || handle.classList.contains('bottom-right')) {
-                        windowEl.style.width = Math.max(400, Math.min(newWidth, maxWidth)) + 'px';
-                    }
-                    if (handle.classList.contains('bottom') || handle.classList.contains('bottom-right')) {
-                        windowEl.style.height = Math.max(300, Math.min(newHeight, maxHeight)) + 'px';
-                    }
-                });
-                document.addEventListener('mouseup', () => isResizing = false);
-            });
-        }
+  // Startup apps
+  setTimeout(() => {
+    JSON.parse(localStorage.getItem('eclipseos_startup_apps') || '[]').forEach(id => { if (apps[id]) openApp(id); });
+  }, 800);
+}
 
-        function bringToFront(appId) {
-            if (windows[appId]) {
-                windows[appId].element.style.zIndex = ++zIndexCounter;
-                updateTaskbar();
-            }
-        }
-        
-        function constrainWindowToBounds(windowEl) {
-            if (windowEl.classList.contains('maximized')) return;
-            
-            const width = windowEl.offsetWidth;
-            const height = windowEl.offsetHeight;
-            let left = windowEl.offsetLeft;
-            let top = windowEl.offsetTop;
-            
-            // Calculate boundaries
-            const maxX = Math.max(0, window.innerWidth - width);
-            const maxY = Math.max(0, window.innerHeight - 48 - height);
-            
-            // Constrain position
-            left = Math.max(0, Math.min(left, maxX));
-            top = Math.max(0, Math.min(top, maxY));
-            
-            // Apply constrained position
-            windowEl.style.left = left + 'px';
-            windowEl.style.top = top + 'px';
-            
-            // Also constrain size if needed
-            if (width > window.innerWidth) {
-                windowEl.style.width = window.innerWidth + 'px';
-            }
-            if (height > window.innerHeight - 48) {
-                windowEl.style.height = (window.innerHeight - 48) + 'px';
-            }
-        }
+// ══════════════════════════════════════════════
+//  STARTUP CHIME
+// ══════════════════════════════════════════════
+function playStartupChime() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [[261.63,0],[329.63,.13],[392,.26],[523.25,.4]].forEach(([freq, t]) => {
+      var osc = ctx.createOscillator(), gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq; osc.type = 'sine';
+      gain.gain.setValueAtTime(0, ctx.currentTime + t);
+      gain.gain.linearRampToValueAtTime(.12, ctx.currentTime + t + .06);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + t + .5);
+      osc.start(ctx.currentTime + t); osc.stop(ctx.currentTime + t + .5);
+    });
+  } catch(e) {}
+}
 
-        function minimizeWindow(appId) {
-            if (windows[appId]) {
-                const windowEl = windows[appId].element;
-                
-                // Add minimizing animation
-                windowEl.classList.add('minimizing');
-                
-                // After animation, add minimized class
-                setTimeout(() => {
-                    windowEl.classList.remove('minimizing');
-                    windowEl.classList.add('minimized');
-                    windows[appId].minimized = true;
-                    updateTaskbar();
-                }, 300); // Match animation duration
-            }
-        }
+// ══════════════════════════════════════════════
+//  GRID HELPERS
+// ══════════════════════════════════════════════
+function getGridPos(x, y) {
+  var col = Math.round((x - GRID_PAD) / GRID_SIZE), row = Math.round((y - GRID_PAD) / GRID_SIZE);
+  return { x: GRID_PAD + col * GRID_SIZE, y: GRID_PAD + row * GRID_SIZE, col, row };
+}
+function gridOccupied(col, row, exclude) {
+  return Object.keys(desktopLayout).some(id => {
+    if (id === exclude) return false;
+    var g = getGridPos(desktopLayout[id].x, desktopLayout[id].y);
+    return g.col === col && g.row === row;
+  });
+}
+function nextFreeGrid(start) {
+  start = start || 0;
+  var maxCols = Math.floor((window.innerWidth - GRID_PAD * 2) / GRID_SIZE);
+  for (var i = start; i < 1000; i++) {
+    var col = i % maxCols, row = Math.floor(i / maxCols);
+    if (!gridOccupied(col, row)) return { x: GRID_PAD + col * GRID_SIZE, y: GRID_PAD + row * GRID_SIZE, col, row };
+  }
+  return { x: GRID_PAD, y: GRID_PAD, col: 0, row: 0 };
+}
 
-        function toggleMaximize(appId) {
-            if (windows[appId]) {
-                const win = windows[appId];
-                win.element.classList.toggle('maximized');
-                win.maximized = !win.maximized;
-            }
-        }
+// ══════════════════════════════════════════════
+//  DESKTOP ICONS
+// ══════════════════════════════════════════════
+function renderDesktopIcons() {
+  var container = document.getElementById('desktopIcons');
+  container.innerHTML = '';
+  var gridIdx = 0;
+  Object.keys(apps).forEach((appId, idx) => {
+    var app = apps[appId];
+    var icon = document.createElement('div');
+    icon.className = 'desktop-icon';
+    icon.dataset.appId = appId;
+    icon.style.opacity = '0';
+    icon.style.animation = 'fadeIn .45s ease forwards';
+    icon.style.animationDelay = (idx * .04) + 's';
 
-        function closeWindow(appId) {
-            if (windows[appId]) {
-                const windowEl = windows[appId].element;
-                
-                // Add closing animation
-                windowEl.classList.add('closing');
-                
-                // Wait for animation to complete, then remove
-                setTimeout(() => {
-                    windowEl.remove();
-                    delete windows[appId];
-                    updateTaskbar();
-                }, 200); // Match the animation duration
-            }
-        }
+    var saved = desktopLayout[appId];
+    var pos;
+    if (saved) {
+      pos = getGridPos(saved.x, saved.y);
+      if (gridOccupied(pos.col, pos.row, appId)) { pos = nextFreeGrid(gridIdx); gridIdx++; }
+    } else { pos = nextFreeGrid(gridIdx); gridIdx++; }
+    icon.style.left = pos.x + 'px'; icon.style.top = pos.y + 'px';
+    desktopLayout[appId] = { x: pos.x, y: pos.y };
 
-        function updateTaskbar() {
-            const container = document.getElementById('taskbarApps');
-            container.innerHTML = '';
-            const sortedApps = Object.keys(windows).sort((a, b) => parseInt(windows[b].element.style.zIndex) - parseInt(windows[a].element.style.zIndex));
-            sortedApps.forEach(appId => {
-                const app = apps[appId], win = windows[appId];
-                const btn = document.createElement('button');
-                btn.className = 'taskbar-app';
-                if (parseInt(win.element.style.zIndex) === zIndexCounter) btn.classList.add('active');
-                btn.innerHTML = `
-                    <span>${getIconHtml(app, 18)}</span>
-                    <span class="taskbar-app-text">${app.name}</span>
-                    <span class="taskbar-close-btn" onclick="event.stopPropagation(); closeWindow('${appId}')">✕</span>
-                `;
-                btn.addEventListener('click', () => {
-                    if (win.minimized) {
-                        win.element.classList.remove('minimized');
-                        win.element.classList.add('restoring');
-                        win.minimized = false;
-                        constrainWindowToBounds(win.element);
-                        setTimeout(() => {
-                            win.element.classList.remove('restoring');
-                        }, 300);
-                    }
-                    bringToFront(appId);
-                });
-                container.appendChild(btn);
-            });
-        }
+    icon.innerHTML = '<div class="icon-image">' + getIconHtml(app, 46) + '</div><div class="icon-label" id="lbl-'+appId+'">' + app.name + '</div>';
+    icon.addEventListener('click', e => { e.stopPropagation(); selectIcon(icon, e.ctrlKey || e.metaKey); });
+    icon.addEventListener('dblclick', () => openApp(appId));
+    icon.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); showIconCtx(e, appId, icon); });
+    makeIconDraggable(icon);
+    container.appendChild(icon);
+  });
+  localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
+}
 
-        // ===== THEME =====
-        function changeTheme(theme) {
-            currentTheme = theme;
-            document.body.className = `theme-${theme}`;
-            localStorage.setItem('eclipseos_theme', theme);
-        }
+function selectIcon(icon, multi) {
+  if (!multi) deselectAllIcons();
+  icon.classList.add('selected');
+  selectedIcons.add(icon.dataset.appId);
+}
+function deselectAllIcons() {
+  document.querySelectorAll('.desktop-icon').forEach(i => i.classList.remove('selected'));
+  selectedIcons.clear();
+}
 
-        function setWallpaper(value) {
-            const desktop = document.getElementById('desktop');
-            if (value === 'none') {
-                desktop.style.background = 'var(--bg-primary)';
-                desktop.style.backgroundSize = '';
-                desktop.style.backgroundPosition = '';
-                localStorage.removeItem('eclipseos_wallpaper');
-            } else if (value.startsWith('http') || value.startsWith('data:')) {
-                desktop.style.background = `url('${value}') center/cover no-repeat`;
-                localStorage.setItem('eclipseos_wallpaper', value);
-            } else {
-                // solid color or other CSS value
-                desktop.style.background = value;
-                desktop.style.backgroundSize = '';
-                desktop.style.backgroundPosition = '';
-                localStorage.setItem('eclipseos_wallpaper', value);
-            }
-        }
+function showIconCtx(e, appId, icon) {
+  var menu = document.getElementById('deskCtx');
+  menu.innerHTML = `
+    <div class="ctx-item" onclick="openApp('${appId}');closeCtxMenu()">▶ Open</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="startRename('${appId}');closeCtxMenu()">✏️ Rename</div>
+    <div class="ctx-item" onclick="pinToggle('${appId}');closeCtxMenu()">📌 ${pinnedAppIds.includes(appId)?'Unpin from':'Pin to'} Taskbar</div>`;
+  var x = Math.min(e.clientX, window.innerWidth - 200), y = Math.min(e.clientY, window.innerHeight - 150);
+  menu.style.left = x + 'px'; menu.style.top = y + 'px';
+  menu.classList.add('open');
+}
 
-        function resetDesktopLayout() {
-            if (confirm('Reset all desktop icons to default positions?')) {
-                desktopLayout = {};
-                localStorage.removeItem('eclipseos_desktop_layout');
-                renderDesktopIcons();
-            }
-        }
+function startRename(appId) {
+  var lbl = document.getElementById('lbl-' + appId);
+  if (!lbl) return;
+  var cur = apps[appId].name;
+  lbl.innerHTML = '<input class="icon-label-edit" value="' + cur + '" id="ren-' + appId + '">';
+  var inp = document.getElementById('ren-' + appId);
+  inp.focus(); inp.select();
+  function done() {
+    var val = inp.value.trim() || cur;
+    apps[appId].name = val;
+    lbl.textContent = val;
+    renderStartMenuApps();
+    renderPinnedApps();
+  }
+  inp.addEventListener('blur', done);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { inp.blur(); } if (e.key === 'Escape') { inp.value = cur; inp.blur(); } });
+}
 
-        // ===== CLOCK =====
-        function updateClock() {
-            const now = new Date();
-            
-            // Update time
-            const hours = now.getHours() % 12 || 12;
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-            document.getElementById('clockTime').textContent = `${hours}:${minutes} ${ampm}`;
-            
-            // Update date
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const month = months[now.getMonth()];
-            const day = now.getDate();
-            const year = now.getFullYear();
-            document.getElementById('clockDate').textContent = `${month} ${day}, ${year}`;
-        }
+function makeIconDraggable(element) {
+  var isDragging = false, startX, startY, initialX, initialY;
+  var gp = document.getElementById('gridPreview');
+  element.addEventListener('mousedown', e => {
+    if (e.detail === 2 || e.button !== 0) return;
+    isDragging = true; startX = e.clientX; startY = e.clientY;
+    initialX = element.offsetLeft; initialY = element.offsetTop;
+    element.style.zIndex = 1000; element.classList.add('dragging');
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDragging) return; e.preventDefault();
+    var nx = initialX + (e.clientX - startX), ny = initialY + (e.clientY - startY);
+    element.style.left = nx + 'px'; element.style.top = ny + 'px';
+    var gPos = getGridPos(nx, ny), occ = gridOccupied(gPos.col, gPos.row, element.dataset.appId);
+    gp.style.display = 'block'; gp.style.left = gPos.x + 'px'; gp.style.top = gPos.y + 'px';
+    gp.className = 'grid-preview' + (occ ? ' occupied' : '');
+  });
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return; isDragging = false;
+    element.style.zIndex = ''; element.classList.remove('dragging'); gp.style.display = 'none';
+    var cx = parseInt(element.style.left), cy = parseInt(element.style.top);
+    var gPos = getGridPos(cx, cy), appId = element.dataset.appId;
+    if (gridOccupied(gPos.col, gPos.row, appId)) {
+      var s = desktopLayout[appId];
+      if (s) { element.style.left = s.x + 'px'; element.style.top = s.y + 'px'; }
+    } else {
+      element.style.left = gPos.x + 'px'; element.style.top = gPos.y + 'px';
+      desktopLayout[appId] = { x: gPos.x, y: gPos.y };
+      localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
+    }
+  });
+}
 
+// ══════════════════════════════════════════════
+//  RUBBER-BAND MULTI-SELECT
+// ══════════════════════════════════════════════
+function initRubberBand() {
+  var rb = document.getElementById('rubberBand');
+  var startX, startY, dragging = false;
+  document.getElementById('desktopIcons').addEventListener('mousedown', e => {
+    if (e.target !== e.currentTarget && !e.target.classList.contains('desktop-icons')) return;
+    if (e.button !== 0) return;
+    startX = e.clientX; startY = e.clientY; dragging = true;
+    rb.style.display = 'block'; rb.style.left = startX + 'px'; rb.style.top = startY + 'px';
+    rb.style.width = '0'; rb.style.height = '0';
+    if (!e.ctrlKey && !e.metaKey) deselectAllIcons();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    var x = Math.min(e.clientX, startX), y = Math.min(e.clientY, startY);
+    var w = Math.abs(e.clientX - startX), h = Math.abs(e.clientY - startY);
+    rb.style.left = x + 'px'; rb.style.top = y + 'px'; rb.style.width = w + 'px'; rb.style.height = h + 'px';
+    var r1 = { x, y, x2: x + w, y2: y + h };
+    document.querySelectorAll('.desktop-icon').forEach(icon => {
+      var r = icon.getBoundingClientRect();
+      var r2 = { x: r.left, y: r.top, x2: r.right, y2: r.bottom };
+      var overlaps = r1.x < r2.x2 && r1.x2 > r2.x && r1.y < r2.y2 && r1.y2 > r2.y;
+      if (overlaps) { icon.classList.add('selected'); selectedIcons.add(icon.dataset.appId); }
+      else if (!e.ctrlKey && !e.metaKey) { icon.classList.remove('selected'); selectedIcons.delete(icon.dataset.appId); }
+    });
+  });
+  document.addEventListener('mouseup', () => { if (!dragging) return; dragging = false; rb.style.display = 'none'; });
+}
 
-        // ===== WINDOW SNAPPING =====
-        const snapPreview = document.getElementById('snapPreview');
-        let snapZone = null;
+// ══════════════════════════════════════════════
+//  START MENU
+// ══════════════════════════════════════════════
+function renderStartMenuApps() {
+  var g = document.getElementById('smGrid'); g.innerHTML = '';
+  Object.keys(apps).forEach((id, i) => {
+    var a = apps[id], item = document.createElement('div');
+    item.className = 'sm-item';
+    item.style.animation = 'slideUp .35s ease forwards';
+    item.style.animationDelay = (i * .025) + 's';
+    item.style.opacity = '0';
+    item.innerHTML = '<div class="sm-icon">' + getIconHtml(a, 28) + '</div><div class="sm-label">' + a.name + '</div>';
+    item.addEventListener('click', () => { openApp(id); closeStartMenu(); });
+    g.appendChild(item);
+  });
+}
+function toggleStartMenu() { document.getElementById('startMenu').classList.toggle('active'); }
+function closeStartMenu() { document.getElementById('startMenu').classList.remove('active'); }
 
-        function getSnapZone(x, y) {
-            if (y < 8) return 'top';
-            if (x < 20) return 'left';
-            if (x > window.innerWidth - 20) return 'right';
-            return null;
-        }
+// ══════════════════════════════════════════════
+//  PINNED APPS
+// ══════════════════════════════════════════════
+function renderPinnedApps() {
+  var c = document.getElementById('pinnedApps'); c.innerHTML = '';
+  pinnedAppIds.forEach(id => {
+    var a = apps[id]; if (!a) return;
+    var btn = document.createElement('div');
+    btn.className = 'pinned-app';
+    btn.title = a.name;
+    btn.dataset.appId = id;
+    btn.innerHTML = getIconHtml(a, 20) || a.icon;
+    btn.addEventListener('click', () => openApp(id));
+    btn.addEventListener('contextmenu', e => { e.preventDefault(); showTbCtx(e, id, true); });
+    if (windows[id]) btn.classList.add('running');
+    c.appendChild(btn);
+  });
+  localStorage.setItem('eclipseos_pinned', JSON.stringify(pinnedAppIds));
+}
+function pinToggle(id) {
+  if (pinnedAppIds.includes(id)) pinnedAppIds = pinnedAppIds.filter(x => x !== id);
+  else pinnedAppIds.push(id);
+  renderPinnedApps();
+}
 
-        function showSnapPreview(zone) {
-            if (!zone) { snapPreview.style.display = 'none'; return; }
-            const h = window.innerHeight - 48;
-            if (zone === 'left')  { snapPreview.style.cssText = 'display:block;position:fixed;top:0;left:0;width:50%;height:' + h + 'px;background:rgba(0,120,212,0.2);border:2px solid rgba(0,120,212,0.6);border-radius:6px;pointer-events:none;z-index:99999;transition:all 0.1s'; }
-            if (zone === 'right') { snapPreview.style.cssText = 'display:block;position:fixed;top:0;left:50%;width:50%;height:' + h + 'px;background:rgba(0,120,212,0.2);border:2px solid rgba(0,120,212,0.6);border-radius:6px;pointer-events:none;z-index:99999;transition:all 0.1s'; }
-            if (zone === 'top')   { snapPreview.style.cssText = 'display:block;position:fixed;top:0;left:0;width:100%;height:' + h + 'px;background:rgba(0,120,212,0.15);border:2px solid rgba(0,120,212,0.5);border-radius:0;pointer-events:none;z-index:99999;transition:all 0.1s'; }
-        }
+// ══════════════════════════════════════════════
+//  VIRTUAL DESKTOPS
+// ══════════════════════════════════════════════
+function renderVdSwitcher() {
+  var c = document.getElementById('vdSwitcher'); c.innerHTML = '';
+  for (var i = 0; i < 4; i++) {
+    var btn = document.createElement('div');
+    btn.className = 'vd-btn' + (i === currentVd ? ' active' : '');
+    btn.textContent = i + 1;
+    btn.dataset.vd = i;
+    btn.title = 'Desktop ' + (i + 1);
+    btn.addEventListener('click', (function(idx){ return () => switchVd(idx); })(i));
+    btn.addEventListener('contextmenu', e => { e.preventDefault(); showVdPreview(); });
+    c.appendChild(btn);
+  }
+}
+function switchVd(idx) {
+  if (idx === currentVd) return;
+  Object.values(windows).forEach(w => {
+    var el = w.element;
+    el.style.display = (w.vd === idx && !w.minimized) ? '' : 'none';
+  });
+  currentVd = idx;
+  renderVdSwitcher();
+  updateTaskbar();
+}
+function showVdPreview() {
+  var ov = document.getElementById('vdPreview'); ov.innerHTML = '';
+  for (var i = 0; i < 4; i++) {
+    var thumb = document.createElement('div');
+    thumb.className = 'vd-thumb' + (i === currentVd ? ' active' : '');
+    var count = Object.values(windows).filter(w => w.vd === i).length;
+    thumb.innerHTML = '<div class="vd-thumb-label">Desktop ' + (i+1) + '</div><div class="vd-thumb-count">' + count + ' window' + (count !== 1 ? 's' : '') + '</div>';
+    thumb.addEventListener('click', (function(idx){ return () => { switchVd(idx); closeVdPreview(); }; })(i));
+    ov.appendChild(thumb);
+  }
+  ov.classList.add('open');
+}
+function closeVdPreview() { document.getElementById('vdPreview').classList.remove('open'); }
 
-        function applySnap(windowEl, zone) {
-            windowEl.classList.remove('snap-left', 'snap-right', 'maximized');
-            if (zone === 'left')  windowEl.classList.add('snap-left');
-            if (zone === 'right') windowEl.classList.add('snap-right');
-            if (zone === 'top')   windowEl.classList.add('maximized');
-        }
+// ══════════════════════════════════════════════
+//  WINDOW MANAGEMENT
+// ══════════════════════════════════════════════
+function openApp(appId) {
+  var existing = windows[appId];
+  if (existing) {
+    bringToFront(appId);
+    if (existing.minimized) {
+      existing.element.classList.remove('minimized');
+      existing.element.classList.add('restoring');
+      existing.minimized = false;
+      existing.element.style.display = '';
+      constrainWindow(existing.element);
+      setTimeout(() => existing.element.classList.remove('restoring'), 300);
+    }
+    return;
+  }
+  var a = apps[appId];
+  var el = document.createElement('div');
+  el.className = 'window';
+  el.dataset.appId = appId;
+  el.style.zIndex = ++zIdx;
 
-        // Hook into window dragging — patch makeWindowDraggable to support snapping
-        const _origMakeWindowDraggable = makeWindowDraggable;
-        function makeWindowDraggable(windowEl) {
-            const titlebar = windowEl.querySelector('.window-titlebar');
-            let isDragging = false, startX, startY, initialX, initialY, wasSnapped = false;
-            titlebar.addEventListener('mousedown', (e) => {
-                if (e.target.closest('.window-control-btn') || windowEl.classList.contains('maximized')) return;
-                isDragging = true;
-                startX = e.clientX; startY = e.clientY;
-                initialX = windowEl.offsetLeft; initialY = windowEl.offsetTop;
-                wasSnapped = windowEl.classList.contains('snap-left') || windowEl.classList.contains('snap-right');
-                if (wasSnapped) { windowEl.classList.remove('snap-left','snap-right'); }
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault();
-                let newX = initialX + (e.clientX - startX);
-                let newY = initialY + (e.clientY - startY);
-                newX = Math.max(0, Math.min(newX, window.innerWidth - windowEl.offsetWidth));
-                newY = Math.max(0, Math.min(newY, window.innerHeight - 48 - windowEl.offsetHeight));
-                windowEl.style.left = newX + 'px';
-                windowEl.style.top  = newY + 'px';
-                snapZone = getSnapZone(e.clientX, e.clientY);
-                showSnapPreview(snapZone);
-            });
-            document.addEventListener('mouseup', (e) => {
-                if (!isDragging) return;
-                isDragging = false;
-                snapPreview.style.display = 'none';
-                if (snapZone) { applySnap(windowEl, snapZone); snapZone = null; }
-            });
-        }
+  var mw = window.innerWidth - 40, mh = window.innerHeight - 88;
+  var dw = Math.min(a.width || 820, mw), dh = Math.min(a.height || 620, mh);
+  var left = Math.max(20, (window.innerWidth - dw) / 2);
+  var top  = Math.max(20, (window.innerHeight - dh - 68) / 2);
+  left = Math.min(left, window.innerWidth - dw - 20);
+  top  = Math.min(top,  window.innerHeight - dh - 88);
+  el.style.width = dw + 'px'; el.style.height = dh + 'px';
+  el.style.left  = left + 'px'; el.style.top = top + 'px';
 
-        // ===== DESKTOP CONTEXT MENU =====
-        function initContextMenu() {
-            const menu = document.getElementById('desktopCtxMenu');
-            document.getElementById('desktop').addEventListener('contextmenu', (e) => {
-                if (e.target.closest('.desktop-icon') || e.target.closest('.desktop-widget')) return;
-                e.preventDefault();
-                menu.innerHTML = `
-                    <div class="ctx-item" onclick="openApp('notepad');closeCtxMenu()">📝 New Note</div>
-                    <div class="ctx-item" onclick="openApp('stickynotes');closeCtxMenu()">📌 New Sticky Note</div>
-                    <div class="ctx-sep"></div>
-                    <div class="ctx-item" onclick="addWidget('clock');closeCtxMenu()">🕐 Add Clock Widget</div>
-                    <div class="ctx-item" onclick="addWidget('weather');closeCtxMenu()">🌤️ Add Weather Widget</div>
-                    <div class="ctx-item" onclick="addWidget('sticky');closeCtxMenu()">📌 Add Sticky Widget</div>
-                    <div class="ctx-sep"></div>
-                    <div class="ctx-item" onclick="openApp('settings');closeCtxMenu()">⚙️ Settings</div>
-                    <div class="ctx-item" onclick="resetDesktopLayout();closeCtxMenu()">↺ Reset Icon Layout</div>
-                    <div class="ctx-sep"></div>
-                    <div class="ctx-item" onclick="changeTheme(currentTheme==='white'?'black':'white');closeCtxMenu()">🎨 Toggle Theme</div>`;
-                const x = Math.min(e.clientX, window.innerWidth - 220);
-                const y = Math.min(e.clientY, window.innerHeight - 280);
-                menu.style.left = x + 'px';
-                menu.style.top  = y + 'px';
-                menu.classList.add('open');
-            });
-            document.addEventListener('click', closeCtxMenu);
-            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeCtxMenu(); });
-        }
-        function closeCtxMenu() {
-            document.getElementById('desktopCtxMenu').classList.remove('open');
-        }
-
-        // ===== DESKTOP WIDGETS =====
-        let widgets = JSON.parse(localStorage.getItem('eclipseos_widgets') || '[]');
-
-        function saveWidgets() {
-            localStorage.setItem('eclipseos_widgets', JSON.stringify(widgets));
-        }
-
-        function addWidget(type) {
-            const w = { id: Date.now(), type, x: 100 + Math.random()*200, y: 100 + Math.random()*100, text: '' };
-            widgets.push(w);
-            saveWidgets();
-            renderWidget(w);
-        }
-
-        function removeWidget(id) {
-            widgets = widgets.filter(w => w.id !== id);
-            saveWidgets();
-            const el = document.getElementById('widget-' + id);
-            if (el) el.remove();
-        }
-
-        function renderWidget(w) {
-            const container = document.getElementById('widgetContainer');
-            const div = document.createElement('div');
-            div.className = 'desktop-widget';
-            div.id = 'widget-' + w.id;
-            div.style.left = w.x + 'px';
-            div.style.top  = w.y + 'px';
-            div.style.position = 'absolute';
-
-            if (w.type === 'clock') {
-                div.innerHTML = `<div class="widget-clock"><div class="wc-time" id="wt-${w.id}">--:--</div><div class="wc-date" id="wd-${w.id}"></div></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
-                setInterval(() => {
-                    const now = new Date();
-                    const h = now.getHours().toString().padStart(2,'0');
-                    const m = now.getMinutes().toString().padStart(2,'0');
-                    const el = document.getElementById('wt-' + w.id);
-                    const de = document.getElementById('wd-' + w.id);
-                    if (el) el.textContent = h + ':' + m;
-                    if (de) de.textContent = now.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'});
-                }, 1000);
-            } else if (w.type === 'weather') {
-                div.innerHTML = `<div class="widget-stats" id="weath-${w.id}"><div style="font-size:11px;font-weight:700;letter-spacing:1px;opacity:0.6;margin-bottom:8px;text-transform:uppercase">Weather</div><div id="weath-content-${w.id}" style="font-size:12px;opacity:0.7">Enter city below</div><input id="weath-city-${w.id}" placeholder="City name…" style="margin-top:8px;width:100%;padding:5px 8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:5px;color:white;font-family:Oxanium,sans-serif;font-size:11px;outline:none" onkeydown="if(event.key==='Enter')fetchWidgetWeather(${w.id})"></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
-                if (w.city) fetchWidgetWeather(w.id, w.city);
-            } else if (w.type === 'sticky') {
-                div.innerHTML = `<div class="widget-sticky"><textarea placeholder="Widget note..." oninput="updateWidgetText(${w.id},this.value)">${w.text||''}</textarea></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
-            }
-
-            makeDraggableWidget(div, w);
-            container.appendChild(div);
-        }
-
-        function updateWidgetText(id, text) {
-            const w = widgets.find(x => x.id === id);
-            if (w) { w.text = text; saveWidgets(); }
-        }
-
-        function makeDraggableWidget(el, w) {
-            let dragging = false, sx, sy, ix, iy;
-            const handle = el.querySelector('.widget-clock, .widget-stats, .widget-sticky div:first-child') || el;
-            el.addEventListener('mousedown', (e) => {
-                if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('widget-close')) return;
-                dragging = true; sx = e.clientX; sy = e.clientY;
-                ix = el.offsetLeft; iy = el.offsetTop;
-                el.style.zIndex = 999;
-            });
-            document.addEventListener('mousemove', (e) => {
-                if (!dragging) return;
-                el.style.left = (ix + e.clientX - sx) + 'px';
-                el.style.top  = (iy + e.clientY - sy) + 'px';
-                w.x = ix + e.clientX - sx;
-                w.y = iy + e.clientY - sy;
-            });
-            document.addEventListener('mouseup', () => {
-                if (dragging) { dragging = false; el.style.zIndex = ''; saveWidgets(); }
-            });
-        }
-
-        function fetchWidgetWeather(id, city) {
-            const cityEl = document.getElementById('weath-city-' + id);
-            const c = city || (cityEl && cityEl.value.trim());
-            if (!c) return;
-            const w = widgets.find(x => x.id === id);
-            if (w) w.city = c;
-            saveWidgets();
-            const apiKey = localStorage.getItem('eclipseos_weather_key') || '';
-            if (!apiKey) { const el = document.getElementById('weath-content-' + id); if(el) el.textContent = '🔑 Set API key in Weather app'; return; }
-            fetch('https://api.openweathermap.org/data/2.5/weather?q=' + encodeURIComponent(c) + '&appid=' + apiKey + '&units=metric')
-                .then(r => r.json())
-                .then(d => {
-                    const el = document.getElementById('weath-content-' + id);
-                    if (!el) return;
-                    if (d.cod !== 200) { el.textContent = '❌ ' + (d.message || 'Not found'); return; }
-                    const icons = {'01d':'☀️','01n':'🌙','02d':'⛅','02n':'🌙','03d':'☁️','04d':'☁️','09d':'🌧️','10d':'🌦️','11d':'⛈️','13d':'❄️','50d':'🌫️'};
-                    const icon = icons[d.weather[0].icon] || '🌤️';
-                    el.innerHTML = '<div style="font-size:24px;margin-bottom:4px">' + icon + ' ' + Math.round(d.main.temp) + '°C</div><div>' + d.name + '</div><div style="opacity:0.6;font-size:10px">' + d.weather[0].description + '</div>';
-                    if (cityEl) cityEl.style.display = 'none';
-                })
-                .catch(() => { const el = document.getElementById('weath-content-' + id); if(el) el.textContent = '⚠️ Network error'; });
-        }
-
-        function initWidgets() {
-            widgets.forEach(w => renderWidget(w));
-        }
-
-        // ===== START =====
-        init();
-
-        // Open startup apps
-        setTimeout(function() {
-            var startupApps = JSON.parse(localStorage.getItem('eclipseos_startup_apps') || '[]');
-            startupApps.forEach(function(id) { if (apps[id]) openApp(id); });
-        }, 800);
-    </script>
-
-    <!-- Volume popup -->
-    <div class="tray-popup" id="volumePopup">
-        <div class="tray-popup-title">Volume</div>
-        <div class="tray-slider-row">
-            <span id="volEmoji">🔊</span>
-            <input type="range" class="tray-slider" id="volSlider" min="0" max="100" value="100"
-                oninput="onVolumeChange(this.value)">
-            <span class="tray-value" id="volValue">100%</span>
-        </div>
-        <button class="tray-mute-btn" id="muteBtn" onclick="toggleMute()">🔇 Mute</button>
+  var tbColor = APP_COLORS[appId] || 'var(--accent)';
+  el.innerHTML = `
+    <div class="window-titlebar" style="background:${tbColor}">
+      <span class="window-icon">${getIconHtml(a,16)}</span>
+      <span class="window-title">${a.name}</span>
+      <div class="window-controls">
+        <div class="wcb min" title="Minimize">−</div>
+        <div class="wcb max" title="Maximize">□</div>
+        <div class="wcb cls" title="Close">×</div>
+      </div>
     </div>
+    <div class="window-content"><iframe src="${a.file}"></iframe></div>
+    <div class="resize-handle right"></div>
+    <div class="resize-handle bottom"></div>
+    <div class="resize-handle bottom-right"></div>`;
 
-    <!-- Network popup -->
-    <div class="tray-popup" id="networkPopup">
-        <div class="tray-popup-title">Network</div>
-        <div class="net-status" id="netStatus">
-            <div class="net-status-dot" id="netDot"></div>
-            <div class="net-status-info">
-                <div class="ns-label" id="netLabel">Checking...</div>
-                <div class="ns-sub"   id="netSub"></div>
-            </div>
-        </div>
+  document.body.appendChild(el);
+  windows[appId] = { element: el, minimized: false, maximized: false, vd: currentVd };
+  constrainWindow(el);
+
+  el.querySelector('.min').addEventListener('click', () => minimizeWindow(appId));
+  el.querySelector('.max').addEventListener('click', () => toggleMaximize(appId));
+  el.querySelector('.cls').addEventListener('click', () => closeWindow(appId));
+  el.addEventListener('mousedown', () => bringToFront(appId));
+  makeWindowDraggable(el);
+  makeWindowResizable(el);
+  updateTaskbar();
+  renderPinnedApps();
+
+  // Show notification
+  pushNotif(a.icon, a.name, a.name + ' opened', '');
+}
+
+function makeWindowDraggable(el) {
+  var tb = el.querySelector('.window-titlebar');
+  var isDrag = false, sx, sy, ix, iy, wasSnapped = false;
+  var snap = null;
+  var preview = document.getElementById('snapPreview');
+
+  tb.addEventListener('mousedown', e => {
+    if (e.target.closest('.window-controls') || el.classList.contains('maximized')) return;
+    isDrag = true; sx = e.clientX; sy = e.clientY;
+    ix = el.offsetLeft; iy = el.offsetTop;
+    wasSnapped = ['snap-left','snap-right','snap-tl','snap-tr','snap-bl','snap-br'].some(c => el.classList.contains(c));
+    if (wasSnapped) el.className = el.className.replace(/snap-\w+/g, '').trim();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!isDrag) return; e.preventDefault();
+    var nx = Math.max(0, Math.min(ix + (e.clientX - sx), window.innerWidth - el.offsetWidth));
+    var ny = Math.max(0, Math.min(iy + (e.clientY - sy), window.innerHeight - 68 - el.offsetHeight));
+    el.style.left = nx + 'px'; el.style.top = ny + 'px';
+    snap = getSnapZone(e.clientX, e.clientY);
+    showSnapPreview(snap);
+  });
+  document.addEventListener('mouseup', () => {
+    if (!isDrag) return; isDrag = false; preview.style.display = 'none';
+    if (snap) { applySnap(el, snap); snap = null; }
+  });
+}
+
+function getSnapZone(x, y) {
+  var h = window.innerHeight - 68, w = window.innerWidth;
+  if (y < 6) return 'maximize';
+  if (x < 16 && y < h * .5) return 'snap-tl';
+  if (x < 16 && y >= h * .5) return 'snap-bl';
+  if (x > w - 16 && y < h * .5) return 'snap-tr';
+  if (x > w - 16 && y >= h * .5) return 'snap-br';
+  if (x < 16) return 'snap-left';
+  if (x > w - 16) return 'snap-right';
+  return null;
+}
+function showSnapPreview(zone) {
+  var p = document.getElementById('snapPreview'), h = window.innerHeight - 68, w = window.innerWidth;
+  if (!zone) { p.style.display = 'none'; return; }
+  var styles = {
+    'maximize':   `top:0;left:0;width:${w}px;height:${h}px`,
+    'snap-left':  `top:0;left:0;width:${w*.5}px;height:${h}px`,
+    'snap-right': `top:0;left:${w*.5}px;width:${w*.5}px;height:${h}px`,
+    'snap-tl':    `top:0;left:0;width:${w*.5}px;height:${h*.5}px`,
+    'snap-tr':    `top:0;left:${w*.5}px;width:${w*.5}px;height:${h*.5}px`,
+    'snap-bl':    `top:${h*.5}px;left:0;width:${w*.5}px;height:${h*.5}px`,
+    'snap-br':    `top:${h*.5}px;left:${w*.5}px;width:${w*.5}px;height:${h*.5}px`,
+  };
+  p.style.cssText = 'display:block;position:fixed;background:rgba(0,120,212,.18);border:2px solid rgba(0,120,212,.55);border-radius:6px;pointer-events:none;z-index:99999;transition:all .1s;' + styles[zone];
+}
+function applySnap(el, zone) {
+  el.className = el.className.replace(/snap-\w+/g, '').replace(/maximized/g, '').trim();
+  if (zone === 'maximize') { el.classList.add('maximized'); return; }
+  el.classList.add(zone);
+}
+
+function makeWindowResizable(el) {
+  var tip = document.getElementById('resizeTooltip');
+  el.querySelectorAll('.resize-handle').forEach(handle => {
+    var isRes = false, sx, sy, sw, sh;
+    handle.addEventListener('mousedown', e => {
+      if (el.classList.contains('maximized')) return;
+      e.stopPropagation(); isRes = true;
+      sx = e.clientX; sy = e.clientY; sw = el.offsetWidth; sh = el.offsetHeight;
+    });
+    document.addEventListener('mousemove', e => {
+      if (!isRes) return; e.preventDefault();
+      var dx = e.clientX - sx, dy = e.clientY - sy;
+      var maxW = Math.max(360, window.innerWidth - el.offsetLeft);
+      var maxH = Math.max(260, window.innerHeight - 68 - el.offsetTop);
+      if (handle.classList.contains('right') || handle.classList.contains('bottom-right'))
+        el.style.width = Math.min(Math.max(360, sw + dx), maxW) + 'px';
+      if (handle.classList.contains('bottom') || handle.classList.contains('bottom-right'))
+        el.style.height = Math.min(Math.max(260, sh + dy), maxH) + 'px';
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+      tip.textContent = Math.round(el.offsetWidth) + ' × ' + Math.round(el.offsetHeight);
+    });
+    document.addEventListener('mouseup', () => { if (isRes) { isRes = false; tip.style.display = 'none'; } });
+  });
+}
+
+function bringToFront(appId) {
+  if (windows[appId]) { windows[appId].element.style.zIndex = ++zIdx; updateTaskbar(); }
+}
+function constrainWindow(el) {
+  if (el.classList.contains('maximized')) return;
+  var w = el.offsetWidth, h = el.offsetHeight;
+  var l = Math.max(0, Math.min(el.offsetLeft, window.innerWidth - w));
+  var t = Math.max(0, Math.min(el.offsetTop, window.innerHeight - 68 - h));
+  el.style.left = l + 'px'; el.style.top = t + 'px';
+}
+function minimizeWindow(appId) {
+  var w = windows[appId]; if (!w) return;
+  w.element.classList.add('minimizing');
+  setTimeout(() => { w.element.classList.remove('minimizing'); w.element.style.display = 'none'; w.minimized = true; updateTaskbar(); }, 280);
+}
+function toggleMaximize(appId) {
+  var w = windows[appId]; if (!w) return;
+  w.element.className = w.element.className.replace(/snap-\w+/g, '').trim();
+  w.element.classList.toggle('maximized'); w.maximized = !w.maximized;
+}
+function closeWindow(appId) {
+  var w = windows[appId]; if (!w) return;
+  w.element.classList.add('closing');
+  setTimeout(() => { w.element.remove(); delete windows[appId]; updateTaskbar(); renderPinnedApps(); }, 200);
+}
+
+// Taskbar right-click on app
+function showTbCtx(e, appId, isPinned) {
+  var menu = document.getElementById('tbCtx');
+  menu.innerHTML = `
+    <div class="ctx-item" onclick="openApp('${appId}');document.getElementById('tbCtx').classList.remove('open')">▶ Open</div>
+    <div class="ctx-item" onclick="pinToggle('${appId}');document.getElementById('tbCtx').classList.remove('open')">📌 ${pinnedAppIds.includes(appId)?'Unpin':'Pin to Taskbar'}</div>
+    ${windows[appId] ? `<div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="minimizeWindow('${appId}');document.getElementById('tbCtx').classList.remove('open')">− Minimize</div>
+    <div class="ctx-item" onclick="toggleMaximize('${appId}');document.getElementById('tbCtx').classList.remove('open')">□ Maximize</div>
+    <div class="ctx-item" onclick="closeWindow('${appId}');document.getElementById('tbCtx').classList.remove('open')">✕ Close</div>` : ''}`;
+  var x = Math.min(e.clientX, window.innerWidth - 190);
+  var y = Math.max(0, e.clientY - menu.offsetHeight - 8);
+  menu.style.left = x + 'px'; menu.style.top = (e.clientY - 120) + 'px';
+  menu.classList.add('open');
+}
+
+function updateTaskbar() {
+  var c = document.getElementById('taskbarApps'); c.innerHTML = '';
+  Object.keys(windows).filter(id => windows[id].vd === currentVd).forEach(id => {
+    var a = apps[id], w = windows[id];
+    var btn = document.createElement('button');
+    btn.className = 'taskbar-app';
+    if (parseInt(w.element.style.zIndex) === zIdx) btn.classList.add('active');
+    btn.innerHTML = '<span>' + getIconHtml(a, 16) + '</span><span class="taskbar-app-text">' + a.name + '</span><span class="tb-cls" onclick="event.stopPropagation();closeWindow(\''+id+'\')">✕</span>';
+    btn.addEventListener('click', () => {
+      if (w.minimized) { w.element.style.display = ''; w.element.classList.add('restoring'); w.minimized = false; constrainWindow(w.element); setTimeout(() => w.element.classList.remove('restoring'), 280); }
+      bringToFront(id);
+    });
+    btn.addEventListener('contextmenu', e => { e.preventDefault(); showTbCtx(e, id, false); });
+    c.appendChild(btn);
+  });
+  document.querySelectorAll('.pinned-app').forEach(p => {
+    var id = p.dataset.appId;
+    p.classList.toggle('running', !!windows[id]);
+  });
+}
+
+// ══════════════════════════════════════════════
+//  SPOTLIGHT SEARCH
+// ══════════════════════════════════════════════
+var spotlightIdx = -1;
+function toggleSpotlight() {
+  var ov = document.getElementById('spotlightOverlay');
+  if (ov.classList.contains('open')) { closeSpotlight(); return; }
+  ov.classList.add('open');
+  document.getElementById('spotlightInput').value = '';
+  spotlightSearch();
+  setTimeout(() => document.getElementById('spotlightInput').focus(), 50);
+}
+function closeSpotlight() {
+  document.getElementById('spotlightOverlay').classList.remove('open');
+}
+function spotlightSearch() {
+  var q = document.getElementById('spotlightInput').value.toLowerCase();
+  var res = document.getElementById('spotlightResults');
+  var matches = Object.keys(apps).filter(id => !q || apps[id].name.toLowerCase().includes(q) || apps[id].category.toLowerCase().includes(q));
+  if (!matches.length) { res.innerHTML = '<div class="spotlight-empty">No results for "' + q + '"</div>'; return; }
+  spotlightIdx = -1;
+  res.innerHTML = matches.map((id, i) => `<div class="spotlight-result" data-id="${id}" onclick="openApp('${id}');closeSpotlight()">
+    <div class="spotlight-result-icon">${getIconHtml(apps[id],24)}</div>
+    <div><div class="spotlight-result-name">${apps[id].name}</div><div class="spotlight-result-cat">${apps[id].category}</div></div>
+  </div>`).join('');
+}
+function spotlightKey(e) {
+  var items = document.querySelectorAll('.spotlight-result');
+  if (e.key === 'ArrowDown') { spotlightIdx = Math.min(spotlightIdx + 1, items.length - 1); highlightSpotlight(items); }
+  else if (e.key === 'ArrowUp') { spotlightIdx = Math.max(spotlightIdx - 1, 0); highlightSpotlight(items); }
+  else if (e.key === 'Enter') {
+    var sel = document.querySelector('.spotlight-result.highlighted');
+    if (sel) { openApp(sel.dataset.id); closeSpotlight(); }
+  } else if (e.key === 'Escape') closeSpotlight();
+}
+function highlightSpotlight(items) {
+  items.forEach((el, i) => el.classList.toggle('highlighted', i === spotlightIdx));
+  if (items[spotlightIdx]) items[spotlightIdx].scrollIntoView({ block: 'nearest' });
+}
+
+// ══════════════════════════════════════════════
+//  NOTIFICATIONS
+// ══════════════════════════════════════════════
+function pushNotif(icon, app, title, body) {
+  if (dndMode) return;
+  var n = { id: Date.now(), icon, app, title, body, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) };
+  notifications.unshift(n);
+  if (notifications.length > 50) notifications.pop();
+  localStorage.setItem('eclipseos_notifs', JSON.stringify(notifications));
+  renderNotifList();
+  var badge = document.getElementById('notifIcon');
+  badge.textContent = '🔔' + (notifications.length > 0 ? ' ' + notifications.length : '');
+}
+function renderNotifList() {
+  var c = document.getElementById('notifList');
+  if (!notifications.length) { c.innerHTML = '<div class="notif-empty">No notifications</div>'; return; }
+  c.innerHTML = notifications.map(n => `<div class="notif-item" id="notif-${n.id}">
+    <div class="notif-item-header">
+      <span class="notif-item-icon">${n.icon||'💬'}</span>
+      <span class="notif-item-app">${n.app||''}</span>
+      <span class="notif-item-time">${n.time||''}</span>
+      <button class="notif-dismiss" onclick="dismissNotif(${n.id})">✕</button>
     </div>
+    <div class="notif-item-title">${n.title||''}</div>
+    ${n.body ? '<div class="notif-item-body">'+n.body+'</div>' : ''}
+  </div>`).join('');
+}
+function dismissNotif(id) {
+  notifications = notifications.filter(n => n.id !== id);
+  localStorage.setItem('eclipseos_notifs', JSON.stringify(notifications));
+  renderNotifList();
+}
+function clearNotifs() { notifications = []; localStorage.setItem('eclipseos_notifs', '[]'); renderNotifList(); document.getElementById('notifIcon').textContent = '🔔'; }
+function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
 
+// ══════════════════════════════════════════════
+//  QUICK SETTINGS
+// ══════════════════════════════════════════════
+function toggleQs() { document.getElementById('qsPanel').classList.toggle('open'); }
+function toggleDnd() {
+  dndMode = !dndMode;
+  localStorage.setItem('eclipseos_dnd', dndMode);
+  document.getElementById('dndDot').classList.toggle('on', dndMode);
+  document.getElementById('qsDnd').classList.toggle('on', dndMode);
+}
+function toggleNightMode() {
+  var btn = document.getElementById('qsNight');
+  var on = btn.classList.toggle('on');
+  document.body.style.filter = on ? 'sepia(20%) brightness(85%)' : '';
+  localStorage.setItem('eclipseos_nightmode', on);
+}
+function onBrightness(v) {
+  var pct = Math.max(20, v);
+  document.body.style.filter = (localStorage.getItem('eclipseos_nightmode')==='true' ? 'sepia(20%) ' : '') + 'brightness(' + pct + '%)';
+  document.getElementById('qsBrightVal').textContent = pct + '%';
+}
+function updateQsTheme() {
+  ['white','black','grey'].forEach(t => document.getElementById('qt-'+t).classList.toggle('active', t === currentTheme));
+}
+
+// ══════════════════════════════════════════════
+//  VOLUME
+// ══════════════════════════════════════════════
+function onVolumeChange(v) {
+  volLevel = parseInt(v); isMuted = false;
+  var icon = volLevel === 0 ? '🔇' : volLevel < 40 ? '🔉' : '🔊';
+  document.getElementById('volEmoji').textContent = icon;
+  document.getElementById('volumeIcon').textContent = icon;
+  document.getElementById('volValue').textContent = v + '%';
+  if (document.getElementById('qsVolVal')) document.getElementById('qsVolVal').textContent = v + '%';
+  if (document.getElementById('qsVolIcon')) document.getElementById('qsVolIcon').textContent = icon;
+}
+function toggleMute() {
+  isMuted = !isMuted;
+  var icon = isMuted ? '🔇' : volLevel < 40 ? '🔉' : '🔊';
+  document.getElementById('volEmoji').textContent = icon;
+  document.getElementById('volumeIcon').textContent = icon;
+}
+
+// ══════════════════════════════════════════════
+//  TRAY POPUPS
+// ══════════════════════════════════════════════
+function toggleTray(name) {
+  document.querySelectorAll('.tray-popup').forEach(p => { if (p.id !== name + 'Popup') p.classList.remove('active'); });
+  var p = document.getElementById(name + 'Popup'); if (!p) return;
+  p.classList.toggle('active');
+  if (name === 'network') updateNetworkStatus();
+}
+function updateNetworkStatus() {
+  var dot = document.getElementById('netDot'), lbl = document.getElementById('netLabel'), sub = document.getElementById('netSub');
+  if (!dot) return;
+  var online = navigator.onLine;
+  dot.className = 'net-dot ' + (online ? 'online' : 'offline');
+  lbl.textContent = online ? 'Connected' : 'No Connection';
+  sub.textContent = online ? 'Internet available' : 'Check your network';
+  document.getElementById('networkIcon').textContent = online ? '📶' : '❌';
+}
+window.addEventListener('online',  updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+
+// ══════════════════════════════════════════════
+//  CALENDAR
+// ══════════════════════════════════════════════
+function toggleCal() { var c = document.getElementById('calPopup'); c.classList.toggle('open'); if (c.classList.contains('open')) renderCal(); }
+function calNav(dir) { calDate.setMonth(calDate.getMonth() + dir); renderCal(); }
+function renderCal() {
+  var now = new Date(), y = calDate.getFullYear(), m = calDate.getMonth();
+  document.getElementById('calMonth').textContent = calDate.toLocaleString('default', {month:'long',year:'numeric'});
+  var g = document.getElementById('calGrid');
+  var days = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+  g.innerHTML = days.map(d => '<div class="cal-dow">'+d+'</div>').join('');
+  var first = new Date(y, m, 1).getDay(), last = new Date(y, m+1, 0).getDate();
+  for (var i = 0; i < first; i++) g.innerHTML += '<div class="cal-day other-month"></div>';
+  for (var d = 1; d <= last; d++) {
+    var isToday = d === now.getDate() && m === now.getMonth() && y === now.getFullYear();
+    g.innerHTML += '<div class="cal-day' + (isToday?' today':'') + '">' + d + '</div>';
+  }
+}
+
+// ══════════════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════════════
+function updateClock() {
+  var now = new Date();
+  var fmt = localStorage.getItem('eclipseos_clock_format') || '12';
+  var h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
+  var timeStr = fmt === '24' ? h.toString().padStart(2,'0') + ':' + m : ((h%12||12) + ':' + m + ' ' + (h>=12?'PM':'AM'));
+  document.getElementById('clockTime').textContent = timeStr;
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('clockDate').textContent = months[now.getMonth()] + ' ' + now.getDate();
+}
+
+// ══════════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════════
+function changeTheme(theme) {
+  currentTheme = theme;
+  document.body.className = 'theme-' + theme;
+  localStorage.setItem('eclipseos_theme', theme);
+  updateQsTheme();
+}
+function setWallpaper(value) {
+  var d = document.getElementById('desktop');
+  if (value === 'none') { d.style.background = 'var(--bg)'; localStorage.removeItem('eclipseos_wallpaper'); }
+  else if (value.startsWith('http') || value.startsWith('data:')) { d.style.background = "url('"+value+"') center/cover no-repeat"; localStorage.setItem('eclipseos_wallpaper', value); }
+  else { d.style.background = value; localStorage.setItem('eclipseos_wallpaper', value); }
+}
+function resetDesktopLayout() {
+  if (confirm('Reset all desktop icons to default positions?')) { desktopLayout = {}; localStorage.removeItem('eclipseos_desktop_layout'); renderDesktopIcons(); }
+}
+
+// ══════════════════════════════════════════════
+//  DESKTOP CONTEXT MENU
+// ══════════════════════════════════════════════
+function initContextMenu() {
+  var menu = document.getElementById('deskCtx');
+  document.getElementById('desktop').addEventListener('contextmenu', e => {
+    if (e.target.closest('.desktop-icon') || e.target.closest('.desktop-widget')) return;
+    e.preventDefault();
+    menu.innerHTML = `
+      <div class="ctx-item" onclick="openApp('notepad');closeCtxMenu()">📝 New Note</div>
+      <div class="ctx-item" onclick="openApp('stickynotes');closeCtxMenu()">📌 New Sticky Note</div>
+      <div class="ctx-sep"></div>
+      <div class="ctx-item" onclick="addWidget('clock');closeCtxMenu()">🕐 Add Clock Widget</div>
+      <div class="ctx-item" onclick="addWidget('stats');closeCtxMenu()">📊 Add Stats Widget</div>
+      <div class="ctx-item" onclick="addWidget('weather');closeCtxMenu()">🌤️ Add Weather Widget</div>
+      <div class="ctx-item" onclick="addWidget('sticky');closeCtxMenu()">📌 Add Sticky Widget</div>
+      <div class="ctx-sep"></div>
+      <div class="ctx-item" onclick="toggleSpotlight();closeCtxMenu()">🔍 Spotlight Search</div>
+      <div class="ctx-item" onclick="openApp('settings');closeCtxMenu()">⚙️ Settings</div>
+      <div class="ctx-item" onclick="resetDesktopLayout();closeCtxMenu()">↺ Reset Icon Layout</div>
+      <div class="ctx-sep"></div>
+      <div class="ctx-item" onclick="changeTheme(currentTheme==='white'?'black':'white');closeCtxMenu()">🎨 Toggle Theme</div>`;
+    var x = Math.min(e.clientX, window.innerWidth - 220), y = Math.min(e.clientY, window.innerHeight - 320);
+    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+    menu.classList.add('open');
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCtxMenu(); });
+}
+function closeCtxMenu() { document.getElementById('deskCtx').classList.remove('open'); }
+
+// ══════════════════════════════════════════════
+//  DESKTOP WIDGETS
+// ══════════════════════════════════════════════
+var widgets = JSON.parse(localStorage.getItem('eclipseos_widgets') || '[]');
+function saveWidgets() { localStorage.setItem('eclipseos_widgets', JSON.stringify(widgets)); }
+function addWidget(type) {
+  var w = { id: Date.now(), type, x: 100 + Math.random()*200, y: 80 + Math.random()*100, text:'' };
+  widgets.push(w); saveWidgets(); renderWidget(w);
+}
+function removeWidget(id) {
+  widgets = widgets.filter(w => w.id !== id); saveWidgets();
+  var el = document.getElementById('widget-' + id); if (el) el.remove();
+}
+function renderWidget(w) {
+  var container = document.getElementById('widgetContainer');
+  var div = document.createElement('div');
+  div.className = 'desktop-widget'; div.id = 'widget-' + w.id;
+  div.style.left = w.x + 'px'; div.style.top = w.y + 'px'; div.style.position = 'absolute';
+
+  if (w.type === 'clock') {
+    div.innerHTML = `<div class="widget-clock"><div class="wc-time" id="wt-${w.id}">--:--</div><div class="wc-date" id="wd-${w.id}"></div></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+    var tick = setInterval(() => {
+      var now = new Date(), t = document.getElementById('wt-'+w.id), d = document.getElementById('wd-'+w.id);
+      if (!t) { clearInterval(tick); return; }
+      t.textContent = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+      d.textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+    }, 1000);
+
+  } else if (w.type === 'stats') {
+    div.innerHTML = `<div class="widget-stats">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;opacity:.55;margin-bottom:8px;text-transform:uppercase">System</div>
+      <div class="ws-row"><span class="ws-label">CPU</span><span class="ws-val" id="wcpu-${w.id}">--</span></div>
+      <div class="ws-bar"><div class="ws-fill" id="wcpub-${w.id}" style="background:#0078d4;width:0%"></div></div>
+      <div class="ws-row"><span class="ws-label">RAM</span><span class="ws-val" id="wram-${w.id}">--</span></div>
+      <div class="ws-bar"><div class="ws-fill" id="wramb-${w.id}" style="background:#34c759;width:0%"></div></div>
+      <div class="ws-row"><span class="ws-label">Disk</span><span class="ws-val" id="wdisk-${w.id}">--</span></div>
+      <div class="ws-bar"><div class="ws-fill" id="wdiskb-${w.id}" style="background:#ff9500;width:0%"></div></div>
+    </div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+    // Simulate animated stats
+    var cpuVal = 20 + Math.random() * 30;
+    var ramVal = 40 + Math.random() * 20;
+    var diskVal = 55 + Math.random() * 15;
+    var statsInt = setInterval(() => {
+      cpuVal = Math.max(5, Math.min(95, cpuVal + (Math.random()-0.5)*15));
+      ramVal = Math.max(20, Math.min(90, ramVal + (Math.random()-0.5)*5));
+      diskVal = Math.max(40, Math.min(95, diskVal + (Math.random()-0.5)*2));
+      var c = document.getElementById('wcpu-'+w.id);
+      if (!c) { clearInterval(statsInt); return; }
+      c.textContent = Math.round(cpuVal) + '%'; document.getElementById('wcpub-'+w.id).style.width = cpuVal + '%';
+      document.getElementById('wram-'+w.id).textContent = Math.round(ramVal) + '%'; document.getElementById('wramb-'+w.id).style.width = ramVal + '%';
+      document.getElementById('wdisk-'+w.id).textContent = Math.round(diskVal) + '%'; document.getElementById('wdiskb-'+w.id).style.width = diskVal + '%';
+    }, 1200);
+
+  } else if (w.type === 'weather') {
+    div.innerHTML = `<div class="widget-weather">
+      <div style="font-size:10px;font-weight:800;letter-spacing:2px;opacity:.55;margin-bottom:8px;text-transform:uppercase">Weather</div>
+      <div id="wweath-${w.id}" style="font-size:12px;opacity:.7">Fetching location…</div>
+      <input id="wcity-${w.id}" placeholder="Or type a city…" style="margin-top:8px;width:100%;padding:5px 8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:5px;color:#fff;font-family:Oxanium,sans-serif;font-size:11px;outline:none" onkeydown="if(event.key==='Enter')fetchWidgetWeather(${w.id},null)">
+    </div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+    if (w.city) fetchWidgetWeather(w.id, w.city);
+    else fetchWeatherByLocation(w.id);
+
+  } else if (w.type === 'sticky') {
+    div.innerHTML = `<div class="widget-sticky"><textarea placeholder="Widget note…" oninput="updateWidgetText(${w.id},this.value)">${w.text||''}</textarea></div><button class="widget-close" onclick="removeWidget(${w.id})">×</button>`;
+  }
+
+  makeDraggableWidget(div, w);
+  container.appendChild(div);
+}
+function updateWidgetText(id, text) { var w = widgets.find(x => x.id === id); if (w) { w.text = text; saveWidgets(); } }
+function makeDraggableWidget(el, w) {
+  var dragging = false, sx, sy, ix, iy;
+  el.addEventListener('mousedown', e => {
+    if (e.target.tagName === 'TEXTAREA' || e.target.classList.contains('widget-close') || e.target.tagName === 'INPUT') return;
+    dragging = true; sx = e.clientX; sy = e.clientY; ix = el.offsetLeft; iy = el.offsetTop; el.style.zIndex = 999;
+  });
+  document.addEventListener('mousemove', e => { if (!dragging) return; el.style.left = (ix + e.clientX - sx) + 'px'; el.style.top = (iy + e.clientY - sy) + 'px'; w.x = ix + e.clientX - sx; w.y = iy + e.clientY - sy; });
+  document.addEventListener('mouseup', () => { if (dragging) { dragging = false; el.style.zIndex = ''; saveWidgets(); } });
+}
+
+// Weather using Open-Meteo (free, no API key)
+function fetchWeatherByLocation(wid) {
+  if (!navigator.geolocation) { fetchWidgetWeather(wid, null); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    var lat = pos.coords.latitude.toFixed(4), lon = pos.coords.longitude.toFixed(4);
+    fetch('https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lon+'&current_weather=true&temperature_unit=celsius')
+      .then(r => r.json()).then(d => {
+        var el = document.getElementById('wweath-'+wid); if (!el) return;
+        var cw = d.current_weather;
+        var codes = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',61:'🌧️',71:'❄️',80:'🌦️',95:'⛈️'};
+        var icon = codes[Math.floor(cw.weathercode/10)*10] || codes[cw.weathercode] || '🌡️';
+        el.innerHTML = '<div style="font-size:26px;margin-bottom:2px">'+icon+' '+Math.round(cw.temperature)+'°C</div><div style="font-size:10px;opacity:.6">Wind: '+cw.windspeed+' km/h</div>';
+        var w = widgets.find(x => x.id === wid); if (w) { w.lat = lat; w.lon = lon; saveWidgets(); }
+        var inp = document.getElementById('wcity-'+wid); if (inp) inp.style.display = 'none';
+      }).catch(() => { fetchWidgetWeather(wid, null); });
+  }, () => { fetchWidgetWeather(wid, null); });
+}
+function fetchWidgetWeather(id, city) {
+  var cityEl = document.getElementById('wcity-'+id);
+  var c = city || (cityEl && cityEl.value.trim());
+  var el = document.getElementById('wweath-'+id);
+  if (!c) return;
+  var w = widgets.find(x => x.id === id); if (w) { w.city = c; saveWidgets(); }
+  if (el) el.textContent = 'Loading…';
+  // Use geocoding then Open-Meteo
+  fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(c)+'&count=1')
+    .then(r => r.json()).then(geo => {
+      if (!geo.results || !geo.results.length) { if(el) el.textContent = '❌ City not found'; return; }
+      var loc = geo.results[0];
+      return fetch('https://api.open-meteo.com/v1/forecast?latitude='+loc.latitude+'&longitude='+loc.longitude+'&current_weather=true').then(r => r.json()).then(d => {
+        if (!el) return;
+        var cw = d.current_weather;
+        var codes = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',61:'🌧️',71:'❄️',80:'🌦️',95:'⛈️'};
+        var icon = codes[Math.floor(cw.weathercode/10)*10] || codes[cw.weathercode] || '🌡️';
+        el.innerHTML = '<div style="font-size:24px;margin-bottom:2px">'+icon+' '+Math.round(cw.temperature)+'°C</div><div style="font-size:10px;opacity:.55">'+loc.name+', '+loc.country+'</div>';
+        if (cityEl) cityEl.style.display = 'none';
+      });
+    }).catch(() => { if(el) el.textContent = '⚠️ Weather unavailable'; });
+}
+function initWidgets() { widgets.forEach(w => renderWidget(w)); }
+
+// ══════════════════════════════════════════════
+//  NEWS TICKER
+// ══════════════════════════════════════════════
+var TICKER_ITEMS = [
+  'ServerplexOS 2.0 launches with virtual desktops, spotlight search & live weather widgets',
+  'Open-Meteo API delivers free weather data to millions of developers worldwide',
+  'Web Audio API enables rich in-browser sound synthesis without plugins',
+  'CSS backdrop-filter brings native glass morphism to modern browsers',
+  'Virtual desktop switching now supports up to 4 workspaces with per-app window management',
+  'Blob URL technique eliminates iframe navigation conflicts in embedded OS environments',
+  'Battery Status API warns users before critical power loss during gaming sessions',
+  'Spotlight Search (Ctrl+Space) lets you find and launch any app instantly',
+  'Rubber-band multi-select makes organizing your desktop faster than ever',
+  'Window corner snapping supports 6 snap zones including all four corners',
+];
+function initTicker() {
+  document.getElementById('tickerInner').textContent = TICKER_ITEMS.join('   ·   ');
+}
+
+// ══════════════════════════════════════════════
+//  SHUTDOWN / RESTART
+// ══════════════════════════════════════════════
+function showShutdown(type) {
+  closeStartMenu();
+  var ov = document.getElementById('shutdownOverlay');
+  document.getElementById('shutdownText').textContent = type === 'restart' ? 'Restarting…' : 'Shutting down…';
+  ov.classList.add('open');
+  setTimeout(() => {
+    if (type === 'restart') { sessionStorage.setItem('eclipseos_authed','true'); location.reload(); }
+    else { sessionStorage.removeItem('eclipseos_authed'); window.location.replace('account.html'); }
+  }, 2400);
+}
+
+// ══════════════════════════════════════════════
+//  LOG OUT
+// ══════════════════════════════════════════════
+function logOut() {
+  closeStartMenu();
+  var ov = document.getElementById('shutdownOverlay');
+  document.getElementById('shutdownText').textContent = 'Signing out…';
+  ov.classList.add('open');
+  setTimeout(() => { sessionStorage.removeItem('eclipseos_authed'); window.location.replace('account.html'); }, 1600);
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+init();
+</script>
 </body>
 </html>

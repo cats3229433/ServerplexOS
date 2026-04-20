@@ -25,7 +25,7 @@ body.theme-grey{--bg:#808080;--bg2:#6a6a6a;--bg3:#555;--text:#fff;--text2:#ddd;-
 @keyframes slideRight{from{transform:translateX(100%)}to{transform:translateX(0)}}
 @keyframes slideDown{from{transform:translateY(-10px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes shutdownFade{from{opacity:0}to{opacity:1}}
-@keyframes ticker{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── Desktop ── */
@@ -114,12 +114,6 @@ body.theme-grey{--bg:#808080;--bg2:#6a6a6a;--bg3:#555;--text:#fff;--text2:#ddd;-
 .dnd-dot{width:6px;height:6px;border-radius:50%;background:#ff3b30;display:none;margin-left:-2px}
 .dnd-dot.on{display:block}
 
-/* ── News ticker ── */
-.news-ticker{position:fixed;bottom:0;left:0;width:100%;height:20px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:flex;align-items:center;overflow:hidden;z-index:9999;border-top:1px solid rgba(255,255,255,.07)}
-.ticker-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent);padding:0 10px;white-space:nowrap;flex-shrink:0;border-right:1px solid rgba(255,255,255,.15);margin-right:8px}
-.ticker-track{flex:1;overflow:hidden;position:relative;height:100%}
-.ticker-inner{position:absolute;white-space:nowrap;font-size:10px;color:rgba(255,255,255,.7);top:50%;transform:translateY(-50%);animation:ticker 40s linear infinite}
-.ticker-inner:hover{animation-play-state:paused}
 
 /* ── Start Menu ── */
 .start-menu{position:fixed;bottom:72px;left:8px;width:580px;height:580px;background:var(--glass);border:1px solid var(--border);border-radius:12px;box-shadow:0 16px 48px rgba(0,0,0,.35);display:none;flex-direction:column;z-index:10001;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)}
@@ -397,11 +391,6 @@ body.theme-grey{--bg:#808080;--bg2:#6a6a6a;--bg3:#555;--text:#fff;--text2:#ddd;-
   </div>
 </div>
 
-<!-- News ticker -->
-<div class="news-ticker" id="newsTicker">
-  <span class="ticker-label">NEWS</span>
-  <div class="ticker-track">
-    <div class="ticker-inner" id="tickerInner"></div>
   </div>
 </div>
 
@@ -563,7 +552,6 @@ function init() {
   initContextMenu();
   initWidgets();
   initRubberBand();
-  initTicker();
   updateQsTheme();
   updateNetworkStatus();
   renderNotifList();
@@ -1418,24 +1406,6 @@ function fetchWidgetWeather(id, city) {
 }
 function initWidgets() { widgets.forEach(w => renderWidget(w)); }
 
-// ══════════════════════════════════════════════
-//  NEWS TICKER
-// ══════════════════════════════════════════════
-var TICKER_ITEMS = [
-  'ServerplexOS 2.0 launches with virtual desktops, spotlight search & live weather widgets',
-  'Open-Meteo API delivers free weather data to millions of developers worldwide',
-  'Web Audio API enables rich in-browser sound synthesis without plugins',
-  'CSS backdrop-filter brings native glass morphism to modern browsers',
-  'Virtual desktop switching now supports up to 4 workspaces with per-app window management',
-  'Blob URL technique eliminates iframe navigation conflicts in embedded OS environments',
-  'Battery Status API warns users before critical power loss during gaming sessions',
-  'Spotlight Search (Ctrl+Space) lets you find and launch any app instantly',
-  'Rubber-band multi-select makes organizing your desktop faster than ever',
-  'Window corner snapping supports 6 snap zones including all four corners',
-];
-function initTicker() {
-  document.getElementById('tickerInner').textContent = TICKER_ITEMS.join('   ·   ');
-}
 
 // ══════════════════════════════════════════════
 //  SHUTDOWN / RESTART

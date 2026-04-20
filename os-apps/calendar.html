@@ -5,49 +5,98 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{padding:16px 20px;background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:12px;flex-shrink:0}
-.nav-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e6edf3;padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px;transition:all 0.2s}
-.nav-btn:hover{background:rgba(255,255,255,0.12)}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{padding:16px 20px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nav-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px;transition:all 0.2s}
+.nav-btn:hover{background:var(--border2)}
 .month-title{font-size:20px;font-weight:700;flex:1;text-align:center}
-.today-btn{background:#0078d4;border:none;border-radius:8px;color:white;padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px}
+.today-btn{background:var(--accent);border:none;border-radius:8px;color:white;padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px}
 .view-btns{display:flex;gap:4px}
-.view-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#8b949e;padding:5px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
-.view-btn.active{background:#0078d4;color:white;border-color:#0078d4}
+.view-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text3);padding:5px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
+.view-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
 .main{flex:1;display:flex;overflow:hidden}
 .cal-wrap{flex:1;padding:16px;overflow-y:auto}
 .day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
-.day-header{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:#8b949e;padding:8px 0;text-transform:uppercase}
+.day-header{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text3);padding:8px 0;text-transform:uppercase}
 .day-header.weekend{color:#58a6ff}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.day-cell{min-height:90px;background:#161b22;border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:8px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:3px}
-.day-cell:hover{background:#1f2937;border-color:rgba(255,255,255,0.12)}
+.day-cell{min-height:90px;background:var(--surface);border:1px solid rgba(255,255,255,0.04);border-radius:8px;padding:8px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:3px}
+.day-cell:hover{background:var(--surface2);border-color:var(--border2)}
 .day-cell.other{opacity:0.3}
-.day-cell.today{border-color:#0078d4;background:#0d2137}
+.day-cell.today{border-color:var(--accent);background:#0d2137}
 .day-num{font-size:13px;font-weight:600;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%}
-.day-cell.today .day-num{background:#0078d4;color:white}
+.day-cell.today .day-num{background:var(--accent);color:white}
 .event-dot{font-size:10px;padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidebar{width:260px;background:#161b22;border-left:1px solid rgba(255,255,255,0.08);padding:16px;overflow-y:auto;flex-shrink:0}
-.sidebar h3{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#8b949e;margin-bottom:12px}
-.add-event{width:100%;padding:10px;background:#0078d4;border:none;border-radius:8px;color:white;font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;margin-bottom:16px}
-.add-event:hover{background:#0090ff}
-.event-form{background:#0d1117;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;margin-bottom:16px;display:none}
-.event-form input,.event-form select{width:100%;padding:7px 10px;background:#161b22;border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:12px;outline:none;margin-bottom:8px}
-.event-form input::placeholder{color:#8b949e}
+.sidebar{width:260px;background:var(--surface);border-left:1px solid var(--border);padding:16px;overflow-y:auto;flex-shrink:0}
+.sidebar h3{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.add-event{width:100%;padding:10px;background:var(--accent);border:none;border-radius:8px;color:white;font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;margin-bottom:16px}
+.add-event:hover{background:var(--accent-bright, #0090ff)}
+.event-form{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;display:none}
+.event-form input,.event-form select{width:100%;padding:7px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;margin-bottom:8px}
+.event-form input::placeholder{color:var(--text3)}
 .form-btns{display:flex;gap:6px}
 .form-btn{flex:1;padding:7px;border:none;border-radius:6px;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer}
 .form-save{background:#238636;color:white}
 .form-cancel{background:#3e3e42;color:#ccc}
-.upcoming-event{padding:8px;background:#0d1117;border-left:3px solid #0078d4;border-radius:0 6px 6px 0;margin-bottom:6px;font-size:12px}
-.ue-title{font-weight:600;color:#e6edf3}
-.ue-date{color:#8b949e;font-size:11px;margin-top:2px}
+.upcoming-event{padding:8px;background:var(--bg);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;margin-bottom:6px;font-size:12px}
+.ue-title{font-weight:600;color:var(--text)}
+.ue-date{color:var(--text3);font-size:11px;margin-top:2px}
 .ev-colors{display:flex;gap:6px;margin-bottom:8px}
 .ev-color{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent}
 .ev-color.selected{border-color:white}
-.no-events{color:#8b949e;font-size:12px;padding:8px 0}
+.no-events{color:var(--text3);font-size:12px;padding:8px 0}
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="header">
   <button class="nav-btn" onclick="changeMonth(-1)">←</button>
   <div class="month-title" id="monthTitle"></div>
@@ -86,13 +135,13 @@ body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:10
   </div>
 </div>
 <script>
-const COLORS=['#0078d4','#238636','#da3633','#e3b341','#8957e5','#f78166'];
-let events=JSON.parse(localStorage.getItem('eclipseos_calendar_events')||'[]');
+const COLORS=['var(--accent)','#238636','#da3633','#e3b341','#8957e5','#f78166'];
+let events=JSON.parse(localStorage.getItem('serverplex_calendar_events')||'[]');
 let cur=new Date(),selColor=COLORS[0];
 const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const today=new Date();
 
-function save(){localStorage.setItem('eclipseos_calendar_events',JSON.stringify(events));}
+function save(){localStorage.setItem('serverplex_calendar_events',JSON.stringify(events));}
 function dateStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 
 function render(){

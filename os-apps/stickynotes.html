@@ -5,11 +5,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:#0d1117;height:100vh;overflow:hidden;display:flex;flex-direction:column}
-.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.toolbar h2{font-size:15px;font-weight:700;color:#e6edf3}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.toolbar h2{font-size:15px;font-weight:700;color:var(--text)}
 .spacer{flex:1}
-.tb-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.08);border-radius:7px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s}
+.tb-btn{padding:6px 14px;border:1px solid var(--border);border-radius:7px;background:rgba(128,128,128,0.08);color:var(--text);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s}
 .tb-btn:hover{background:rgba(255,255,255,0.1)}
 .color-btn{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all 0.15s;flex-shrink:0}
 .color-btn:hover{transform:scale(1.2)}
@@ -31,9 +31,58 @@ body{font-family:'Oxanium',sans-serif;background:#0d1117;height:100vh;overflow:h
 .empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.1);pointer-events:none}
 .empty div{font-size:64px;margin-bottom:16px}
 .empty p{font-size:16px}
-</style>
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
+.sp-accent{color:var(--accent)}</style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="toolbar">
   <h2>📌 Sticky Notes</h2>
   <div style="display:flex;gap:6px;margin-left:12px" id="colorPicker"></div>
@@ -54,7 +103,7 @@ const COLORS=[
   {bg:'#fed7aa',header:'#fdba74'},
   {bg:'#f1f5f9',header:'#e2e8f0'},
 ];
-let notes=JSON.parse(localStorage.getItem('eclipseos_sticky_v2')||'[]');
+let notes=JSON.parse(localStorage.getItem('serverplex_sticky_v2')||'[]');
 let selColor=0;
 const canvas=document.getElementById('canvas');
 
@@ -68,7 +117,7 @@ COLORS.forEach((c,i)=>{
   cp.appendChild(b);
 });
 
-function save(){localStorage.setItem('eclipseos_sticky_v2',JSON.stringify(notes));}
+function save(){localStorage.setItem('serverplex_sticky_v2',JSON.stringify(notes));}
 function updateEmpty(){document.getElementById('emptyState').style.display=notes.length?'none':'flex';}
 
 function addNote(data=null){

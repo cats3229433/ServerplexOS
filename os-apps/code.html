@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; background: #1e1e1e; color: #cccccc; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { font-family: 'Oxanium', sans-serif; background: var(--bg); color: var(--text2); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
         /* Menu bar */
         .menu-bar { background: #2d2d2d; height: 32px; display: flex; align-items: center; padding: 0 8px; border-bottom: 1px solid #1a1a1a; font-size: 13px; flex-shrink: 0; z-index: 100; position: relative; }
@@ -34,7 +34,7 @@
         .sb-btn { background: none; border: none; color: #777; cursor: pointer; font-size: 15px; padding: 2px 5px; border-radius: 3px; line-height: 1; }
         .sb-btn:hover { color: #ccc; background: #3e3e42; }
         .file-search { margin: 0 8px 6px; padding: 5px 8px; background: #3c3c3c; border: 1px solid #555; border-radius: 4px; color: #ccc; font-family: 'Oxanium', sans-serif; font-size: 12px; outline: none; width: calc(100% - 16px); flex-shrink: 0; }
-        .file-search:focus { border-color: #007acc; }
+        .file-search:focus { border-color: var(--accent); }
         .file-search::placeholder { color: #555; }
         .file-tree { flex: 1; overflow-y: auto; }
         .file-item { padding: 5px 10px; cursor: pointer; display: flex; align-items: center; gap: 7px; font-size: 13px; transition: background 0.1s; }
@@ -52,7 +52,7 @@
         .tabs-bar::-webkit-scrollbar { display: none; }
         .etab { padding: 0 12px; height: 35px; display: flex; align-items: center; gap: 6px; font-size: 13px; border-right: 1px solid #1a1a1a; cursor: pointer; white-space: nowrap; min-width: 90px; color: #888; }
         .etab:hover { background: #2a2a2a; color: #ccc; }
-        .etab.active { background: #1e1e1e; color: #ccc; border-top: 2px solid #007acc; }
+        .etab.active { background: #1e1e1e; color: #ccc; border-top: 2px solid var(--accent); }
         .tab-x { margin-left: auto; padding: 1px 4px; border-radius: 2px; font-size: 15px; color: #666; transition: all 0.1s; }
         .tab-x:hover { background: #555; color: #fff; }
         .editor-wrap { flex: 1; position: relative; overflow: hidden; }
@@ -69,12 +69,12 @@
 
         /* Output panel */
         .panel-resize { height: 4px; background: transparent; cursor: ns-resize; border-top: 1px solid #3a3a3a; flex-shrink: 0; }
-        .panel-resize:hover { background: #007acc; }
+        .panel-resize:hover { background: var(--accent); }
         .panel { display: none; flex-direction: column; flex-shrink: 0; height: 200px; border-top: 1px solid #1a1a1a; background: #1e1e1e; }
         .panel.open { display: flex; }
         .panel-header { display: flex; align-items: center; background: #2d2d2d; border-bottom: 1px solid #1a1a1a; padding-right: 8px; flex-shrink: 0; }
         .p-tab { padding: 6px 14px; font-size: 12px; cursor: pointer; color: #777; border-bottom: 2px solid transparent; }
-        .p-tab.active { color: #ccc; border-bottom-color: #007acc; }
+        .p-tab.active { color: #ccc; border-bottom-color: var(--accent); }
         .p-close { margin-left: auto; background: none; border: none; color: #666; cursor: pointer; font-size: 16px; padding: 4px 8px; }
         .p-close:hover { color: #ccc; }
         .console-body { flex: 1; overflow: auto; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; }
@@ -86,7 +86,7 @@
         #previewFrame { width: 100%; height: 100%; border: none; background: white; display: none; flex: 1; }
 
         /* Status bar */
-        .status-bar { background: #007acc; color: white; height: 22px; display: flex; align-items: center; padding: 0 12px; font-size: 11px; flex-shrink: 0; }
+        .status-bar { background: var(--accent); color: white; height: 22px; display: flex; align-items: center; padding: 0 12px; font-size: 11px; flex-shrink: 0; }
         .sl { display: flex; gap: 12px; flex: 1; }
         .sr { display: flex; gap: 12px; }
         .si { cursor: pointer; padding: 0 4px; border-radius: 2px; }
@@ -103,9 +103,58 @@
         ::-webkit-scrollbar-track { background: #1e1e1e; }
         ::-webkit-scrollbar-thumb { background: #424242; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
-    </style>
+    
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
+</style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 
 <div class="menu-bar" id="menuBar">
     <div class="menu-item" data-m="file">File
@@ -212,7 +261,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
-let files = JSON.parse(localStorage.getItem('eclipseos_code_files') || '{}');
+let files = JSON.parse(localStorage.getItem('serverplex_code_files') || '{}');
 let activeFile = null, editor = null;
 let minimapOn = true, wordWrap = 'on', fontSize = 14;
 let currentTheme = 'vs-dark';
@@ -317,7 +366,7 @@ async function downloadAll() {
     const zip = new JSZip();
     Object.keys(files).forEach(n => zip.file(n, files[n].content));
     const b = await zip.generateAsync({type:'blob'});
-    const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(b),download:'eclipse-project.zip'});
+    const a = Object.assign(document.createElement('a'), {href:URL.createObjectURL(b),download:'serverplex-project.zip'});
     a.click(); URL.revokeObjectURL(a.href);
 }
 
@@ -453,7 +502,7 @@ document.getElementById('panelResize').addEventListener('mousedown', e => { resi
 document.addEventListener('mousemove', e => { if (!resizing) return; const h=Math.max(80,Math.min(startH+(startY-e.clientY),600)); document.getElementById('panel').style.height=h+'px'; });
 document.addEventListener('mouseup', () => resizing=false);
 
-function saveFiles() { localStorage.setItem('eclipseos_code_files', JSON.stringify(files)); }
+function saveFiles() { localStorage.setItem('serverplex_code_files', JSON.stringify(files)); }
 </script>
 </body>
 </html>

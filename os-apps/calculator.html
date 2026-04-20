@@ -5,40 +5,89 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:#0d1117;display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.calc{background:#161b22;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.calc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
 .mode-row{display:flex;gap:6px;margin-bottom:14px}
-.mode-btn{flex:1;padding:7px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#8b949e;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s}
-.mode-btn.active{background:#0078d4;color:white;border-color:#0078d4}
-.display{background:#0d1117;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;margin-bottom:14px;min-height:90px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:4px}
-.display-expr{font-size:13px;color:#8b949e;min-height:18px;word-break:break-all;text-align:right}
-.display-val{font-size:36px;font-weight:700;color:#e6edf3;word-break:break-all;text-align:right}
-.history-btn{font-size:11px;color:#8b949e;cursor:pointer;text-align:right;margin-bottom:8px}
+.mode-btn{flex:1;padding:7px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s}
+.mode-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
+.display{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;min-height:90px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:4px}
+.display-expr{font-size:13px;color:var(--text3);min-height:18px;word-break:break-all;text-align:right}
+.display-val{font-size:36px;font-weight:700;color:var(--text);word-break:break-all;text-align:right}
+.history-btn{font-size:11px;color:var(--text3);cursor:pointer;text-align:right;margin-bottom:8px}
 .history-btn:hover{color:#4db8ff}
-.history-panel{background:#0d1117;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:8px;margin-bottom:10px;max-height:100px;overflow-y:auto;display:none}
-.history-item{font-size:12px;color:#8b949e;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
-.history-item:hover{color:#e6edf3}
+.history-panel{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:10px;max-height:100px;overflow-y:auto;display:none}
+.history-item{font-size:12px;color:var(--text3);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
+.history-item:hover{color:var(--text)}
 .history-item:last-child{border-bottom:none}
 .sci-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .btn{padding:0;height:56px;border:none;border-radius:10px;font-family:'Oxanium',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
 .btn:active{transform:scale(0.94)}
-.btn-num{background:#21262d;color:#e6edf3}
-.btn-num:hover{background:#30363d}
-.btn-op{background:#0078d4;color:white}
-.btn-op:hover{background:#0090ff}
+.btn-num{background:var(--bg2);color:var(--text)}
+.btn-num:hover{background:var(--bg2)}
+.btn-op{background:var(--accent);color:white}
+.btn-op:hover{background:var(--accent-bright, #0090ff)}
 .btn-eq{background:#238636;color:white}
 .btn-eq:hover{background:#2ea043}
 .btn-clear{background:#da3633;color:white}
 .btn-clear:hover{background:#f85149}
-.btn-fn{background:#161b22;color:#79c0ff;border:1px solid rgba(255,255,255,0.08);font-size:12px}
-.btn-fn:hover{background:#21262d}
+.btn-fn{background:var(--surface);color:#79c0ff;border:1px solid var(--border);font-size:12px}
+.btn-fn:hover{background:var(--bg2)}
 .btn-span2{grid-column:span 2}
 .sci-panel{display:none}
 .sci-panel.show{display:block}
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="calc">
   <div class="mode-row">
     <button class="mode-btn active" onclick="setMode('standard')">Standard</button>
@@ -94,7 +143,7 @@ body{font-family:'Oxanium',sans-serif;background:#0d1117;display:flex;align-item
 </div>
 <script>
 let cur='0',op=null,prev=null,waiting=false,expr='';
-let history=JSON.parse(localStorage.getItem('eclipseos_calc_history')||'[]');
+let history=JSON.parse(localStorage.getItem('serverplex_calc_history')||'[]');
 let mode='standard';
 
 function upd(){
@@ -157,7 +206,7 @@ function factorial(n){if(n<0)return NaN;if(n===0||n===1)return 1;let r=1;for(let
 function toggleSign(){cur=(parseFloat(cur)*-1).toString();upd();}
 function backspace(){cur=cur.length>1?cur.slice(0,-1):'0';upd();}
 function clear(){cur='0';op=null;prev=null;waiting=false;expr='';upd();}
-function addHistory(e){history.unshift(e);if(history.length>50)history.pop();localStorage.setItem('eclipseos_calc_history',JSON.stringify(history));}
+function addHistory(e){history.unshift(e);if(history.length>50)history.pop();localStorage.setItem('serverplex_calc_history',JSON.stringify(history));}
 function toggleHistory(){
   const p=document.getElementById('historyPanel');
   const show=p.style.display==='block';p.style.display=show?'none':'block';

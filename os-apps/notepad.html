@@ -5,38 +5,87 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
-.tb-btn{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:6px;color:#e6edf3;padding:5px 12px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s;white-space:nowrap}
-.tb-btn:hover{background:rgba(255,255,255,0.12)}
-.tb-btn.active{background:#0078d4;border-color:#0078d4}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.tb-btn{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:5px 12px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.2s;white-space:nowrap}
+.tb-btn:hover{background:var(--border2)}
+.tb-btn.active{background:var(--accent);border-color:var(--accent)}
 .sep{width:1px;height:20px;background:rgba(255,255,255,0.1);margin:0 4px}
 .font-size-wrap{display:flex;align-items:center;gap:4px}
-.font-select{background:#161b22;border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6edf3;padding:4px 8px;font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
-.font-select option{background:#0d1117}
+.font-select{background:var(--surface);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:4px 8px;font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.font-select option{background:var(--bg)}
 .spacer{flex:1}
-.status{font-size:11px;color:#8b949e}
+.status{font-size:11px;color:var(--text3)}
 .editor-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.tabs-bar{background:#161b22;display:flex;border-bottom:1px solid rgba(255,255,255,0.08);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
+.tabs-bar{background:var(--surface);display:flex;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;flex-shrink:0}
 .tabs-bar::-webkit-scrollbar{display:none}
-.note-tab{padding:8px 16px;cursor:pointer;font-size:13px;color:#8b949e;border-right:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:100px;border-bottom:2px solid transparent}
+.note-tab{padding:8px 16px;cursor:pointer;font-size:13px;color:var(--text3);border-right:1px solid var(--border);display:flex;align-items:center;gap:6px;white-space:nowrap;min-width:100px;border-bottom:2px solid transparent}
 .note-tab:hover{background:rgba(255,255,255,0.04);color:#ccc}
-.note-tab.active{color:#e6edf3;border-bottom-color:#0078d4;background:rgba(255,255,255,0.04)}
+.note-tab.active{color:var(--text);border-bottom-color:var(--accent);background:rgba(255,255,255,0.04)}
 .tab-x{color:#666;font-size:15px;padding:0 2px;border-radius:2px}
 .tab-x:hover{color:#f85149;background:rgba(248,81,73,0.1)}
-.add-tab{padding:8px 14px;cursor:pointer;color:#8b949e;font-size:18px;flex-shrink:0}
-.add-tab:hover{color:#e6edf3;background:rgba(255,255,255,0.04)}
-.textarea{flex:1;width:100%;background:#0d1117;border:none;resize:none;outline:none;font-family:'Oxanium',sans-serif;font-size:14px;line-height:1.7;color:#e6edf3;padding:20px;display:none}
+.add-tab{padding:8px 14px;cursor:pointer;color:var(--text3);font-size:18px;flex-shrink:0}
+.add-tab:hover{color:var(--text);background:rgba(255,255,255,0.04)}
+.textarea{flex:1;width:100%;background:var(--bg);border:none;resize:none;outline:none;font-family:'Oxanium',sans-serif;font-size:14px;line-height:1.7;color:var(--text);padding:20px;display:none}
 .textarea.active{display:block}
-.find-bar{background:#1f2937;border-top:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:none;align-items:center;gap:8px;flex-shrink:0}
+.find-bar{background:var(--surface2);border-top:1px solid var(--border);padding:8px 12px;display:none;align-items:center;gap:8px;flex-shrink:0}
 .find-bar.show{display:flex}
-.find-input{background:#0d1117;border:1px solid rgba(255,255,255,0.12);border-radius:6px;color:#e6edf3;padding:5px 10px;font-family:'Oxanium',sans-serif;font-size:13px;outline:none;width:200px}
-.find-input:focus{border-color:#0078d4}
-.find-count{font-size:12px;color:#8b949e;min-width:60px}
-.stat-bar{background:#161b22;border-top:1px solid rgba(255,255,255,0.08);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:#8b949e;flex-shrink:0}
+.find-input{background:var(--bg);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:5px 10px;font-family:'Oxanium',sans-serif;font-size:13px;outline:none;width:200px}
+.find-input:focus{border-color:var(--accent)}
+.find-count{font-size:12px;color:var(--text3);min-width:60px}
+.stat-bar{background:var(--surface);border-top:1px solid var(--border);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="toolbar">
   <button class="tb-btn" onclick="newNote()">📄 New</button>
   <button class="tb-btn" onclick="saveNote()">💾 Save</button>
@@ -85,13 +134,13 @@ body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:10
   <span id="statLines">Lines: 1</span>
 </div>
 <script>
-let notes=JSON.parse(localStorage.getItem('eclipseos_notepad_notes')||'null');
+let notes=JSON.parse(localStorage.getItem('serverplex_notepad_notes')||'null');
 if(!notes||!Array.isArray(notes))notes=[{id:1,title:'Note 1',content:''}];
 let activeId=notes[0].id;
 let fontFamily="'Oxanium',sans-serif",fontSize=14;
 let autoSaveTimer;
 
-function save(){localStorage.setItem('eclipseos_notepad_notes',JSON.stringify(notes));}
+function save(){localStorage.setItem('serverplex_notepad_notes',JSON.stringify(notes));}
 function getNoteById(id){return notes.find(n=>n.id===id);}
 function getActiveTA(){return document.getElementById('ta-'+activeId);}
 

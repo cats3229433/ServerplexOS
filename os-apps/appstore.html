@@ -4,7 +4,7 @@
 <meta charset="UTF-8"><title>App Store</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#080b10;--surface:#0e1420;--surface2:#141c2e;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#e8edf5;--muted:#6b7a99;--accent:#3b82f6;--accent2:#60a5fa;--green:#22c55e;--red:#ef4444}
+:root{--bg:#080b10;--surface:#0e1420;--surface2:#141c2e;--border:var(--border);--border2:var(--border2);--text:var(--text);--muted:#6b7a99;--accent:#3b82f6;--accent2:#60a5fa;--green:#22c55e;--red:#ef4444}
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .topbar{background:rgba(14,20,32,0.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0;z-index:10;position:relative}
@@ -19,7 +19,7 @@ body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);hei
 .search-input::placeholder{color:var(--muted)}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);pointer-events:none}
 .topbar-btn{padding:7px 14px;border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;border:1px solid var(--border);background:rgba(255,255,255,0.04);color:var(--muted);transition:all .2s;letter-spacing:.3px}
-.topbar-btn:hover{color:var(--text);background:rgba(255,255,255,0.08);border-color:var(--border2)}
+.topbar-btn:hover{color:var(--text);background:var(--border);border-color:var(--border2)}
 .topbar-btn.active{background:rgba(59,130,246,0.15);border-color:rgba(59,130,246,0.4);color:var(--accent2)}
 .refresh-btn{padding:7px 10px;font-size:16px;color:var(--muted)}
 .main{flex:1;display:flex;overflow:hidden}
@@ -31,7 +31,7 @@ body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);hei
 .cat-btn.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 2px 2px 0;background:var(--accent)}
 .cat-emoji{font-size:16px;width:22px;text-align:center;flex-shrink:0}
 .cat-label{flex:1}
-.cat-pill{font-size:10px;font-weight:700;background:rgba(255,255,255,0.07);color:var(--muted);padding:1px 7px;border-radius:20px;transition:all .15s}
+.cat-pill{font-size:10px;font-weight:700;background:var(--border);color:var(--muted);padding:1px 7px;border-radius:20px;transition:all .15s}
 .cat-btn.active .cat-pill{background:rgba(59,130,246,0.2);color:var(--accent2)}
 .sidebar-divider{height:1px;background:var(--border);margin:10px 10px}
 .content{flex:1;overflow-y:auto;padding:20px 22px}
@@ -148,9 +148,58 @@ body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);hei
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 .toast.success .tdot{color:var(--green)}
 .toast.error .tdot{color:var(--red)}
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="topbar">
   <div class="logo">
     <div class="logo-icon">🏪</div>
@@ -217,7 +266,7 @@ body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);hei
 </div>
 <div class="toast" id="toast"><span class="tdot">●</span><span id="toastMsg"></span></div>
 <script>
-const REGISTRY_URL='https://cdn.jsdelivr.net/gh/YOUR_USERNAME/eclipseos-store@main/registry.json';
+const REGISTRY_URL='https://cdn.jsdelivr.net/gh/YOUR_USERNAME/serverplexos-store@main/registry.json';
 const CONTACT_META={email:{icon:'📧',label:'Email',href:v=>`mailto:${v}`},altEmail:{icon:'📧',label:'Alt Email',href:v=>`mailto:${v}`},phone:{icon:'📱',label:'Phone',href:v=>`tel:${v}`},website:{icon:'🌐',label:'Website',href:v=>v},github:{icon:'🐙',label:'GitHub',href:v=>`https://github.com/${v}`},discord:{icon:'💬',label:'Discord',href:v=>v.startsWith('http')?v:`https://discord.gg/${v}`},discordUser:{icon:'👤',label:'Discord',href:null},instagram:{icon:'📸',label:'Instagram',href:v=>`https://instagram.com/${v}`},snapchat:{icon:'👻',label:'Snapchat',href:null},twitter:{icon:'🐦',label:'Twitter/X',href:v=>`https://x.com/${v}`},youtube:{icon:'▶️',label:'YouTube',href:v=>v.startsWith('http')?v:`https://youtube.com/@${v}`},tiktok:{icon:'🎵',label:'TikTok',href:v=>`https://tiktok.com/@${v}`},twitch:{icon:'🟣',label:'Twitch',href:v=>`https://twitch.tv/${v}`},reddit:{icon:'🤖',label:'Reddit',href:v=>`https://reddit.com/u/${v}`},linkedin:{icon:'💼',label:'LinkedIn',href:v=>`https://linkedin.com/in/${v}`},telegram:{icon:'✈️',label:'Telegram',href:v=>`https://t.me/${v}`},patreon:{icon:'🎁',label:'Patreon',href:v=>`https://patreon.com/${v}`},kofi:{icon:'☕',label:'Ko-fi',href:v=>`https://ko-fi.com/${v}`},npm:{icon:'📦',label:'NPM',href:v=>`https://npmjs.com/~${v}`}};
 const CAT_GRAD={Games:'linear-gradient(135deg,#7f1d1d,#991b1b)',Utilities:'linear-gradient(135deg,#1e3a5f,#1e40af)',Productivity:'linear-gradient(135deg,#14532d,#15803d)',Media:'linear-gradient(135deg,#78350f,#b45309)','Developer Tools':'linear-gradient(135deg,#3b0764,#7e22ce)',Other:'linear-gradient(135deg,#1f2937,#374151)'};
 let apps=[],installed=JSON.parse(localStorage.getItem('serverplex_store_installed')||'{}');

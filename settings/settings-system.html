@@ -130,10 +130,6 @@ select,input[type="text"]{padding:7px 12px;border:1px solid var(--border);border
       <div class="row-info"><div class="row-label">Startup Chime</div><div class="row-desc">Play a sound when the desktop loads</div></div>
       <label class="toggle"><input type="checkbox" id="chimeToggle" checked onchange="saveSetting('serverplex_startup_chime',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
     </div>
-    <div class="row">
-      <div class="row-info"><div class="row-label">News Ticker</div><div class="row-desc">Show the scrolling news bar at the bottom</div></div>
-      <label class="toggle"><input type="checkbox" id="tickerToggle" checked onchange="toggleTicker(this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
-    </div>
   </div>
 </div>
 
@@ -193,7 +189,6 @@ Object.keys(APPS).forEach(function(id) {
 });
 
 function saveSetting(key, val) { localStorage.setItem(key, val); }
-function applyFont(v) {
   localStorage.setItem('serverplex_os_font_size', v);
   if (window.parent && window.parent.document.body) window.parent.document.body.style.fontSize = v + 'px';
 }
@@ -204,11 +199,6 @@ function saveClock(v) {
 function goFullscreen() {
   var el = window.parent ? window.parent.document.documentElement : document.documentElement;
   if (el.requestFullscreen) el.requestFullscreen();
-}
-function toggleTicker(on) {
-  localStorage.setItem('serverplex_ticker', on);
-  var t = window.parent && window.parent.document.getElementById('newsTicker');
-  if (t) t.style.display = on ? '' : 'none';
 }
 </script>
 </body>

@@ -5,37 +5,86 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.toolbar{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
-.tb-btn{padding:6px 12px;border:1px solid rgba(255,255,255,0.08);border-radius:6px;background:rgba(255,255,255,0.04);color:#e6edf3;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.15s}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.tb-btn{padding:6px 12px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,0.04);color:var(--text);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;transition:all 0.15s}
 .tb-btn:hover{background:rgba(255,255,255,0.1)}
 .tb-btn:disabled{opacity:0.3;cursor:default}
 .sep{width:1px;height:20px;background:rgba(255,255,255,0.1)}
 .spacer{flex:1}
-.zoom-display{font-size:12px;color:#8b949e;min-width:48px;text-align:center}
+.zoom-display{font-size:12px;color:var(--text3);min-width:48px;text-align:center}
 .main{flex:1;display:flex;overflow:hidden}
 .viewer{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;background:repeating-conic-gradient(rgba(255,255,255,0.03) 0% 25%,transparent 0% 50%) 0 0/24px 24px;cursor:grab;position:relative}
 .viewer.grabbing{cursor:grabbing}
 .img-wrap{position:relative;transform-origin:center;transition:transform 0.1s}
 .viewer img{display:block;max-width:none;image-rendering:auto;user-select:none;border-radius:4px}
-.sidebar{width:200px;background:#161b22;border-left:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
-.sidebar-title{padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sidebar{width:200px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sidebar-title{padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
 .info-list{padding:10px 14px;display:flex;flex-direction:column;gap:8px;overflow-y:auto}
 .info-row{display:flex;flex-direction:column;gap:2px}
-.info-label{font-size:10px;color:#8b949e;text-transform:uppercase;letter-spacing:1px}
-.info-val{font-size:13px;color:#e6edf3;word-break:break-all}
-.thumb-strip{height:90px;background:#0d1117;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;padding:8px;gap:6px;overflow-x:auto;flex-shrink:0;scrollbar-width:thin}
+.info-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
+.info-val{font-size:13px;color:var(--text);word-break:break-all}
+.thumb-strip{height:90px;background:var(--bg);border-top:1px solid var(--border);display:flex;align-items:center;padding:8px;gap:6px;overflow-x:auto;flex-shrink:0;scrollbar-width:thin}
 .thumb{width:68px;height:68px;flex-shrink:0;border-radius:6px;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:all 0.15s;opacity:0.6}
 .thumb:hover{opacity:0.9;border-color:rgba(255,255,255,0.3)}
-.thumb.active{opacity:1;border-color:#0078d4}
+.thumb.active{opacity:1;border-color:var(--accent)}
 .placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:rgba(255,255,255,0.1)}
 .placeholder div{font-size:64px}
 .placeholder p{font-size:15px}
 input[type=file]{display:none}
-.status-bar{background:#161b22;border-top:1px solid rgba(255,255,255,0.08);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:#8b949e;flex-shrink:0}
+.status-bar{background:var(--surface);border-top:1px solid var(--border);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:var(--text3);flex-shrink:0}
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="toolbar">
   <label class="tb-btn" for="fileInput">📂 Open</label>
   <input type="file" id="fileInput" accept="image/*" multiple onchange="loadImages(event)">

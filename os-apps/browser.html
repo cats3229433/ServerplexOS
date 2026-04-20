@@ -7,15 +7,15 @@
   <title>ServerplexOS Browser</title>
   <style>
     :root {
-      --accent: #0078d4;
+      --accent: var(--accent);
       --accent-glow: rgba(0,120,212,0.35);
       --bg: #07090f;
       --surface: #0e1420;
       --surface2: #141c2e;
       --surface3: #1a2238;
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.13);
-      --text: #e8edf5;
+      --border: var(--border);
+      --border2: var(--border2);
+      --text: var(--text);
       --text2: #8b97b0;
       --text3: #4a5568;
       --red: #ef4444;
@@ -284,7 +284,7 @@
       border:none; color:#fff; font-family:'Oxanium',sans-serif;
       font-size:14px; font-weight:700; cursor:pointer; transition:background 0.2s;
     }
-    .ntp-go:hover { background:#0090ff; }
+    .ntp-go:hover { background:var(--accent-bright, #0090ff); }
 
     /* Quick tiles */
     .ntp-tiles-label {
@@ -402,13 +402,13 @@
     }
     .s-btn:hover { background:var(--surface3); color:var(--text); }
     .s-btn.primary { background:var(--accent); border-color:var(--accent); color:#fff; box-shadow:0 4px 14px var(--accent-glow); }
-    .s-btn.primary:hover { background:#0090ff; }
+    .s-btn.primary:hover { background:var(--accent-bright, #0090ff); }
     .s-btn.danger { background:rgba(239,68,68,0.1); border-color:rgba(239,68,68,0.3); color:#fca5a5; }
     .s-btn.danger:hover { background:rgba(239,68,68,0.2); }
     .s-toggle {
       width:44px; height:24px; border-radius:12px;
       position:relative; cursor:pointer; transition:background 0.25s; flex-shrink:0;
-      background:rgba(255,255,255,0.12); border:none;
+      background:var(--border2); border:none;
     }
     .s-toggle.on { background:var(--accent); }
     .s-toggle::after {
@@ -532,10 +532,59 @@
       font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s;
       box-shadow:0 4px 16px var(--accent-glow);
     }
-    .ext-open:hover { background:#0090ff; transform:translateY(-2px); }
-  </style>
+    .ext-open:hover { background:var(--accent-bright, #0090ff); transform:translateY(-2px); }
+  
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
+</style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 
   <!-- Toggle header button -->
   <button class="toggle-btn" id="toggleBtn" title="Toggle browser bar (Alt+H)">▲</button>
@@ -631,8 +680,8 @@ const DEFAULT_BLOCKLIST = [
   'demdex.net','exelator.com','adsymptotic.com','adzerk.net','bidswitch.net',
 ];
 
-let adBlockEnabled = localStorage.getItem('spl_adb_enabled') !== 'false';
-let adBlockList    = JSON.parse(localStorage.getItem('spl_adb_list') || 'null') || DEFAULT_BLOCKLIST;
+let adBlockEnabled = localStorage.getItem('serverplex_bw_adb_enabled') !== 'false';
+let adBlockList    = JSON.parse(localStorage.getItem('serverplex_bw_adb_list') || 'null') || DEFAULT_BLOCKLIST;
 let blockedCount   = 0;
 let sessionBlockCount = 0;
 
@@ -667,7 +716,7 @@ function showBlockToast(domain) {
 document.getElementById('adBlockBtn').onclick = (e) => {
   e.stopPropagation();
   adBlockEnabled = !adBlockEnabled;
-  localStorage.setItem('spl_adb_enabled', adBlockEnabled);
+  localStorage.setItem('serverplex_bw_adb_enabled', adBlockEnabled);
   sessionBlockCount = 0;
   updateBlockBadge();
 };
@@ -676,7 +725,7 @@ document.getElementById('adBlockBtn').onclick = (e) => {
 //  STATE
 // ════════════════════════════════════════════════════
 // Only use a user-configured ScramJet URL — no public fallbacks (they block iframing)
-function getSjUrl() { return (localStorage.getItem('spl_sj_app') || '').trim().replace(/\/$/, ''); }
+function getSjUrl() { return (localStorage.getItem('serverplex_bw_sj_app') || '').trim().replace(/\/$/, ''); }
 let sjUrlIndex = 0;
 
 let tabs        = [];
@@ -684,7 +733,7 @@ let activeId    = 0;
 let tabCounter  = 0;
 let isCollapsed = false;
 let settingsPage = null;
-let globalHistory = JSON.parse(sessionStorage.getItem('spl_hist') || '[]');
+let globalHistory = JSON.parse(sessionStorage.getItem('serverplex_bw_hist') || '[]');
 
 const $ = id => document.getElementById(id);
 const header     = $('header');
@@ -792,12 +841,12 @@ function updateUrlBar() {
 
 function saveTabs() {
   try {
-    sessionStorage.setItem('spl_tabs', JSON.stringify(tabs.map(t => ({
+    sessionStorage.setItem('serverplex_bw_tabs', JSON.stringify(tabs.map(t => ({
       id:t.id, type:t.type, url:t.url, title:t.title,
       history:t.history||[], histIdx:t.histIdx||0, pinned:!!t.pinned
     }))));
-    sessionStorage.setItem('spl_active', activeId);
-    sessionStorage.setItem('spl_ctr', tabCounter);
+    sessionStorage.setItem('serverplex_bw_active', activeId);
+    sessionStorage.setItem('serverplex_bw_ctr', tabCounter);
   } catch(e) {}
 }
 
@@ -904,7 +953,7 @@ function getGreeting() {
 
 function showNTP(container, t) {
   t.type = 'ntp'; t.url = ''; t.title = 'New Tab';
-  const userName = localStorage.getItem('eclipseos_username') || localStorage.getItem('serverplex_username') || '';
+  const userName = localStorage.getItem('serverplex_username') || localStorage.getItem('serverplex_username') || '';
 
   const recentHist = globalHistory.slice(0, 4);
   const histHTML = recentHist.length ? recentHist.map(h => {
@@ -921,10 +970,10 @@ function showNTP(container, t) {
     <div class="ntp-date" id="ntpDate"></div>
     <div class="ntp-search-wrap">
       <select class="ntp-engine" id="ntpEngine">
-        <option value="https://google.com/search?q=" ${(localStorage.getItem('spl_engine')||'google')==='google'?'selected':''}>Google</option>
-        <option value="https://duckduckgo.com/?q=" ${(localStorage.getItem('spl_engine')||'')==='ddg'?'selected':''}>DuckDuckGo</option>
-        <option value="https://www.bing.com/search?q=" ${(localStorage.getItem('spl_engine')||'')==='bing'?'selected':''}>Bing</option>
-        <option value="https://search.brave.com/search?q=" ${(localStorage.getItem('spl_engine')||'')==='brave'?'selected':''}>Brave</option>
+        <option value="https://google.com/search?q=" ${(localStorage.getItem('serverplex_bw_engine')||'google')==='google'?'selected':''}>Google</option>
+        <option value="https://duckduckgo.com/?q=" ${(localStorage.getItem('serverplex_bw_engine')||'')==='ddg'?'selected':''}>DuckDuckGo</option>
+        <option value="https://www.bing.com/search?q=" ${(localStorage.getItem('serverplex_bw_engine')||'')==='bing'?'selected':''}>Bing</option>
+        <option value="https://search.brave.com/search?q=" ${(localStorage.getItem('serverplex_bw_engine')||'')==='brave'?'selected':''}>Brave</option>
       </select>
       <input class="ntp-input" id="ntpQ" placeholder="Search the web or enter a URL…" autocomplete="off" spellcheck="false">
       <button class="ntp-go" id="ntpGo">Go →</button>
@@ -944,7 +993,7 @@ function showNTP(container, t) {
   // Clock
   function tickNTP() {
     const now  = new Date();
-    const fmt  = localStorage.getItem('spl_clock_fmt') || localStorage.getItem('eclipseos_clock_format') || '12';
+    const fmt  = localStorage.getItem('serverplex_bw_clock_fmt') || localStorage.getItem('serverplex_clock_format') || '12';
     let h = now.getHours(), m = String(now.getMinutes()).padStart(2,'0'), timeStr;
     if (fmt === '24') {
       timeStr = String(h).padStart(2,'0') + ':' + m;
@@ -978,7 +1027,7 @@ function showNTP(container, t) {
       'https://www.bing.com/search?q=':'bing',
       'https://search.brave.com/search?q=':'brave',
     };
-    localStorage.setItem('spl_engine', map[ntpEngine.value] || 'google');
+    localStorage.setItem('serverplex_bw_engine', map[ntpEngine.value] || 'google');
   };
   function doNTPSearch() {
     const q = ntpQ.value.trim();
@@ -1010,7 +1059,7 @@ function navigate(raw) {
   if (!raw) return;
   let url = raw.trim();
   if (!url.includes('.') || url.includes(' ')) {
-    const eng = localStorage.getItem('spl_engine') || 'google';
+    const eng = localStorage.getItem('serverplex_bw_engine') || 'google';
     const engines = {
       google:'https://google.com/search?q=', ddg:'https://duckduckgo.com/?q=',
       bing:'https://www.bing.com/search?q=', brave:'https://search.brave.com/search?q=',
@@ -1044,7 +1093,7 @@ function loadUrl(url) {
     const hostname = new URL(url).hostname.replace('www.','');
     globalHistory.unshift({ url, title: hostname, ts: Date.now() });
     if (globalHistory.length > 500) globalHistory.pop();
-    sessionStorage.setItem('spl_hist', JSON.stringify(globalHistory));
+    sessionStorage.setItem('serverplex_bw_hist', JSON.stringify(globalHistory));
   } catch(e) {}
 
   try { t.title = new URL(url).hostname.replace('www.','') || url; } catch(e) { t.title = url; }
@@ -1167,8 +1216,8 @@ function showNTPCurrent() {
 // ════════════════════════════════════════════════════
 //  BOOKMARKS
 // ════════════════════════════════════════════════════
-function getBookmarks() { return JSON.parse(localStorage.getItem('spl_bookmarks') || '[]'); }
-function saveBookmarks(bm) { localStorage.setItem('spl_bookmarks', JSON.stringify(bm)); }
+function getBookmarks() { return JSON.parse(localStorage.getItem('serverplex_bw_bookmarks') || '[]'); }
+function saveBookmarks(bm) { localStorage.setItem('serverplex_bw_bookmarks', JSON.stringify(bm)); }
 
 function addBookmark() {
   const t = activeTab();
@@ -1236,7 +1285,7 @@ function showHistoryDD() {
 }
 
 function clearHistory() {
-  globalHistory = []; sessionStorage.removeItem('spl_hist'); closeAllDD();
+  globalHistory = []; sessionStorage.removeItem('serverplex_bw_hist'); closeAllDD();
   showBlockToast('History cleared');
 }
 
@@ -1330,23 +1379,23 @@ function buildSettingsHTML() {
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Search Engine</div><div class="s-row-sub">Default search used in the URL bar and new tab page</div></div>
           <select class="s-select" id="s-engine" onchange="saveEngine()">
-            <option value="google" ${(localStorage.getItem('spl_engine')||'google')==='google'?'selected':''}>Google</option>
-            <option value="ddg"    ${(localStorage.getItem('spl_engine')||'')==='ddg'?'selected':''}>DuckDuckGo</option>
-            <option value="bing"   ${(localStorage.getItem('spl_engine')||'')==='bing'?'selected':''}>Bing</option>
-            <option value="brave"  ${(localStorage.getItem('spl_engine')||'')==='brave'?'selected':''}>Brave</option>
+            <option value="google" ${(localStorage.getItem('serverplex_bw_engine')||'google')==='google'?'selected':''}>Google</option>
+            <option value="ddg"    ${(localStorage.getItem('serverplex_bw_engine')||'')==='ddg'?'selected':''}>DuckDuckGo</option>
+            <option value="bing"   ${(localStorage.getItem('serverplex_bw_engine')||'')==='bing'?'selected':''}>Bing</option>
+            <option value="brave"  ${(localStorage.getItem('serverplex_bw_engine')||'')==='brave'?'selected':''}>Brave</option>
           </select>
         </div>
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Clock Format</div><div class="s-row-sub">Used on the new tab page</div></div>
           <select class="s-select" id="s-clockfmt" onchange="saveClockFmt()">
-            <option value="12" ${(localStorage.getItem('spl_clock_fmt')||localStorage.getItem('eclipseos_clock_format')||'12')==='12'?'selected':''}>12-hour</option>
-            <option value="24" ${(localStorage.getItem('spl_clock_fmt')||'')==='24'?'selected':''}>24-hour</option>
+            <option value="12" ${(localStorage.getItem('serverplex_bw_clock_fmt')||localStorage.getItem('serverplex_clock_format')||'12')==='12'?'selected':''}>12-hour</option>
+            <option value="24" ${(localStorage.getItem('serverplex_bw_clock_fmt')||'')==='24'?'selected':''}>24-hour</option>
           </select>
         </div>
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Bookmarks Bar</div><div class="s-row-sub">Show the bookmarks bar below the URL bar</div></div>
-          <button class="s-toggle ${localStorage.getItem('spl_bkbar')!=='false'?'on':''}" id="s-bkbar" onclick="toggleSetting('s-bkbar','spl_bkbar',()=>{
-            document.querySelector('.bookmarks-bar').style.display = localStorage.getItem('spl_bkbar')==='false'?'none':'';
+          <button class="s-toggle ${localStorage.getItem('serverplex_bw_bkbar')!=='false'?'on':''}" id="s-bkbar" onclick="toggleSetting('s-bkbar','serverplex_bw_bkbar',()=>{
+            document.querySelector('.bookmarks-bar').style.display = localStorage.getItem('serverplex_bw_bkbar')==='false'?'none':'';
           })"></button>
         </div>
       </div>
@@ -1368,7 +1417,7 @@ function buildSettingsHTML() {
         <div class="s-section-label">Ad Blocker</div>
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Enable Ad Blocker</div><div class="s-row-sub">Blocks known ad and tracker domains from loading</div></div>
-          <button class="s-toggle ${adBlockEnabled?'on':''}" id="s-adb" onclick="toggleSetting('s-adb','spl_adb_enabled',()=>{ adBlockEnabled=localStorage.getItem('spl_adb_enabled')!=='false'; updateBlockBadge(); })"></button>
+          <button class="s-toggle ${adBlockEnabled?'on':''}" id="s-adb" onclick="toggleSetting('s-adb','serverplex_bw_adb_enabled',()=>{ adBlockEnabled=localStorage.getItem('serverplex_bw_adb_enabled')!=='false'; updateBlockBadge(); })"></button>
         </div>
         <div class="s-row vertical">
           <div class="s-row-info"><div class="s-row-label">Block List</div><div class="s-row-sub">One domain per line. Changes take effect on next page load.</div></div>
@@ -1384,11 +1433,11 @@ function buildSettingsHTML() {
         <div class="s-section-label">Privacy</div>
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Send Do Not Track</div><div class="s-row-sub">Requests sites not to track you (honoured by few sites)</div></div>
-          <button class="s-toggle ${localStorage.getItem('spl_dnt')==='true'?'on':''}" id="s-dnt" onclick="toggleSetting('s-dnt','spl_dnt')"></button>
+          <button class="s-toggle ${localStorage.getItem('serverplex_bw_dnt')==='true'?'on':''}" id="s-dnt" onclick="toggleSetting('s-dnt','serverplex_bw_dnt')"></button>
         </div>
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Clear History on Close</div><div class="s-row-sub">Automatically clears browsing history when you close the browser</div></div>
-          <button class="s-toggle ${localStorage.getItem('spl_clearonclose')==='true'?'on':''}" id="s-clearonclose" onclick="toggleSetting('s-clearonclose','spl_clearonclose')"></button>
+          <button class="s-toggle ${localStorage.getItem('serverplex_bw_clearonclose')==='true'?'on':''}" id="s-clearonclose" onclick="toggleSetting('s-clearonclose','serverplex_bw_clearonclose')"></button>
         </div>
       </div>
     </div>
@@ -1404,16 +1453,16 @@ function buildSettingsHTML() {
           </div>
           <div style="display:flex;gap:8px;width:100%">
             <input class="s-input" id="s-sjapp" type="text" style="flex:1"
-              value="${localStorage.getItem('spl_sj_app')||''}"
+              value="${localStorage.getItem('serverplex_bw_sj_app')||''}"
               placeholder="https://your-scramjet.pages.dev">
             <button class="s-btn primary" onclick="saveSjApp()">Save</button>
           </div>
         </div>
         <div class="s-row">
           <div class="s-row-info"><div class="s-row-label">Proxy Mode</div><div class="s-row-sub">How external sites are loaded</div></div>
-          <select class="s-select" id="s-proxymode" onchange="localStorage.setItem('spl_proxy_mode',this.value)">
-            <option value="scramjet" ${(localStorage.getItem('spl_proxy_mode')||'scramjet')==='scramjet'?'selected':''}>ScramJet</option>
-            <option value="direct"   ${(localStorage.getItem('spl_proxy_mode')||'')==='direct'?'selected':''}>Direct (no proxy)</option>
+          <select class="s-select" id="s-proxymode" onchange="localStorage.setItem('serverplex_bw_proxy_mode',this.value)">
+            <option value="scramjet" ${(localStorage.getItem('serverplex_bw_proxy_mode')||'scramjet')==='scramjet'?'selected':''}>ScramJet</option>
+            <option value="direct"   ${(localStorage.getItem('serverplex_bw_proxy_mode')||'')==='direct'?'selected':''}>Direct (no proxy)</option>
           </select>
         </div>
       </div>
@@ -1467,28 +1516,28 @@ function toggleSetting(toggleId, storageKey, cb) {
   localStorage.setItem(storageKey, on);
   if (cb) cb();
 }
-function saveEngine() { localStorage.setItem('spl_engine', document.getElementById('s-engine').value); }
-function saveClockFmt() { localStorage.setItem('spl_clock_fmt', document.getElementById('s-clockfmt').value); }
+function saveEngine() { localStorage.setItem('serverplex_bw_engine', document.getElementById('s-engine').value); }
+function saveClockFmt() { localStorage.setItem('serverplex_bw_clock_fmt', document.getElementById('s-clockfmt').value); }
 function saveSjApp() {
   const val = document.getElementById('s-sjapp')?.value.trim();
-  if (val) { localStorage.setItem('spl_sj_app', val); showBlockToast('ScramJet URL saved'); }
+  if (val) { localStorage.setItem('serverplex_bw_sj_app', val); showBlockToast('ScramJet URL saved'); }
 }
 function saveBlockList() {
   const val = document.getElementById('s-blocklist')?.value || '';
   adBlockList = val.split('\n').map(s=>s.trim()).filter(Boolean);
-  localStorage.setItem('spl_adb_list', JSON.stringify(adBlockList));
+  localStorage.setItem('serverplex_bw_adb_list', JSON.stringify(adBlockList));
   showBlockToast('Block list saved (' + adBlockList.length + ' entries)');
 }
 function resetBlockList() {
   adBlockList = [...DEFAULT_BLOCKLIST];
-  localStorage.removeItem('spl_adb_list');
+  localStorage.removeItem('serverplex_bw_adb_list');
   const el = document.getElementById('s-blocklist');
   if (el) el.value = DEFAULT_BLOCKLIST.join('\n');
   showBlockToast('Block list reset');
 }
 function clearHistorySettings() {
   if (!confirm('Clear all browsing history?')) return;
-  globalHistory = []; sessionStorage.removeItem('spl_hist');
+  globalHistory = []; sessionStorage.removeItem('serverplex_bw_hist');
   showBlockToast('History cleared');
 }
 function clearBookmarks() {
@@ -1498,13 +1547,13 @@ function clearBookmarks() {
 }
 function resetAll() {
   if (!confirm('Reset all browser settings to defaults?')) return;
-  ['spl_engine','spl_clock_fmt','spl_bkbar','spl_dnt','spl_clearonclose','spl_sj_app','spl_proxy_mode','spl_adb_enabled','spl_adb_list'].forEach(k=>localStorage.removeItem(k));
+  ['serverplex_bw_engine','serverplex_bw_clock_fmt','serverplex_bw_bkbar','serverplex_bw_dnt','serverplex_bw_clearonclose','serverplex_bw_sj_app','serverplex_bw_proxy_mode','serverplex_bw_adb_enabled','serverplex_bw_adb_list'].forEach(k=>localStorage.removeItem(k));
   showBlockToast('Settings reset — reload to apply');
 }
 function exportData() {
   const data = {
     exported: new Date().toISOString(), version:2, browser:'ServerplexOS',
-    settings: { engine: localStorage.getItem('spl_engine'), sj_app: localStorage.getItem('spl_sj_app'), proxy_mode: localStorage.getItem('spl_proxy_mode') },
+    settings: { engine: localStorage.getItem('serverplex_bw_engine'), sj_app: localStorage.getItem('serverplex_bw_sj_app'), proxy_mode: localStorage.getItem('serverplex_bw_proxy_mode') },
     bookmarks: getBookmarks(), history: globalHistory,
   };
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
@@ -1520,12 +1569,12 @@ function importData() {
       try {
         const d = JSON.parse(ev.target.result);
         if (d.settings) {
-          if (d.settings.engine)     localStorage.setItem('spl_engine', d.settings.engine);
-          if (d.settings.sj_app)     localStorage.setItem('spl_sj_app', d.settings.sj_app);
-          if (d.settings.proxy_mode) localStorage.setItem('spl_proxy_mode', d.settings.proxy_mode);
+          if (d.settings.engine)     localStorage.setItem('serverplex_bw_engine', d.settings.engine);
+          if (d.settings.sj_app)     localStorage.setItem('serverplex_bw_sj_app', d.settings.sj_app);
+          if (d.settings.proxy_mode) localStorage.setItem('serverplex_bw_proxy_mode', d.settings.proxy_mode);
         }
         if (d.bookmarks) saveBookmarks(d.bookmarks);
-        if (d.history)   { globalHistory = d.history; sessionStorage.setItem('spl_hist', JSON.stringify(globalHistory)); }
+        if (d.history)   { globalHistory = d.history; sessionStorage.setItem('serverplex_bw_hist', JSON.stringify(globalHistory)); }
         showBlockToast('Data imported successfully');
       } catch(e) { alert('Invalid file — could not import.'); }
     };
@@ -1631,7 +1680,7 @@ document.addEventListener('keydown', e => {
     }
     if (e.shiftKey) {
       switch(e.key.toLowerCase()) {
-        case 'a': e.preventDefault(); adBlockEnabled=!adBlockEnabled; localStorage.setItem('spl_adb_enabled',adBlockEnabled); sessionBlockCount=0; updateBlockBadge(); break;
+        case 'a': e.preventDefault(); adBlockEnabled=!adBlockEnabled; localStorage.setItem('serverplex_bw_adb_enabled',adBlockEnabled); sessionBlockCount=0; updateBlockBadge(); break;
         case 's': e.preventDefault(); $('ddSettings').onclick(); break;
         case 'd': e.preventDefault(); duplicateTab(activeId); break;
       }
@@ -1653,10 +1702,10 @@ document.addEventListener('keydown', e => {
 // ════════════════════════════════════════════════════
 function restoreTabs() {
   try {
-    const saved = JSON.parse(sessionStorage.getItem('spl_tabs') || '[]');
+    const saved = JSON.parse(sessionStorage.getItem('serverplex_bw_tabs') || '[]');
     if (!saved.length) return false;
-    tabCounter = parseInt(sessionStorage.getItem('spl_ctr') || '0');
-    activeId   = parseInt(sessionStorage.getItem('spl_active') || '0');
+    tabCounter = parseInt(sessionStorage.getItem('serverplex_bw_ctr') || '0');
+    activeId   = parseInt(sessionStorage.getItem('serverplex_bw_active') || '0');
     saved.forEach(t => {
       tabs.push({ ...t });
       if (t.type !== 'settings') {
@@ -1681,14 +1730,14 @@ function restoreTabs() {
 }
 
 // Apply bookmarks bar visibility
-if (localStorage.getItem('spl_bkbar') === 'false') {
+if (localStorage.getItem('serverplex_bw_bkbar') === 'false') {
   document.querySelector('.bookmarks-bar').style.display = 'none';
 }
 
 // Clear on close if set
 window.addEventListener('beforeunload', () => {
-  if (localStorage.getItem('spl_clearonclose') === 'true') {
-    globalHistory = []; sessionStorage.removeItem('spl_hist');
+  if (localStorage.getItem('serverplex_bw_clearonclose') === 'true') {
+    globalHistory = []; sessionStorage.removeItem('serverplex_bw_hist');
   }
 });
 

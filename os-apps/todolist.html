@@ -5,35 +5,35 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .header h1{font-size:20px;font-weight:700}
 .stats-row{display:flex;gap:8px;margin-left:auto;font-size:12px}
-.stat-chip{padding:4px 10px;border-radius:20px;background:rgba(255,255,255,0.06);color:#8b949e}
-.stat-chip span{color:#e6edf3;font-weight:700}
-.toolbar{padding:12px 16px;background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
+.stat-chip{padding:4px 10px;border-radius:20px;background:var(--border);color:var(--text3)}
+.stat-chip span{color:var(--text);font-weight:700}
+.toolbar{padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;flex-shrink:0;flex-wrap:wrap}
 .add-row{display:flex;gap:8px;flex:1;min-width:300px}
-.task-input{flex:1;padding:9px 14px;background:#0d1117;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
-.task-input:focus{border-color:#0078d4}
-.task-input::placeholder{color:#8b949e}
-.p-select{padding:9px 10px;background:#0d1117;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
-.p-select option{background:#0d1117}
-.cat-input{padding:9px 10px;background:#0d1117;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:12px;outline:none;width:110px}
-.cat-input::placeholder{color:#8b949e}
-.due-input{padding:9px 10px;background:#0d1117;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.task-input{flex:1;padding:9px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
+.task-input:focus{border-color:var(--accent)}
+.task-input::placeholder{color:var(--text3)}
+.p-select{padding:9px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.p-select option{background:var(--bg)}
+.cat-input{padding:9px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;width:110px}
+.cat-input::placeholder{color:var(--text3)}
+.due-input{padding:9px 10px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
 .add-btn{padding:9px 18px;background:#238636;border:none;border-radius:8px;color:white;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
 .add-btn:hover{background:#2ea043}
-.filter-row{display:flex;gap:6px;padding:10px 16px;background:#161b22;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.filter-row{display:flex;gap:6px;padding:10px 16px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
 .filter-row::-webkit-scrollbar{display:none}
-.filter-btn{padding:5px 12px;border:1px solid rgba(255,255,255,0.08);border-radius:20px;background:none;color:#8b949e;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s}
-.filter-btn:hover{color:#e6edf3;border-color:rgba(255,255,255,0.2)}
-.filter-btn.active{background:#0078d4;border-color:#0078d4;color:white}
-.search-input{padding:5px 12px;background:#0d1117;border:1px solid rgba(255,255,255,0.08);border-radius:20px;color:#e6edf3;font-family:'Oxanium',sans-serif;font-size:12px;outline:none;margin-left:auto;width:180px}
-.search-input::placeholder{color:#8b949e}
+.filter-btn{padding:5px 12px;border:1px solid var(--border);border-radius:20px;background:none;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;white-space:nowrap;transition:all 0.2s}
+.filter-btn:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:white}
+.search-input{padding:5px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;margin-left:auto;width:180px}
+.search-input::placeholder{color:var(--text3)}
 .tasks-area{flex:1;overflow-y:auto;padding:12px 16px}
-.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#8b949e;padding:8px 0 6px;margin-bottom:4px}
-.task-item{background:#161b22;border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px;transition:all 0.2s;cursor:default}
-.task-item:hover{border-color:rgba(255,255,255,0.14);background:#1f2937}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);padding:8px 0 6px;margin-bottom:4px}
+.task-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:12px;transition:all 0.2s;cursor:default}
+.task-item:hover{border-color:var(--border2);background:var(--surface2)}
 .task-item.done{opacity:0.5}
 .task-item.high{border-left:3px solid #f85149}
 .task-item.medium{border-left:3px solid #e3b341}
@@ -43,24 +43,73 @@ body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:10
 .cb-check{color:white;font-size:11px;display:none}
 .task-item.done .cb-check{display:block}
 .task-body{flex:1;min-width:0}
-.task-text{font-size:14px;font-weight:600;color:#e6edf3;margin-bottom:3px}
-.task-item.done .task-text{text-decoration:line-through;color:#8b949e}
+.task-text{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.task-item.done .task-text{text-decoration:line-through;color:var(--text3)}
 .task-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .task-cat{font-size:10px;padding:2px 7px;border-radius:10px;background:rgba(0,120,212,0.15);color:#4db8ff;border:1px solid rgba(0,120,212,0.2)}
-.task-due{font-size:11px;color:#8b949e}
+.task-due{font-size:11px;color:var(--text3)}
 .task-due.overdue{color:#f85149}
 .task-acts{display:flex;gap:4px;opacity:0;transition:opacity 0.2s}
 .task-item:hover .task-acts{opacity:1}
-.ta-btn{background:none;border:none;color:#8b949e;cursor:pointer;font-size:14px;padding:3px 5px;border-radius:4px}
-.ta-btn:hover{background:rgba(255,255,255,0.08);color:#e6edf3}
-.empty{text-align:center;padding:60px 20px;color:#8b949e}
+.ta-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:3px 5px;border-radius:4px}
+.ta-btn:hover{background:var(--border);color:var(--text)}
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
 .empty div{font-size:40px;margin-bottom:12px}
 .empty p{font-size:14px}
-.progress-bar{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;margin:0 16px;flex-shrink:0}
+.progress-bar{height:3px;background:var(--border);border-radius:2px;margin:0 16px;flex-shrink:0}
 .progress-fill{height:100%;background:#238636;border-radius:2px;transition:width 0.4s}
+
+/* ── ServerplexOS Theme System ── */
+:root { --accent: #0078d4; }
+body {
+  --bg:      #f0f2f5;
+  --bg2:     #e4e7ed;
+  --surface: #ffffff;
+  --surface2:#f0f2f5;
+  --text:    #0d0f14;
+  --text2:   #55606e;
+  --text3:   #8a95a3;
+  --border:  rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.14);
+  --shadow:  0 4px 20px rgba(0,0,0,.10);
+}
+body.dark {
+  --bg:      #060811;
+  --bg2:     #111420;
+  --surface: #12151f;
+  --surface2:#1a1e2e;
+  --text:    var(--text);
+  --text2:   #8b97b0;
+  --text3:   #5a6478;
+  --border:  var(--border);
+  --border2: var(--border2);
+  --shadow:  0 4px 20px rgba(0,0,0,.5);
+}
+body.grey {
+  --bg:      #3a3e4a;
+  --bg2:     #4e535e;
+  --surface: #484c57;
+  --surface2:#545862;
+  --text:    #eef0f4;
+  --text2:   #b8bec8;
+  --text3:   #858ea0;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.18);
+  --shadow:  0 4px 20px rgba(0,0,0,.35);
+}
 </style>
 </head>
 <body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
 <div class="header">
   <div>📋</div>
   <h1>To-Do List</h1>
@@ -96,9 +145,9 @@ body{font-family:'Oxanium',sans-serif;background:#0d1117;color:#e6edf3;height:10
 <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
 <div class="tasks-area" id="taskArea"></div>
 <script>
-let tasks=JSON.parse(localStorage.getItem('eclipseos_tasks_v2')||'[]');
+let tasks=JSON.parse(localStorage.getItem('serverplex_tasks_v2')||'[]');
 let filter='all';
-function save(){localStorage.setItem('eclipseos_tasks_v2',JSON.stringify(tasks));}
+function save(){localStorage.setItem('serverplex_tasks_v2',JSON.stringify(tasks));}
 function setFilter(f){filter=f;document.querySelectorAll('.filter-btn').forEach((b,i)=>{const fs=['all','pending','done','high','medium','low','overdue'];b.classList.toggle('active',fs[i]===f);});render();}
 function addTask(){
   const text=document.getElementById('taskInput').value.trim();

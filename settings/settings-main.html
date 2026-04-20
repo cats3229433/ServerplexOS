@@ -1,46 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Settings</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; height: 100vh; display: flex; background: #f5f5f5; }
-        .sidebar { width: 250px; background: #fff; border-right: 1px solid #ddd; }
-        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid #ddd; }
-        .sidebar-header h2 { font-size: 20px; color: #333; }
-        .nav-item { padding: 14px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; color: #666; }
-        .nav-item:hover { background: #f0f0f0; }
-        .nav-item.active { background: #e3f2fd; color: #0078d4; font-weight: 600; }
-        .content { flex: 1; overflow-y: auto; padding: 40px; }
-        iframe { width: 100%; height: 100%; border: none; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<title>Settings — ServerplexOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e0e0e0;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
+body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#333}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
+body{font-family:'Oxanium',sans-serif;height:100vh;display:flex;background:var(--bg);color:var(--text);overflow:hidden;transition:background .3s,color .3s}
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-header{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sidebar-header h2{font-size:17px;font-weight:800;letter-spacing:.5px}
+.sidebar-header .sub{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+.nav-item{padding:11px 18px;cursor:pointer;transition:background .15s,color .15s;display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;font-weight:600;border-left:3px solid transparent;position:relative}
+.nav-item:hover{background:var(--bg2);color:var(--text)}
+.nav-item.active{background:rgba(0,120,212,.12);color:var(--accent);border-left-color:var(--accent)}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:12px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text2);letter-spacing:1px}
+.content{flex:1;overflow:hidden}
+iframe{width:100%;height:100%;border:none;background:var(--bg)}
+</style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>⚙️ Settings</h2>
-        </div>
-        <div class="nav-item active" onclick="loadPage('system')">💻 System</div>
-        <div class="nav-item" onclick="loadPage('personalization')">🎨 Personalization</div>
-        <div class="nav-item" onclick="loadPage('apps')">📱 Apps</div>
-        <div class="nav-item" onclick="loadPage('accounts')">👤 Accounts</div>
-        <div class="nav-item" onclick="loadPage('privacy')">🔒 Privacy & Security</div>
-        <div class="nav-item" onclick="loadPage('about')">ℹ️ About</div>
-    </div>
-    <div class="content">
-        <iframe id="contentFrame" src="settings-system.html"></iframe>
-    </div>
-
-    <script>
-        function loadPage(page) {
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.target.classList.add('active');
-            document.getElementById('contentFrame').src = `settings-${page}.html`;
-        }
-    </script>
+<script>
+(function(){
+  var t = localStorage.getItem('serverplex_theme') || 'white';
+  if (t === 'black') document.body.classList.add('dark');
+  else if (t === 'grey') document.body.classList.add('grey');
+  var acc = localStorage.getItem('serverplex_accent');
+  if (acc) document.documentElement.style.setProperty('--accent', acc);
+})();
+</script>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>⚙️ Settings</h2>
+    <div class="sub">ServerplexOS</div>
+  </div>
+  <div class="nav-item active" data-page="system"         onclick="nav(this,'system')">        <span class="nav-icon">💻</span> System</div>
+  <div class="nav-item"        data-page="personalization" onclick="nav(this,'personalization')"><span class="nav-icon">🎨</span> Personalization</div>
+  <div class="nav-item"        data-page="apps"            onclick="nav(this,'apps')">           <span class="nav-icon">📱</span> Apps</div>
+  <div class="nav-item"        data-page="accounts"        onclick="nav(this,'accounts')">       <span class="nav-icon">👤</span> Accounts</div>
+  <div class="nav-item"        data-page="privacy"         onclick="nav(this,'privacy')">        <span class="nav-icon">🔒</span> Privacy & Security</div>
+  <div class="nav-item"        data-page="about"           onclick="nav(this,'about')">          <span class="nav-icon">ℹ️</span> About</div>
+  <div class="sidebar-footer">Version 2.0 · Build 2026</div>
+</div>
+<div class="content">
+  <iframe id="contentFrame" src="settings-system.html"></iframe>
+</div>
+<script>
+function nav(el, page) {
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('contentFrame').src = 'settings-' + page + '.html';
+}
+// Keep theme in sync when child pages change it
+window.addEventListener('message', e => {
+  if (e.data && e.data.type === 'theme-change') {
+    document.body.className = e.data.theme === 'black' ? 'dark' : e.data.theme === 'grey' ? 'grey' : '';
+  }
+});
+</script>
 </body>
 </html>

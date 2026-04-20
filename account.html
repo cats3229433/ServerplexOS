@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EclipseOS</title>
+  <title>ServerplexOS</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -316,7 +316,7 @@
   <!-- BOOT SCREEN -->
   <div id="bootScreen">
     <div class="boot-icon">💻</div>
-    <div class="boot-logo">EclipseOS</div>
+    <div class="boot-logo">ServerplexOS</div>
     <div class="boot-progress-container">
       <div class="boot-status" id="bootStatus">Initializing...</div>
       <div class="boot-bar-track">
@@ -339,7 +339,7 @@
     <div class="login-card" id="loginCard">
       <div class="login-avatar" id="loginAvatar">👤</div>
       <div class="login-username" id="loginUsername">USER</div>
-      <div class="login-subtitle">EclipseOS</div>
+      <div class="login-subtitle">ServerplexOS</div>
 
       <div class="input-group">
         <input type="password" id="passwordInput" placeholder="Enter PIN or leave blank" autocomplete="off" />
@@ -366,9 +366,9 @@
 
   <script>
     // ===== Load saved user info =====
-    const savedUsername = localStorage.getItem('eclipseos_username') || 'User';
-    const savedAvatar = localStorage.getItem('eclipseos_avatar') || '👤';
-    const savedPin = localStorage.getItem('eclipseos_pin') || '';
+    const savedUsername = localStorage.getItem('serverplex_username') || 'User';
+    const savedAvatar = localStorage.getItem('serverplex_avatar') || '👤';
+    const savedPin = localStorage.getItem('serverplex_pin') || '';
 
     document.getElementById('loginUsername').textContent = savedUsername.toUpperCase();
     document.getElementById('loginAvatar').textContent = savedAvatar;
@@ -416,8 +416,8 @@
     }
 
     function guestLogin() {
-      localStorage.setItem('eclipseos_username', 'Guest');
-      localStorage.setItem('eclipseos_avatar', '👤');
+      localStorage.setItem('serverplex_username', 'Guest');
+      localStorage.setItem('serverplex_avatar', '👤');
       launchOS();
     }
 
@@ -425,7 +425,7 @@
       const overlay = document.getElementById('launchOverlay');
       overlay.classList.add('visible');
       setTimeout(() => {
-        sessionStorage.setItem('eclipseos_authed', 'true'); window.location.href = 'eclipseos.html';
+        sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'eclipseos.html';
       }, 1200);
     }
 

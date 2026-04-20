@@ -1,218 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
-        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
-        .section { margin-bottom: 40px; }
-        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
-        .setting-item { padding: 16px; background: #f9f9f9; border-radius: 8px; margin-bottom: 12px; }
-        .setting-label { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: #333; }
-        .setting-desc { font-size: 13px; color: #666; margin-bottom: 12px; }
-        button { padding: 10px 20px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 8px; }
-        button:hover { background: #005a9e; }
-        button.danger { background: #ff3b30; }
-        button.danger:hover { background: #cc2f26; }
-        input[type="file"] { display: none; }
-        .warning { padding: 12px; background: #fff3cd; color: #856404; border-radius: 6px; margin-bottom: 12px; font-size: 14px; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd;--danger:#ff3b30}
+body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+h1{font-size:26px;font-weight:800;margin-bottom:24px}
+.section{margin-bottom:28px}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row-info{flex:1}
+.row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.row-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s;flex-shrink:0}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--border)}
+.btn-danger{background:rgba(255,59,48,.1);color:var(--danger);border:1px solid rgba(255,59,48,.3)}
+.btn-danger:hover{background:rgba(255,59,48,.2)}
+.warn-banner{margin:14px 16px 0;padding:10px 14px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;font-size:12px;color:#f59e0b;line-height:1.5}
+input[type=file]{display:none}
+</style>
 </head>
 <body>
-    <h1>🔒 Privacy & Security</h1>
-    
-    <div class="section">
-        <div class="section-title">Clear Data</div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Clear Notepad Data</div>
-            <div class="setting-desc">Delete all saved notepad text</div>
-            <button onclick="clearNotepad()">Clear Notepad</button>
-        </div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Clear To-Do List</div>
-            <div class="setting-desc">Delete all tasks from your to-do list</div>
-            <button onclick="clearTodos()">Clear Tasks</button>
-        </div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Clear Sticky Notes</div>
-            <div class="setting-desc">Delete all sticky notes</div>
-            <button onclick="clearStickyNotes()">Clear Notes</button>
-        </div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Clear Markdown</div>
-            <div class="setting-desc">Delete saved markdown content</div>
-            <button onclick="clearMarkdown()">Clear Markdown</button>
-        </div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Clear Recycle Bin</div>
-            <div class="setting-desc">Empty the recycle bin permanently</div>
-            <button onclick="clearRecycleBin()">Empty Bin</button>
-        </div>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
+<h1>🔒 Privacy & Security</h1>
+
+<div class="section">
+  <div class="sec-title">Clear App Data</div>
+  <div class="card">
+    <div class="row"><div class="row-info"><div class="row-label">Notepad</div><div class="row-desc">Delete all saved notepad text</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_notepad_text','Notepad cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">To-Do List</div><div class="row-desc">Delete all tasks</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_tasks','Tasks cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Sticky Notes</div><div class="row-desc">Delete all sticky notes</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_sticky_notes','Sticky notes cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Markdown Editor</div><div class="row-desc">Delete saved markdown content</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_markdown','Markdown cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Recycle Bin</div><div class="row-desc">Permanently empty the recycle bin</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_recycle_bin','Recycle bin emptied')">Empty</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Desktop Widgets</div><div class="row-desc">Remove all desktop widgets</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_widgets','Widgets cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Notification History</div><div class="row-desc">Clear all stored notifications</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_notifs','Notifications cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Game History</div><div class="row-desc">Clear recently played and favourite games</div></div><button class="btn btn-ghost" onclick="clearGames()">Clear</button></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title">Data Management</div>
+  <div class="card">
+    <div class="row">
+      <div class="row-info"><div class="row-label">Export All Settings</div><div class="row-desc">Download a backup of all OS data as JSON</div></div>
+      <button class="btn btn-primary" onclick="exportData()">📥 Export</button>
     </div>
-
-    <div class="section">
-        <div class="section-title">Data Management</div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Export Settings</div>
-            <div class="setting-desc">Download all OS settings and data as JSON file</div>
-            <button onclick="exportSettings()">📥 Export Settings</button>
-        </div>
-        
-        <div class="setting-item">
-            <div class="setting-label">Import Settings</div>
-            <div class="setting-desc">Restore settings from previously exported file</div>
-            <button onclick="document.getElementById('importFile').click()">📤 Import Settings</button>
-            <input type="file" id="importFile" accept=".json" onchange="importSettings(event)">
-        </div>
+    <div class="row">
+      <div class="row-info"><div class="row-label">Import Settings</div><div class="row-desc">Restore from a previously exported backup</div></div>
+      <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">📤 Import</button>
+      <input type="file" id="importFile" accept=".json" onchange="importData(event)">
     </div>
+  </div>
+</div>
 
-    <div class="section">
-        <div class="section-title">Danger Zone</div>
-        
-        <div class="setting-item">
-            <div class="warning">⚠️ Warning: This action cannot be undone!</div>
-            <div class="setting-label">Clear ALL OS Data</div>
-            <div class="setting-desc">Factory reset - delete all settings, apps data, and personalization</div>
-            <button class="danger" onclick="clearAllData()">🗑️ Factory Reset</button>
-        </div>
+<div class="section">
+  <div class="sec-title">Danger Zone</div>
+  <div class="card">
+    <div class="warn-banner">⚠️ The actions below are permanent and cannot be undone.</div>
+    <div class="row" style="margin-top:0">
+      <div class="row-info"><div class="row-label">Clear All OS Data</div><div class="row-desc">Factory reset — removes all settings, profile, app data, and personalization</div></div>
+      <button class="btn btn-danger" onclick="factoryReset()">🗑️ Factory Reset</button>
     </div>
+  </div>
+</div>
 
-    <script>
-        function clearNotepad() {
-            if (confirm('Clear all notepad text?')) {
-                localStorage.removeItem('eclipseos_notepad_text');
-                alert('✅ Notepad cleared');
-            }
-        }
+<script>
+function clearKey(key, msg) {
+  if (!confirm('Clear ' + msg.replace(' cleared','').replace(' emptied','') + '?')) return;
+  localStorage.removeItem(key);
+  alert('✅ ' + msg);
+}
+function clearGames() {
+  if (!confirm('Clear game history and favourites?')) return;
+  localStorage.removeItem('serverplex_game_recents');
+  localStorage.removeItem('serverplex_game_favs');
+  alert('✅ Game history cleared');
+}
 
-        function clearTodos() {
-            if (confirm('Clear all tasks?')) {
-                localStorage.removeItem('eclipseos_tasks');
-                alert('✅ Tasks cleared');
-            }
-        }
+function exportData() {
+  var data = {};
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && (k.startsWith('serverplex_') || k.startsWith('eclipseos_'))) data[k] = localStorage.getItem(k);
+  }
+  var blob = new Blob([JSON.stringify({exportDate:new Date().toISOString(),version:'2.0',data:data},null,2)],{type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'serverplexos-backup-' + new Date().toISOString().split('T')[0] + '.json';
+  a.click(); URL.revokeObjectURL(a.href);
+}
 
-        function clearStickyNotes() {
-            if (confirm('Clear all sticky notes?')) {
-                localStorage.removeItem('eclipseos_sticky_notes');
-                alert('✅ Sticky notes cleared');
-            }
-        }
+function importData(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try {
+      var imported = JSON.parse(ev.target.result);
+      if (!confirm('Import settings? This will overwrite your current OS settings.')) { e.target.value=''; return; }
+      var d = imported.data || {};
+      Object.keys(d).forEach(function(k){ localStorage.setItem(k, d[k]); });
+      alert('✅ Settings imported! Reloading…');
+      e.target.value = '';
+      setTimeout(function(){ (window.parent||window).location.reload(); }, 800);
+    } catch(err) { alert('❌ Invalid backup file'); e.target.value=''; }
+  };
+  reader.readAsText(file);
+}
 
-        function clearMarkdown() {
-            if (confirm('Clear markdown content?')) {
-                localStorage.removeItem('eclipseos_markdown');
-                alert('✅ Markdown cleared');
-            }
-        }
-
-        function clearRecycleBin() {
-            if (confirm('Empty recycle bin?')) {
-                localStorage.removeItem('eclipseos_recycle_bin');
-                alert('✅ Recycle bin emptied');
-            }
-        }
-
-        function exportSettings() {
-            const data = {};
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('eclipseos_')) {
-                    data[key] = localStorage.getItem(key);
-                }
-            }
-            
-            const exportData = {
-                exportDate: new Date().toISOString(),
-                version: '1.0',
-                data: data
-            };
-            
-            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `eclipseos-settings-${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            alert('✅ Settings exported successfully!');
-        }
-
-        function importSettings(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const imported = JSON.parse(e.target.result);
-                    
-                    if (!confirm('⚠️ Import settings?\n\nThis will replace your current OS settings. Continue?')) {
-                        event.target.value = '';
-                        return;
-                    }
-                    
-                    if (imported.data) {
-                        Object.keys(imported.data).forEach(key => {
-                            localStorage.setItem(key, imported.data[key]);
-                        });
-                    }
-                    
-                    alert('✅ Settings imported successfully!\n\nReloading OS...');
-                    event.target.value = '';
-                    
-                    if (window.parent && window.parent.location) {
-                        setTimeout(() => window.parent.location.reload(), 1000);
-                    } else {
-                        setTimeout(() => location.reload(), 1000);
-                    }
-                } catch (error) {
-                    alert('❌ Error importing settings: Invalid file format');
-                    event.target.value = '';
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function clearAllData() {
-            if (!confirm('⚠️ FACTORY RESET\n\nThis will delete ALL OS data including:\n- All app data\n- Settings and personalization\n- User profile\n- Desktop layout\n\nThis CANNOT be undone!\n\nContinue?')) {
-                return;
-            }
-            
-            if (!confirm('Are you absolutely sure? This is your last chance to cancel!')) {
-                return;
-            }
-            
-            // Clear all eclipseos data
-            const keys = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('eclipseos_')) {
-                    keys.push(key);
-                }
-            }
-            
-            keys.forEach(key => localStorage.removeItem(key));
-            
-            alert('✅ Factory reset complete!\n\nReloading OS...');
-            
-            if (window.parent && window.parent.location) {
-                setTimeout(() => window.parent.location.reload(), 1000);
-            } else {
-                setTimeout(() => location.reload(), 1000);
-            }
-        }
-    </script>
+function factoryReset() {
+  if (!confirm('FACTORY RESET\n\nThis will delete ALL ServerplexOS data permanently.\n\nThis cannot be undone. Continue?')) return;
+  if (!confirm('Last chance — are you absolutely sure?')) return;
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && (k.startsWith('serverplex_') || k.startsWith('eclipseos_'))) keys.push(k);
+  }
+  keys.forEach(function(k){ localStorage.removeItem(k); });
+  alert('✅ Factory reset complete. Reloading…');
+  setTimeout(function(){ (window.parent||window).location.replace('welcome.html'); }, 800);
+}
+</script>
 </body>
 </html>

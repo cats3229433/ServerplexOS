@@ -432,13 +432,34 @@ body.theme-grey{--bg:#808080;--bg2:#6a6a6a;--bg3:#555;--text:#fff;--text2:#ddd;-
 
 <script>
 // ══════════════════════════════════════════════
+//  ONE-TIME MIGRATION: eclipseos_* → serverplex_*
+//  Runs once on first load, converts all old keys silently.
+// ══════════════════════════════════════════════
+(function migrateLegacyKeys() {
+  if (localStorage.getItem('serverplex_migrated') === 'true') return;
+  var oldPrefix = 'eclipseos_', newPrefix = 'serverplex_';
+  Object.keys(localStorage).forEach(function(key) {
+    if (key.indexOf(oldPrefix) === 0) {
+      var newKey = newPrefix + key.slice(oldPrefix.length);
+      // Don't overwrite if new key already exists
+      if (!localStorage.getItem(newKey)) localStorage.setItem(newKey, localStorage.getItem(key));
+      localStorage.removeItem(key);
+    }
+  });
+  // Also migrate sessionStorage authed flag
+  var authed = sessionStorage.getItem('eclipseos_authed');
+  if (authed) { sessionStorage.setItem('serverplex_authed', authed); sessionStorage.removeItem('eclipseos_authed'); }
+  localStorage.setItem('serverplex_migrated', 'true');
+})();
+
+// ══════════════════════════════════════════════
 //  BOOT ROUTING
 // ══════════════════════════════════════════════
 (function(){
-  var setup = localStorage.getItem('eclipseos_setup_complete') === 'true';
-  var hasPin = !!localStorage.getItem('eclipseos_pin');
-  var hasPw  = !!localStorage.getItem('eclipseos_password');
-  var authed = sessionStorage.getItem('eclipseos_authed') === 'true';
+  var setup = localStorage.getItem('serverplex_setup_complete') === 'true';
+  var hasPin = !!localStorage.getItem('serverplex_pin');
+  var hasPw  = !!localStorage.getItem('serverplex_password');
+  var authed = sessionStorage.getItem('serverplex_authed') === 'true' || sessionStorage.getItem('eclipseos_authed') === 'true';
   if (!setup) { window.location.replace('welcome.html'); return; }
   if ((hasPin || hasPw) && !authed) { window.location.replace('account.html'); return; }
 })();
@@ -496,12 +517,12 @@ Object.keys(CUSTOM_ICONS).forEach(id => { if (apps[id]) apps[id].customIcon = CU
 // ══════════════════════════════════════════════
 let windows = {}, zIdx = 100;
 let selectedIcons = new Set();
-let currentTheme = localStorage.getItem('eclipseos_theme') || 'white';
-let desktopLayout = JSON.parse(localStorage.getItem('eclipseos_desktop_layout') || '{}');
+let currentTheme = localStorage.getItem('serverplex_theme') || 'white';
+let desktopLayout = JSON.parse(localStorage.getItem('serverplex_desktop_layout') || '{}');
 let currentVd = 0; // virtual desktop index (0-3)
-let dndMode = localStorage.getItem('eclipseos_dnd') === 'true';
-let notifications = JSON.parse(localStorage.getItem('eclipseos_notifs') || '[]');
-let pinnedAppIds = JSON.parse(localStorage.getItem('eclipseos_pinned') || '["browser","games","settings","terminal"]');
+let dndMode = localStorage.getItem('serverplex_dnd') === 'true';
+let notifications = JSON.parse(localStorage.getItem('serverplex_notifs') || '[]');
+let pinnedAppIds = JSON.parse(localStorage.getItem('serverplex_pinned') || '["browser","games","settings","terminal"]');
 let volLevel = 100, isMuted = false;
 let calDate = new Date();
 const GRID_SIZE = 100, GRID_PAD = 20;
@@ -514,22 +535,22 @@ Object.keys(desktopLayout).forEach(id => { if (!apps[id]) delete desktopLayout[i
 // ══════════════════════════════════════════════
 function init() {
   document.body.className = 'theme-' + currentTheme;
-  var fs = localStorage.getItem('eclipseos_os_font_size');
+  var fs = localStorage.getItem('serverplex_os_font_size');
   if (fs) document.body.style.fontSize = fs + 'px';
-  var acc = localStorage.getItem('eclipseos_accent');
+  var acc = localStorage.getItem('serverplex_accent');
   if (acc) document.documentElement.style.setProperty('--accent', acc);
 
-  var wp = localStorage.getItem('eclipseos_wallpaper');
+  var wp = localStorage.getItem('serverplex_wallpaper');
   if (wp && wp !== 'none') {
     var d = document.getElementById('desktop');
     d.style.background = (wp.startsWith('http') || wp.startsWith('data:')) ? "url('"+wp+"') center/cover no-repeat" : wp;
   }
 
-  var nm = localStorage.getItem('eclipseos_nightmode') === 'true';
+  var nm = localStorage.getItem('serverplex_nightmode') === 'true';
   if (nm) document.body.style.filter = 'sepia(20%) brightness(85%)';
 
-  document.getElementById('smUsername').textContent = localStorage.getItem('eclipseos_username') || 'User';
-  document.getElementById('smAvatar').textContent   = localStorage.getItem('eclipseos_avatar')   || '👤';
+  document.getElementById('smUsername').textContent = localStorage.getItem('serverplex_username') || 'User';
+  document.getElementById('smAvatar').textContent   = localStorage.getItem('serverplex_avatar')   || '👤';
 
   if (dndMode) { document.getElementById('dndDot').classList.add('on'); document.getElementById('qsDnd').classList.add('on'); }
 
@@ -574,7 +595,7 @@ function init() {
 
   // Startup apps
   setTimeout(() => {
-    JSON.parse(localStorage.getItem('eclipseos_startup_apps') || '[]').forEach(id => { if (apps[id]) openApp(id); });
+    JSON.parse(localStorage.getItem('serverplex_startup_apps') || '[]').forEach(id => { if (apps[id]) openApp(id); });
   }, 800);
 }
 
@@ -652,7 +673,7 @@ function renderDesktopIcons() {
     makeIconDraggable(icon);
     container.appendChild(icon);
   });
-  localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
+  localStorage.setItem('serverplex_desktop_layout', JSON.stringify(desktopLayout));
 }
 
 function selectIcon(icon, multi) {
@@ -723,7 +744,7 @@ function makeIconDraggable(element) {
     } else {
       element.style.left = gPos.x + 'px'; element.style.top = gPos.y + 'px';
       desktopLayout[appId] = { x: gPos.x, y: gPos.y };
-      localStorage.setItem('eclipseos_desktop_layout', JSON.stringify(desktopLayout));
+      localStorage.setItem('serverplex_desktop_layout', JSON.stringify(desktopLayout));
     }
   });
 }
@@ -795,7 +816,7 @@ function renderPinnedApps() {
     if (windows[id]) btn.classList.add('running');
     c.appendChild(btn);
   });
-  localStorage.setItem('eclipseos_pinned', JSON.stringify(pinnedAppIds));
+  localStorage.setItem('serverplex_pinned', JSON.stringify(pinnedAppIds));
 }
 function pinToggle(id) {
   if (pinnedAppIds.includes(id)) pinnedAppIds = pinnedAppIds.filter(x => x !== id);
@@ -1103,7 +1124,7 @@ function pushNotif(icon, app, title, body) {
   var n = { id: Date.now(), icon, app, title, body, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) };
   notifications.unshift(n);
   if (notifications.length > 50) notifications.pop();
-  localStorage.setItem('eclipseos_notifs', JSON.stringify(notifications));
+  localStorage.setItem('serverplex_notifs', JSON.stringify(notifications));
   renderNotifList();
   var badge = document.getElementById('notifIcon');
   badge.textContent = '🔔' + (notifications.length > 0 ? ' ' + notifications.length : '');
@@ -1124,10 +1145,10 @@ function renderNotifList() {
 }
 function dismissNotif(id) {
   notifications = notifications.filter(n => n.id !== id);
-  localStorage.setItem('eclipseos_notifs', JSON.stringify(notifications));
+  localStorage.setItem('serverplex_notifs', JSON.stringify(notifications));
   renderNotifList();
 }
-function clearNotifs() { notifications = []; localStorage.setItem('eclipseos_notifs', '[]'); renderNotifList(); document.getElementById('notifIcon').textContent = '🔔'; }
+function clearNotifs() { notifications = []; localStorage.setItem('serverplex_notifs', '[]'); renderNotifList(); document.getElementById('notifIcon').textContent = '🔔'; }
 function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
 
 // ══════════════════════════════════════════════
@@ -1136,7 +1157,7 @@ function toggleNotifPanel() { document.getElementById('notifPanel').classList.to
 function toggleQs() { document.getElementById('qsPanel').classList.toggle('open'); }
 function toggleDnd() {
   dndMode = !dndMode;
-  localStorage.setItem('eclipseos_dnd', dndMode);
+  localStorage.setItem('serverplex_dnd', dndMode);
   document.getElementById('dndDot').classList.toggle('on', dndMode);
   document.getElementById('qsDnd').classList.toggle('on', dndMode);
 }
@@ -1144,11 +1165,11 @@ function toggleNightMode() {
   var btn = document.getElementById('qsNight');
   var on = btn.classList.toggle('on');
   document.body.style.filter = on ? 'sepia(20%) brightness(85%)' : '';
-  localStorage.setItem('eclipseos_nightmode', on);
+  localStorage.setItem('serverplex_nightmode', on);
 }
 function onBrightness(v) {
   var pct = Math.max(20, v);
-  document.body.style.filter = (localStorage.getItem('eclipseos_nightmode')==='true' ? 'sepia(20%) ' : '') + 'brightness(' + pct + '%)';
+  document.body.style.filter = (localStorage.getItem('serverplex_nightmode')==='true' ? 'sepia(20%) ' : '') + 'brightness(' + pct + '%)';
   document.getElementById('qsBrightVal').textContent = pct + '%';
 }
 function updateQsTheme() {
@@ -1219,7 +1240,7 @@ function renderCal() {
 // ══════════════════════════════════════════════
 function updateClock() {
   var now = new Date();
-  var fmt = localStorage.getItem('eclipseos_clock_format') || '12';
+  var fmt = localStorage.getItem('serverplex_clock_format') || '12';
   var h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
   var timeStr = fmt === '24' ? h.toString().padStart(2,'0') + ':' + m : ((h%12||12) + ':' + m + ' ' + (h>=12?'PM':'AM'));
   document.getElementById('clockTime').textContent = timeStr;
@@ -1233,17 +1254,17 @@ function updateClock() {
 function changeTheme(theme) {
   currentTheme = theme;
   document.body.className = 'theme-' + theme;
-  localStorage.setItem('eclipseos_theme', theme);
+  localStorage.setItem('serverplex_theme', theme);
   updateQsTheme();
 }
 function setWallpaper(value) {
   var d = document.getElementById('desktop');
-  if (value === 'none') { d.style.background = 'var(--bg)'; localStorage.removeItem('eclipseos_wallpaper'); }
-  else if (value.startsWith('http') || value.startsWith('data:')) { d.style.background = "url('"+value+"') center/cover no-repeat"; localStorage.setItem('eclipseos_wallpaper', value); }
-  else { d.style.background = value; localStorage.setItem('eclipseos_wallpaper', value); }
+  if (value === 'none') { d.style.background = 'var(--bg)'; localStorage.removeItem('serverplex_wallpaper'); }
+  else if (value.startsWith('http') || value.startsWith('data:')) { d.style.background = "url('"+value+"') center/cover no-repeat"; localStorage.setItem('serverplex_wallpaper', value); }
+  else { d.style.background = value; localStorage.setItem('serverplex_wallpaper', value); }
 }
 function resetDesktopLayout() {
-  if (confirm('Reset all desktop icons to default positions?')) { desktopLayout = {}; localStorage.removeItem('eclipseos_desktop_layout'); renderDesktopIcons(); }
+  if (confirm('Reset all desktop icons to default positions?')) { desktopLayout = {}; localStorage.removeItem('serverplex_desktop_layout'); renderDesktopIcons(); }
 }
 
 // ══════════════════════════════════════════════
@@ -1279,8 +1300,8 @@ function closeCtxMenu() { document.getElementById('deskCtx').classList.remove('o
 // ══════════════════════════════════════════════
 //  DESKTOP WIDGETS
 // ══════════════════════════════════════════════
-var widgets = JSON.parse(localStorage.getItem('eclipseos_widgets') || '[]');
-function saveWidgets() { localStorage.setItem('eclipseos_widgets', JSON.stringify(widgets)); }
+var widgets = JSON.parse(localStorage.getItem('serverplex_widgets') || '[]');
+function saveWidgets() { localStorage.setItem('serverplex_widgets', JSON.stringify(widgets)); }
 function addWidget(type) {
   var w = { id: Date.now(), type, x: 100 + Math.random()*200, y: 80 + Math.random()*100, text:'' };
   widgets.push(w); saveWidgets(); renderWidget(w);
@@ -1425,8 +1446,8 @@ function showShutdown(type) {
   document.getElementById('shutdownText').textContent = type === 'restart' ? 'Restarting…' : 'Shutting down…';
   ov.classList.add('open');
   setTimeout(() => {
-    if (type === 'restart') { sessionStorage.setItem('eclipseos_authed','true'); location.reload(); }
-    else { sessionStorage.removeItem('eclipseos_authed'); window.location.replace('account.html'); }
+    if (type === 'restart') { sessionStorage.setItem('serverplex_authed','true'); location.reload(); }
+    else { sessionStorage.removeItem('serverplex_authed'); window.location.replace('account.html'); }
   }, 2400);
 }
 
@@ -1438,7 +1459,7 @@ function logOut() {
   var ov = document.getElementById('shutdownOverlay');
   document.getElementById('shutdownText').textContent = 'Signing out…';
   ov.classList.add('open');
-  setTimeout(() => { sessionStorage.removeItem('eclipseos_authed'); window.location.replace('account.html'); }, 1600);
+  setTimeout(() => { sessionStorage.removeItem('serverplex_authed'); window.location.replace('account.html'); }, 1600);
 }
 
 // ══════════════════════════════════════════════

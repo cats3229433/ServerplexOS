@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EclipseOS — Locked</title>
+  <title>ServerplexOS — Locked</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
@@ -211,7 +211,7 @@
   <div id="loginScreen">
     <div class="avatar-wrap" id="avatarWrap"></div>
     <div class="lock-username" id="lockUsername">User</div>
-    <div class="lock-subtitle">EclipseOS</div>
+    <div class="lock-subtitle">ServerplexOS</div>
 
     <!-- PIN mode -->
     <div id="pinMode">
@@ -232,11 +232,11 @@
   </div>
 
   <script>
-    const savedPin      = localStorage.getItem('eclipseos_pin') || '';
-    const savedPassword = localStorage.getItem('eclipseos_password') || '';
-    const savedUsername = localStorage.getItem('eclipseos_username') || 'User';
-    const savedAvatar   = localStorage.getItem('eclipseos_avatar') || '👤';
-    const avatarImage   = localStorage.getItem('eclipseos_avatar_image') || '';
+    const savedPin      = localStorage.getItem('serverplex_pin') || '';
+    const savedPassword = localStorage.getItem('serverplex_password') || '';
+    const savedUsername = localStorage.getItem('serverplex_username') || 'User';
+    const savedAvatar   = localStorage.getItem('serverplex_avatar') || '👤';
+    const avatarImage   = localStorage.getItem('serverplex_avatar_image') || '';
 
     // If no security, skip straight to OS
     if (!savedPin && !savedPassword) {
@@ -255,7 +255,7 @@
     // ── Clock ──
     function updateClock() {
       const now = new Date();
-      const fmt = localStorage.getItem('eclipseos_clock_format') || '12';
+      const fmt = localStorage.getItem('serverplex_clock_format') || '12';
       let h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
       let timeStr;
       if (fmt === '24') {
@@ -379,10 +379,7 @@
     function unlock() {
       document.getElementById('loginScreen').style.transition = 'opacity 0.4s ease';
       document.getElementById('loginScreen').style.opacity = '0';
-      setTimeout(() => {
-        sessionStorage.setItem('eclipseos_authed', 'true');
-        window.location.href = 'eclipseos.html';
-      }, 400);
+      setTimeout(() => sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'eclipseos.html', 400);
     }
 
     // Keyboard support for PIN

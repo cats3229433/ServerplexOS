@@ -1,158 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
-        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
-        .about-header { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 40px; color: white; }
-        .about-header .logo { font-size: 80px; margin-bottom: 16px; }
-        .about-header h2 { font-size: 32px; margin-bottom: 8px; }
-        .about-header .version { font-size: 16px; opacity: 0.9; }
-        .section { margin-bottom: 40px; }
-        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
-        .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .info-item { padding: 16px; background: #f9f9f9; border-radius: 8px; }
-        .info-label { font-size: 13px; color: #666; margin-bottom: 4px; }
-        .info-value { font-size: 16px; font-weight: 600; color: #333; }
-        .link-section { margin-top: 40px; text-align: center; }
-        .link-section a { color: #0078d4; text-decoration: none; margin: 0 12px; font-size: 14px; }
-        .link-section a:hover { text-decoration: underline; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
+body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+h1{font-size:26px;font-weight:800;margin-bottom:24px}
+.hero{background:linear-gradient(135deg,#0d1b2a,#1a1040 60%,#0f1a35);border-radius:16px;padding:32px;text-align:center;margin-bottom:28px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(0,120,212,.28),transparent 70%);pointer-events:none}
+.hero-logo{font-size:60px;margin-bottom:12px;display:block}
+.hero-name{font-size:28px;font-weight:800;color:#fff;letter-spacing:.5px;margin-bottom:4px}
+.hero-ver{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:2px}
+.section{margin-bottom:28px}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.info-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.info-value{font-size:15px;font-weight:700;color:var(--text)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.desc-block{padding:16px;font-size:13px;color:var(--text2);line-height:1.75}
+.links{display:flex;justify-content:center;gap:20px;padding:16px;border-top:1px solid var(--border)}
+.links a{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;padding:6px 14px;border-radius:20px;border:1px solid var(--border);transition:all .18s}
+.links a:hover{background:var(--bg2)}
+.stat-bar{height:4px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
+.stat-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .6s ease}
+</style>
 </head>
 <body>
-    <div class="about-header">
-        <div class="logo">💻</div>
-        <h2>EclipseOS</h2>
-        <div class="version">Version 1.0 - Build 2026.03.14</div>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
+<h1>ℹ️ About</h1>
+
+<div class="hero">
+  <span class="hero-logo">💻</span>
+  <div class="hero-name">ServerplexOS</div>
+  <div class="hero-ver">Version 2.0 · Build 2026.04</div>
+</div>
+
+<div class="section">
+  <div class="sec-title">System Information</div>
+  <div class="info-grid">
+    <div class="info-card"><div class="info-label">OS Name</div><div class="info-value">ServerplexOS</div></div>
+    <div class="info-card"><div class="info-label">Version</div><div class="info-value">2.0</div></div>
+    <div class="info-card"><div class="info-label">Build</div><div class="info-value">2026.04.19</div></div>
+    <div class="info-card"><div class="info-label">Browser</div><div class="info-value" id="browser">—</div></div>
+    <div class="info-card"><div class="info-label">Resolution</div><div class="info-value" id="resolution">—</div></div>
+    <div class="info-card"><div class="info-label">Platform</div><div class="info-value" id="platform">—</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title">Statistics</div>
+  <div class="info-grid">
+    <div class="info-card"><div class="info-label">Installed Apps</div><div class="info-value">21</div></div>
+    <div class="info-card"><div class="info-label">Running Processes</div><div class="info-value" id="procs">0</div></div>
+    <div class="info-card">
+      <div class="info-label">Storage Used</div>
+      <div class="info-value" id="storage">—</div>
+      <div class="stat-bar"><div class="stat-fill" id="storageFill"></div></div>
     </div>
+    <div class="info-card"><div class="info-label">Active Theme</div><div class="info-value" id="activeTheme">—</div></div>
+    <div class="info-card"><div class="info-label">Virtual Desktops</div><div class="info-value">4</div></div>
+    <div class="info-card"><div class="info-label">Pinned Apps</div><div class="info-value" id="pinnedCount">—</div></div>
+  </div>
+</div>
 
-    <div class="section">
-        <div class="section-title">System Information</div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">OS Name</div>
-                <div class="info-value">EclipseOS</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Version</div>
-                <div class="info-value">1.0</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Build</div>
-                <div class="info-value">2026.03.14</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Browser</div>
-                <div class="info-value" id="browserInfo">Loading...</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Screen Resolution</div>
-                <div class="info-value" id="resolution">Loading...</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Platform</div>
-                <div class="info-value" id="platform">Loading...</div>
-            </div>
-        </div>
+<div class="section">
+  <div class="sec-title">About ServerplexOS</div>
+  <div class="card">
+    <div class="desc-block">
+      ServerplexOS is a fully web-based operating system that runs entirely in your browser. It features a complete desktop environment with window management, virtual desktops, spotlight search, live weather widgets, a games library, and a suite of productivity and entertainment applications — all without any installation required.
     </div>
-
-    <div class="section">
-        <div class="section-title">Statistics</div>
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Installed Apps</div>
-                <div class="info-value">18 apps</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Running Processes</div>
-                <div class="info-value" id="runningProcesses">0</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Storage Used</div>
-                <div class="info-value" id="storageUsed">Loading...</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Last Login</div>
-                <div class="info-value" id="lastLogin">Today</div>
-            </div>
-        </div>
+    <div class="links">
+      <a href="../Legal/index.html" target="_blank">📋 Legal</a>
+      <a href="../Credits/index.html" target="_blank">👥 Credits</a>
+      <a href="https://github.com/Serverplex" target="_blank">💻 GitHub</a>
     </div>
+  </div>
+</div>
 
-    <div class="section">
-        <div class="section-title">About</div>
-        <div class="info-item" style="padding: 20px;">
-            <p style="line-height: 1.8; color: #666;">
-                EclipseOS is a web-based operating system that runs entirely in your browser. 
-                It features a complete desktop environment with window management, file storage, 
-                and a suite of productivity and entertainment applications.
-            </p>
-        </div>
-    </div>
+<script>
+function getBrowser() {
+  var ua = navigator.userAgent;
+  if (ua.includes('Firefox')) return 'Firefox';
+  if (ua.includes('Edg'))     return 'Edge';
+  if (ua.includes('Chrome'))  return 'Chrome';
+  if (ua.includes('Safari'))  return 'Safari';
+  if (ua.includes('OPR'))     return 'Opera';
+  return 'Unknown';
+}
+function getPlatform() {
+  var p = navigator.platform || '';
+  if (p.includes('Win'))    return 'Windows';
+  if (p.includes('Mac'))    return 'macOS';
+  if (p.includes('Linux'))  return 'Linux';
+  if (p.includes('iPhone') || p.includes('iPad')) return 'iOS';
+  return p || 'Unknown';
+}
 
-    <div class="link-section">
-        <a href="../Legal/index.html" target="_blank">📋 Legal & Terms</a>
-        <a href="../Credits/index.html" target="_blank">👥 Credits</a>
-        <a href="https://github.com" target="_blank">💻 GitHub</a>
-    </div>
+document.getElementById('browser').textContent    = getBrowser();
+document.getElementById('resolution').textContent = window.screen.width + ' × ' + window.screen.height;
+document.getElementById('platform').textContent   = getPlatform();
+document.getElementById('activeTheme').textContent = (localStorage.getItem('serverplex_theme') || 'white').charAt(0).toUpperCase() + (localStorage.getItem('serverplex_theme') || 'white').slice(1);
+document.getElementById('pinnedCount').textContent = JSON.parse(localStorage.getItem('serverplex_pinned') || '[]').length + ' apps';
 
-    <script>
-        // Browser detection
-        function getBrowserInfo() {
-            const ua = navigator.userAgent;
-            let browser = 'Unknown';
-            
-            if (ua.includes('Firefox')) browser = 'Firefox';
-            else if (ua.includes('Edg')) browser = 'Edge';
-            else if (ua.includes('Chrome')) browser = 'Chrome';
-            else if (ua.includes('Safari')) browser = 'Safari';
-            else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera';
-            
-            return browser;
-        }
+// Storage
+var total = 0;
+for (var i = 0; i < localStorage.length; i++) {
+  var k = localStorage.key(i);
+  total += (localStorage[k] || '').length + k.length;
+}
+var kb = (total / 1024).toFixed(1);
+document.getElementById('storage').textContent = kb + ' KB';
+document.getElementById('storageFill').style.width = Math.min((kb / 5120) * 100, 100) + '%';
 
-        // Platform detection
-        function getPlatform() {
-            const platform = navigator.platform;
-            if (platform.includes('Win')) return 'Windows';
-            if (platform.includes('Mac')) return 'macOS';
-            if (platform.includes('Linux')) return 'Linux';
-            if (platform.includes('iPhone') || platform.includes('iPad')) return 'iOS';
-            if (platform.includes('Android')) return 'Android';
-            return platform;
-        }
-
-        // Calculate storage
-        function getStorageUsed() {
-            let totalSize = 0;
-            for (let key in localStorage) {
-                if (localStorage.hasOwnProperty(key)) {
-                    totalSize += localStorage[key].length + key.length;
-                }
-            }
-            return (totalSize / 1024).toFixed(2) + ' KB';
-        }
-
-        // Update running processes
-        function updateRunningProcesses() {
-            if (window.parent && window.parent.windows) {
-                const count = Object.keys(window.parent.windows).length;
-                document.getElementById('runningProcesses').textContent = count;
-            }
-        }
-
-        // Initialize
-        document.getElementById('browserInfo').textContent = getBrowserInfo();
-        document.getElementById('resolution').textContent = `${window.screen.width} × ${window.screen.height}`;
-        document.getElementById('platform').textContent = getPlatform();
-        document.getElementById('storageUsed').textContent = getStorageUsed();
-        
-        updateRunningProcesses();
-        setInterval(updateRunningProcesses, 2000);
-    </script>
+function updateProcs() {
+  var n = window.parent && window.parent.windows ? Object.keys(window.parent.windows).length : 0;
+  document.getElementById('procs').textContent = n;
+}
+updateProcs();
+setInterval(updateProcs, 2000);
+</script>
 </body>
 </html>

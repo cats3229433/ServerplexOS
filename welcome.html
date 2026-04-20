@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to EclipseOS</title>
+  <title>Welcome to ServerplexOS</title>
   <style>
     :root {
       --accent: #0078d4;
@@ -393,7 +393,7 @@
       <!-- ── STEP 0: Welcome ── -->
       <div class="step active" id="step0">
         <div class="welcome-logo">💻</div>
-        <div class="welcome-title">Welcome to EclipseOS</div>
+        <div class="welcome-title">Welcome to ServerplexOS</div>
         <div class="welcome-sub">Let's get you set up in just a few steps.<br>This will only take a minute.</div>
         <button class="btn btn-primary" style="width:100%;" onclick="nextStep()">Get Started →</button>
       </div>
@@ -574,7 +574,7 @@
 
         <div class="btn-row" style="margin-top:24px;">
           <button class="btn btn-primary" style="font-size:16px;" onclick="launchOS()">
-            Launch EclipseOS →
+            Launch ServerplexOS →
           </button>
         </div>
       </div>
@@ -584,7 +584,7 @@
 
   <script>
     // ── Check if already set up ──
-    if (localStorage.getItem('eclipseos_setup_complete') === 'true') {
+    if (localStorage.getItem('serverplex_setup_complete') === 'true') {
       window.location.replace('eclipseos.html');
     }
 
@@ -721,8 +721,8 @@
     }
 
     function skipSecurity() {
-      localStorage.removeItem('eclipseos_pin');
-      localStorage.removeItem('eclipseos_password');
+      localStorage.removeItem('serverplex_pin');
+      localStorage.removeItem('serverplex_password');
       showStep(3);
     }
 
@@ -750,13 +750,13 @@
         setTimeout(() => { inp.classList.remove('shake'); inp.style.borderColor = ''; }, 600);
         return;
       }
-      localStorage.setItem('eclipseos_username', name);
+      localStorage.setItem('serverplex_username', name);
       if (avatarIsImage && avatarImageData) {
-        localStorage.setItem('eclipseos_avatar', '📷');        // fallback emoji
-        localStorage.setItem('eclipseos_avatar_image', avatarImageData); // actual image
+        localStorage.setItem('serverplex_avatar', '📷');        // fallback emoji
+        localStorage.setItem('serverplex_avatar_image', avatarImageData); // actual image
       } else {
-        localStorage.setItem('eclipseos_avatar', selectedAvatar || '👤');
-        localStorage.removeItem('eclipseos_avatar_image');
+        localStorage.setItem('serverplex_avatar', selectedAvatar || '👤');
+        localStorage.removeItem('serverplex_avatar_image');
       }
       nextStep();
     }
@@ -769,43 +769,43 @@
           setTimeout(() => document.getElementById('numpad').classList.remove('shake'), 600);
           return;
         }
-        localStorage.setItem('eclipseos_pin', pinValue);
-        localStorage.removeItem('eclipseos_password');
+        localStorage.setItem('serverplex_pin', pinValue);
+        localStorage.removeItem('serverplex_password');
       } else {
         const pw = document.getElementById('passwordInput').value;
         const conf = document.getElementById('passwordConfirm').value;
         if (!pw) { document.getElementById('passError').textContent = 'Please enter a password.'; return; }
         if (pw !== conf) { document.getElementById('passError').textContent = 'Passwords do not match.'; return; }
-        localStorage.setItem('eclipseos_password', pw);
-        localStorage.removeItem('eclipseos_pin');
+        localStorage.setItem('serverplex_password', pw);
+        localStorage.removeItem('serverplex_pin');
       }
       nextStep();
     }
 
     function saveTheme() {
-      localStorage.setItem('eclipseos_theme', selectedTheme);
-      localStorage.setItem('eclipseos_theme', selectedTheme); // compat with OS
+      localStorage.setItem('serverplex_theme', selectedTheme);
+      localStorage.setItem('serverplex_theme', selectedTheme); // compat with OS
       nextStep();
     }
 
     function saveExtras() {
-      localStorage.setItem('eclipseos_notifications_enabled', notifCb.checked);
-      localStorage.setItem('eclipseos_clock_format', clockFmt);
+      localStorage.setItem('serverplex_notifications_enabled', notifCb.checked);
+      localStorage.setItem('serverplex_clock_format', clockFmt);
       buildSummary();
       nextStep();
     }
 
     function buildSummary() {
-      const name = localStorage.getItem('eclipseos_username') || 'Unknown';
-      const av   = localStorage.getItem('eclipseos_avatar') || '👤';
-      const hasPin = !!localStorage.getItem('eclipseos_pin');
-      const hasPw  = !!localStorage.getItem('eclipseos_password');
-      const theme  = localStorage.getItem('eclipseos_theme') || 'white';
-      const notif  = localStorage.getItem('eclipseos_notifications_enabled') !== 'false';
-      const clock  = localStorage.getItem('eclipseos_clock_format') || '12';
+      const name = localStorage.getItem('serverplex_username') || 'Unknown';
+      const av   = localStorage.getItem('serverplex_avatar') || '👤';
+      const hasPin = !!localStorage.getItem('serverplex_pin');
+      const hasPw  = !!localStorage.getItem('serverplex_password');
+      const theme  = localStorage.getItem('serverplex_theme') || 'white';
+      const notif  = localStorage.getItem('serverplex_notifications_enabled') !== 'false';
+      const clock  = localStorage.getItem('serverplex_clock_format') || '12';
 
       const secLabel = hasPin ? '🔢 PIN set' : hasPw ? '🔐 Password set' : '🔓 None';
-      const avatarImg = localStorage.getItem('eclipseos_avatar_image');
+      const avatarImg = localStorage.getItem('serverplex_avatar_image');
       const avatarDisplay = avatarImg
         ? `<img src="${avatarImg}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;vertical-align:middle;">`
         : av;
@@ -820,8 +820,8 @@
     }
 
     function launchOS() {
-      localStorage.setItem('eclipseos_setup_complete', 'true');
-      sessionStorage.setItem('eclipseos_authed', 'true'); window.location.href = 'eclipseos.html';
+      localStorage.setItem('serverplex_setup_complete', 'true');
+      sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'eclipseos.html';
     }
 
     // Init

@@ -1,113 +1,203 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
-        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
-        .section { margin-bottom: 40px; }
-        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
-        .profile-section { padding: 24px; background: #f9f9f9; border-radius: 12px; }
-        .profile-header { display: flex; align-items: center; gap: 24px; margin-bottom: 24px; }
-        .profile-avatar { width: 80px; height: 80px; background: #0078d4; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; color: white; cursor: pointer; }
-        .profile-info { flex: 1; }
-        .profile-name { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
-        .profile-email { font-size: 14px; color: #666; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; font-weight: 600; margin-bottom: 8px; color: #333; }
-        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
-        .avatar-picker { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 12px; }
-        .avatar-option { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; font-size: 32px; cursor: pointer; border-radius: 8px; transition: all 0.2s; }
-        .avatar-option:hover { background: #e0e0e0; transform: scale(1.1); }
-        .avatar-option.selected { background: #e3f2fd; border: 2px solid #0078d4; }
-        button { padding: 12px 24px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        button:hover { background: #005a9e; }
-        .success-message { padding: 12px; background: #d4edda; color: #155724; border-radius: 6px; margin-bottom: 20px; display: none; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
+body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+h1{font-size:26px;font-weight:800;margin-bottom:24px}
+.section{margin-bottom:28px}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.profile-hero{padding:20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border)}
+.avatar-circle{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:38px;cursor:pointer;transition:transform .25s;flex-shrink:0;overflow:hidden}
+.avatar-circle:hover{transform:scale(1.06) rotate(5deg)}
+.avatar-circle img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.profile-name-big{font-size:20px;font-weight:800;margin-bottom:3px}
+.profile-sub{font-size:12px;color:var(--text2)}
+.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row-info{flex:1}
+.row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.row-desc{font-size:12px;color:var(--text2)}
+input[type=text],input[type=password]{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none;width:200px}
+input[type=text]:focus,input[type=password]:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,120,212,.15)}
+.avatar-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;padding:14px 16px}
+.av-opt{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:26px;cursor:pointer;border-radius:8px;transition:all .18s;border:2px solid transparent}
+.av-opt:hover{background:var(--bg2);transform:scale(1.1)}
+.av-opt.selected{background:rgba(0,120,212,.15);border-color:var(--accent)}
+.upload-zone{margin:0 16px 14px;border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.upload-zone:hover{border-color:var(--accent);background:rgba(0,120,212,.04)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-preview{width:60px;height:60px;border-radius:50%;object-fit:cover;margin:0 auto 8px;display:none}
+.btn{padding:9px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;transition:all .18s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
+.btn-danger{background:rgba(255,59,48,.12);color:#ff3b30;border:1px solid rgba(255,59,48,.3)}
+.btn-danger:hover{background:rgba(255,59,48,.22)}
+.success{padding:10px 14px;background:rgba(52,199,89,.15);color:#34c759;border:1px solid rgba(52,199,89,.3);border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.footer-row{padding:14px 16px;display:flex;gap:10px}
+</style>
 </head>
 <body>
-    <h1>👤 Accounts</h1>
-    
-    <div class="section">
-        <div class="section-title">User Profile</div>
-        <div class="profile-section">
-            <div class="profile-header">
-                <div class="profile-avatar" id="currentAvatar">👤</div>
-                <div class="profile-info">
-                    <div class="profile-name" id="displayName">User</div>
-                    <div class="profile-email">Local Account</div>
-                </div>
-            </div>
-            
-            <div class="success-message" id="successMessage">Profile updated successfully!</div>
-            
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" placeholder="Enter your username">
-            </div>
-            
-            <div class="form-group">
-                <label>Choose Avatar</label>
-                <div class="avatar-picker" id="avatarPicker"></div>
-            </div>
-            
-            <button onclick="saveProfile()">💾 Save Changes</button>
-        </div>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
+<h1>👤 Accounts</h1>
+
+<div class="section">
+  <div class="sec-title">User Profile</div>
+  <div class="card">
+    <div class="profile-hero">
+      <div class="avatar-circle" id="avatarPreview">👤</div>
+      <div>
+        <div class="profile-name-big" id="displayName">User</div>
+        <div class="profile-sub">Local Account · ServerplexOS</div>
+      </div>
     </div>
+    <div class="success" id="successMsg">✅ Profile saved successfully!</div>
+    <div class="row">
+      <div class="row-info"><div class="row-label">Username</div><div class="row-desc">Your display name across the OS</div></div>
+      <input type="text" id="usernameInput" placeholder="Enter username" maxlength="24">
+    </div>
+  </div>
+</div>
 
-    <script>
-        const avatars = ['👤', '😀', '😎', '🤖', '👨', '👩', '🧑', '👴', '👵', '🧔', '👨‍💼', '👩‍💼', '🎓', '👑', '🐱', '🐶'];
-        let selectedAvatar = localStorage.getItem('eclipseos_avatar') || '👤';
+<div class="section">
+  <div class="sec-title">Avatar — Emoji</div>
+  <div class="card">
+    <div class="avatar-grid" id="avatarGrid"></div>
+  </div>
+</div>
 
-        function renderAvatarPicker() {
-            const picker = document.getElementById('avatarPicker');
-            picker.innerHTML = avatars.map(avatar => `
-                <div class="avatar-option ${avatar === selectedAvatar ? 'selected' : ''}" 
-                     onclick="selectAvatar('${avatar}')">
-                    ${avatar}
-                </div>
-            `).join('');
-        }
+<div class="section">
+  <div class="sec-title">Avatar — Photo</div>
+  <div class="card">
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" accept="image/*" onchange="handleUpload(event)">
+      <img class="upload-preview" id="uploadPreview" src="">
+      <div id="uploadPrompt">📷 Click or drag to upload a photo</div>
+    </div>
+  </div>
+</div>
 
-        function selectAvatar(avatar) {
-            selectedAvatar = avatar;
-            renderAvatarPicker();
-            document.getElementById('currentAvatar').textContent = avatar;
-        }
+<div class="section">
+  <div class="sec-title">Security</div>
+  <div class="card">
+    <div class="row">
+      <div class="row-info"><div class="row-label">PIN</div><div class="row-desc">4-digit login PIN (leave blank to remove)</div></div>
+      <input type="password" id="pinInput" placeholder="New 4-digit PIN" maxlength="4">
+    </div>
+    <div class="row">
+      <div class="row-info"><div class="row-label">Password</div><div class="row-desc">Text password (leave blank to remove)</div></div>
+      <input type="password" id="pwInput" placeholder="New password">
+    </div>
+  </div>
+</div>
 
-        function saveProfile() {
-            const username = document.getElementById('username').value.trim();
-            
-            if (username) {
-                localStorage.setItem('eclipseos_username', username);
-                document.getElementById('displayName').textContent = username;
-            }
-            
-            localStorage.setItem('eclipseos_avatar', selectedAvatar);
-            
-            // Update parent OS if accessible
-            if (window.parent && window.parent.document.getElementById('startMenuUsername')) {
-                window.parent.document.getElementById('startMenuUsername').textContent = username || 'User';
-                window.parent.document.getElementById('startMenuAvatar').textContent = selectedAvatar;
-            }
-            
-            // Show success message
-            const msg = document.getElementById('successMessage');
-            msg.style.display = 'block';
-            setTimeout(() => msg.style.display = 'none', 3000);
-        }
+<div class="card">
+  <div class="footer-row">
+    <button class="btn btn-primary" onclick="save()">💾 Save Changes</button>
+    <button class="btn btn-danger" onclick="clearSecurity()">🔓 Remove Security</button>
+  </div>
+</div>
 
-        // Load current profile
-        const currentUsername = localStorage.getItem('eclipseos_username') || 'User';
-        document.getElementById('username').value = currentUsername;
-        document.getElementById('displayName').textContent = currentUsername;
-        document.getElementById('currentAvatar').textContent = selectedAvatar;
-        
-        renderAvatarPicker();
-    </script>
+<script>
+var AVATARS = ['👤','😀','😎','🤖','👨','👩','🧑','👴','👵','🧔','👨‍💼','👩‍💼','🎓','👑','🐱','🐶','🦊','🐺','🦁','🐯','🐸','🐧','🌟','🎮'];
+var selectedAvatar = localStorage.getItem('serverplex_avatar') || '👤';
+var uploadedImage  = localStorage.getItem('serverplex_avatar_image') || '';
+
+// Load
+var uname = localStorage.getItem('serverplex_username') || 'User';
+document.getElementById('usernameInput').value = uname;
+document.getElementById('displayName').textContent = uname;
+var ap = document.getElementById('avatarPreview');
+if (uploadedImage) { ap.innerHTML = '<img src="'+uploadedImage+'">'; }
+else ap.textContent = selectedAvatar;
+
+// Build grid
+var grid = document.getElementById('avatarGrid');
+AVATARS.forEach(function(av){
+  var d = document.createElement('div');
+  d.className = 'av-opt' + (av === selectedAvatar && !uploadedImage ? ' selected' : '');
+  d.textContent = av;
+  d.onclick = function(){
+    selectedAvatar = av; uploadedImage = '';
+    document.querySelectorAll('.av-opt').forEach(function(x){ x.classList.remove('selected'); });
+    d.classList.add('selected');
+    ap.innerHTML = av;
+    document.getElementById('uploadPreview').style.display = 'none';
+    document.getElementById('uploadPrompt').style.display = '';
+    document.getElementById('uploadZone').style.borderStyle = 'dashed';
+  };
+  grid.appendChild(d);
+});
+
+// Upload
+if (uploadedImage) {
+  var prev = document.getElementById('uploadPreview');
+  prev.src = uploadedImage; prev.style.display = 'block';
+  document.getElementById('uploadPrompt').style.display = 'none';
+}
+function handleUpload(e) {
+  var file = e.target.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    uploadedImage = ev.target.result;
+    var prev = document.getElementById('uploadPreview');
+    prev.src = uploadedImage; prev.style.display = 'block';
+    document.getElementById('uploadPrompt').style.display = 'none';
+    document.querySelector('.av-opt.selected') && document.querySelector('.av-opt.selected').classList.remove('selected');
+    ap.innerHTML = '<img src="'+uploadedImage+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+  };
+  reader.readAsDataURL(file);
+}
+
+function save() {
+  var uname = document.getElementById('usernameInput').value.trim() || 'User';
+  localStorage.setItem('serverplex_username', uname);
+  localStorage.setItem('serverplex_avatar',   selectedAvatar);
+  if (uploadedImage) localStorage.setItem('serverplex_avatar_image', uploadedImage);
+  else localStorage.removeItem('serverplex_avatar_image');
+  document.getElementById('displayName').textContent = uname;
+
+  var pin = document.getElementById('pinInput').value.trim();
+  var pw  = document.getElementById('pwInput').value;
+  if (pin && /^\d{4}$/.test(pin)) { localStorage.setItem('serverplex_pin', pin); localStorage.removeItem('serverplex_password'); }
+  else if (pw) { localStorage.setItem('serverplex_password', pw); localStorage.removeItem('serverplex_pin'); }
+
+  // Update parent OS
+  if (window.parent) {
+    var smu = window.parent.document.getElementById('smUsername');
+    var sma = window.parent.document.getElementById('smAvatar');
+    if (smu) smu.textContent = uname;
+    if (sma) { if (uploadedImage) sma.innerHTML = '<img src="'+uploadedImage+'" style="width:44px;height:44px;object-fit:cover;border-radius:50%">'; else sma.textContent = selectedAvatar; }
+  }
+
+  var msg = document.getElementById('successMsg');
+  msg.style.display = 'block';
+  setTimeout(function(){ msg.style.display = 'none'; }, 3000);
+}
+
+function clearSecurity() {
+  if (!confirm('Remove PIN and password? The OS will no longer require login.')) return;
+  localStorage.removeItem('serverplex_pin');
+  localStorage.removeItem('serverplex_password');
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pwInput').value = '';
+  alert('Security removed.');
+}
+</script>
 </body>
 </html>

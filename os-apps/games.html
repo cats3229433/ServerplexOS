@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -125,7 +126,21 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface);border:1px solid var(--border2);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);z-index:99999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── Game player overlay ── */
+/* Battery warning modals */
+.batt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
+.batt-overlay.open{display:flex;animation:popIn .2s ease}
+.batt-modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:28px 28px 22px;max-width:360px;width:100%;text-align:center;box-shadow:var(--shadow-lg)}
+.batt-icon{font-size:48px;margin-bottom:12px;display:block}
+.batt-title{font-size:17px;font-weight:800;margin-bottom:8px}
+.batt-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.batt-btns{display:flex;gap:8px}
+.batt-btn{flex:1;padding:10px;border-radius:10px;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.batt-btn.primary{background:var(--accent);color:#fff;box-shadow:0 4px 14px var(--glow)}
+.batt-btn.primary:hover{transform:translateY(-1px)}
+.batt-btn.ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border2)}
+.batt-btn.ghost:hover{color:var(--text);background:var(--bg3)}
+.batt-bar-wrap{width:100%;height:10px;background:var(--bg3);border-radius:6px;overflow:hidden;margin-bottom:6px}
+.batt-bar-fill{height:100%;border-radius:6px;transition:width .5s ease}
 .game-player-overlay{position:fixed;inset:0;z-index:99998;background:#000;display:none;flex-direction:column}
 .game-player-overlay.open{display:flex;animation:popIn .2s ease}
 .game-player-bar{height:40px;background:#0d0f14;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08)}
@@ -143,7 +158,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 </style>
 </head>
 <body>
-<script>document.body.className='theme-'+(localStorage.getItem('eclipseos_theme')||'black');</script>
+<script>document.body.className='theme-'+(localStorage.getItem('serverplex_theme')||'black');</script>
 
 <div class="app">
   <div class="topbar">
@@ -202,7 +217,23 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
 
   <div class="statusbar">
     <span id="statusText">Connecting…</span>
-    <span style="margin-left:auto" id="statusFavs"></span>
+    <span style="margin-left:auto;display:flex;align-items:center;gap:10px">
+      <span id="batteryDisplay" style="display:none;align-items:center;gap:6px;font-size:10px;letter-spacing:.5px">
+        <!-- Visual battery widget -->
+        <span id="battVisual" style="display:inline-flex;align-items:center;gap:2px">
+          <span style="position:relative;display:inline-block;width:22px;height:11px;border:1.5px solid currentColor;border-radius:2px;overflow:visible" id="battBody">
+            <!-- fill bar -->
+            <span id="battFill" style="position:absolute;left:1px;top:1px;bottom:1px;border-radius:1px;transition:width .6s ease,background .6s ease"></span>
+            <!-- charging bolt overlay -->
+            <span id="battBolt" style="position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:8px;z-index:1">⚡</span>
+          </span>
+          <!-- battery nub -->
+          <span style="display:inline-block;width:2px;height:5px;border-radius:0 1px 1px 0" id="battNub"></span>
+        </span>
+        <span id="batteryPct" style="font-weight:700;min-width:28px"></span>
+      </span>
+      <span id="statusFavs"></span>
+    </span>
   </div>
 </div>
 
@@ -229,7 +260,34 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
   </div>
 </div>
 
-<!-- Game player — script-run for manual games, iframe for registry games -->
+<!-- Battery low warning (< 20%) — lets user continue anyway -->
+<div class="batt-overlay" id="battWarnOverlay">
+  <div class="batt-modal">
+    <span class="batt-icon">🪫</span>
+    <div class="batt-title">Low Battery</div>
+    <div class="batt-bar-wrap"><div class="batt-bar-fill" id="battWarnBar" style="background:#f59e0b"></div></div>
+    <div class="batt-sub" id="battWarnSub">Your battery is low. Gaming may drain it quickly. Consider plugging in before playing.</div>
+    <div class="batt-btns">
+      <button class="batt-btn ghost" onclick="closeBattWarn()">Cancel</button>
+      <button class="batt-btn primary" onclick="battWarnContinue()">Continue Anyway →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Battery critical block (≤ 5%) — cannot continue until plugged in -->
+<div class="batt-overlay" id="battBlockOverlay">
+  <div class="batt-modal">
+    <span class="batt-icon">🔴</span>
+    <div class="batt-title">Battery Critical</div>
+    <div class="batt-bar-wrap"><div class="batt-bar-fill" id="battBlockBar" style="background:#ef4444"></div></div>
+    <div class="batt-sub" id="battBlockSub">Your battery is critically low. Please plug in your charger or charge above 5% before playing.</div>
+    <div class="batt-btns">
+      <button class="batt-btn ghost" onclick="closeBattBlock()">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- Game player — blob iframe for full isolation -->
 <div class="game-player-overlay" id="gamePlayerOverlay">
   <div class="game-player-bar">
     <span id="gpIcon" style="font-size:18px">🎮</span>
@@ -282,7 +340,7 @@ const MANUAL_GAMES = [
   name: 'Adventure Capitalist',
   icon: '💰',
   cover: 'https://cdn2.steamgriddb.com/icon_thumb/29c5bc899fe290c1dcdab537dea8354d.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/A/AdventureCapitalist.html',
   category: 'Strategy',
   author: 'Hyper Hippo Games',
   description: 'An idle business simulation game where you invest in increasingly profitable ventures, hire managers to automate production, and expand your empire across Earth, the Moon, and Mars while chasing exponential growth.',
@@ -294,7 +352,7 @@ const MANUAL_GAMES = [
   name: 'Among Us (Fan Game)',
   icon: '🕵️‍♂️',
   cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/73206bd9-257c-4f50-b1f3-59a306e24084/dfq2s3e-05782889-08c7-45d8-ab45-72232e9ec880.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzczMjA2YmQ5LTI1N2MtNGY1MC1iMWYzLTU5YTMwNmUyNDA4NFwvZGZxMnMzZS0wNTc4Mjg4OS0wOGM3LTQ1ZDgtYWI0NS03MjIzMmU5ZWM4ODAucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.tsJdAPG3U5txNM2O82P9Vyvv3ljM_UT4878py0ePH60',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/A/AmongUs.html',
   category: 'Multiplayer',
   author: 'Fan‑made / Unknown',
   description: 'A browser‑based recreation of the classic social‑deduction gameplay, featuring tasks, sabotage, emergency meetings, and simple offline or local play without the official servers.',
@@ -306,7 +364,7 @@ const MANUAL_GAMES = [
   name: 'Backrooms 3D (FanGame)',
   icon: '🚪',
   cover: 'https://images.sftcdn.net/images/t_app-icon-l/p/8ec9a73e-204d-4402-af6b-3df5ce85b354/1627129876/backrooms-backrooms-icn.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/Backrooms.html',
   category: 'Adventure',
   author: 'Fan-Made / Unknown',
   description: 'A fan-made exploration horror game set in the endless yellow halls of Level 0, focusing on eerie atmosphere, liminal spaces, and the unsettling search for an exit while avoiding mysterious entities.',
@@ -318,7 +376,7 @@ const MANUAL_GAMES = [
   name: 'Bacon May Die',
   icon: '🥓',
   cover: 'https://th.bing.com/th/id/OIP.CgwwOm35K21jOca_CzZs3AHaHa?w=163&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BaconMayDie.html',
   category: 'Action',
   author: 'SnoutUp Games',
   description: 'A frantic beat-em-up where you play as a heavily armed pig battling waves of goofy enemies, unlocking weapons, outfits, and co‑op chaos while surviving increasingly intense combat.',
@@ -330,7 +388,7 @@ const MANUAL_GAMES = [
   name: "Baldi's Basics (Fan Game)",
   icon: '📓',
   cover: 'https://cdn2.steamgriddb.com/icon/d23a0a2880738ad75a04b1c9dc7d9b73/32/256x256.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BaldiBasics.html',
   category: 'Adventure',
   author: 'Fan-Made / Unknown',
   description: 'A fan-made take on the Baldi’s Basics formula, featuring notebook collecting, maze-like school exploration, and custom twists on the original characters and mechanics while keeping the surreal edutainment-horror style.',
@@ -342,7 +400,7 @@ const MANUAL_GAMES = [
   name: 'Baseball Bros',
   icon: '⚾',
   cover: 'https://baseballbrosgame.io/cache/data/image/game/baseball-bros-io-game-m208x208.jpg',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BaseballBros.html',
   category: 'Sports',
   author: 'Fan-Made / Unknown',
   description: 'A fast-paced arcade baseball game focused on timing your swings, hitting for distance, collecting power-ups, and chaining perfect hits to rack up massive scores across increasingly challenging rounds.',
@@ -354,7 +412,7 @@ const MANUAL_GAMES = [
   name: 'Basket Random',
   icon: '🏀',
   cover: 'https://play-lh.googleusercontent.com/gP8T5Z1O-ngxIloiwcBZzrzyLPYDp0R_1BDNKUDZboIRPVImeyWI8-7aExvB9gAGNKc',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketRandom.html',
   category: 'Sports',
   author: 'RHM Interactive',
   description: 'A chaotic physics-based basketball game where each round changes the court, gravity, and player movement, creating unpredictable and hilarious matches as you try to score before your opponent.',
@@ -366,7 +424,7 @@ const MANUAL_GAMES = [
   name: 'Basketball Bros',
   icon: '🏀',
   cover: 'https://www.basketball-bros.io/basketball-bros/logo.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketballBros.html',
   category: 'Sports',
   author: 'Fan-Made / Unknown',
   description: 'A fast-paced 1v1 arcade basketball game focused on quick movement, flashy dunks, simple controls, and chaotic back-and-forth scoring. Players outmaneuver opponents, time jumps, and use aggressive blocks to win short, intense matches.',
@@ -378,7 +436,7 @@ const MANUAL_GAMES = [
   name: 'Basketball Stars',
   icon: '🏀',
   cover: 'https://img.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec-512x512.jpeg',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketballStars.html',
   category: 'Sports',
   author: 'Madpuffers',
   description: 'A fast-paced 1v1 and 2v2 basketball game featuring smooth animations, skill-based shooting, stealing, and blocking, with unlockable characters, outfits, and competitive tournament modes.',
@@ -390,7 +448,7 @@ const MANUAL_GAMES = [
   name: 'Bit Planes',
   icon: '🛩️',
   cover: 'https://th.bing.com/th/id/OIP.3uAc7AgCcWCTs2y_x2k0lgHaHa?w=166&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BitLife.html',
   category: 'Arcade',
   author: 'Fan-Made / Unknown',
   description: 'A retro‑style arcade flying game where you pilot pixel aircraft through waves of enemies, dodge projectiles, collect power-ups, and survive increasingly intense levels with simple but fast-paced controls.',
@@ -402,7 +460,7 @@ const MANUAL_GAMES = [
   name: 'BitLife',
   icon: '📘',
   cover: 'https://images.yourstory.com/cs/images/companies/a7dac95e969c-bitlife-1672665626585.png?fm=auto&ar=1:1&mode=fill&fill=solid&fill-color=fff',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BitLife.html',
   category: 'Other',
   author: 'Candywriter, LLC',
   description: 'A life simulation game where every decision shapes your character’s journey from birth to death, letting you choose careers, relationships, education, and risky or wholesome paths to create unique life stories.',
@@ -414,9 +472,9 @@ const MANUAL_GAMES = [
   name: 'Bloxd.io',
   icon: '🧱',
   cover: 'https://img-hws.y8.com/cloud/v2-y8-studio-banner/361/bloxd-1667995919-logo.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/Bloxd.html',
   category: 'Multiplayer',
-  author: 'BloxdHop Team',
+  author: 'Bloxd.io',
   description: 'A multiplayer block‑based game featuring parkour, sandbox building, creative modes, and competitive minigames inspired by Minecraft-style movement and mechanics.',
   featured: false,
 },
@@ -426,7 +484,7 @@ const MANUAL_GAMES = [
   name: 'Boxing Random',
   icon: '🥊',
   cover: 'https://games76ez.com/uploads/2025/8/boxing-random.jpg',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BoxingRandom.html',
   category: 'Sports',
   author: 'RHM Interactive',
   description: 'A chaotic physics-based boxing game where each round changes fighter positions, platforms, and conditions, creating unpredictable and hilarious one-button matches.',
@@ -438,7 +496,7 @@ const MANUAL_GAMES = [
   name: 'Chess',
   icon: '♟️',
   cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8a9db7bb-486f-4f74-ba59-513e78b175c4/dfy1l6k-3891a94b-1b8b-4d35-b0e5-c28da471c789.png/v1/fill/w_512,h_512/chess_com___icon_by_shamo45_dfy1l6k-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvOGE5ZGI3YmItNDg2Zi00Zjc0LWJhNTktNTEzZTc4YjE3NWM0XC9kZnkxbDZrLTM4OTFhOTRiLTFiOGItNGQzNS1iMGU1LWMyOGRhNDcxYzc4OS5wbmciLCJ3aWR0aCI6Ijw9NTEyIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.KJBGUzMYClczE0wyHEWIpcTb1D-4JXceZQJJzcH_ER8',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/chess.html',
   category: 'Strategy',
   author: 'Unknown',
   description: 'A classic two‑player strategy game focused on tactical positioning, long-term planning, and outmaneuvering the opponent’s king through a combination of offense and defense.',
@@ -450,7 +508,7 @@ const MANUAL_GAMES = [
   name: 'Cookie Clicker',
   icon: '🍪',
   cover: 'https://play-lh.googleusercontent.com/Z1MOuuiD05ZN5LkVmMEvKF0mqAc-FknaQ2j8s4dZiO-LSPQX4EEA3RVJdlQEtxe96ok',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CookieClicker.html',
   category: 'Strategy',
   author: 'Orteil / DashNet',
   description: 'An incremental idle game where you generate cookies by clicking and by purchasing buildings, upgrades, and synergies that exponentially increase your cookies per second.',
@@ -462,7 +520,7 @@ const MANUAL_GAMES = [
   name: 'Core Ball',
   icon: '🎯',
   cover: 'https://mariogames.io/data/image/game/coreball.jpg',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CoreBall.html',
   category: 'Arcade',
   author: 'Unknown',
   description: 'A timing-based arcade game where you launch numbered balls onto a rotating core without letting them collide, increasing in speed and difficulty across dozens of levels.',
@@ -474,7 +532,7 @@ const MANUAL_GAMES = [
   name: 'Crazy Cattle 3D',
   icon: '🐄',
   cover: 'https://crazycattle3dgithub.io/data/image/crazy-cattle-3d-online.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CrazyCattle.html',
   category: 'Action',
   author: 'Unknown',
   description: 'A chaotic physics-based action game where you control a wild cow rampaging through farms and towns, smashing obstacles, avoiding hazards, and maintaining momentum to cause maximum destruction.',
@@ -486,7 +544,7 @@ const MANUAL_GAMES = [
   name: 'Crossy Road',
   icon: '🐔',
   cover: 'https://cdn.jim-nielsen.com/ios/1024/crossy-road-2022-05-13.png',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CrossyRoad.html',
   category: 'Arcade',
   author: 'Hipster Whale',
   description: 'An endless arcade hopper where you dodge cars, trains, and hazards while crossing roads, rivers, and tracks, aiming to travel as far as possible and unlock dozens of quirky characters.',
@@ -498,7 +556,7 @@ const MANUAL_GAMES = [
   name: 'Deltarune',
   icon: '⭐',
   cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8ef1af63-5387-4149-9fc7-91af014f7541/deurk9t-fa41a1c5-0302-48a0-9243-08f5a5ae564c.png/v1/fill/w_512,h_512/deltarune_dock_icon_by_usednoo25_by_usednoo25_deurk9t-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvOGVmMWFmNjMtNTM4Ny00MTQ5LTlmYzctOTFhZjAxNGY3NTQxXC9kZXVyazl0LWZhNDFhMWM1LTAzMDItNDhhMC05MjQzLTA4ZjVhNWFlNTY0Yy5wbmciLCJ3aWR0aCI6Ijw9NTEyIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.eF0TmiWOKHqzO5gQ2DRdwN1fX3kdw0uva-IDPwABz2U',
-  url: '',
+  url: 'skip',
   category: 'Adventure',
   author: 'Toby Fox',
   description: 'A story-driven adventure game where you and your classmates are pulled into a mysterious world, facing choices, puzzles, and turn-based encounters that shape the fate of its characters.',
@@ -510,7 +568,7 @@ const MANUAL_GAMES = [
   name: 'Drive Mad',
   icon: '🚗',
   cover: 'https://th.bing.com/th/id/OIP.odp26kFzqu9k2p8kmeAJGgHaHa?w=178&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/D/DriveMad.html',
   category: 'Arcade',
   author: 'Unknown',
   description: 'A physics-based driving game where you navigate unstable vehicles across tricky obstacle courses, balancing speed and control to reach the finish without flipping.',
@@ -617,8 +675,8 @@ const MANUAL_GAMES = [
   id: 'epsteins-basics',
   name: "Epstein's Basics",
   icon: '📓',
-  cover: 'https://th.bing.com/th/id/OIP.iX96C2TgzAp3iq3yfEuiwwHaGe?w=214&h=187&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  cover: 'https://th.bing.com/th/id/OIP.CeK_3tEPDN3CsJPpFaenDgHaHa?w=195&h=195&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/E/EpsteinBasics.html',
   category: 'Other',
   author: 'Unknown',
   description: "A fanmade parody remake of Baldi's Basics that replaces characters and themes with dark satirical elements, keeping the notebook-collecting gameplay and chaotic chase mechanics while reimagining the setting and cast.",
@@ -630,7 +688,7 @@ const MANUAL_GAMES = [
   name: "Five Nights At Epstein's",
   icon: '🕹️',
   cover: 'https://th.bing.com/th/id/OIP.GI4LJKOuMY2NA0XKl1s15wHaHa?w=157&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/F/FiveNightsAtEpstein.html',
   category: 'Other',
   author: 'Evan Productions',
   description: 'A dark satirical fan-made survival game inspired by Five Nights at Freddy’s, where players monitor cameras, manage systems, and survive five nights against exaggerated, fictionalized antagonists.',
@@ -642,7 +700,7 @@ const MANUAL_GAMES = [
   name: "Friday Night Funkin'",
   icon: '🎤',
   cover: 'https://gaamess.com/wp-content/uploads/2022/01/Friday.jpg',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/F/FridayNightFunkin.html',
   category: 'Arcade',
   author: 'Unknown',
   description: "A fanmade parody twist on Friday Night Funkin', featuring humorous remixes, altered characters, and intentionally offbeat charts while keeping the core rhythm‑battle gameplay intact.",
@@ -690,7 +748,7 @@ const MANUAL_GAMES = [
   name: 'Gorilla Tag',
   icon: '🦍',
   cover: 'https://th.bing.com/th/id/OIP.gVDHx01YS8hFyLYW73wCYgAAAA?w=144&h=182&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/G/GorillaTag.html',
   category: 'Other',
   author: 'Another Axiom',
   description: 'A fast-paced VR movement game where players run, jump, and climb using only their arms, featuring tag-based game modes and physics-driven locomotion in social multiplayer environments.',
@@ -738,7 +796,7 @@ const MANUAL_GAMES = [
   name: 'Hole.io',
   icon: '🕳️',
   cover: 'https://th.bing.com/th/id/OIP.AF8S_5xvpl_ZqqxXDOIJYgAAAA?w=143&h=146&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/H/Hole.io.html',
   category: 'Arcade',
   author: 'VOODOO',
   description: 'A competitive arcade game where you control a growing black hole, swallowing objects, buildings, and opponents to become the largest hole on the map before time runs out.',
@@ -750,7 +808,7 @@ const MANUAL_GAMES = [
   name: 'Idle Breakout',
   icon: '🟦',
   cover: 'https://th.bing.com/th/id/OIP.NXNnMYihpqJ3DUszIleJugAAAA?w=142&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/I/IdleBreakout.html',
   category: 'Arcade',
   author: 'Kodiqi',
   description: 'An incremental twist on the classic brick‑breaker game where you buy and upgrade balls to automatically destroy bricks, earn cash, and progress through increasingly difficult levels.',
@@ -762,7 +820,7 @@ const MANUAL_GAMES = [
   name: 'Idle Miner Tycoon',
   icon: '⛏️',
   cover: 'https://th.bing.com/th/id/OIP.lMlU5xlCphbRwf5IWMv2NgHaHa?w=162&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/I/IdleMinerTycoon.html',
   category: 'Strategy',
   author: 'Kolibri Games',
   description: 'A management and incremental game where you automate mines, hire managers, upgrade shafts, and expand your mining empire to maximize profits over time.',
@@ -774,7 +832,7 @@ const MANUAL_GAMES = [
   name: 'Jelly Truck',
   icon: '🚚',
   cover: 'https://th.bing.com/th/id/OIP.Q_H90sWnp2iw5oaX8b1aYQHaHa?w=182&h=181&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/J/JellyTruck.html',
   category: 'Arcade',
   author: 'GameTornado',
   description: 'A physics-based driving game where you control a soft, jelly-like truck and navigate wobbly terrain, flipping, bouncing, and squeezing through obstacles to reach the finish.',
@@ -786,7 +844,7 @@ const MANUAL_GAMES = [
   name: 'Just Fall .lol',
   icon: '🐧',
   cover: 'https://th.bing.com/th/id/OIP.pGun1ac8cl8pQ8jve7OHhgAAAA?w=154&h=159&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/J/JustFall.html',
   category: 'Multiplayer',
   author: 'JustPlay.LOL',
   description: 'A multiplayer platformer where penguins compete in obstacle-filled arenas, jumping, sliding, and surviving elimination rounds to be the last one standing.',
@@ -798,7 +856,7 @@ const MANUAL_GAMES = [
   name: 'Lucky Block Obby',
   icon: '🎲',
   cover: 'https://th.bing.com/th/id/OIP.T5oVySkjHN0DDLPg4row2QHaHa?w=184&h=184&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/L/LuckyBlockObby.html',
   category: 'Adventure',
   author: 'Unknown',
   description: 'An obstacle-course game themed around Lucky Blocks, where each block can help or sabotage you with random effects as you race to reach the end.',
@@ -810,7 +868,7 @@ const MANUAL_GAMES = [
   name: 'Monkey Mart',
   icon: '🐒',
   cover: 'https://th.bing.com/th/id/OIP.PBnuZm9t0XMjAY693_8BewAAAA?w=100&h=100&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/M/MonkeyMart.html',
   category: 'Arcade',
   author: 'TinyDobbins',
   description: 'A lighthearted management game where you run a supermarket as a monkey, harvesting crops, stocking shelves, serving customers, and expanding your store with new departments and upgrades.',
@@ -894,7 +952,7 @@ const MANUAL_GAMES = [
   name: 'N-Gon',
   icon: '🔷',
   cover: 'https://th.bing.com/th/id/OIP.OPNNVlnVYy9P27pro526mAAAAA?w=173&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/N/NGon.html',
   category: 'Arcade',
   author: 'Landfall',
   description: 'A minimalist arena survival shooter where you control a tiny geometric ship and dodge, weave, and blast through escalating waves of shapes. Each enemy type has distinct movement patterns, forcing precise movement and quick reactions as the screen fills with chaos.',
@@ -906,7 +964,7 @@ const MANUAL_GAMES = [
   name: 'Operius',
   icon: '🚀',
   cover: 'https://th.bing.com/th/id/OIP.CLXwTUqHscDB50sIXmJohQAAAA?w=180&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
+  url: 'skip',
   category: 'Arcade',
   author: 'Opera GX',
   description: 'A fast, neon‑styled arcade shooter built directly into Opera GX. You pilot a small ship through tight corridors, blasting obstacles and weaving through hazards as the speed ramps up. Simple controls, clean visuals, and a pure reflex‑driven gameplay loop make it a compact but addictive high‑score chaser.',
@@ -1162,7 +1220,7 @@ const MANUAL_GAMES = [
   category: 'Arcade',
   author: 'Unknown',
   description: 'A fast-paced physics soccer game where rocket-powered cars boost, flip, and slam into the ball to score goals. Simple controls and chaotic movement make every match unpredictable and fun.',
-  featured: false,
+  featured: true,
 },
 
 {
@@ -1606,13 +1664,13 @@ const REGISTRY          = ''; // Set a URL here to re-enable the registry
 const REGISTRY_FALLBACK = '';
 
 // Accent colour
-var _acc = localStorage.getItem('eclipseos_accent');
+var _acc = localStorage.getItem('serverplex_accent');
 if (_acc) document.documentElement.style.setProperty('--accent', _acc);
 
 // State
 var games      = [];
-var favs       = JSON.parse(localStorage.getItem('eclipseos_game_favs')    || '[]');
-var recents    = JSON.parse(localStorage.getItem('eclipseos_game_recents') || '[]');
+var favs       = JSON.parse(localStorage.getItem('serverplex_game_favs')    || '[]');
+var recents    = JSON.parse(localStorage.getItem('serverplex_game_recents') || '[]');
 var currentCat = 'all';
 var showFavs   = false;
 var activeGame = null;
@@ -1621,8 +1679,8 @@ var activeGame = null;
 var _injectedNodes = [];
 var _currentGameUrl = '';
 
-function saveFavs()    { localStorage.setItem('eclipseos_game_favs',    JSON.stringify(favs));    }
-function saveRecents() { localStorage.setItem('eclipseos_game_recents', JSON.stringify(recents)); }
+function saveFavs()    { localStorage.setItem('serverplex_game_favs',    JSON.stringify(favs));    }
+function saveRecents() { localStorage.setItem('serverplex_game_recents', JSON.stringify(recents)); }
 function isFav(id)     { return favs.includes(id); }
 
 function addRecent(id) {
@@ -1873,6 +1931,13 @@ var _blobUrl = null;
 
 function launchGame() {
   if (!activeGame || !activeGame.url) { showToast('No game file set','⚠️'); return; }
+  // Battery gate — warn at ≤20%, block at ≤5%
+  if (!checkBatteryBeforeLaunch()) return;
+  _launchDirect();
+}
+
+function _launchDirect() {
+  if (!activeGame || !activeGame.url) { showToast('No game file set','⚠️'); return; }
   closeDetail();
   addRecent(activeGame.id);
   document.getElementById('gpTitle').textContent = clean(activeGame.name) || 'Game';
@@ -1925,8 +1990,8 @@ function closeGamePlayer() {
 
 function reloadGame() {
   if (!activeGame) return;
-  // Re-run the full launch flow which handles both manual and registry
-  launchGame();
+  // Skip battery check on reload — user already acknowledged it to get here
+  _launchDirect();
 }
 
 function toggleFullscreen() {
@@ -1946,7 +2011,116 @@ function showToast(msg, icon) {
   toastT = setTimeout(function(){ document.getElementById('toast').classList.remove('show'); }, 2500);
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  BATTERY
+// ═══════════════════════════════════════════════════════════════
+var _battery       = null;
+var _battPct       = 100;
+var _battCharging  = false;
+var _pendingLaunch = false; // game waiting behind a low-battery warning
+
+function updateBatteryUI() {
+  var pct      = Math.round(_battPct);
+  var charging = _battCharging;
+  var disp     = document.getElementById('batteryDisplay');
+  if (!disp) return;
+  disp.style.display = 'flex';
+
+  // Pick colour based on level
+  var color = pct <= 5  ? '#ef4444'   // red
+            : pct <= 20 ? '#f59e0b'   // amber
+            : pct <= 40 ? '#eab308'   // yellow
+            : '#22c55e';              // green
+
+  // Fill bar width (cap at 100%)
+  var fillW = Math.min(pct, 100);
+  var fill  = document.getElementById('battFill');
+  if (fill) { fill.style.width = fillW + '%'; fill.style.background = charging ? '#3b82f6' : color; }
+
+  // Battery body border + nub colour
+  var body = document.getElementById('battBody');
+  var nub  = document.getElementById('battNub');
+  if (body) body.style.color = charging ? '#3b82f6' : color;
+  if (nub)  nub.style.background = charging ? '#3b82f6' : color;
+
+  // Charging bolt overlay
+  var bolt = document.getElementById('battBolt');
+  if (bolt) bolt.style.display = charging ? 'flex' : 'none';
+
+  // Percentage text
+  var pctEl = document.getElementById('batteryPct');
+  if (pctEl) {
+    pctEl.textContent = (charging ? '⚡ ' : '') + pct + '%';
+    pctEl.style.color = charging ? '#3b82f6' : color;
+  }
+
+  // If critically low while a game is open, force close it
+  if (pct <= 5 && !charging) {
+    var overlay = document.getElementById('gamePlayerOverlay');
+    if (overlay && overlay.classList.contains('open')) {
+      closeGamePlayer();
+      showBattBlock(pct);
+    }
+  }
+}
+
+function initBattery() {
+  if (!('getBattery' in navigator)) return; // API not available — silently skip
+  navigator.getBattery().then(function(bat) {
+    _battery = bat;
+    function sync() {
+      _battPct      = (bat.level * 100);
+      _battCharging = bat.charging;
+      updateBatteryUI();
+    }
+    sync();
+    bat.addEventListener('levelchange',   sync);
+    bat.addEventListener('chargingchange', sync);
+  }).catch(function() { /* permission denied or unsupported — skip */ });
+}
+
+function checkBatteryBeforeLaunch() {
+  // Returns true if OK to launch immediately, false if blocked/warned
+  if (_battCharging) return true; // charging — always OK
+  if (_battPct <= 5) {
+    showBattBlock(_battPct);
+    return false;
+  }
+  if (_battPct <= 20) {
+    showBattWarn(_battPct);
+    return false;
+  }
+  return true;
+}
+
+function showBattWarn(pct) {
+  document.getElementById('battWarnBar').style.width = pct + '%';
+  document.getElementById('battWarnSub').textContent =
+    'Your battery is at ' + Math.round(pct) + '%. Gaming may drain it quickly. Consider plugging in before playing.';
+  document.getElementById('battWarnOverlay').classList.add('open');
+}
+function closeBattWarn() {
+  document.getElementById('battWarnOverlay').classList.remove('open');
+  _pendingLaunch = false;
+}
+function battWarnContinue() {
+  document.getElementById('battWarnOverlay').classList.remove('open');
+  _pendingLaunch = false;
+  _launchDirect();
+}
+
+function showBattBlock(pct) {
+  document.getElementById('battBlockBar').style.width = pct + '%';
+  document.getElementById('battBlockSub').textContent =
+    'Your battery is at ' + Math.round(pct) + '%. Please plug in your charger or charge above 5% to play.';
+  document.getElementById('battBlockOverlay').classList.add('open');
+}
+function closeBattBlock() {
+  document.getElementById('battBlockOverlay').classList.remove('open');
+}
+
 loadGames();
+initBattery();
 </script>
 </body>
 </html>

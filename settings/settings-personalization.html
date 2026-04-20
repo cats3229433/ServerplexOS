@@ -1,108 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
-        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
-        .section { margin-bottom: 40px; }
-        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
-        .theme-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-        .theme-card { padding: 20px; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
-        .theme-card:hover { transform: translateY(-4px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .theme-card.active { border-color: #0078d4; background: #e3f2fd; }
-        .theme-preview { width: 100%; height: 80px; border-radius: 8px; margin-bottom: 12px; }
-        .theme-name { font-weight: 600; font-size: 16px; }
-        .wallpaper-picker { margin-top: 16px; }
-        input[type="color"] { width: 100%; height: 60px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; }
-        button { padding: 10px 20px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-top: 12px; }
-        button:hover { background: #005a9e; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
+body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+h1{font-size:26px;font-weight:800;margin-bottom:24px}
+.section{margin-bottom:32px}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row-info{flex:1}
+.row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
+.row-desc{font-size:12px;color:var(--text2)}
+/* Theme grid */
+.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px}
+.theme-card{border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;overflow:hidden}
+.theme-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
+.theme-preview{height:56px}
+.theme-name{text-align:center;font-size:12px;font-weight:700;padding:7px;background:var(--bg2)}
+/* Accent colors */
+.accent-row{display:flex;align-items:center;gap:8px;padding:12px 16px;flex-wrap:wrap}
+.accent-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .18s;flex-shrink:0}
+.accent-dot:hover{transform:scale(1.15)}
+.accent-dot.selected{border-color:#fff;box-shadow:0 0 0 3px var(--border),0 0 0 5px currentColor}
+/* Wallpaper */
+.wp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px}
+.wp-option{height:60px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .18s;position:relative;overflow:hidden}
+.wp-option:hover{transform:scale(1.04)}
+.wp-option.selected{border-color:var(--accent)}
+.wp-url-row{padding:10px 16px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border)}
+.wp-url-row input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}
+.btn-ghost:hover{background:var(--border)}
+</style>
 </head>
 <body>
-    <h1>🎨 Personalization</h1>
-    
-    <div class="section">
-        <div class="section-title">Theme</div>
-        <div class="theme-grid">
-            <div class="theme-card" onclick="setTheme('white')">
-                <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #f0f0f0);"></div>
-                <div class="theme-name">White</div>
-            </div>
-            <div class="theme-card" onclick="setTheme('black')">
-                <div class="theme-preview" style="background: linear-gradient(135deg, #000000, #1a1a1a);"></div>
-                <div class="theme-name">Black</div>
-            </div>
-            <div class="theme-card" onclick="setTheme('grey')">
-                <div class="theme-preview" style="background: linear-gradient(135deg, #808080, #555555);"></div>
-                <div class="theme-name">Grey</div>
-            </div>
-        </div>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
+<h1>🎨 Personalization</h1>
+
+<div class="section">
+  <div class="sec-title">Theme</div>
+  <div class="card">
+    <div class="theme-grid">
+      <div class="theme-card" id="th-white" onclick="setTheme('white')">
+        <div class="theme-preview" style="background:linear-gradient(135deg,#fff,#e0e0e0)"></div>
+        <div class="theme-name">White</div>
+      </div>
+      <div class="theme-card" id="th-black" onclick="setTheme('black')">
+        <div class="theme-preview" style="background:linear-gradient(135deg,#000,#1a1a1a)"></div>
+        <div class="theme-name">Black</div>
+      </div>
+      <div class="theme-card" id="th-grey" onclick="setTheme('grey')">
+        <div class="theme-preview" style="background:linear-gradient(135deg,#808080,#555)"></div>
+        <div class="theme-name">Grey</div>
+      </div>
     </div>
+  </div>
+</div>
 
-    <div class="section">
-        <div class="section-title">Wallpaper</div>
-        <div class="wallpaper-picker">
-            <label for="wallpaperColor" style="display: block; margin-bottom: 8px; font-weight: 600;">Desktop Background Color:</label>
-            <input type="color" id="wallpaperColor" value="#ffffff">
-            <button onclick="applyWallpaper()">Apply Wallpaper</button>
-            <button onclick="resetWallpaper()" style="background: #666;">Reset to Default</button>
-        </div>
+<div class="section">
+  <div class="sec-title">Accent Color</div>
+  <div class="card">
+    <div class="accent-row" id="accentRow"></div>
+    <div class="row" style="border-top:1px solid var(--border)">
+      <div class="row-info"><div class="row-label">Custom Accent</div><div class="row-desc">Pick any color</div></div>
+      <input type="color" id="accentCustom" style="width:40px;height:32px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:none;padding:2px" onchange="setAccent(this.value)">
     </div>
+  </div>
+</div>
 
-    <div class="section">
-        <div class="section-title">Desktop</div>
-        <button onclick="resetLayout()">Reset Icon Layout</button>
+<div class="section">
+  <div class="sec-title">Wallpaper</div>
+  <div class="card">
+    <div class="wp-grid" id="wpGrid"></div>
+    <div class="wp-url-row">
+      <input type="text" id="wpUrl" placeholder="Paste an image URL…">
+      <button class="btn btn-primary" onclick="applyWpUrl()">Apply</button>
+      <button class="btn btn-ghost" onclick="resetWp()">Reset</button>
     </div>
+  </div>
+</div>
 
-    <script>
-        function setTheme(theme) {
-            if (window.parent && window.parent.changeTheme) {
-                window.parent.changeTheme(theme);
-                updateActiveTheme(theme);
-            }
-        }
+<div class="section">
+  <div class="sec-title">Desktop</div>
+  <div class="card">
+    <div class="row">
+      <div class="row-info"><div class="row-label">Reset Icon Layout</div><div class="row-desc">Move all icons back to default positions</div></div>
+      <button class="btn btn-ghost" onclick="resetLayout()">↺ Reset</button>
+    </div>
+  </div>
+</div>
 
-        function updateActiveTheme(theme) {
-            document.querySelectorAll('.theme-card').forEach((card, index) => {
-                const themes = ['white', 'black', 'grey'];
-                card.classList.toggle('active', themes[index] === theme);
-            });
-        }
+<script>
+var ACCENTS = ['#0078d4','#34c759','#ff375f','#ff9500','#af52de','#5856d6','#00bcd4','#ff2d55','#ffcc00','#8e8e93'];
+var WALLPAPERS = [
+  {label:'Solid Dark', style:'background:#07090f'},
+  {label:'Blue Gradient', style:'background:linear-gradient(135deg,#1e3a5f,#0078d4)'},
+  {label:'Purple', style:'background:linear-gradient(135deg,#1a1040,#764ba2)'},
+  {label:'Sunset', style:'background:linear-gradient(135deg,#f59e0b,#ff375f)'},
+  {label:'Forest', style:'background:linear-gradient(135deg,#134e13,#34c759)'},
+  {label:'Ocean', style:'background:linear-gradient(135deg,#0078d4,#00bcd4)'},
+  {label:'Midnight', style:'background:linear-gradient(135deg,#000,#1a1a2e)'},
+  {label:'Warm', style:'background:linear-gradient(135deg,#ff9500,#ff2d55)'},
+];
 
-        function applyWallpaper() {
-            const color = document.getElementById('wallpaperColor').value;
-            if (window.parent && window.parent.setWallpaper) {
-                window.parent.setWallpaper(color);
-            }
-        }
+var curAccent = localStorage.getItem('serverplex_accent') || '#0078d4';
+var curTheme  = localStorage.getItem('serverplex_theme')  || 'white';
+var curWp     = localStorage.getItem('serverplex_wallpaper') || '';
 
-        function resetWallpaper() {
-            if (window.parent && window.parent.setWallpaper) {
-                window.parent.setWallpaper('none');
-                document.getElementById('wallpaperColor').value = '#ffffff';
-            }
-        }
+// Theme cards
+['white','black','grey'].forEach(function(t){
+  document.getElementById('th-'+t).classList.toggle('active', t === curTheme);
+});
 
-        function resetLayout() {
-            if (window.parent && window.parent.resetDesktopLayout) {
-                window.parent.resetDesktopLayout();
-            }
-        }
+// Accent dots
+var ar = document.getElementById('accentRow');
+ACCENTS.forEach(function(c){
+  var d = document.createElement('div');
+  d.className = 'accent-dot' + (c === curAccent ? ' selected' : '');
+  d.style.background = c;
+  d.title = c;
+  d.onclick = function(){ setAccent(c); };
+  ar.appendChild(d);
+});
+document.getElementById('accentCustom').value = curAccent;
 
-        // Load current theme
-        const currentTheme = localStorage.getItem('eclipseos_theme') || 'white';
-        updateActiveTheme(currentTheme);
+// Wallpaper presets
+var wg = document.getElementById('wpGrid');
+WALLPAPERS.forEach(function(wp){
+  var d = document.createElement('div');
+  d.className = 'wp-option';
+  d.setAttribute('style', wp.style);
+  d.title = wp.label;
+  d.onclick = function(){ applyWp(wp.style.replace('background:','')); };
+  wg.appendChild(d);
+});
 
-        // Load current wallpaper
-        const wallpaper = localStorage.getItem('eclipseos_wallpaper');
-        if (wallpaper && wallpaper !== 'none') {
-            document.getElementById('wallpaperColor').value = wallpaper;
-        }
-    </script>
+function setTheme(t) {
+  localStorage.setItem('serverplex_theme', t);
+  document.body.className = t === 'black' ? 'dark' : t === 'grey' ? 'grey' : '';
+  ['white','black','grey'].forEach(function(x){ document.getElementById('th-'+x).classList.toggle('active', x===t); });
+  if (window.parent && window.parent.changeTheme) window.parent.changeTheme(t);
+  // Notify settings-main to update its sidebar theme
+  if (window.parent && window.parent.postMessage) window.parent.postMessage({type:'theme-change',theme:t},'*');
+}
+
+function setAccent(c) {
+  localStorage.setItem('serverplex_accent', c);
+  document.documentElement.style.setProperty('--accent', c);
+  document.getElementById('accentCustom').value = c;
+  document.querySelectorAll('.accent-dot').forEach(function(d){ d.classList.toggle('selected', d.style.background === c || d.style.backgroundColor === c); });
+  if (window.parent) window.parent.document.documentElement.style.setProperty('--accent', c);
+}
+
+function applyWp(val) {
+  localStorage.setItem('serverplex_wallpaper', val);
+  if (window.parent && window.parent.setWallpaper) window.parent.setWallpaper(val);
+}
+function applyWpUrl() {
+  var url = document.getElementById('wpUrl').value.trim();
+  if (!url) return;
+  applyWp('url(\'' + url + '\') center/cover no-repeat');
+}
+function resetWp() {
+  localStorage.removeItem('serverplex_wallpaper');
+  document.getElementById('wpUrl').value = '';
+  if (window.parent && window.parent.setWallpaper) window.parent.setWallpaper('none');
+}
+function resetLayout() {
+  if (window.parent && window.parent.resetDesktopLayout) window.parent.resetDesktopLayout();
+  else alert('Reset successful — desktop icons will reposition on next load.');
+}
+</script>
 </body>
 </html>

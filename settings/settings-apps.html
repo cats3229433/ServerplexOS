@@ -1,93 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: #fff; }
-        h1 { font-size: 32px; margin-bottom: 32px; color: #333; }
-        .section { margin-bottom: 40px; }
-        .section-title { font-size: 20px; margin-bottom: 16px; color: #333; font-weight: 600; }
-        .app-list { display: grid; gap: 12px; }
-        .app-item { padding: 16px; background: #f9f9f9; border-radius: 8px; display: flex; align-items: center; gap: 16px; }
-        .app-icon { font-size: 32px; }
-        .app-info { flex: 1; }
-        .app-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; }
-        .app-status { font-size: 13px; color: #666; }
-        .app-status.running { color: #34c759; }
-        button { padding: 8px 16px; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        button:hover { background: #005a9e; }
-    </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd;--green:#34c759}
+body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+h1{font-size:26px;font-weight:800;margin-bottom:24px}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.search-wrap{position:relative;margin-bottom:16px}
+.search-wrap input{width:100%;padding:10px 14px 10px 36px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-wrap::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px}
+.app-grid{display:grid;gap:8px}
+.app-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:14px;transition:all .18s}
+.app-item:hover{border-color:var(--border);background:var(--bg2)}
+.app-icon{font-size:28px;width:38px;text-align:center;flex-shrink:0}
+.app-meta{flex:1;min-width:0}
+.app-name{font-size:14px;font-weight:700;color:var(--text)}
+.app-cat{font-size:11px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+.app-status{font-size:11px;font-weight:700;margin-top:3px}
+.app-status.running{color:var(--green)}
+.app-status.stopped{color:var(--text2)}
+.btn{padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s;flex-shrink:0}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-stop{background:rgba(255,59,48,.12);color:#ff3b30;border:1px solid rgba(255,59,48,.3)}
+.btn-stop:hover{background:rgba(255,59,48,.22)}
+.filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.filter-btn:hover,.filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+</style>
 </head>
 <body>
-    <h1>📱 Apps</h1>
-    
-    <div class="section">
-        <div class="section-title">Installed Apps</div>
-        <div class="app-list" id="appList"></div>
-    </div>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black')document.body.classList.add('dark');
+  else if(t==='grey')document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc)document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
 
-    <script>
-        const apps = {
-            browser: { name: 'Browser', icon: '🌐' },
-            games: { name: 'Games', icon: '🎮' },
-            tools: { name: 'Tools', icon: '🔧' },
-            notepad: { name: 'Notepad', icon: '📝' },
-            calculator: { name: 'Calculator', icon: '🧮' },
-            calendar: { name: 'Calendar', icon: '📅' },
-            terminal: { name: 'Terminal', icon: '💻' },
-            paint: { name: 'Paint', icon: '🎨' },
-            taskmanager: { name: 'Task Manager', icon: '📊' },
-            todolist: { name: 'To-Do List', icon: '📋' },
-            stickynotes: { name: 'Sticky Notes', icon: '📌' },
-            imageviewer: { name: 'Image Viewer', icon: '🖼️' },
-            clock: { name: 'Clock', icon: '⏰' },
-            recyclebin: { name: 'Recycle Bin', icon: '🗑️' },
-            search: { name: 'Search', icon: '🔍' },
-            musicplayer: { name: 'Music Player', icon: '🎵' },
-            markdowneditor: { name: 'Markdown Editor', icon: '📄' },
-            notifications: { name: 'Notifications', icon: '🔔' },
-            settings: { name: 'Settings', icon: '⚙️' }
-        };
+<h1>📱 Apps</h1>
 
-        function render() {
-            const list = document.getElementById('appList');
-            let html = '';
-            
-            Object.keys(apps).forEach(appId => {
-                const app = apps[appId];
-                const isRunning = window.parent && window.parent.windows && window.parent.windows[appId];
-                
-                html += `
-                    <div class="app-item">
-                        <div class="app-icon">${app.icon}</div>
-                        <div class="app-info">
-                            <div class="app-name">${app.name}</div>
-                            <div class="app-status ${isRunning ? 'running' : ''}">
-                                ${isRunning ? '● Running' : 'Not running'}
-                            </div>
-                        </div>
-                        <button onclick="launchApp('${appId}')">
-                            ${isRunning ? 'Open' : 'Launch'}
-                        </button>
-                    </div>
-                `;
-            });
-            
-            list.innerHTML = html;
-        }
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="Search apps…" oninput="render()">
+</div>
 
-        function launchApp(appId) {
-            if (window.parent && window.parent.openApp) {
-                window.parent.openApp(appId);
-            }
-        }
+<div class="filter-row" id="filterRow"></div>
+<div class="sec-title" id="appCount">All Apps</div>
+<div class="app-grid" id="appGrid"></div>
 
-        render();
-        setInterval(render, 2000); // Update running status every 2 seconds
-    </script>
+<script>
+var APPS = [
+  {id:'browser',       name:'Browser',        icon:'🌐', cat:'Internet'},
+  {id:'notepad',       name:'Notepad',         icon:'📝', cat:'Productivity'},
+  {id:'calculator',    name:'Calculator',      icon:'🧮', cat:'Utilities'},
+  {id:'calendar',      name:'Calendar',        icon:'📅', cat:'Productivity'},
+  {id:'terminal',      name:'Terminal',        icon:'💻', cat:'System'},
+  {id:'code',          name:'Code Editor',     icon:'👨‍💻', cat:'Development'},
+  {id:'paint',         name:'Paint',           icon:'🎨', cat:'Creative'},
+  {id:'todolist',      name:'To-Do List',      icon:'📋', cat:'Productivity'},
+  {id:'stickynotes',   name:'Sticky Notes',    icon:'📌', cat:'Productivity'},
+  {id:'imageviewer',   name:'Image Viewer',    icon:'🖼️', cat:'Media'},
+  {id:'clock',         name:'Clock',           icon:'⏰', cat:'Utilities'},
+  {id:'recyclebin',    name:'Recycle Bin',     icon:'🗑️', cat:'System'},
+  {id:'search',        name:'Search',          icon:'🔍', cat:'System'},
+  {id:'musicplayer',   name:'Music Player',    icon:'🎵', cat:'Media'},
+  {id:'markdowneditor',name:'Markdown Editor', icon:'📄', cat:'Productivity'},
+  {id:'settings',      name:'Settings',        icon:'⚙️', cat:'System'},
+  {id:'filemanager',   name:'File Manager',    icon:'📁', cat:'System'},
+  {id:'games',         name:'Games',           icon:'🎮', cat:'Entertainment'},
+  {id:'voicerecorder', name:'Voice Recorder',  icon:'🎙️', cat:'Media'},
+  {id:'screenrecorder',name:'Screen Recorder', icon:'📹', cat:'Media'},
+  {id:'appstore',      name:'App Store',       icon:'🏪', cat:'System'},
+];
+
+var CATS = ['All', ...new Set(APPS.map(a => a.cat))];
+var curCat = 'All';
+
+// Filter buttons
+var fr = document.getElementById('filterRow');
+CATS.forEach(function(c){
+  var b = document.createElement('button');
+  b.className = 'filter-btn' + (c === 'All' ? ' active' : '');
+  b.textContent = c;
+  b.onclick = function(){
+    curCat = c;
+    document.querySelectorAll('.filter-btn').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    render();
+  };
+  fr.appendChild(b);
+});
+
+function isRunning(id) {
+  return !!(window.parent && window.parent.windows && window.parent.windows[id]);
+}
+
+function render() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var list = APPS.filter(function(a){
+    if (curCat !== 'All' && a.cat !== curCat) return false;
+    if (q && !a.name.toLowerCase().includes(q) && !a.cat.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  // Sort: running first
+  list.sort(function(a,b){ return (isRunning(b.id)?1:0) - (isRunning(a.id)?1:0); });
+  document.getElementById('appCount').textContent = list.length + ' app' + (list.length !== 1 ? 's' : '') + (curCat !== 'All' ? ' in ' + curCat : '');
+  var g = document.getElementById('appGrid');
+  g.innerHTML = '';
+  list.forEach(function(a){
+    var running = isRunning(a.id);
+    var div = document.createElement('div');
+    div.className = 'app-item';
+    div.innerHTML =
+      '<div class="app-icon">' + a.icon + '</div>' +
+      '<div class="app-meta"><div class="app-name">' + a.name + '</div><div class="app-cat">' + a.cat + '</div>' +
+      '<div class="app-status ' + (running?'running':'stopped') + '">' + (running?'● Running':'○ Not running') + '</div></div>' +
+      '<button class="btn ' + (running?'btn-stop':'btn-primary') + '" data-id="' + a.id + '">' + (running?'Close':'Launch') + '</button>';
+    div.querySelector('button').onclick = function(){
+      if (running) { if (window.parent && window.parent.closeWindow) window.parent.closeWindow(a.id); }
+      else { if (window.parent && window.parent.openApp) window.parent.openApp(a.id); }
+      setTimeout(render, 300);
+    };
+    g.appendChild(div);
+  });
+}
+
+render();
+setInterval(render, 2000);
+</script>
 </body>
 </html>

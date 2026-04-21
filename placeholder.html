@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Serverplex Airlines — Fly Beyond</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy: #050d1a;
+      --deep: #0a1628;
+      --mid: #0f2040;
+      --gold: #c8a84b;
+      --gold-light: #e8c96a;
+      --gold-pale: #f5e4a8;
+      --white: #f0eeea;
+      --muted: #8899aa;
+      --accent: #1a3a6e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.5;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.5rem 4rem;
+      background: linear-gradient(to bottom, rgba(5,13,26,0.95), transparent);
+      backdrop-filter: blur(2px);
+      animation: fadeDown 1s ease 0.3s both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 40px;
+      height: 40px;
+    }
+
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: var(--white);
+    }
+
+    .logo-text span {
+      color: var(--gold);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.6rem 1.8rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .nav-cta:hover {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 80%, rgba(26,58,110,0.4) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(200,168,75,0.08) 0%, transparent 60%),
+        linear-gradient(160deg, #050d1a 0%, #0a1a35 50%, #050d1a 100%);
+    }
+
+    /* Animated stars */
+    .stars {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .star {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--dur) ease-in-out infinite var(--delay);
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.5); }
+    }
+
+    /* SVG Plane illustration */
+    .hero-plane {
+      position: absolute;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(700px, 90vw);
+      opacity: 0.12;
+      animation: drift 12s ease-in-out infinite;
+    }
+
+    @keyframes drift {
+      0%, 100% { transform: translateX(-50%) translateY(0px) rotate(-1deg); }
+      50% { transform: translateX(-50%) translateY(-18px) rotate(1deg); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 0 2rem;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1s ease 0.6s both;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3.5rem, 9vw, 8rem);
+      font-weight: 300;
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 1s ease 0.8s both;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-subtitle {
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      max-width: 420px;
+      margin: 0 auto 3rem;
+      line-height: 1.8;
+      animation: fadeUp 1s ease 1s both;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1.2rem;
+      justify-content: center;
+      animation: fadeUp 1s ease 1.2s both;
+    }
+
+    .btn-primary {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 1rem 2.8rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .btn-primary:hover::after { opacity: 0.15; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(240,238,234,0.3);
+      padding: 1rem 2.8rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--white);
+      background: rgba(240,238,234,0.05);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      animation: fadeUp 1s ease 1.6s both;
+    }
+
+    .scroll-indicator span {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.1); }
+    }
+
+    /* ─── SEARCH BAR ─── */
+    .search-section {
+      background: var(--deep);
+      padding: 3rem 4rem;
+      border-top: 1px solid rgba(200,168,75,0.15);
+      border-bottom: 1px solid rgba(200,168,75,0.15);
+    }
+
+    .search-tabs {
+      display: flex;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .search-tab {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid transparent;
+      transition: all 0.3s;
+      background: none;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+    }
+
+    .search-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      gap: 1px;
+      background: rgba(200,168,75,0.1);
+    }
+
+    .search-field {
+      background: var(--mid);
+      padding: 1.2rem 1.5rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .search-field:hover { background: rgba(26,58,110,0.5); }
+
+    .search-field label {
+      display: block;
+      font-size: 0.55rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+
+    .search-field input, .search-field select {
+      background: none;
+      border: none;
+      color: var(--white);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 300;
+      width: 100%;
+      outline: none;
+    }
+
+    .search-field select option { background: var(--deep); }
+
+    .search-submit {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 1.2rem 2rem;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .search-submit:hover { background: var(--gold-light); }
+
+    /* ─── DESTINATIONS ─── */
+    .section {
+      padding: 7rem 4rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 4rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.6rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.8rem;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 4vw, 3.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+    }
+
+    .section-title em { font-style: italic; color: var(--gold-light); }
+
+    .view-all {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(136,153,170,0.3);
+      padding-bottom: 2px;
+      transition: color 0.3s;
+      white-space: nowrap;
+      margin-bottom: 0.3rem;
+    }
+
+    .view-all:hover { color: var(--gold); }
+
+    .destinations-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      grid-template-rows: 320px 220px;
+      gap: 1.5rem;
+    }
+
+    .dest-card {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .dest-card:first-child {
+      grid-row: 1 / 3;
+    }
+
+    .dest-bg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.7s ease;
+    }
+
+    .dest-card:hover .dest-bg { transform: scale(1.06); }
+
+    /* SVG destination illustrations */
+    .dest-illus {
+      width: 100%;
+      height: 100%;
+      transition: transform 0.7s ease;
+    }
+
+    .dest-card:hover .dest-illus { transform: scale(1.04); }
+
+    .dest-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5,13,26,0.9) 0%, rgba(5,13,26,0.1) 60%);
+    }
+
+    .dest-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 1.5rem;
+    }
+
+    .dest-city {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 300;
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+
+    .dest-card:first-child .dest-city { font-size: 2.8rem; }
+
+    .dest-country {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+
+    .dest-price {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dest-price-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .dest-price-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+    }
+
+    /* ─── FEATURES ─── */
+    .features-section {
+      background: var(--deep);
+      padding: 7rem 4rem;
+      border-top: 1px solid rgba(200,168,75,0.1);
+      border-bottom: 1px solid rgba(200,168,75,0.1);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3rem;
+      margin-top: 4rem;
+    }
+
+    .feature-card {
+      text-align: center;
+    }
+
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 1.5rem;
+      color: var(--gold);
+    }
+
+    .feature-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.25rem;
+      font-weight: 400;
+      margin-bottom: 0.8rem;
+    }
+
+    .feature-desc {
+      font-size: 0.72rem;
+      line-height: 1.9;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    /* ─── CLASSES ─── */
+    .classes-section { padding: 7rem 4rem; }
+
+    .classes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-top: 4rem;
+    }
+
+    .class-card {
+      border: 1px solid rgba(200,168,75,0.12);
+      padding: 3rem 2.5rem;
+      position: relative;
+      transition: border-color 0.3s, background 0.3s;
+      overflow: hidden;
+    }
+
+    .class-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .class-card:hover {
+      border-color: rgba(200,168,75,0.3);
+      background: rgba(26,58,110,0.1);
+    }
+
+    .class-card:hover::before { opacity: 1; }
+
+    .class-card.featured {
+      background: rgba(26,58,110,0.2);
+      border-color: rgba(200,168,75,0.35);
+    }
+
+    .class-card.featured::before { opacity: 1; }
+
+    .class-badge {
+      position: absolute;
+      top: 1.5rem; right: 1.5rem;
+      font-size: 0.5rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 0.3rem 0.7rem;
+    }
+
+    .class-tier {
+      font-size: 0.55rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .class-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 300;
+      margin-bottom: 0.5rem;
+    }
+
+    .class-tagline {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      letter-spacing: 0.03em;
+    }
+
+    .class-amenities {
+      list-style: none;
+      margin-bottom: 2.5rem;
+    }
+
+    .class-amenities li {
+      font-size: 0.7rem;
+      color: var(--muted);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(136,153,170,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      letter-spacing: 0.05em;
+    }
+
+    .class-amenities li::before {
+      content: '—';
+      color: var(--gold);
+      font-size: 0.6rem;
+    }
+
+    .class-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    .class-price strong {
+      font-size: 2rem;
+      color: var(--white);
+      font-weight: 300;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--navy);
+      border-top: 1px solid rgba(200,168,75,0.15);
+      padding: 5rem 4rem 3rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 4rem;
+      margin-bottom: 4rem;
+    }
+
+    .footer-brand p {
+      font-size: 0.7rem;
+      line-height: 1.9;
+      color: var(--muted);
+      margin-top: 1.5rem;
+      max-width: 280px;
+    }
+
+    .footer-col h4 {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-col ul { list-style: none; }
+
+    .footer-col li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-col a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.72rem;
+      transition: color 0.2s;
+      letter-spacing: 0.04em;
+    }
+
+    .footer-col a:hover { color: var(--white); }
+
+    .footer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(136,153,170,0.1);
+    }
+
+    .footer-bottom p {
+      font-size: 0.6rem;
+      color: rgba(136,153,170,0.5);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-gold-line {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      opacity: 0.5;
+    }
+
+    /* ─── GOLD RULE ─── */
+    .gold-rule {
+      width: 40px;
+      height: 1px;
+      background: var(--gold);
+      margin-bottom: 1.2rem;
+    }
+
+    /* ─── PROMO BANNER ─── */
+    .promo-banner {
+      background: linear-gradient(135deg, var(--mid) 0%, var(--accent) 100%);
+      border: 1px solid rgba(200,168,75,0.2);
+      padding: 3.5rem 4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 0 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .promo-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(200,168,75,0.08) 0%, transparent 70%);
+    }
+
+    .promo-text h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.2rem;
+      font-weight: 300;
+      margin-bottom: 0.5rem;
+    }
+
+    .promo-text p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+
+    .promo-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+      position: relative;
+    }
+
+    .promo-badge small {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 300;
+      color: var(--muted);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 0.3rem;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ─── NAVIGATION ─── -->
+<nav>
+  <a class="logo" href="#">
+    <svg class="logo-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="19" stroke="#c8a84b" stroke-width="1"/>
+      <path d="M8 22 L20 10 L32 22 L26 22 L20 16 L14 22 Z" fill="#c8a84b" opacity="0.9"/>
+      <path d="M14 22 L20 16 L26 22 L24 22 L20 18 L16 22 Z" fill="#050d1a"/>
+      <path d="M11 24 L29 24 L28 26 L12 26 Z" fill="#c8a84b" opacity="0.5"/>
+    </svg>
+    <span class="logo-text">SERVERPLEX <span>AIRLINES</span></span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#">Destinations</a></li>
+    <li><a href="#">Book</a></li>
+    <li><a href="#">Experience</a></li>
+    <li><a href="#">Rewards</a></li>
+    <li><a href="#">Fleet</a></li>
+  </ul>
+
+  <button class="nav-cta">Sign In</button>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- Stars -->
+  <div class="stars" id="stars"></div>
+
+  <!-- Plane silhouette -->
+  <svg class="hero-plane" viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Fuselage -->
+    <ellipse cx="350" cy="110" rx="260" ry="28" fill="white"/>
+    <!-- Nose -->
+    <path d="M590 110 Q640 108 660 112 Q640 116 590 114 Z" fill="white"/>
+    <!-- Tail -->
+    <path d="M90 110 Q60 108 40 104 Q50 110 40 116 Q60 112 90 110 Z" fill="white"/>
+    <!-- Wings -->
+    <path d="M320 110 Q340 70 500 50 Q480 90 360 110 Z" fill="white" opacity="0.9"/>
+    <path d="M320 110 Q340 150 500 170 Q480 130 360 110 Z" fill="white" opacity="0.6"/>
+    <!-- Tail fin -->
+    <path d="M100 110 Q90 85 130 60 Q140 85 120 110 Z" fill="white" opacity="0.8"/>
+    <!-- Windows -->
+    <ellipse cx="300" cy="105" rx="8" ry="5" fill="#c8a84b" opacity="0.7"/>
+    <ellipse cx="330" cy="104" rx="8" ry="5" fill="#c8a84b" opacity="0.7"/>
+    <ellipse cx="360" cy="104" rx="8" ry="5" fill="#c8a84b" opacity="0.7"/>
+    <ellipse cx="390" cy="105" rx="8" ry="5" fill="#c8a84b" opacity="0.7"/>
+    <ellipse cx="420" cy="106" rx="8" ry="5" fill="#c8a84b" opacity="0.7"/>
+    <ellipse cx="450" cy="108" rx="8" ry="5" fill="#c8a84b" opacity="0.5"/>
+    <!-- Gold stripe -->
+    <line x1="95" y1="118" x2="600" y2="118" stroke="#c8a84b" stroke-width="1.5" opacity="0.5"/>
+  </svg>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Est. 2008 · Premium Air Travel</p>
+    <h1 class="hero-title">
+      Fly<br/><em>Beyond</em><br/>Horizons
+    </h1>
+    <p class="hero-subtitle">Where every journey becomes a destination. Experience the art of travel, refined.</p>
+    <div class="hero-actions">
+      <button class="btn-primary">Book a Flight</button>
+      <button class="btn-secondary">Explore Routes</button>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ─── SEARCH ─── -->
+<section class="search-section">
+  <div class="search-tabs">
+    <button class="search-tab active">One Way</button>
+    <button class="search-tab">Round Trip</button>
+    <button class="search-tab">Multi-City</button>
+  </div>
+  <div class="search-grid">
+    <div class="search-field">
+      <label>From</label>
+      <input type="text" placeholder="New York, JFK" />
+    </div>
+    <div class="search-field">
+      <label>To</label>
+      <input type="text" placeholder="Paris, CDG" />
+    </div>
+    <div class="search-field">
+      <label>Depart</label>
+      <input type="date" />
+    </div>
+    <div class="search-field">
+      <label>Cabin Class</label>
+      <select>
+        <option>First Class</option>
+        <option>Business</option>
+        <option>Premium Economy</option>
+        <option>Economy</option>
+      </select>
+    </div>
+    <button class="search-submit">Search Flights</button>
+  </div>
+</section>
+
+<!-- ─── DESTINATIONS ─── -->
+<section class="section">
+  <div class="section-header">
+    <div>
+      <p class="section-eyebrow">Where will you go</p>
+      <h2 class="section-title">Curated <em>Destinations</em></h2>
+    </div>
+    <a href="#" class="view-all">View All Routes →</a>
+  </div>
+
+  <div class="destinations-grid">
+
+    <!-- Card 1: Tokyo (large) -->
+    <div class="dest-card">
+      <svg class="dest-illus" viewBox="0 0 500 540" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#050d1a"/>
+            <stop offset="60%" stop-color="#0f2040"/>
+            <stop offset="100%" stop-color="#1a3a6e"/>
+          </linearGradient>
+          <linearGradient id="fuji" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e8e8f0"/>
+            <stop offset="100%" stop-color="#8899aa"/>
+          </linearGradient>
+        </defs>
+        <rect width="500" height="540" fill="url(#sky1)"/>
+        <!-- Stars -->
+        <circle cx="80" cy="60" r="1" fill="white" opacity="0.7"/>
+        <circle cx="150" cy="30" r="1.5" fill="white" opacity="0.8"/>
+        <circle cx="230" cy="80" r="1" fill="white" opacity="0.6"/>
+        <circle cx="380" cy="40" r="1" fill="white" opacity="0.7"/>
+        <circle cx="420" cy="90" r="1.5" fill="white" opacity="0.5"/>
+        <circle cx="310" cy="20" r="1" fill="white" opacity="0.8"/>
+        <!-- Moon -->
+        <circle cx="390" cy="70" r="20" fill="#e8ddb0" opacity="0.9"/>
+        <circle cx="400" cy="63" r="16" fill="#0f2040"/>
+        <!-- Mt. Fuji -->
+        <path d="M150 260 L250 120 L350 260 Z" fill="url(#fuji)" opacity="0.8"/>
+        <path d="M220 145 Q250 120 280 145 L270 155 Q250 138 230 155 Z" fill="white"/>
+        <!-- City skyline -->
+        <rect x="0" y="320" width="500" height="220" fill="#050d1a"/>
+        <rect x="20" y="280" width="30" height="60" fill="#0a1628"/>
+        <rect x="60" y="260" width="20" height="80" fill="#0a1628"/>
+        <rect x="90" y="240" width="40" height="100" fill="#0f2040"/>
+        <rect x="140" y="270" width="25" height="70" fill="#0a1628"/>
+        <rect x="175" y="250" width="35" height="90" fill="#0f2040"/>
+        <rect x="220" y="230" width="50" height="110" fill="#0f2040"/>
+        <rect x="280" y="255" width="30" height="85" fill="#0a1628"/>
+        <rect x="320" y="240" width="45" height="100" fill="#0f2040"/>
+        <rect x="375" y="260" width="25" height="80" fill="#0a1628"/>
+        <rect x="410" y="245" width="35" height="95" fill="#0f2040"/>
+        <rect x="455" y="270" width="30" height="70" fill="#0a1628"/>
+        <!-- Tokyo Tower -->
+        <polygon points="235,170 245,230 255,230 265,170" fill="#c8a84b" opacity="0.9"/>
+        <line x1="250" y1="155" x2="250" y2="170" stroke="#c8a84b" stroke-width="3"/>
+        <rect x="237" y="190" width="26" height="4" fill="#c8a84b" opacity="0.7"/>
+        <!-- Windows glow -->
+        <rect x="95" y="250" width="4" height="3" fill="#c8a84b" opacity="0.6"/>
+        <rect x="103" y="260" width="4" height="3" fill="#c8a84b" opacity="0.4"/>
+        <rect x="183" y="258" width="4" height="3" fill="#c8a84b" opacity="0.5"/>
+        <rect x="228" y="240" width="4" height="3" fill="#c8a84b" opacity="0.7"/>
+        <rect x="240" y="248" width="4" height="3" fill="#c8a84b" opacity="0.5"/>
+        <rect x="325" y="250" width="4" height="3" fill="#c8a84b" opacity="0.6"/>
+        <rect x="340" y="260" width="4" height="3" fill="#c8a84b" opacity="0.4"/>
+        <!-- Cherry blossoms -->
+        <circle cx="50" cy="310" r="18" fill="#ffb7c5" opacity="0.3"/>
+        <circle cx="70" cy="305" r="14" fill="#ffb7c5" opacity="0.25"/>
+        <circle cx="440" cy="308" r="16" fill="#ffb7c5" opacity="0.3"/>
+        <circle cx="460" cy="303" r="12" fill="#ffb7c5" opacity="0.25"/>
+        <!-- Reflection in water -->
+        <rect x="0" y="380" width="500" height="160" fill="#050d1a" opacity="0.9"/>
+        <line x1="0" y1="390" x2="500" y2="390" stroke="#1a3a6e" stroke-width="1" opacity="0.5"/>
+      </svg>
+      <div class="dest-overlay"></div>
+      <div class="dest-info">
+        <div class="dest-city">Tokyo</div>
+        <div class="dest-country">Japan · NRT</div>
+        <div class="dest-price">
+          <span class="dest-price-label">From</span>
+          <span class="dest-price-value">$1,240</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Paris -->
+    <div class="dest-card">
+      <svg class="dest-illus" viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a2a50"/>
+            <stop offset="100%" stop-color="#0f2040"/>
+          </linearGradient>
+        </defs>
+        <rect width="300" height="320" fill="url(#sky2)"/>
+        <!-- Eiffel Tower -->
+        <polygon points="130,60 145,200 155,200 170,60" fill="#8899aa" opacity="0.7"/>
+        <polygon points="125,60 135,80 165,80 175,60" fill="#8899aa" opacity="0.8"/>
+        <line x1="150" y1="50" x2="150" y2="60" stroke="#c8a84b" stroke-width="2"/>
+        <rect x="134" y="95" width="32" height="3" fill="#6677aa" opacity="0.7"/>
+        <rect x="138" y="130" width="24" height="3" fill="#6677aa" opacity="0.7"/>
+        <rect x="142" y="160" width="16" height="3" fill="#6677aa" opacity="0.6"/>
+        <!-- Ground -->
+        <rect x="0" y="200" width="300" height="120" fill="#050d1a"/>
+        <!-- City -->
+        <rect x="0" y="160" width="60" height="60" fill="#0a1628"/>
+        <rect x="70" y="170" width="50" height="50" fill="#0a1628"/>
+        <rect x="180" y="165" width="55" height="55" fill="#0a1628"/>
+        <rect x="245" y="172" width="55" height="48" fill="#0a1628"/>
+        <!-- Street lights -->
+        <line x1="80" y1="200" x2="80" y2="240" stroke="#c8a84b" stroke-width="1" opacity="0.4"/>
+        <circle cx="80" cy="200" r="3" fill="#c8a84b" opacity="0.6"/>
+        <line x1="220" y1="200" x2="220" y2="240" stroke="#c8a84b" stroke-width="1" opacity="0.4"/>
+        <circle cx="220" cy="200" r="3" fill="#c8a84b" opacity="0.6"/>
+        <!-- Stars -->
+        <circle cx="40" cy="30" r="1" fill="white" opacity="0.8"/>
+        <circle cx="100" cy="20" r="1" fill="white" opacity="0.6"/>
+        <circle cx="200" cy="35" r="1.5" fill="white" opacity="0.7"/>
+        <circle cx="260" cy="15" r="1" fill="white" opacity="0.8"/>
+        <!-- Moon -->
+        <circle cx="250" cy="50" r="15" fill="#e8ddb0" opacity="0.8"/>
+        <circle cx="257" cy="44" r="12" fill="#1a2a50"/>
+      </svg>
+      <div class="dest-overlay"></div>
+      <div class="dest-info">
+        <div class="dest-city">Paris</div>
+        <div class="dest-country">France · CDG</div>
+        <div class="dest-price">
+          <span class="dest-price-label">From</span>
+          <span class="dest-price-value">$890</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Maldives -->
+    <div class="dest-card">
+      <svg class="dest-illus" viewBox="0 0 300 320" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ocean" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#003d6b"/>
+            <stop offset="50%" stop-color="#006994"/>
+            <stop offset="100%" stop-color="#00b4d8"/>
+          </linearGradient>
+          <linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a0a2e"/>
+            <stop offset="40%" stop-color="#8b1a4a"/>
+            <stop offset="70%" stop-color="#e8743a"/>
+            <stop offset="100%" stop-color="#f4a54b"/>
+          </linearGradient>
+        </defs>
+        <rect width="300" height="320" fill="url(#sunset)"/>
+        <rect x="0" y="160" width="300" height="160" fill="url(#ocean)"/>
+        <!-- Sun -->
+        <circle cx="150" cy="160" r="35" fill="#f4a54b" opacity="0.9"/>
+        <!-- Water shimmer -->
+        <ellipse cx="150" cy="185" rx="100" ry="10" fill="#f4a54b" opacity="0.2"/>
+        <line x1="50" y1="175" x2="250" y2="175" stroke="#f4a54b" stroke-width="1" opacity="0.3"/>
+        <line x1="80" y1="185" x2="220" y2="185" stroke="#f4a54b" stroke-width="1" opacity="0.2"/>
+        <!-- Island -->
+        <ellipse cx="150" cy="200" rx="60" ry="12" fill="#d4a96a"/>
+        <ellipse cx="150" cy="196" rx="55" ry="8" fill="#e8c17a"/>
+        <!-- Palm trees -->
+        <line x1="130" y1="196" x2="122" y2="165" stroke="#3d2200" stroke-width="2"/>
+        <path d="M122 165 Q108 155 100 160 Q110 155 115 168 Q112 157 122 155 Q120 163 128 167 Z" fill="#2d6a4f"/>
+        <line x1="165" y1="196" x2="172" y2="162" stroke="#3d2200" stroke-width="2"/>
+        <path d="M172 162 Q186 152 194 157 Q184 152 179 165 Q182 154 172 152 Q174 160 166 164 Z" fill="#2d6a4f"/>
+        <!-- Bungalow -->
+        <rect x="140" y="186" width="20" height="12" fill="#8b4513" opacity="0.8"/>
+        <polygon points="137,186 150,178 163,186" fill="#a0522d" opacity="0.8"/>
+        <!-- Stars -->
+        <circle cx="30" cy="25" r="1" fill="white" opacity="0.6"/>
+        <circle cx="70" cy="45" r="1" fill="white" opacity="0.5"/>
+        <circle cx="220" cy="30" r="1" fill="white" opacity="0.7"/>
+        <circle cx="270" cy="50" r="1.5" fill="white" opacity="0.5"/>
+      </svg>
+      <div class="dest-overlay"></div>
+      <div class="dest-info">
+        <div class="dest-city">Maldives</div>
+        <div class="dest-country">South Asia · MLE</div>
+        <div class="dest-price">
+          <span class="dest-price-label">From</span>
+          <span class="dest-price-value">$2,100</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: New York -->
+    <div class="dest-card">
+      <svg class="dest-illus" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="nysky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#050d1a"/>
+            <stop offset="100%" stop-color="#0a1a35"/>
+          </linearGradient>
+        </defs>
+        <rect width="300" height="220" fill="url(#nysky)"/>
+        <!-- Buildings -->
+        <rect x="0" y="100" width="25" height="120" fill="#0f2040"/>
+        <rect x="30" y="80" width="20" height="140" fill="#0a1628"/>
+        <rect x="55" y="60" width="30" height="160" fill="#0f2040"/>
+        <rect x="90" y="40" width="20" height="180" fill="#0a1628"/>
+        <!-- Empire State Building -->
+        <rect x="115" y="30" width="35" height="190" fill="#0f2040"/>
+        <rect x="120" y="15" width="25" height="20" fill="#0a1628"/>
+        <line x1="132" y1="5" x2="132" y2="15" stroke="#c8a84b" stroke-width="2"/>
+        <!-- More buildings -->
+        <rect x="155" y="55" width="25" height="165" fill="#0f2040"/>
+        <rect x="185" y="70" width="30" height="150" fill="#0a1628"/>
+        <rect x="220" y="45" width="25" height="175" fill="#0f2040"/>
+        <rect x="250" y="80" width="20" height="140" fill="#0a1628"/>
+        <rect x="275" y="65" width="25" height="155" fill="#0f2040"/>
+        <!-- Windows glow -->
+        <rect x="60" y="70" width="3" height="2" fill="#c8a84b" opacity="0.7"/>
+        <rect x="67" y="78" width="3" height="2" fill="#c8a84b" opacity="0.5"/>
+        <rect x="93" y="50" width="3" height="2" fill="#c8a84b" opacity="0.6"/>
+        <rect x="120" y="38" width="3" height="2" fill="#c8a84b" opacity="0.8"/>
+        <rect x="130" y="50" width="3" height="2" fill="#c8a84b" opacity="0.6"/>
+        <rect x="120" y="60" width="3" height="2" fill="#c8a84b" opacity="0.5"/>
+        <rect x="225" y="55" width="3" height="2" fill="#c8a84b" opacity="0.6"/>
+        <rect x="160" y="65" width="3" height="2" fill="#c8a84b" opacity="0.5"/>
+        <!-- Stars -->
+        <circle cx="20" cy="20" r="1" fill="white" opacity="0.8"/>
+        <circle cx="80" cy="10" r="1" fill="white" opacity="0.6"/>
+        <circle cx="200" cy="15" r="1.5" fill="white" opacity="0.7"/>
+        <circle cx="260" cy="25" r="1" fill="white" opacity="0.6"/>
+      </svg>
+      <div class="dest-overlay"></div>
+      <div class="dest-info">
+        <div class="dest-city">New York</div>
+        <div class="dest-country">USA · JFK</div>
+        <div class="dest-price">
+          <span class="dest-price-label">From</span>
+          <span class="dest-price-value">$340</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5: Dubai -->
+    <div class="dest-card">
+      <svg class="dest-illus" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="dubaisky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#050d1a"/>
+            <stop offset="60%" stop-color="#1a2a50"/>
+            <stop offset="100%" stop-color="#c87e2a"/>
+          </linearGradient>
+        </defs>
+        <rect width="300" height="220" fill="url(#dubaisky)"/>
+        <!-- Sand -->
+        <ellipse cx="150" cy="220" rx="200" ry="40" fill="#8b6914" opacity="0.3"/>
+        <!-- Burj Khalifa -->
+        <polygon points="143,15 150,10 157,15 154,180 146,180" fill="#8899aa" opacity="0.9"/>
+        <rect x="144" y="60" width="12" height="2" fill="#6677aa" opacity="0.7"/>
+        <rect x="145" y="90" width="10" height="2" fill="#6677aa" opacity="0.6"/>
+        <rect x="146" y="120" width="8" height="2" fill="#6677aa" opacity="0.5"/>
+        <line x1="150" y1="5" x2="150" y2="10" stroke="#c8a84b" stroke-width="1.5"/>
+        <!-- Other towers -->
+        <rect x="80" y="80" width="25" height="140" fill="#0f2040"/>
+        <polygon points="80,80 92,65 105,80" fill="#0a1628"/>
+        <rect x="110" y="100" width="20" height="120" fill="#0a1628"/>
+        <rect x="185" y="90" width="22" height="130" fill="#0f2040"/>
+        <polygon points="185,90 196,70 207,90" fill="#0a1628"/>
+        <rect x="215" y="105" width="20" height="115" fill="#0a1628"/>
+        <!-- Windows -->
+        <rect x="83" y="90" width="3" height="2" fill="#c8a84b" opacity="0.6"/>
+        <rect x="90" y="100" width="3" height="2" fill="#c8a84b" opacity="0.4"/>
+        <rect x="189" y="100" width="3" height="2" fill="#c8a84b" opacity="0.6"/>
+        <rect x="148" y="30" width="4" height="2" fill="#c8a84b" opacity="0.7"/>
+        <!-- Stars -->
+        <circle cx="30" cy="25" r="1" fill="white" opacity="0.7"/>
+        <circle cx="240" cy="20" r="1.5" fill="white" opacity="0.6"/>
+        <circle cx="270" cy="40" r="1" fill="white" opacity="0.8"/>
+        <!-- Crescent -->
+        <path d="M 48 45 A 15 15 0 1 0 48 75 A 10 10 0 1 1 48 45" fill="#e8ddb0" opacity="0.7"/>
+      </svg>
+      <div class="dest-overlay"></div>
+      <div class="dest-info">
+        <div class="dest-city">Dubai</div>
+        <div class="dest-country">UAE · DXB</div>
+        <div class="dest-price">
+          <span class="dest-price-label">From</span>
+          <span class="dest-price-value">$760</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── PROMO BANNER ─── -->
+<div class="promo-banner">
+  <div class="promo-text">
+    <h2>Summer Escapes — Up to 30% Off</h2>
+    <p>Limited-time fares on select routes. Book by May 31, 2026.</p>
+  </div>
+  <div class="promo-badge">
+    30%
+    <small>Off Select Routes</small>
+  </div>
+  <button class="btn-primary">Claim Offer</button>
+</div>
+
+<!-- ─── FEATURES ─── -->
+<section class="features-section">
+  <div style="text-align:center; margin-bottom: 1rem;">
+    <p class="section-eyebrow" style="display:inline-block;">Why Fly With Us</p>
+  </div>
+  <h2 class="section-title" style="text-align:center;">The <em>Serverplex</em> Difference</h2>
+
+  <div class="features-grid">
+
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="27" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+        <path d="M14 30 L22 22 L28 28 L36 18 L42 24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="28" cy="28" r="3" fill="currentColor" opacity="0.7"/>
+        <path d="M20 38 Q28 32 36 38" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+      </svg>
+      <div class="feature-title">Real-Time Tracking</div>
+      <p class="feature-desc">Live flight status, gate information, and instant alerts — all in the palm of your hand.</p>
+    </div>
+
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="27" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+        <rect x="16" y="20" width="24" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="16" y1="26" x2="40" y2="26" stroke="currentColor" stroke-width="1"/>
+        <circle cx="22" cy="31" r="2" fill="currentColor" opacity="0.6"/>
+        <path d="M34 18 Q38 14 42 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+        <circle cx="42" cy="16" r="2" fill="currentColor"/>
+      </svg>
+      <div class="feature-title">Seamless Connectivity</div>
+      <p class="feature-desc">High-speed Wi-Fi on every flight. Stay connected at 35,000 feet without compromise.</p>
+    </div>
+
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="27" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+        <path d="M20 34 Q28 20 36 34" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="28" cy="21" r="4" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="22" y1="38" x2="34" y2="38" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+        <path d="M16 42 L40 42" stroke="currentColor" stroke-width="1" stroke-linecap="round" opacity="0.3"/>
+      </svg>
+      <div class="feature-title">Culinary Excellence</div>
+      <p class="feature-desc">Menus crafted by Michelin-starred chefs, with seasonal ingredients and regional specialties.</p>
+    </div>
+
+    <div class="feature-card">
+      <svg class="feature-icon" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="28" cy="28" r="27" stroke="currentColor" stroke-width="1" opacity="0.3"/>
+        <path d="M28 16 L30.5 23 L38 23 L32 27.5 L34.5 35 L28 30.5 L21.5 35 L24 27.5 L18 23 L25.5 23 Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="28" cy="28" r="10" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+      </svg>
+      <div class="feature-title">Elite Rewards</div>
+      <p class="feature-desc">Earn SkyPoints on every flight. Redeem for upgrades, lounge access, and exclusive experiences.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── CABIN CLASSES ─── -->
+<section class="classes-section">
+  <p class="section-eyebrow">Travel Your Way</p>
+  <h2 class="section-title">Choose Your <em>Experience</em></h2>
+
+  <div class="classes-grid">
+
+    <div class="class-card">
+      <div class="class-tier">Economy Class</div>
+      <div class="class-name">Economy</div>
+      <div class="class-tagline">Thoughtfully designed for comfort on every journey, with amenities that exceed expectations.</div>
+      <ul class="class-amenities">
+        <li>Ergonomic recline seats</li>
+        <li>Personal entertainment screen</li>
+        <li>Complimentary meals & drinks</li>
+        <li>USB charging at every seat</li>
+        <li>23kg checked baggage</li>
+      </ul>
+      <div class="class-price">From <strong>$340</strong></div>
+      <button class="btn-secondary" style="width:100%;">Explore Economy</button>
+    </div>
+
+    <div class="class-card featured">
+      <div class="class-badge">Most Popular</div>
+      <div class="class-tier">Business Class</div>
+      <div class="class-name">Business</div>
+      <div class="class-tagline">Lie-flat beds, curated dining, and dedicated lounges — for those who demand more from the journey.</div>
+      <ul class="class-amenities">
+        <li>Lie-flat bed with duvet</li>
+        <li>Award-winning chef menus</li>
+        <li>Priority boarding & check-in</li>
+        <li>Exclusive airport lounge access</li>
+        <li>40kg checked baggage</li>
+      </ul>
+      <div class="class-price">From <strong>$2,800</strong></div>
+      <button class="btn-primary" style="width:100%;">Explore Business</button>
+    </div>
+
+    <div class="class-card">
+      <div class="class-tier">First Class</div>
+      <div class="class-name">First</div>
+      <div class="class-tagline">A private suite at 35,000 feet. The pinnacle of aviation luxury, reserved for the discerning few.</div>
+      <ul class="class-amenities">
+        <li>Private suite with closing door</li>
+        <li>Michelin-star dining on demand</li>
+        <li>Luxury bedding & amenity kit</li>
+        <li>Chauffeur transfer included</li>
+        <li>Unlimited baggage allowance</li>
+      </ul>
+      <div class="class-price">From <strong>$8,500</strong></div>
+      <button class="btn-secondary" style="width:100%;">Explore First</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a class="logo" href="#" style="text-decoration:none;">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="20" cy="20" r="19" stroke="#c8a84b" stroke-width="1"/>
+          <path d="M8 22 L20 10 L32 22 L26 22 L20 16 L14 22 Z" fill="#c8a84b" opacity="0.9"/>
+          <path d="M11 24 L29 24 L28 26 L12 26 Z" fill="#c8a84b" opacity="0.5"/>
+        </svg>
+        <span class="logo-text">SERVERPLEX <span>AIRLINES</span></span>
+      </a>
+      <p>Since 2008, we've redefined air travel with a commitment to exceptional service, modern fleet, and destinations that inspire.</p>
+    </div>
+
+    <div class="footer-col">
+      <h4>Fly</h4>
+      <ul>
+        <li><a href="#">Book a Flight</a></li>
+        <li><a href="#">Check In</a></li>
+        <li><a href="#">Manage Booking</a></li>
+        <li><a href="#">Flight Status</a></li>
+        <li><a href="#">Destinations</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Experience</h4>
+      <ul>
+        <li><a href="#">First Class</a></li>
+        <li><a href="#">Business Class</a></li>
+        <li><a href="#">Economy</a></li>
+        <li><a href="#">Lounges</a></li>
+        <li><a href="#">Our Fleet</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">SkyPoints Rewards</a></li>
+        <li><a href="#">Sustainability</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Press</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 Serverplex Airlines. All rights reserved.</p>
+    <div class="footer-gold-line"></div>
+    <p>Privacy Policy · Terms of Service · Cookie Preferences</p>
+  </div>
+</footer>
+
+<script>
+  // Generate stars
+  const starsContainer = document.getElementById('stars');
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.cssText = `
+      left: ${Math.random() * 100}%;
+      top: ${Math.random() * 100}%;
+      --dur: ${2 + Math.random() * 4}s;
+      --delay: ${Math.random() * 4}s;
+      width: ${Math.random() > 0.8 ? 2 : 1}px;
+      height: ${Math.random() > 0.8 ? 2 : 1}px;
+    `;
+    starsContainer.appendChild(star);
+  }
+
+  // Search tabs
+  document.querySelectorAll('.search-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  // Parallax on hero
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    const plane = document.querySelector('.hero-plane');
+    if (plane) plane.style.transform = `translateX(-50%) translateY(${y * 0.3}px)`;
+  });
+</script>
+
+</body>
+</html>

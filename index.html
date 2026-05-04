@@ -1019,6 +1019,19 @@
 
   </main>
 
+  <!-- GAME CTA -->
+  <div class="game-cta">
+    <div class="game-cta-inner">
+      <div class="section-label" style="color:var(--amber);margin-bottom:0.75rem;">Bonus — Play</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,3vw,3rem);font-weight:700;margin-bottom:1rem;">Cats Love Cake 2</h2>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--warm-gray);font-style:italic;max-width:420px;margin:0 auto 2rem;">Take a break and play a little cat game — because every great article deserves a reward.</p>
+      <button class="play-btn" onclick="openGame()">
+        <span class="play-btn-icon">🐱</span>
+        Play Now
+      </button>
+    </div>
+  </div>
+
   <footer>
     <div class="footer-logo">The World of Cats</div>
     <div class="footer-note">
@@ -1027,6 +1040,151 @@
       ✦ All facts verified ✦
     </div>
   </footer>
+
+  <!-- GAME POPUP -->
+  <div class="game-overlay" id="gameOverlay" onclick="closeGameOnBg(event)">
+    <div class="game-modal">
+      <div class="game-modal-header">
+        <span class="game-modal-title">🐱❤️🍰 Cats Love Cake 2</span>
+        <button class="game-close-btn" onclick="closeGame()" title="Close">✕</button>
+      </div>
+      <div class="game-frame-wrap">
+        <iframe id="gameFrame" src="about:blank" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* ── GAME CTA ── */
+    .game-cta {
+      background: linear-gradient(135deg, #1a1108 0%, #231a0f 50%, #1a1108 100%);
+      border-top: 1px solid rgba(200,131,42,0.3);
+      border-bottom: 1px solid rgba(200,131,42,0.3);
+      padding: 6rem 2rem;
+      text-align: center;
+    }
+
+    .game-cta-inner { max-width: 600px; margin: 0 auto; }
+
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--amber);
+      color: var(--ink);
+      border: none;
+      padding: 1rem 2.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 20px rgba(200,131,42,0.3);
+    }
+
+    .play-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .play-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,131,42,0.45); }
+    .play-btn:hover::before { transform: translateX(0); }
+    .play-btn:active { transform: translateY(0); }
+
+    .play-btn-icon { font-size: 1.4rem; }
+
+    /* ── GAME OVERLAY ── */
+    .game-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,8,4,0.88);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .game-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .game-modal {
+      background: #1e1508;
+      border: 1px solid rgba(200,131,42,0.4);
+      box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,131,42,0.1);
+      width: min(820px, 95vw);
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.3s ease;
+    }
+
+    .game-overlay.active .game-modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .game-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid rgba(200,131,42,0.2);
+      flex-shrink: 0;
+    }
+
+    .game-modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: var(--cream);
+    }
+
+    .game-close-btn {
+      background: none;
+      border: 1px solid rgba(200,131,42,0.3);
+      color: var(--warm-gray);
+      width: 2rem;
+      height: 2rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .game-close-btn:hover {
+      background: rgba(200,131,42,0.15);
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+
+    .game-frame-wrap {
+      flex: 1;
+      position: relative;
+      min-height: 500px;
+    }
+
+    .game-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      display: block;
+    }
+  </style>
 
   <script>
     // Intersection Observer for fade-in animations
@@ -1039,6 +1197,50 @@
     }, { threshold: 0.1 });
 
     document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // Game popup
+    const gameSrc = `<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="stylesheet.3adae015.css" type="text/css" charset="utf-8">
+<base href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@0f95cc77a7b2663210b37232e2e6e0d15514be62/cats%20love%20cake%202/">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>🐱❤️🍰 2️⃣</title>
+  <script src="poki-sdk.js"><\/script>
+  <link rel="stylesheet" href="src.a63d0d57.css">
+</head>
+<body>
+  <div id="container"><div id="game"></div></div>
+  <script src="src.bbaf125d.js"><\/script>
+  <script src="siteLock.7347f017.js"><\/script>
+</body>
+</html>`;
+
+    function openGame() {
+      const overlay = document.getElementById('gameOverlay');
+      const frame = document.getElementById('gameFrame');
+      frame.srcdoc = gameSrc;
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeGame() {
+      const overlay = document.getElementById('gameOverlay');
+      const frame = document.getElementById('gameFrame');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      setTimeout(() => { frame.srcdoc = ''; frame.src = 'about:blank'; }, 300);
+    }
+
+    function closeGameOnBg(e) {
+      if (e.target === document.getElementById('gameOverlay')) closeGame();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeGame();
+    });
   </script>
 
 </body>

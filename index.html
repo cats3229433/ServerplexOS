@@ -670,6 +670,156 @@
 </head>
 <body>
 
+  <!-- ANNOUNCEMENT BANNER -->
+  <div class="announcement-banner">
+    <div class="announcement-inner">
+      <span class="announcement-badge">📢 Notice</span>
+      <p class="announcement-text">
+        <strong>Serverplex</strong> is undergoing a development period from <strong>May 2–10</strong> — squashing bugs, shipping new features, and rolling out better customizations.
+        In the meantime, enjoy this little corner of the internet dedicated to kitties. 🐱
+      </p>
+      <button class="announcement-close" onclick="this.closest('.announcement-banner').style.display='none'" title="Dismiss">✕</button>
+    </div>
+  </div>
+
+  <style>
+    .announcement-banner {
+      background: linear-gradient(90deg, #2a1a06, #3a2410, #2a1a06);
+      border-bottom: 2px solid var(--amber);
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      padding: 0.85rem 2rem;
+    }
+
+    .announcement-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .announcement-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: var(--amber);
+      color: var(--ink);
+      padding: 0.3rem 0.7rem;
+      white-space: nowrap;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .announcement-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--cream);
+      flex: 1;
+    }
+
+    .announcement-text strong {
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    .announcement-close {
+      background: none;
+      border: 1px solid rgba(200,131,42,0.35);
+      color: var(--warm-gray);
+      width: 1.8rem;
+      height: 1.8rem;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+
+    .announcement-close:hover {
+      background: rgba(200,131,42,0.15);
+      color: var(--amber);
+      border-color: var(--amber);
+    }
+  </style>
+
+  <!-- ANNOUNCEMENT BANNER -->
+  <div class="announcement-banner">
+    <div class="announcement-inner">
+      <div class="announcement-badge">📢 Notice</div>
+      <div class="announcement-text">
+        <strong>Serverplex</strong> is undergoing a development period from
+        <span class="announcement-dates">May 2 – May 10</span> — our team is squashing bugs, shipping new features, and rolling out better customizations.
+        In the meantime, enjoy this little site about kitties! 🐱
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .announcement-banner {
+      background: linear-gradient(90deg, #3a1f00, #5c3008, #3a1f00);
+      border-bottom: 1px solid rgba(200,131,42,0.5);
+      padding: 0.9rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .announcement-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .announcement-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      background: var(--amber);
+      color: var(--ink);
+      padding: 0.25rem 0.65rem;
+      font-weight: 500;
+      flex-shrink: 0;
+    }
+
+    .announcement-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      color: var(--cream);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .announcement-text strong {
+      color: var(--amber);
+      font-weight: 700;
+    }
+
+    .announcement-dates {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--amber);
+      letter-spacing: 0.05em;
+      background: rgba(200,131,42,0.12);
+      padding: 0.1rem 0.4rem;
+      border: 1px solid rgba(200,131,42,0.3);
+    }
+
+    @media (max-width: 600px) {
+      .announcement-inner { flex-direction: column; gap: 0.5rem; }
+      .announcement-text { font-size: 0.9rem; }
+    }
+  </style>
+
   <!-- HERO -->
   <section class="hero">
     <div class="hero-left">

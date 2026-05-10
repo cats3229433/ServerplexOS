@@ -3,109 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServerplexOS</title>
-    <link rel="icon" type="image/png" href="https://i.ibb.co/6JtbZdfP/Sp-Icon-newer.png">
+    <title>Google</title> <link id="favicon" rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; width: 100%; overflow: hidden; animation: fadeIn 0.8s ease-in; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: #0d0d1a; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        iframe { width: 100%; height: 100%; border: none; opacity: 0; animation: fadeIn 1s ease-in 0.3s forwards; }
 
-        .popup-blocked {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0d0d1a; color: white;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            z-index: 999999; font-family: 'Oxanium', sans-serif; text-align: center; padding: 40px;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        iframe { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            display: block;
+            animation: fadeIn 0.8s ease-in forwards; 
         }
-        .popup-blocked.show { opacity: 1; pointer-events: all; }
-        .popup-blocked .icon { font-size: 3.5em; margin-bottom: 20px; }
-        .popup-blocked h2 { font-size: 2em; color: #f9a825; margin-bottom: 16px; font-weight: 900; }
-        .popup-blocked p { font-size: 1.05em; color: #ccc; margin-bottom: 24px; max-width: 480px; line-height: 1.6; }
-        .steps { background: #1a1a2e; border-radius: 10px; padding: 20px 28px; font-size: 0.95em; color: #ddd; line-height: 2; text-align: left; white-space: pre-line; max-width: 440px; width: 100%; margin-bottom: 28px; }
-        .retry-btn { background: #f9a825; color: #0d0d1a; border: none; padding: 12px 32px; border-radius: 8px; font-size: 1em; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.2s; }
-        .retry-btn:hover { background: #fbc02d; transform: scale(1.05); }
     </style>
 </head>
 <body>
 
-    <div class="popup-blocked" id="popupBlocked">
-        <div class="icon">🚫</div>
-        <h2>Popups Blocked</h2>
-        <p>ServerplexOS needs to open in a popup tab to enable tab cloaking. Please allow popups for this site.</p>
-        <div class="steps" id="popupSteps"></div>
-        <button class="retry-btn" onclick="tryCloakAgain()">Try Again</button>
-    </div>
-
-    <iframe id="mainFrame" src=""></iframe>
+    <iframe id="mainFrame" src="about:blank"></iframe>
 
     <script>
-        const isCloaked = location.search.includes('cloaked=1');
+        const frame = document.getElementById('mainFrame');
         const isReturningUser = localStorage.getItem('serverplex_setup_complete') === 'true';
 
-        if (isCloaked) {
-            const frame = document.getElementById('mainFrame');
+        // --- TAB CLOAKING LOGIC ---
+        // This ensures even if the HTML file is named index.html, 
+        // the browser tab looks like Google.
+        document.title = "Google";
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = 'https://www.google.com/favicon.ico';
+        document.getElementsByTagName('head')[0].appendChild(link);
+
+        // --- NAVIGATION LOGIC ---
+        window.addEventListener('DOMContentLoaded', () => {
             frame.src = 'placeholder.html';
 
+            // Wait exactly 4 seconds (4000ms) before switching
             setTimeout(() => {
                 if (isReturningUser) {
                     frame.src = 'account.html';
                 } else {
                     frame.src = 'welcome.html';
                 }
-            }, 5000);
-
-            window.addEventListener('beforeunload', e => { e.preventDefault(); e.returnValue = ''; });
-        } else {
-            attemptCloak();
-        }
-
-        function attemptCloak() {
-            const popup = window.open(
-                location.href.split('?')[0] + '?cloaked=1', '_blank',
-                'popup=yes,width=' + screen.availWidth + ',height=' + screen.availHeight + ',left=0,top=0'
-            );
-            if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-                showBlockedNotice();
-            } else {
-                window.location.replace('https://www.google.com');
-            }
-        }
-
-        function tryCloakAgain() {
-            document.getElementById('popupBlocked').classList.remove('show');
-            attemptCloak();
-        }
-
-        function showBlockedNotice() {
-            document.getElementById('popupSteps').innerText = getInstructions();
-            document.getElementById('popupBlocked').classList.add('show');
-            const frame = document.getElementById('mainFrame');
-            if (isReturningUser) {
-                frame.src = 'account.html';   // ← routes to account → desktop.html
-            } else {
-                frame.src = 'welcome.html';   // ← routes to welcome → desktop.html
-            }
-            frame.style.opacity = '1';
-        }
-
-        function getInstructions() {
-            const ua = navigator.userAgent;
-            if (ua.includes('Chrome') && !ua.includes('Edg') && !ua.includes('OPR'))
-                return '1. Click the 🔒 icon in the address bar\n2. Go to "Site settings"\n3. Set "Pop-ups and redirects" to Allow\n4. Click "Try Again" above';
-            if (ua.includes('Firefox'))
-                return '1. Click the shield/lock icon in the address bar\n2. Select "More Information"\n3. Go to Permissions → Allow Pop-ups\n4. Click "Try Again" above';
-            if (ua.includes('Edg'))
-                return '1. Click the 🔒 icon in the address bar\n2. Go to "Permissions for this site"\n3. Set "Pop-ups and redirects" to Allow\n4. Click "Try Again" above';
-            return '1. Click the lock/info icon in your address bar\n2. Find "Pop-ups and redirects"\n3. Set it to Allow\n4. Click "Try Again" above';
-        }
+            }, 4000); 
+        });
 
         window.addEventListener('message', e => {
             if (e.data && e.data.type === 'navigate') {
-                const f = document.getElementById('mainFrame');
-                if (f) f.src = e.data.path;
+                frame.src = e.data.path;
             }
+        });
+
+        window.addEventListener('beforeunload', e => { 
+            e.preventDefault(); 
+            e.returnValue = ''; 
         });
     </script>
 </body>

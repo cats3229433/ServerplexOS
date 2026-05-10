@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Media Streaming</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--accent:#0078d4}
+body{--bg:#f0f2f5;--bg2:#e4e7ed;--surface:#fff;--text:#0d0f14;--text2:#55606e;--text3:#8a95a3;--border:rgba(0,0,0,.09);--border2:rgba(0,0,0,.14)}
+body.dark{--bg:#060811;--bg2:#111420;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--text3:#5a6478;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13)}
+body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--text3:#858ea0;--border:rgba(255,255,255,.10);--border2:rgba(255,255,255,.18)}
+body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Header ── */
+.header{background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;flex-shrink:0;padding:0 16px;height:50px}
+.logo{display:flex;align-items:center;gap:8px;margin-right:20px}
+.logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#1db954,#0078d4);display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{font-size:14px;font-weight:800;letter-spacing:.3px}
+
+/* ── Tabs ── */
+.tabs{display:flex;gap:2px}
+.tab-btn{padding:8px 18px;border:none;background:transparent;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border-radius:8px;transition:all .18s;display:flex;align-items:center;gap:7px}
+.tab-btn:hover{background:var(--bg2);color:var(--text)}
+.tab-btn.active{background:rgba(0,120,212,.12);color:var(--accent)}
+.tab-btn .tab-icon{font-size:16px}
+.spacer{flex:1}
+
+/* Search row */
+.search-row{display:flex;align-items:center;gap:8px}
+.search-wrap{position:relative}
+.search-wrap input{padding:7px 12px 7px 32px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;width:220px;outline:none;transition:all .2s}
+.search-wrap input:focus{border-color:var(--accent);width:260px}
+.search-wrap input::placeholder{color:var(--text3)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none}
+.search-go{padding:7px 14px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s}
+.search-go:hover{opacity:.88}
+
+/* ── Content ── */
+.content{flex:1;display:flex;overflow:hidden}
+.panel{flex:1;display:none;flex-direction:column;overflow:hidden}
+.panel.active{display:flex}
+
+/* Spotify */
+.spotify-inner{flex:1;display:flex;gap:0;overflow:hidden}
+.sp-sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sp-sidebar-header{padding:14px 16px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.sp-list{flex:1;overflow-y:auto;padding:8px}
+.sp-list::-webkit-scrollbar{width:4px}
+.sp-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sp-item{padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text2)}
+.sp-item:hover{background:var(--bg2);color:var(--text)}
+.sp-item.active{background:rgba(0,120,212,.12);color:var(--accent)}
+.sp-item-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.sp-embed-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.sp-embed-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.sp-embed-title{font-size:14px;font-weight:700;flex:1}
+.sp-embed-url-row{display:flex;gap:8px}
+.sp-url-input{flex:1;padding:7px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.sp-url-input:focus{border-color:#1db954}
+.sp-url-btn{padding:7px 14px;background:#1db954;border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.sp-url-btn:hover{background:#17a349}
+.embed-frame{flex:1;border:none;width:100%;height:100%}
+.sp-embed-area{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;flex-direction:column;gap:16px}
+.sp-empty{text-align:center;color:var(--text3)}
+.sp-empty-icon{font-size:52px;margin-bottom:12px}
+.sp-empty-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:6px}
+.sp-empty-desc{font-size:13px;line-height:1.6;max-width:340px}
+.sp-login-btn{padding:12px 28px;background:#1db954;border:none;border-radius:24px;color:#fff;font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .18s;text-decoration:none;display:inline-block}
+.sp-login-btn:hover{background:#17a349;transform:scale(1.03)}
+.sp-quick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:520px;margin-top:8px}
+.sp-quick-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;text-align:center}
+.sp-quick-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.sp-quick-icon{font-size:28px;margin-bottom:7px}
+.sp-quick-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+.sp-quick-desc{font-size:10px;color:var(--text3)}
+
+/* YouTube Music */
+.yt-inner{flex:1;display:flex;gap:0;overflow:hidden}
+.yt-sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.yt-sidebar-header{padding:14px 16px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.yt-list{flex:1;overflow-y:auto;padding:8px}
+.yt-item{padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text2)}
+.yt-item:hover{background:var(--bg2);color:var(--text)}
+.yt-item.active{background:rgba(255,0,0,.08);color:#ff3b30}
+.yt-item-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.yt-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.yt-embed-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.yt-embed-title{font-size:14px;font-weight:700;flex:1}
+.yt-url-row{display:flex;gap:8px}
+.yt-url-input{flex:1;padding:7px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.yt-url-input:focus{border-color:#ff3b30}
+.yt-url-btn{padding:7px 14px;background:#ff3b30;border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.yt-url-btn:hover{background:#d63030}
+.yt-frame-wrap{flex:1;position:relative;overflow:hidden}
+.yt-frame{width:100%;height:100%;border:none}
+.yt-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;color:var(--text3)}
+.yt-empty-icon{font-size:52px}
+.yt-empty-title{font-size:16px;font-weight:700;color:var(--text)}
+.yt-empty-desc{font-size:13px;line-height:1.6;max-width:340px}
+.yt-quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:420px;margin-top:8px}
+.yt-quick-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.yt-quick-card:hover{border-color:#ff3b30;transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.yt-quick-icon{font-size:24px;flex-shrink:0}
+.yt-quick-name{font-size:13px;font-weight:700;color:var(--text)}
+.yt-quick-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+
+/* SoundCloud */
+.sc-inner{flex:1;display:flex;gap:0;overflow:hidden}
+.sc-sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.sc-sidebar-header{padding:14px 16px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.sc-list{flex:1;overflow-y:auto;padding:8px}
+.sc-list::-webkit-scrollbar{width:4px}
+.sc-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.sc-item{padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text2)}
+.sc-item:hover{background:var(--bg2);color:var(--text)}
+.sc-item.active{background:rgba(255,85,0,.1);color:#ff5500}
+.sc-item-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.sc-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.sc-embed-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sc-embed-title{font-size:14px;font-weight:700;flex:1}
+.sc-url-row{display:flex;gap:8px}
+.sc-url-input{flex:1;padding:7px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.sc-url-input:focus{border-color:#ff5500}
+.sc-url-btn{padding:7px 14px;background:#ff5500;border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.sc-url-btn:hover{background:#e04a00}
+.sc-frame-wrap{flex:1;overflow:hidden;display:none;padding:20px;box-sizing:border-box}
+.sc-frame{width:100%;height:100%;border:none;border-radius:12px}
+.sc-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;color:var(--text3)}
+.sc-empty-icon{font-size:52px}
+.sc-empty-title{font-size:16px;font-weight:700;color:var(--text)}
+.sc-empty-desc{font-size:13px;line-height:1.6;max-width:340px}
+.sc-quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:420px;margin-top:8px}
+.sc-quick-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.sc-quick-card:hover{border-color:#ff5500;transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.sc-quick-icon{font-size:24px;flex-shrink:0}
+.sc-quick-name{font-size:13px;font-weight:700;color:var(--text)}
+.sc-quick-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* Deezer */
+.dz-inner{flex:1;display:flex;gap:0;overflow:hidden}
+.dz-sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.dz-sidebar-header{padding:14px 16px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
+.dz-list{flex:1;overflow-y:auto;padding:8px}
+.dz-list::-webkit-scrollbar{width:4px}
+.dz-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.dz-item{padding:9px 12px;border-radius:9px;cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:var(--text2)}
+.dz-item:hover{background:var(--bg2);color:var(--text)}
+.dz-item.active{background:rgba(162,0,255,.1);color:#a200ff}
+.dz-item-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.dz-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.dz-embed-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.dz-embed-title{font-size:14px;font-weight:700;flex:1}
+.dz-url-row{display:flex;gap:8px}
+.dz-url-input{flex:1;padding:7px 12px;border:1px solid var(--border2);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none}
+.dz-url-input:focus{border-color:#a200ff}
+.dz-url-btn{padding:7px 14px;background:#a200ff;border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.dz-url-btn:hover{background:#8800dd}
+.dz-frame-wrap{flex:1;overflow:hidden;display:none;padding:20px;box-sizing:border-box}
+.dz-frame{width:100%;height:100%;border:none;border-radius:12px}
+.dz-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;color:var(--text3)}
+.dz-empty-icon{font-size:52px}
+.dz-empty-title{font-size:16px;font-weight:700;color:var(--text)}
+.dz-empty-desc{font-size:13px;line-height:1.6;max-width:340px}
+.dz-quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%;max-width:420px;margin-top:8px}
+.dz-quick-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:12px}
+.dz-quick-card:hover{border-color:#a200ff;transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.dz-quick-icon{font-size:24px;flex-shrink:0}
+.dz-quick-name{font-size:13px;font-weight:700;color:var(--text)}
+.dz-quick-desc{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* Note banner */
+.note-banner{padding:8px 16px;background:rgba(0,120,212,.08);border-bottom:1px solid rgba(0,120,212,.15);font-size:11px;color:var(--accent);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.note-banner a{color:var(--accent);font-weight:700}
+</style>
+</head>
+<body>
+<script>
+(function(){
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(['black','aurora','tokyo','forest','space','sunset','synth'].includes(t)) document.body.classList.add('dark');
+  else if(t==='grey') document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc) document.documentElement.style.setProperty('--accent',acc);
+})();
+</script>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🎶</div>
+    <div class="logo-text">Media</div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-spotify" onclick="switchTab('spotify')">
+      <span class="tab-icon">🎵</span>Spotify
+    </button>
+    <button class="tab-btn" id="tab-youtube" onclick="switchTab('youtube')">
+      <span class="tab-icon">▶️</span>YouTube Music
+    </button>
+    <button class="tab-btn" id="tab-soundcloud" onclick="switchTab('soundcloud')">
+      <span class="tab-icon">🟠</span>SoundCloud
+    </button>
+    <button class="tab-btn" id="tab-deezer" onclick="switchTab('deezer')">
+      <span class="tab-icon">🟣</span>Deezer
+    </button>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══ SPOTIFY PANEL ══ -->
+<div class="content">
+<div class="panel active" id="panel-spotify">
+  <div class="note-banner">
+    ℹ️ Spotify embed plays 30-second previews for free. Full playback requires a Spotify Premium account and opening in the Spotify app.
+  </div>
+  <div class="spotify-inner">
+    <div class="sp-sidebar">
+      <div class="sp-sidebar-header">Browse</div>
+      <div class="sp-list" id="spList"></div>
+    </div>
+    <div class="sp-embed-wrap">
+      <div class="sp-embed-header">
+        <div class="sp-embed-title" id="spEmbedTitle">Spotify</div>
+        <div class="sp-embed-url-row">
+          <input class="sp-url-input" id="spUrlInput" placeholder="Paste Spotify URL (track, album, playlist…)" onkeydown="if(event.key==='Enter')loadSpotifyUrl()">
+          <button class="sp-url-btn" onclick="loadSpotifyUrl()">Load</button>
+        </div>
+      </div>
+      <div class="sp-embed-area" id="spEmbedArea">
+        <div class="sp-empty">
+          <div class="sp-empty-icon">🎵</div>
+          <div class="sp-empty-title">Open Spotify</div>
+          <div class="sp-empty-desc">Paste any Spotify link above — tracks, albums, playlists, podcasts, or artists. Or browse the quick picks below.</div>
+          <a class="sp-login-btn" href="https://open.spotify.com" target="_blank">Open Spotify Web ↗</a>
+        </div>
+        <div class="sp-quick-grid" id="spQuickGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ YOUTUBE MUSIC PANEL ══ -->
+<div class="panel" id="panel-youtube">
+  <div class="note-banner">
+    ℹ️ YouTube Music requires a Google account for full access. Free tier includes ads. <a href="https://music.youtube.com" target="_blank">Open in full browser ↗</a>
+  </div>
+  <div class="yt-inner">
+    <div class="yt-sidebar">
+      <div class="yt-sidebar-header">Quick Pick</div>
+      <div class="yt-list" id="ytList"></div>
+    </div>
+    <div class="yt-main">
+      <div class="yt-embed-header">
+        <div class="yt-embed-title" id="ytEmbedTitle">YouTube Music</div>
+        <div class="yt-url-row">
+          <input class="yt-url-input" id="ytUrlInput" placeholder="Paste YouTube / YT Music URL or search term…" onkeydown="if(event.key==='Enter')loadYTUrl()">
+          <button class="yt-url-btn" onclick="loadYTUrl()">Load</button>
+        </div>
+      </div>
+      <div class="yt-empty" id="ytEmpty">
+        <div class="yt-empty-icon">▶️</div>
+        <div class="yt-empty-title">YouTube Music</div>
+        <div class="yt-empty-desc">Pick a quick station from the sidebar, paste a YouTube Music URL above, or search for any track or playlist.</div>
+        <div class="yt-quick-grid" id="ytQuickGrid"></div>
+      </div>
+      <div class="yt-frame-wrap" id="ytFrameWrap" style="display:none">
+        <iframe class="yt-frame" id="ytFrame" allow="autoplay; encrypted-media; fullscreen"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SOUNDCLOUD PANEL ══ -->
+<div class="panel" id="panel-soundcloud">
+  <div class="note-banner" style="border-left:3px solid #ff5500">
+    🟠 SoundCloud — full free playback, no account required. Millions of tracks from independent artists.
+  </div>
+  <div class="sc-inner">
+    <div class="sc-sidebar">
+      <div class="sc-sidebar-header">Stations</div>
+      <div class="sc-list" id="scList"></div>
+    </div>
+    <div class="sc-main">
+      <div class="sc-embed-header">
+        <div class="sc-embed-title" id="scEmbedTitle">SoundCloud</div>
+        <div class="sc-url-row">
+          <input class="sc-url-input" id="scUrlInput" placeholder="Paste SoundCloud URL (track, playlist, artist…)" onkeydown="if(event.key==='Enter')loadSCUrl()">
+          <button class="sc-url-btn" onclick="loadSCUrl()">Load</button>
+        </div>
+      </div>
+      <div class="sc-empty" id="scEmpty">
+        <div class="sc-empty-icon">🟠</div>
+        <div class="sc-empty-title">SoundCloud — Free Full Playback</div>
+        <div class="sc-empty-desc">Pick a station from the sidebar or paste any SoundCloud URL to start listening. No account needed for most tracks.</div>
+        <div class="sc-quick-grid" id="scQuickGrid"></div>
+      </div>
+      <div class="sc-frame-wrap" id="scFrameWrap">
+        <iframe class="sc-frame" id="scFrame" allow="autoplay; fullscreen" scrolling="no"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DEEZER PANEL ══ -->
+<div class="panel" id="panel-deezer">
+  <div class="note-banner" style="border-left:3px solid #a200ff">
+    🟣 Deezer — free tier includes full tracks with ads. Create a free account for playlists and favourites.
+  </div>
+  <div class="dz-inner">
+    <div class="dz-sidebar">
+      <div class="dz-sidebar-header">Browse</div>
+      <div class="dz-list" id="dzList"></div>
+    </div>
+    <div class="dz-main">
+      <div class="dz-embed-header">
+        <div class="dz-embed-title" id="dzEmbedTitle">Deezer</div>
+        <div class="dz-url-row">
+          <input class="dz-url-input" id="dzUrlInput" placeholder="Paste Deezer URL (track, album, playlist…)" onkeydown="if(event.key==='Enter')loadDZUrl()">
+          <button class="dz-url-btn" onclick="loadDZUrl()">Load</button>
+        </div>
+      </div>
+      <div class="dz-empty" id="dzEmpty">
+        <div class="dz-empty-icon">🟣</div>
+        <div class="dz-empty-title">Deezer</div>
+        <div class="dz-empty-desc">Pick a chart or playlist from the sidebar, or paste any Deezer URL. Free tier plays full tracks with occasional ads.</div>
+        <div class="dz-quick-grid" id="dzQuickGrid"></div>
+      </div>
+      <div class="dz-frame-wrap" id="dzFrameWrap">
+        <iframe class="dz-frame" id="dzFrame" allow="autoplay; fullscreen" scrolling="no"></iframe>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  SPOTIFY
+// ══════════════════════════════════════════════
+var SP_PRESETS = [
+  { name:'Top 50 Global',   icon:'🌍', uri:'playlist/37i9dQZEVXbMDoHDwVN2tF' },
+  { name:'Hot 100',         icon:'🔥', uri:'playlist/6UeSakyzhiEt4NB3UAd6NQ' },
+  { name:'Chill Hits',      icon:'😌', uri:'playlist/37i9dQZF1DX4WYpdgoIcn6' },
+  { name:'Workout',         icon:'💪', uri:'playlist/37i9dQZF1DX76Wlfdnj7AP' },
+  { name:'Lo-Fi Beats',     icon:'🎧', uri:'playlist/37i9dQZF1DWWQRwui0ExPn' },
+  { name:'Rock Classics',   icon:'🎸', uri:'playlist/37i9dQZF1DWXRqgorJj26U' },
+  { name:'Hip-Hop',         icon:'🎤', uri:'playlist/37i9dQZF1DX0XUsuxWHRQd' },
+  { name:'Late Night Jazz', icon:'🎷', uri:'playlist/37i9dQZF1DX4wta20PHgwo' },
+];
+
+var SP_QUICK = [
+  { name:'Global Top 50',   desc:'Most streamed worldwide', icon:'🌍', uri:'playlist/37i9dQZEVXbMDoHDwVN2tF' },
+  { name:'Chill Vibes',     desc:'Relax and unwind',        icon:'😌', uri:'playlist/37i9dQZF1DX4WYpdgoIcn6' },
+  { name:'Lo-Fi Beats',     desc:'Study & focus',           icon:'🎧', uri:'playlist/37i9dQZF1DWWQRwui0ExPn' },
+  { name:'Mood Booster',    desc:'Feel-good hits',          icon:'⚡', uri:'playlist/37i9dQZF1DX3rxVfibe1L0' },
+  { name:'Deep Focus',      desc:'Instrumental focus',      icon:'🎯', uri:'playlist/37i9dQZF1DWZeKCadgRdKQ' },
+  { name:'Evening Acoustic',desc:'Calm acoustic songs',     icon:'🎸', uri:'playlist/37i9dQZF1DX0jgyAiPl8Af' },
+];
+
+// Build sidebar
+var spList = document.getElementById('spList');
+SP_PRESETS.forEach(function(p, i) {
+  var d = document.createElement('div');
+  d.className = 'sp-item' + (i===0?' active':'');
+  d.innerHTML = '<span class="sp-item-icon">' + p.icon + '</span>' + p.name;
+  d.onclick = function() {
+    document.querySelectorAll('.sp-item').forEach(function(x){ x.classList.remove('active'); });
+    d.classList.add('active');
+    loadSpotify(p.uri, p.name);
+  };
+  spList.appendChild(d);
+});
+
+// Build quick grid
+var spQg = document.getElementById('spQuickGrid');
+SP_QUICK.forEach(function(q) {
+  var d = document.createElement('div');
+  d.className = 'sp-quick-card';
+  d.innerHTML = '<div class="sp-quick-icon">' + q.icon + '</div><div><div class="sp-quick-name">' + q.name + '</div><div class="sp-quick-desc">' + q.desc + '</div></div>';
+  d.onclick = function() { loadSpotify(q.uri, q.name); };
+  spQg.appendChild(d);
+});
+
+function loadSpotify(uri, title) {
+  var area = document.getElementById('spEmbedArea');
+  var embedUrl = 'https://open.spotify.com/embed/' + uri + '?utm_source=generator&theme=0';
+  area.innerHTML = '<iframe style="border-radius:12px;width:100%;height:100%;border:none" src="' + embedUrl + '" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+  document.getElementById('spEmbedTitle').textContent = title || 'Spotify';
+}
+
+function loadSpotifyUrl() {
+  var raw = document.getElementById('spUrlInput').value.trim();
+  if (!raw) return;
+  // Convert open.spotify.com/track/ID → track/ID
+  var match = raw.match(/spotify\.com\/([a-z]+)\/([A-Za-z0-9]+)/);
+  if (match) {
+    loadSpotify(match[1] + '/' + match[2], match[1].charAt(0).toUpperCase() + match[1].slice(1));
+  } else if (/^[a-z]+\/[A-Za-z0-9]+$/.test(raw)) {
+    loadSpotify(raw, 'Spotify');
+  } else {
+    alert('Please paste a valid Spotify URL (e.g. https://open.spotify.com/playlist/37i9dQZEVXbMDoHDwVN2tF)');
+  }
+}
+
+// ══════════════════════════════════════════════
+//  YOUTUBE MUSIC
+// ══════════════════════════════════════════════
+var YT_PRESETS = [
+  { name:'Top Songs',       icon:'🔥', vid:'PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSK' },
+  { name:'Lo-Fi Hip Hop',   icon:'🎧', vid:'jfKfPfyJRdk' },
+  { name:'Chill Pop',       icon:'💆', vid:'PLDIoUOhQQPlXr63I_vwF06Dq3s3NpgA9p' },
+  { name:'80s Hits',        icon:'📼', vid:'PLMKKDl7p5j6mhN7-n_DdBfsG_OJFe5LEx' },
+  { name:'Study Beats',     icon:'📚', vid:'5qap5aO4i9A' },
+  { name:'Rock Anthems',    icon:'🎸', vid:'PLkqz3S84Tw-T4WwdqlYsT6mzZaKfkL3-C' },
+  { name:'Jazz Night',      icon:'🎷', vid:'PLxA687tYuMWgXPKFdoKadKzGnM4RJ-vNe' },
+  { name:'K-Pop Hits',      icon:'⭐', vid:'PLzH6n4zXuckpfMu_4Ff8E7Z1behQks5ba' },
+];
+
+var YT_QUICK = [
+  { name:'Lo-Fi Hip Hop',   desc:'24/7 chill radio',    icon:'🎧', vid:'jfKfPfyJRdk', isPlaylist:false },
+  { name:'Study Beats',     desc:'Focus music',          icon:'📚', vid:'5qap5aO4i9A', isPlaylist:false },
+  { name:'Top Songs 2024',  desc:'Global chart hits',    icon:'🔥', vid:'PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSK', isPlaylist:true },
+  { name:'Relaxing Jazz',   desc:'Smooth jazz vibes',    icon:'🎷', vid:'PLxA687tYuMWgXPKFdoKadKzGnM4RJ-vNe', isPlaylist:true },
+];
+
+var ytList = document.getElementById('ytList');
+YT_PRESETS.forEach(function(p, i) {
+  var d = document.createElement('div');
+  d.className = 'yt-item' + (i===0?' active':'');
+  d.innerHTML = '<span class="yt-item-icon">' + p.icon + '</span>' + p.name;
+  d.onclick = function() {
+    document.querySelectorAll('.yt-item').forEach(function(x){ x.classList.remove('active'); });
+    d.classList.add('active');
+    loadYT(p.vid, p.name, p.vid.startsWith('PL'));
+  };
+  ytList.appendChild(d);
+});
+
+var ytQg = document.getElementById('ytQuickGrid');
+YT_QUICK.forEach(function(q) {
+  var d = document.createElement('div');
+  d.className = 'yt-quick-card';
+  d.innerHTML = '<div class="yt-quick-icon">' + q.icon + '</div><div><div class="yt-quick-name">' + q.name + '</div><div class="yt-quick-desc">' + q.desc + '</div></div>';
+  d.onclick = function() { loadYT(q.vid, q.name, q.isPlaylist); };
+  ytQg.appendChild(d);
+});
+
+function loadYT(vid, title, isPlaylist) {
+  var embedUrl;
+  if (isPlaylist || vid.startsWith('PL')) {
+    embedUrl = 'https://www.youtube.com/embed/videoseries?list=' + vid + '&autoplay=1';
+  } else {
+    embedUrl = 'https://www.youtube.com/embed/' + vid + '?autoplay=1';
+  }
+  document.getElementById('ytEmpty').style.display = 'none';
+  document.getElementById('ytFrameWrap').style.display = '';
+  document.getElementById('ytFrame').src = embedUrl;
+  document.getElementById('ytEmbedTitle').textContent = title || 'YouTube Music';
+}
+
+function loadYTUrl() {
+  var raw = document.getElementById('ytUrlInput').value.trim();
+  if (!raw) return;
+
+  // youtube.com/watch?v=ID
+  var vMatch = raw.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+  // youtu.be/ID
+  var sMatch = raw.match(/youtu\.be\/([A-Za-z0-9_-]{11})/);
+  // playlist?list=ID
+  var pMatch = raw.match(/[?&]list=(PL[A-Za-z0-9_-]+)/);
+  // music.youtube.com
+  var mMatch = raw.match(/music\.youtube\.com\/.+?v=([A-Za-z0-9_-]{11})/);
+  // plain search term
+  var isSearch = !vMatch && !sMatch && !pMatch && !mMatch && !raw.includes('youtube');
+
+  if (isSearch) {
+    // Search YouTube
+    var searchUrl = 'https://www.youtube.com/embed?listType=search&list=' + encodeURIComponent(raw) + '&autoplay=1';
+    document.getElementById('ytEmpty').style.display = 'none';
+    document.getElementById('ytFrameWrap').style.display = '';
+    document.getElementById('ytFrame').src = searchUrl;
+    document.getElementById('ytEmbedTitle').textContent = 'Search: ' + raw;
+  } else if (pMatch) {
+    loadYT(pMatch[1], 'Playlist', true);
+  } else {
+    var vid = (vMatch || sMatch || mMatch || [])[1];
+    if (vid) loadYT(vid, 'YouTube Music', false);
+    else alert('Could not parse that URL. Paste a YouTube or YouTube Music link.');
+  }
+}
+
+
+// ══════════════════════════════════════════════
+//  SOUNDCLOUD
+// ══════════════════════════════════════════════
+var SC_PRESETS = [
+  { name:'Electronic',    icon:'⚡', url:'https://soundcloud.com/weareelectra/sets/electronic-music-playlist' },
+  { name:'Lo-Fi Beats',   icon:'🎧', url:'https://soundcloud.com/chillhopmusic/sets/chillhop-essentials-fall-2023' },
+  { name:'Hip-Hop',       icon:'🎤', url:'https://soundcloud.com/soundcloud-circuits/sets/hip-hop' },
+  { name:'Indie Pop',     icon:'🌟', url:'https://soundcloud.com/soundcloud-circuits/sets/indie-pop' },
+  { name:'Ambient',       icon:'🌊', url:'https://soundcloud.com/soundcloud-circuits/sets/ambient' },
+  { name:'Deep House',    icon:'🏠', url:'https://soundcloud.com/soundcloud-circuits/sets/deep-house' },
+  { name:'R&B',           icon:'💜', url:'https://soundcloud.com/soundcloud-circuits/sets/rnb' },
+  { name:'Rock',          icon:'🎸', url:'https://soundcloud.com/soundcloud-circuits/sets/rock' },
+];
+
+var SC_QUICK = [
+  { name:'Lo-Fi Beats',   desc:'Chill study music',      icon:'🎧', url:'https://soundcloud.com/chillhopmusic' },
+  { name:'Electronic',    desc:'Dance & EDM',             icon:'⚡', url:'https://soundcloud.com/weareelectra' },
+  { name:'Deep House',    desc:'Underground house',       icon:'🏠', url:'https://soundcloud.com/soundcloud-circuits/sets/deep-house' },
+  { name:'Indie Artists', desc:'Discover new music',      icon:'🌟', url:'https://soundcloud.com/soundcloud-circuits/sets/indie-pop' },
+];
+
+var scList = document.getElementById('scList');
+SC_PRESETS.forEach(function(p, i) {
+  var d = document.createElement('div');
+  d.className = 'sc-item' + (i===0?' active':'');
+  d.innerHTML = '<span class="sc-item-icon">' + p.icon + '</span>' + p.name;
+  d.onclick = function() {
+    document.querySelectorAll('.sc-item').forEach(function(x){ x.classList.remove('active'); });
+    d.classList.add('active');
+    loadSC(p.url, p.name);
+  };
+  scList.appendChild(d);
+});
+
+var scQg = document.getElementById('scQuickGrid');
+SC_QUICK.forEach(function(q) {
+  var d = document.createElement('div');
+  d.className = 'sc-quick-card';
+  d.innerHTML = '<div class="sc-quick-icon">' + q.icon + '</div><div><div class="sc-quick-name">' + q.name + '</div><div class="sc-quick-desc">' + q.desc + '</div></div>';
+  d.onclick = function() { loadSC(q.url, q.name); };
+  scQg.appendChild(d);
+});
+
+function loadSC(url, title) {
+  var embedUrl = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) +
+    '&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=true';
+  document.getElementById('scEmpty').style.display = 'none';
+  document.getElementById('scFrameWrap').style.display = '';
+  document.getElementById('scFrame').src = embedUrl;
+  document.getElementById('scEmbedTitle').textContent = title || 'SoundCloud';
+}
+
+function loadSCUrl() {
+  var url = document.getElementById('scUrlInput').value.trim();
+  if (!url) return;
+  if (!url.includes('soundcloud.com')) { alert('Please paste a SoundCloud URL (soundcloud.com/…)'); return; }
+  loadSC(url, 'SoundCloud');
+}
+
+// ══════════════════════════════════════════════
+//  DEEZER
+// ══════════════════════════════════════════════
+var DZ_PRESETS = [
+  { name:'Top Global',    icon:'🌍', id:'1116190245', type:'playlist' },
+  { name:'Chill Vibes',   icon:'😌', id:'1370171451', type:'playlist' },
+  { name:'Hip-Hop',       icon:'🎤', id:'1370174401', type:'playlist' },
+  { name:'Electronic',    icon:'⚡', id:'1370171801', type:'playlist' },
+  { name:'Rock Classics', icon:'🎸', id:'1370172451', type:'playlist' },
+  { name:'R&B Soul',      icon:'💜', id:'1370173301', type:'playlist' },
+  { name:'Pop Hits',      icon:'🌟', id:'1370172101', type:'playlist' },
+  { name:'Lo-Fi',         icon:'🎧', id:'8017039162', type:'playlist' },
+];
+
+var DZ_QUICK = [
+  { name:'Top Global',    desc:'Most played worldwide',  icon:'🌍', id:'1116190245', type:'playlist' },
+  { name:'Chill Vibes',   desc:'Relax & unwind',         icon:'😌', id:'1370171451', type:'playlist' },
+  { name:'Hip-Hop',       desc:'Rap & hip-hop hits',     icon:'🎤', id:'1370174401', type:'playlist' },
+  { name:'Rock Classics', desc:'All-time rock anthems',  icon:'🎸', id:'1370172451', type:'playlist' },
+];
+
+var dzList = document.getElementById('dzList');
+DZ_PRESETS.forEach(function(p, i) {
+  var d = document.createElement('div');
+  d.className = 'dz-item' + (i===0?' active':'');
+  d.innerHTML = '<span class="dz-item-icon">' + p.icon + '</span>' + p.name;
+  d.onclick = function() {
+    document.querySelectorAll('.dz-item').forEach(function(x){ x.classList.remove('active'); });
+    d.classList.add('active');
+    loadDZ(p.id, p.type, p.name);
+  };
+  dzList.appendChild(d);
+});
+
+var dzQg = document.getElementById('dzQuickGrid');
+DZ_QUICK.forEach(function(q) {
+  var d = document.createElement('div');
+  d.className = 'dz-quick-card';
+  d.innerHTML = '<div class="dz-quick-icon">' + q.icon + '</div><div><div class="dz-quick-name">' + q.name + '</div><div class="dz-quick-desc">' + q.desc + '</div></div>';
+  d.onclick = function() { loadDZ(q.id, q.type, q.name); };
+  dzQg.appendChild(d);
+});
+
+function loadDZ(id, type, title) {
+  var embedUrl = 'https://widget.deezer.com/widget/dark/' + type + '/' + id + '?autoplay=false&tracklist=true';
+  document.getElementById('dzEmpty').style.display = 'none';
+  document.getElementById('dzFrameWrap').style.display = '';
+  document.getElementById('dzFrame').src = embedUrl;
+  document.getElementById('dzEmbedTitle').textContent = title || 'Deezer';
+}
+
+function loadDZUrl() {
+  var url = document.getElementById('dzUrlInput').value.trim();
+  if (!url) return;
+  // deezer.com/track/12345 or deezer.com/playlist/12345 etc.
+  var match = url.match(/deezer\.com\/(?:[a-z]{2}\/)?([a-z]+)\/(\d+)/);
+  if (match) {
+    loadDZ(match[2], match[1], match[1].charAt(0).toUpperCase() + match[1].slice(1));
+  } else {
+    alert('Please paste a Deezer URL (deezer.com/track/… or deezer.com/playlist/…)');
+  }
+}
+
+
+// ══════════════════════════════════════════════
+//  TAB SWITCHER
+// ══════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  // Update logo gradient per service
+  var colors = {spotify:'#1db954,#158a3e', youtube:'#ff3b30,#cc0000', soundcloud:'#ff5500,#cc4400', deezer:'#a200ff,#7700cc'};
+  document.querySelector('.logo-icon').style.background = 'linear-gradient(135deg,' + (colors[tab]||'#1db954,#0078d4') + ')';
+}
+</script>
+</body>
+</html>

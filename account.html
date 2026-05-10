@@ -366,9 +366,9 @@
 
   <script>
     // ===== Load saved user info =====
-    const savedUsername = localStorage.getItem('serverplex_username') || 'User';
-    const savedAvatar = localStorage.getItem('serverplex_avatar') || '👤';
-    const savedPin = localStorage.getItem('serverplex_pin') || '';
+    var savedUsername = localStorage.getItem('serverplex_username') || 'User';
+    var savedAvatar   = localStorage.getItem('serverplex_avatar')   || '👤';
+    var savedPin      = localStorage.getItem('serverplex_pin')      || '';
 
     document.getElementById('loginUsername').textContent = savedUsername.toUpperCase();
     document.getElementById('loginAvatar').textContent = savedAvatar;
@@ -425,7 +425,7 @@
       const overlay = document.getElementById('launchOverlay');
       overlay.classList.add('visible');
       setTimeout(() => {
-        sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'eclipseos.html';
+        sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'desktop.html';
       }, 1200);
     }
 

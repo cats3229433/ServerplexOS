@@ -10,7 +10,7 @@ body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8
 body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
 body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
 h1{font-size:26px;font-weight:800;margin-bottom:24px}
-.section{margin-bottom:32px}
+.section{margin-bottom:28px}
 .sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
 .row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--border)}
@@ -18,63 +18,71 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .row-info{flex:1}
 .row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
 .row-desc{font-size:12px;color:var(--text2)}
-/* Theme grid */
-.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 16px}
-.theme-card{border:2px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s;overflow:hidden}
-.theme-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.15)}
+.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px 16px}
+.theme-card{border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;overflow:hidden;position:relative}
+.theme-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .theme-card.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
-.theme-preview{height:56px}
-.theme-name{text-align:center;font-size:12px;font-weight:700;padding:7px;background:var(--bg2)}
-/* Accent colors */
+.theme-card.active::after{content:'✓';position:absolute;top:5px;right:7px;font-size:12px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.theme-preview{height:70px}
+.theme-preview-bar{height:14px;opacity:.7}
+.theme-name{text-align:center;font-size:11px;font-weight:700;padding:7px 4px;background:rgba(0,0,0,.25);color:#fff}
 .accent-row{display:flex;align-items:center;gap:8px;padding:12px 16px;flex-wrap:wrap}
-.accent-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .18s;flex-shrink:0}
+.accent-dot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .18s;position:relative}
 .accent-dot:hover{transform:scale(1.15)}
-.accent-dot.selected{border-color:#fff;box-shadow:0 0 0 3px var(--border),0 0 0 5px currentColor}
-/* Wallpaper */
+.accent-dot.selected::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .wp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px}
-.wp-option{height:60px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:all .18s;position:relative;overflow:hidden}
-.wp-option:hover{transform:scale(1.04)}
-.wp-option.selected{border-color:var(--accent)}
-.wp-url-row{padding:10px 16px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border)}
+.wp-opt{height:64px;border-radius:9px;cursor:pointer;border:2px solid transparent;transition:all .18s}
+.wp-opt:hover{transform:scale(1.04)}
+.wp-opt.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
+.wp-url-row{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--border)}
 .wp-url-row input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
+.tb-mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px}
+.tb-card{border:2px solid var(--border);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .18s;font-size:12px;font-weight:600}
+.tb-card:hover{background:var(--bg2)}
+.tb-card.active{border-color:var(--accent);background:rgba(0,120,212,.1);color:var(--accent)}
+.tb-card-icon{font-size:20px;display:block;margin-bottom:5px}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
+.toggle input:checked+.toggle-track{background:var(--accent)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle input:checked~.toggle-thumb{left:21px}
 .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:.88}
-.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}
-.btn-ghost:hover{background:var(--border)}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.88}
+.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{background:var(--border)}
+/* custom builder */
+.builder-body{padding:16px}
+.color-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.color-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:9px}
+.color-row label{font-size:12px;font-weight:600;color:var(--text);flex:1}
+.color-row input[type=color]{width:34px;height:28px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:none;padding:2px}
+.preview-box{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:14px}
+.pv-top{height:48px;display:flex;align-items:center;padding:0 12px;gap:8px}
+.pv-dot{width:8px;height:8px;border-radius:50%}
+.pv-block{height:14px;border-radius:3px}
+.pv-bar{height:26px;display:flex;align-items:center;padding:0 8px;gap:6px}
+.pv-body{padding:10px;display:flex;gap:8px}
+.pv-win{flex:1;height:36px;border-radius:6px;border-width:1px;border-style:solid}
+.applied{display:none;font-size:11px;color:#34c759;font-weight:600;margin-left:8px}
+.applied.show{display:inline}
 </style>
 </head>
 <body>
 <script>
 (function(){
   var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
+  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
+  if(dark.includes(t))document.body.classList.add('dark');
   else if(t==='grey')document.body.classList.add('grey');
   var acc=localStorage.getItem('serverplex_accent');
   if(acc)document.documentElement.style.setProperty('--accent',acc);
 })();
 </script>
-
 <h1>🎨 Personalization</h1>
 
 <div class="section">
   <div class="sec-title">Theme</div>
-  <div class="card">
-    <div class="theme-grid">
-      <div class="theme-card" id="th-white" onclick="setTheme('white')">
-        <div class="theme-preview" style="background:linear-gradient(135deg,#fff,#e0e0e0)"></div>
-        <div class="theme-name">White</div>
-      </div>
-      <div class="theme-card" id="th-black" onclick="setTheme('black')">
-        <div class="theme-preview" style="background:linear-gradient(135deg,#000,#1a1a1a)"></div>
-        <div class="theme-name">Black</div>
-      </div>
-      <div class="theme-card" id="th-grey" onclick="setTheme('grey')">
-        <div class="theme-preview" style="background:linear-gradient(135deg,#808080,#555)"></div>
-        <div class="theme-name">Grey</div>
-      </div>
-    </div>
-  </div>
+  <div class="card"><div class="theme-grid" id="themeGrid"></div></div>
 </div>
 
 <div class="section">
@@ -82,8 +90,11 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
   <div class="card">
     <div class="accent-row" id="accentRow"></div>
     <div class="row" style="border-top:1px solid var(--border)">
-      <div class="row-info"><div class="row-label">Custom Accent</div><div class="row-desc">Pick any color</div></div>
-      <input type="color" id="accentCustom" style="width:40px;height:32px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:none;padding:2px" onchange="setAccent(this.value)">
+      <div class="row-info"><div class="row-label">Custom Accent</div><div class="row-desc">Override theme default</div></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="color" id="accentCustom" style="width:38px;height:30px;border:1px solid var(--border);border-radius:7px;cursor:pointer;background:none;padding:2px" onchange="setAccent(this.value,true)">
+        <button class="btn btn-ghost" onclick="clearAccentOverride()">Reset</button>
+      </div>
     </div>
   </div>
 </div>
@@ -93,7 +104,7 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
   <div class="card">
     <div class="wp-grid" id="wpGrid"></div>
     <div class="wp-url-row">
-      <input type="text" id="wpUrl" placeholder="Paste an image URL…">
+      <input type="text" id="wpUrl" placeholder="Paste image URL…">
       <button class="btn btn-primary" onclick="applyWpUrl()">Apply</button>
       <button class="btn btn-ghost" onclick="resetWp()">Reset</button>
     </div>
@@ -101,95 +112,186 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 </div>
 
 <div class="section">
+  <div class="sec-title">Taskbar Style</div>
+  <div class="card">
+    <div class="tb-mode-grid">
+      <div class="tb-card" id="tb-blur"   onclick="applyTbMode('blur')">  <span class="tb-card-icon">🫧</span>Blurred</div>
+      <div class="tb-card" id="tb-glass"  onclick="applyTbMode('glass')"> <span class="tb-card-icon">🪟</span>Glass</div>
+      <div class="tb-card" id="tb-solid"  onclick="applyTbMode('solid')"> <span class="tb-card-icon">⬛</span>Solid</div>
+      <div class="tb-card" id="tb-hidden" onclick="applyTbMode('hidden')"><span class="tb-card-icon">👻</span>Hidden</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
   <div class="sec-title">Desktop</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">Reset Icon Layout</div><div class="row-desc">Move all icons back to default positions</div></div>
-      <button class="btn btn-ghost" onclick="resetLayout()">↺ Reset</button>
+    <div class="row"><div class="row-info"><div class="row-label">Reset Icon Layout</div><div class="row-desc">Move all icons back to default positions</div></div><button class="btn btn-ghost" onclick="resetLayout()">↺ Reset</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Icon Glow</div><div class="row-desc">Colored glow under desktop icons</div></div><label class="toggle"><input type="checkbox" id="iconGlowToggle" onchange="localStorage.setItem('serverplex_icon_glow',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title">Custom Theme Builder</div>
+  <div class="card">
+    <div class="builder-body">
+      <div class="preview-box" id="pvBox">
+        <div class="pv-top" id="pvTop"><div class="pv-dot" id="pvDot"></div><div class="pv-block" id="pvBlock1" style="flex:1;max-width:70px"></div></div>
+        <div class="pv-bar" id="pvBar"><div class="pv-block" style="width:32px"></div><div class="pv-block" style="width:48px"></div><div class="pv-block" style="width:40px"></div></div>
+        <div class="pv-body" id="pvBody"><div class="pv-win" id="pvWin1"></div><div class="pv-win" id="pvWin2"></div></div>
+      </div>
+      <div class="color-grid">
+        <div class="color-row"><label>Background</label><input type="color" id="cp-bg"     value="#0a0e1a" oninput="livePreview()"></div>
+        <div class="color-row"><label>Surface</label>   <input type="color" id="cp-bg2"    value="#12151f" oninput="livePreview()"></div>
+        <div class="color-row"><label>Text</label>      <input type="color" id="cp-text"   value="#e8edf5" oninput="livePreview()"></div>
+        <div class="color-row"><label>Muted Text</label><input type="color" id="cp-text2"  value="#6a7590" oninput="livePreview()"></div>
+        <div class="color-row"><label>Border</label>    <input type="color" id="cp-border" value="#1e2030" oninput="livePreview()"></div>
+        <div class="color-row"><label>Accent</label>    <input type="color" id="cp-accent" value="#0078d4" oninput="livePreview()"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="loadPreset('dark')">Dark</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="loadPreset('light')">Light</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="loadPreset('rose')">Rose</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="loadPreset('mint')">Mint</button>
+        <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px" onclick="loadPreset('mono')">Mono</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn btn-primary" onclick="applyCustom()">✨ Apply</button>
+        <button class="btn btn-ghost"   onclick="resetCustom()">Reset</button>
+        <span class="applied" id="appliedBadge">✓ Applied!</span>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
-var ACCENTS = ['#0078d4','#34c759','#ff375f','#ff9500','#af52de','#5856d6','#00bcd4','#ff2d55','#ffcc00','#8e8e93'];
-var WALLPAPERS = [
-  {label:'Solid Dark', style:'background:#07090f'},
-  {label:'Blue Gradient', style:'background:linear-gradient(135deg,#1e3a5f,#0078d4)'},
-  {label:'Purple', style:'background:linear-gradient(135deg,#1a1040,#764ba2)'},
-  {label:'Sunset', style:'background:linear-gradient(135deg,#f59e0b,#ff375f)'},
-  {label:'Forest', style:'background:linear-gradient(135deg,#134e13,#34c759)'},
-  {label:'Ocean', style:'background:linear-gradient(135deg,#0078d4,#00bcd4)'},
-  {label:'Midnight', style:'background:linear-gradient(135deg,#000,#1a1a2e)'},
-  {label:'Warm', style:'background:linear-gradient(135deg,#ff9500,#ff2d55)'},
+var THEMES=[
+  {id:'white', name:'White',  bg:'linear-gradient(135deg,#fff,#e0e0e0)',     bar:'#f0f0f0',accent:'#0078d4'},
+  {id:'black', name:'Black',  bg:'linear-gradient(135deg,#1a1a1a,#000)',     bar:'#0a0a0a',accent:'#0078d4'},
+  {id:'grey',  name:'Grey',   bg:'linear-gradient(135deg,#808080,#555)',     bar:'#505050',accent:'#4a9eff'},
+  {id:'aurora',name:'Aurora', bg:'linear-gradient(135deg,#0a0e1a,#0d1b33)', bar:'#080c1c',accent:'#00d4aa'},
+  {id:'tokyo', name:'Tokyo',  bg:'linear-gradient(135deg,#1a1b2e,#0f3460)', bar:'#16213e',accent:'#ff2d55'},
+  {id:'forest',name:'Forest', bg:'linear-gradient(135deg,#0d1f0e,#1a321b)', bar:'#0a1a0b',accent:'#34c759'},
+  {id:'space', name:'Space',  bg:'linear-gradient(135deg,#020408,#080d1a)', bar:'#020408',accent:'#7c83fd'},
+  {id:'sunset',name:'Sunset', bg:'linear-gradient(135deg,#1a0a0a,#2a1005)', bar:'#180a0a',accent:'#ff6b35'},
+  {id:'arctic',name:'Arctic', bg:'linear-gradient(135deg,#e8f4fd,#f0f8ff)', bar:'#d0e8f8',accent:'#0096d6'},
+  {id:'synth', name:'Synth',  bg:'linear-gradient(135deg,#0d0015,#1e0030)', bar:'#0e0018',accent:'#e040fb'},
+  {id:'custom',name:'Custom', bg:'linear-gradient(135deg,#0a0e1a,#12151f)', bar:'#1e2030',accent:'#0078d4',isCustom:true},
 ];
+var PRESETS={
+  dark: {bg:'#0a0e1a',bg2:'#12151f',text:'#e8edf5',text2:'#6a7590',border:'#1e2030',accent:'#0078d4'},
+  light:{bg:'#f5f5f5',bg2:'#e8e8e8',text:'#111',   text2:'#666',   border:'#ccc',   accent:'#0078d4'},
+  rose: {bg:'#1a0a10',bg2:'#240e18',text:'#f8d7e3',text2:'#c47090',border:'#3d1528',accent:'#ff2d78'},
+  mint: {bg:'#081410',bg2:'#0d1e18',text:'#d4edda',text2:'#6aab80',border:'#163020',accent:'#00c06a'},
+  mono: {bg:'#111',   bg2:'#1c1c1c',text:'#ddd',   text2:'#888',   border:'#333',   accent:'#aaa'},
+};
+var ACCENTS=['#0078d4','#00d4aa','#ff2d55','#34c759','#7c83fd','#ff6b35','#0096d6','#e040fb','#ff9500','#ffcc00','#5856d6','#ff3b30'];
+var WALLPAPERS=[
+  {style:'background:#07090f',label:'Dark'},
+  {style:'background:linear-gradient(135deg,#1e3a5f,#0078d4)',label:'Blue'},
+  {style:'background:linear-gradient(135deg,#1a1040,#764ba2)',label:'Purple'},
+  {style:'background:linear-gradient(135deg,#f59e0b,#ff375f)',label:'Sunset'},
+  {style:'background:linear-gradient(135deg,#134e13,#34c759)',label:'Forest'},
+  {style:'background:linear-gradient(135deg,#0078d4,#00bcd4)',label:'Ocean'},
+  {style:'background:linear-gradient(135deg,#0d0015,#e040fb)',label:'Synth'},
+  {style:'background:linear-gradient(135deg,#020408,#7c83fd)',label:'Space'},
+];
+var curTheme=localStorage.getItem('serverplex_theme')||'white';
+var curAccent=localStorage.getItem('serverplex_accent')||'#0078d4';
+var curTbMode=localStorage.getItem('serverplex_tb_mode')||'blur';
 
-var curAccent = localStorage.getItem('serverplex_accent') || '#0078d4';
-var curTheme  = localStorage.getItem('serverplex_theme')  || 'white';
-var curWp     = localStorage.getItem('serverplex_wallpaper') || '';
-
-// Theme cards
-['white','black','grey'].forEach(function(t){
-  document.getElementById('th-'+t).classList.toggle('active', t === curTheme);
+// Build theme grid
+var tg=document.getElementById('themeGrid');
+THEMES.forEach(function(th){
+  var d=document.createElement('div');d.className='theme-card'+(th.id===curTheme?' active':'');d.id='thcard-'+th.id;
+  var customVars=JSON.parse(localStorage.getItem('serverplex_custom_theme')||'null');
+  var pvBg=th.isCustom&&customVars?customVars.bg:null;
+  d.innerHTML='<div class="theme-preview" style="'+(pvBg?'background:'+pvBg:th.bg)+'"></div><div class="theme-preview-bar" style="background:'+th.bar+'"></div><div class="theme-name" style="background:'+th.accent+'">'+th.name+'</div>';
+  d.onclick=function(){if(th.isCustom){applyCustom();return;}applyTheme(th.id,th.accent);};
+  tg.appendChild(d);
 });
 
 // Accent dots
-var ar = document.getElementById('accentRow');
+var ar=document.getElementById('accentRow');
 ACCENTS.forEach(function(c){
-  var d = document.createElement('div');
-  d.className = 'accent-dot' + (c === curAccent ? ' selected' : '');
-  d.style.background = c;
-  d.title = c;
-  d.onclick = function(){ setAccent(c); };
-  ar.appendChild(d);
+  var d=document.createElement('div');d.className='accent-dot'+(c===curAccent?' selected':'');d.style.background=c;
+  d.onclick=function(){setAccent(c,true);};ar.appendChild(d);
 });
-document.getElementById('accentCustom').value = curAccent;
+document.getElementById('accentCustom').value=curAccent;
 
-// Wallpaper presets
-var wg = document.getElementById('wpGrid');
+// Wallpapers
+var wg=document.getElementById('wpGrid');
 WALLPAPERS.forEach(function(wp){
-  var d = document.createElement('div');
-  d.className = 'wp-option';
-  d.setAttribute('style', wp.style);
-  d.title = wp.label;
-  d.onclick = function(){ applyWp(wp.style.replace('background:','')); };
+  var d=document.createElement('div');d.className='wp-opt';d.setAttribute('style',wp.style);d.title=wp.label;
+  d.onclick=function(){applyWp(wp.style.replace('background:',''));document.querySelectorAll('.wp-opt').forEach(function(x){x.classList.remove('selected');});d.classList.add('selected');};
   wg.appendChild(d);
 });
 
-function setTheme(t) {
-  localStorage.setItem('serverplex_theme', t);
-  document.body.className = t === 'black' ? 'dark' : t === 'grey' ? 'grey' : '';
-  ['white','black','grey'].forEach(function(x){ document.getElementById('th-'+x).classList.toggle('active', x===t); });
-  if (window.parent && window.parent.changeTheme) window.parent.changeTheme(t);
-  // Notify settings-main to update its sidebar theme
-  if (window.parent && window.parent.postMessage) window.parent.postMessage({type:'theme-change',theme:t},'*');
-}
+// Taskbar
+['blur','glass','solid','hidden'].forEach(function(m){var el=document.getElementById('tb-'+m);if(el)el.classList.toggle('active',m===curTbMode);});
 
-function setAccent(c) {
-  localStorage.setItem('serverplex_accent', c);
-  document.documentElement.style.setProperty('--accent', c);
-  document.getElementById('accentCustom').value = c;
-  document.querySelectorAll('.accent-dot').forEach(function(d){ d.classList.toggle('selected', d.style.background === c || d.style.backgroundColor === c); });
-  if (window.parent) window.parent.document.documentElement.style.setProperty('--accent', c);
-}
+// Icon glow
+document.getElementById('iconGlowToggle').checked=localStorage.getItem('serverplex_icon_glow')!=='false';
 
-function applyWp(val) {
-  localStorage.setItem('serverplex_wallpaper', val);
-  if (window.parent && window.parent.setWallpaper) window.parent.setWallpaper(val);
+// Restore custom builder
+(function(){var s=JSON.parse(localStorage.getItem('serverplex_custom_theme')||'null');if(s){Object.keys(s).forEach(function(k){var el=document.getElementById('cp-'+k);if(el)el.value=s[k];});}livePreview();})();
+
+function applyTheme(id,acc){
+  curTheme=id;localStorage.setItem('serverplex_theme',id);
+  document.querySelectorAll('.theme-card').forEach(function(c){c.classList.remove('active');});
+  var card=document.getElementById('thcard-'+id);if(card)card.classList.add('active');
+  var override=localStorage.getItem('serverplex_accent_override');
+  setAccent(override||acc,!!override);
+  if(window.parent&&window.parent.changeTheme)window.parent.changeTheme(id);
+  window.parent&&window.parent.postMessage({type:'theme-change',theme:id},'*');
+  document.body.className=document.body.className.replace(/\b(dark|grey)\b/g,'').trim();
+  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
+  if(dark.includes(id))document.body.classList.add('dark');else if(id==='grey')document.body.classList.add('grey');
 }
-function applyWpUrl() {
-  var url = document.getElementById('wpUrl').value.trim();
-  if (!url) return;
-  applyWp('url(\'' + url + '\') center/cover no-repeat');
+function setAccent(c,isOverride){
+  curAccent=c;document.documentElement.style.setProperty('--accent',c);
+  document.getElementById('accentCustom').value=c;
+  document.querySelectorAll('.accent-dot').forEach(function(d){d.classList.toggle('selected',d.style.background===c||d.style.backgroundColor===c);});
+  if(isOverride)localStorage.setItem('serverplex_accent_override',c);
+  localStorage.setItem('serverplex_accent',c);
+  if(window.parent)window.parent.document.documentElement.style.setProperty('--accent',c);
 }
-function resetWp() {
-  localStorage.removeItem('serverplex_wallpaper');
-  document.getElementById('wpUrl').value = '';
-  if (window.parent && window.parent.setWallpaper) window.parent.setWallpaper('none');
+function clearAccentOverride(){localStorage.removeItem('serverplex_accent_override');var th=THEMES.find(function(t){return t.id===curTheme;});if(th)setAccent(th.accent,false);}
+function applyTbMode(mode){
+  curTbMode=mode;localStorage.setItem('serverplex_tb_mode',mode);
+  ['blur','glass','solid','hidden'].forEach(function(m){var el=document.getElementById('tb-'+m);if(el)el.classList.toggle('active',m===mode);});
+  if(window.parent&&window.parent.setTaskbarMode)window.parent.setTaskbarMode(mode);
 }
-function resetLayout() {
-  if (window.parent && window.parent.resetDesktopLayout) window.parent.resetDesktopLayout();
-  else alert('Reset successful — desktop icons will reposition on next load.');
+function applyWp(val){localStorage.setItem('serverplex_wallpaper',val);if(window.parent&&window.parent.setWallpaper)window.parent.setWallpaper(val);}
+function applyWpUrl(){var url=document.getElementById('wpUrl').value.trim();if(!url)return;applyWp("url('"+url+"') center/cover no-repeat");}
+function resetWp(){localStorage.removeItem('serverplex_wallpaper');document.getElementById('wpUrl').value='';if(window.parent&&window.parent.setWallpaper)window.parent.setWallpaper('none');}
+function resetLayout(){if(window.parent&&window.parent.resetDesktopLayout)window.parent.resetDesktopLayout();else alert('Icons will reposition on next load.');}
+
+// Custom builder
+function getVars(){return{bg:document.getElementById('cp-bg').value,bg2:document.getElementById('cp-bg2').value,text:document.getElementById('cp-text').value,text2:document.getElementById('cp-text2').value,border:document.getElementById('cp-border').value,accent:document.getElementById('cp-accent').value};}
+function livePreview(){
+  var v=getVars();
+  document.getElementById('pvBox').style.background=v.bg;document.getElementById('pvBox').style.borderColor=v.border;
+  document.getElementById('pvTop').style.background=v.bg2;document.getElementById('pvBar').style.background=v.bg2;
+  document.getElementById('pvBody').style.background=v.bg;
+  document.getElementById('pvDot').style.background=v.accent;
+  document.getElementById('pvBlock1').style.background=v.text2;
+  document.querySelectorAll('.pv-block').forEach(function(b){b.style.background=v.text2;b.style.opacity='.45';});
+  document.querySelectorAll('.pv-win').forEach(function(w){w.style.background=v.bg2;w.style.borderColor=v.border;});
 }
+function loadPreset(name){var p=PRESETS[name];if(!p)return;Object.keys(p).forEach(function(k){var el=document.getElementById('cp-'+k);if(el)el.value=p[k];});livePreview();}
+function applyCustom(){
+  var v=getVars();
+  localStorage.setItem('serverplex_custom_theme',JSON.stringify(v));
+  localStorage.setItem('serverplex_theme','custom');
+  try{if(window.parent&&window.parent.applyCustomThemeVars)window.parent.applyCustomThemeVars(v);}catch(e){}
+  document.querySelectorAll('.theme-card').forEach(function(c){c.classList.remove('active');});
+  var card=document.getElementById('thcard-custom');
+  if(card){card.classList.add('active');card.querySelector('.theme-preview').style.background=v.bg;card.querySelector('.theme-preview-bar').style.background=v.bg2;card.querySelector('.theme-name').style.background=v.accent;}
+  var badge=document.getElementById('appliedBadge');badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2000);
+  window.parent&&window.parent.postMessage({type:'theme-change',theme:'custom'},'*');
+}
+function resetCustom(){localStorage.removeItem('serverplex_custom_theme');loadPreset('dark');}
 </script>
 </body>
 </html>

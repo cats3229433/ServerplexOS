@@ -585,7 +585,7 @@
   <script>
     // ── Check if already set up ──
     if (localStorage.getItem('serverplex_setup_complete') === 'true') {
-      window.location.replace('eclipseos.html');
+      window.location.replace('desktop.html');
     }
 
     // ── State ──
@@ -821,7 +821,7 @@
 
     function launchOS() {
       localStorage.setItem('serverplex_setup_complete', 'true');
-      sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'eclipseos.html';
+      sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'desktop.html';
     }
 
     // Init

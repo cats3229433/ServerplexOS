@@ -10,15 +10,30 @@
 body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#333}
 body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
 body{font-family:'Oxanium',sans-serif;height:100vh;display:flex;background:var(--bg);color:var(--text);overflow:hidden;transition:background .3s,color .3s}
+
 .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-header{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+.sidebar-header{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
 .sidebar-header h2{font-size:17px;font-weight:800;letter-spacing:.5px}
 .sidebar-header .sub{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
-.nav-item{padding:11px 18px;cursor:pointer;transition:background .15s,color .15s;display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;font-weight:600;border-left:3px solid transparent;position:relative}
+
+.nav-item{padding:11px 18px;cursor:pointer;transition:background .15s,color .15s;display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;font-weight:600;border-left:3px solid transparent}
 .nav-item:hover{background:var(--bg2);color:var(--text)}
 .nav-item.active{background:rgba(0,120,212,.12);color:var(--accent);border-left-color:var(--accent)}
 .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.sidebar-footer{margin-top:auto;padding:12px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text2);letter-spacing:1px}
+.nav-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;background:rgba(255,59,48,.15);color:#ff3b30;margin-left:auto;display:none}
+.nav-badge.show{display:block}
+
+/* Save bar */
+.save-bar{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface);flex-shrink:0}
+.save-btn{flex:1;padding:9px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.save-btn:hover{opacity:.88;transform:translateY(-1px)}
+.save-btn:disabled{opacity:.5;cursor:default;transform:none}
+.save-status{font-size:11px;color:var(--text2);min-width:80px;text-align:center;transition:color .2s}
+.save-status.saved{color:#34c759}
+.save-status.saving{color:var(--accent)}
+
+.sidebar-footer{padding:10px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text2);letter-spacing:1px}
+
 .content{flex:1;overflow:hidden}
 iframe{width:100%;height:100%;border:none;background:var(--bg)}
 </style>
@@ -26,41 +41,155 @@ iframe{width:100%;height:100%;border:none;background:var(--bg)}
 <body>
 <script>
 (function(){
-  var t = localStorage.getItem('serverplex_theme') || 'white';
-  if (t === 'black') document.body.classList.add('dark');
-  else if (t === 'grey') document.body.classList.add('grey');
-  var acc = localStorage.getItem('serverplex_accent');
-  if (acc) document.documentElement.style.setProperty('--accent', acc);
+  var t=localStorage.getItem('serverplex_theme')||'white';
+  if(t==='black'||t==='aurora'||t==='tokyo'||t==='forest'||t==='space'||t==='sunset'||t==='synth') document.body.classList.add('dark');
+  else if(t==='grey') document.body.classList.add('grey');
+  var acc=localStorage.getItem('serverplex_accent');
+  if(acc) document.documentElement.style.setProperty('--accent',acc);
 })();
 </script>
+
 <div class="sidebar">
   <div class="sidebar-header">
     <h2>⚙️ Settings</h2>
     <div class="sub">ServerplexOS</div>
   </div>
-  <div class="nav-item active" data-page="system"         onclick="nav(this,'system')">        <span class="nav-icon">💻</span> System</div>
-  <div class="nav-item"        data-page="personalization" onclick="nav(this,'personalization')"><span class="nav-icon">🎨</span> Personalization</div>
-  <div class="nav-item"        data-page="apps"            onclick="nav(this,'apps')">           <span class="nav-icon">📱</span> Apps</div>
-  <div class="nav-item"        data-page="accounts"        onclick="nav(this,'accounts')">       <span class="nav-icon">👤</span> Accounts</div>
-  <div class="nav-item"        data-page="privacy"         onclick="nav(this,'privacy')">        <span class="nav-icon">🔒</span> Privacy & Security</div>
-  <div class="nav-item"        data-page="about"           onclick="nav(this,'about')">          <span class="nav-icon">ℹ️</span> About</div>
+
+  <div class="nav-item active" data-page="system"          onclick="nav(this,'system')">         <span class="nav-icon">💻</span>System</div>
+  <div class="nav-item"        data-page="personalization"  onclick="nav(this,'personalization')"> <span class="nav-icon">🎨</span>Personalization</div>
+  <div class="nav-item"        data-page="apps"             onclick="nav(this,'apps')">            <span class="nav-icon">📱</span>Apps</div>
+  <div class="nav-item"        data-page="accounts"         onclick="nav(this,'accounts')">        <span class="nav-icon">👤</span>Accounts</div>
+  <div class="nav-item"        data-page="privacy"          onclick="nav(this,'privacy')">         <span class="nav-icon">🔒</span>Privacy & Security</div>
+  <div class="nav-item"        data-page="about"            onclick="nav(this,'about')">           <span class="nav-icon">ℹ️</span>About</div>
+
+  <!-- Save bar -->
+  <div style="flex:1"></div>
+  <div class="save-bar">
+    <button class="save-btn" id="saveBtn" onclick="saveAndApply()">
+      💾 Save & Apply
+    </button>
+    <span class="save-status" id="saveStatus">No changes</span>
+  </div>
+
   <div class="sidebar-footer">Version 2.0 · Build 2026</div>
 </div>
+
 <div class="content">
   <iframe id="contentFrame" src="settings-system.html"></iframe>
 </div>
+
 <script>
+var currentPage = 'system';
+var pendingChanges = {};
+var saveTimer = null;
+
 function nav(el, page) {
+  // Check for unsaved changes before switching
+  if (Object.keys(pendingChanges).length > 0) {
+    if (!confirm('You have unsaved changes. Switch page anyway? (Changes will be lost)')) return;
+    pendingChanges = {};
+    updateSaveStatus();
+  }
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
+  currentPage = page;
   document.getElementById('contentFrame').src = 'settings-' + page + '.html';
 }
-// Keep theme in sync when child pages change it
-window.addEventListener('message', e => {
-  if (e.data && e.data.type === 'theme-change') {
-    document.body.className = e.data.theme === 'black' ? 'dark' : e.data.theme === 'grey' ? 'grey' : '';
+
+// ── Receive change notifications from child pages ──
+window.addEventListener('message', function(e) {
+  if (!e.data) return;
+
+  // Theme sync from personalization
+  if (e.data.type === 'theme-change') {
+    document.body.className = '';
+    var t = e.data.theme;
+    if (['black','aurora','tokyo','forest','space','sunset','synth'].includes(t)) document.body.classList.add('dark');
+    else if (t === 'grey') document.body.classList.add('grey');
+  }
+
+  // Settings change notification from a child page
+  if (e.data.type === 'settings-changed') {
+    Object.assign(pendingChanges, e.data.changes || {});
+    markUnsaved();
+  }
+
+  // Immediate apply (like theme/accent — no need to wait for Save)
+  if (e.data.type === 'settings-apply-immediate') {
+    applyToOS(e.data);
   }
 });
+
+function markUnsaved() {
+  document.getElementById('saveStatus').textContent = '● Unsaved';
+  document.getElementById('saveStatus').className = 'save-status';
+  document.getElementById('saveBtn').disabled = false;
+}
+
+function updateSaveStatus() {
+  var hasChanges = Object.keys(pendingChanges).length > 0;
+  document.getElementById('saveStatus').textContent = hasChanges ? '● Unsaved' : 'No changes';
+  document.getElementById('saveStatus').className = 'save-status' + (hasChanges ? '' : '');
+  document.getElementById('saveBtn').disabled = !hasChanges;
+}
+
+function saveAndApply() {
+  var btn = document.getElementById('saveBtn');
+  var status = document.getElementById('saveStatus');
+  btn.disabled = true;
+  btn.textContent = '⏳ Applying…';
+  status.textContent = 'Saving…';
+  status.className = 'save-status saving';
+
+  // Save all pending changes to localStorage
+  Object.keys(pendingChanges).forEach(function(key) {
+    localStorage.setItem(key, pendingChanges[key]);
+  });
+
+  // Send to OS parent to apply live
+  applyToOS(pendingChanges);
+
+  // Reload the current settings page to reflect saved state
+  setTimeout(function() {
+    var frame = document.getElementById('contentFrame');
+    frame.src = frame.src; // soft reload — just the iframe
+
+    pendingChanges = {};
+    btn.innerHTML = '💾 Save & Apply';
+    btn.disabled = true;
+    status.textContent = '✓ Saved!';
+    status.className = 'save-status saved';
+
+    setTimeout(function() {
+      status.textContent = 'No changes';
+      status.className = 'save-status';
+    }, 3000);
+  }, 400);
+}
+
+function applyToOS(changes) {
+  // Walk up to the top OS window and post a message
+  try {
+    var target = window.parent !== window ? window.parent : null;
+    if (!target) return;
+    // If nested inside eclipseos.html iframe, go one more level up
+    if (target.parent && target.parent !== target) target = target.parent;
+    target.postMessage({ type: 'settings-apply', ...changes }, '*');
+  } catch(e) {}
+
+  // Also try direct function calls if same origin
+  try {
+    var os = window.parent;
+    if (changes.theme    && os.changeTheme)     os.changeTheme(changes.theme);
+    if (changes.tbMode   && os.setTaskbarMode)  os.setTaskbarMode(changes.tbMode);
+    if (changes.wallpaper && os.setWallpaper)   os.setWallpaper(changes.wallpaper);
+    if (changes.accent) os.document.documentElement.style.setProperty('--accent', changes.accent);
+    if (changes.fontSize) os.document.body.style.fontSize = changes.fontSize + 'px';
+  } catch(e) {}
+}
+
+// Init save button state
+updateSaveStatus();
 </script>
 </body>
 </html>

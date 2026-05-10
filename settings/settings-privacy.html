@@ -5,7 +5,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd;--danger:#ff3b30}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd;--green:#34c759}
 body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
 body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
 body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
@@ -19,13 +19,35 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
 .row-desc{font-size:12px;color:var(--text2);line-height:1.5}
 .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s;flex-shrink:0}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:.88}
-.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}
-.btn-ghost:hover{background:var(--border)}
-.btn-danger{background:rgba(255,59,48,.1);color:var(--danger);border:1px solid rgba(255,59,48,.3)}
-.btn-danger:hover{background:rgba(255,59,48,.2)}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.88}
+.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{background:var(--border)}
+.btn-danger{background:rgba(255,59,48,.1);color:#ff3b30;border:1px solid rgba(255,59,48,.3)}.btn-danger:hover{background:rgba(255,59,48,.2)}
 .warn-banner{margin:14px 16px 0;padding:10px 14px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;font-size:12px;color:#f59e0b;line-height:1.5}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
+.toggle input:checked+.toggle-track{background:var(--accent)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle input:checked~.toggle-thumb{left:21px}
+/* filter hero */
+.filter-hero{padding:14px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(0,120,212,.06),rgba(0,120,212,.02))}
+.filter-shield{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#0056a8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.filter-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)}
+.stat-cell{padding:10px 12px;text-align:center;border-right:1px solid var(--border)}
+.stat-cell:last-child{border-right:none}
+.stat-num{font-size:18px;font-weight:800;color:var(--accent)}
+.stat-lbl{font-size:9px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.block-log{padding:8px 14px;max-height:140px;overflow-y:auto}
+.block-entry{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.block-entry:last-child{border-bottom:none}
+.block-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-weight:500}
+.block-reason{font-size:10px;color:var(--text2);background:var(--bg2);padding:2px 6px;border-radius:8px;flex-shrink:0}
+.block-time{font-size:10px;color:var(--text2);flex-shrink:0}
+.filter-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:none;flex-direction:column}
+.filter-overlay.open{display:flex}
+.filter-overlay-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.filter-overlay-back{padding:7px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;color:var(--text)}
+.filter-overlay iframe{flex:1;border:none;width:100%;background:var(--bg)}
 input[type=file]{display:none}
 </style>
 </head>
@@ -33,110 +55,135 @@ input[type=file]{display:none}
 <script>
 (function(){
   var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
+  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
+  if(dark.includes(t))document.body.classList.add('dark');
   else if(t==='grey')document.body.classList.add('grey');
   var acc=localStorage.getItem('serverplex_accent');
   if(acc)document.documentElement.style.setProperty('--accent',acc);
 })();
 </script>
 
+<div class="filter-overlay" id="filterOverlay">
+  <div class="filter-overlay-header">
+    <button class="filter-overlay-back" onclick="closeFilterSettings()">← Back</button>
+    <span style="font-size:15px;font-weight:800;color:var(--text)">🛡️ Content Filter Settings</span>
+  </div>
+  <iframe id="filterFrame" src="" title="Content Filter Settings"></iframe>
+</div>
+
 <h1>🔒 Privacy & Security</h1>
+
+<div class="section">
+  <div class="sec-title">Content Filter</div>
+  <div class="card">
+    <div class="filter-hero">
+      <div class="filter-shield">🛡️</div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px">Browser Content Filter</div><div style="font-size:12px;color:var(--text2)">Blocks adult content, custom domains &amp; keywords.</div></div>
+      <div style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(52,199,89,.15);color:var(--green);border:1px solid rgba(52,199,89,.3)">● Active</div>
+    </div>
+    <div class="filter-stats">
+      <div class="stat-cell"><div class="stat-num" id="statBlocked">0</div><div class="stat-lbl">Blocked Today</div></div>
+      <div class="stat-cell"><div class="stat-num" id="statCustom">0</div><div class="stat-lbl">Custom Rules</div></div>
+      <div class="stat-cell"><div class="stat-num" id="statWhitelist">0</div><div class="stat-lbl">Whitelisted</div></div>
+    </div>
+    <div class="row"><div class="row-info"><div class="row-label">Block Social Media</div><div class="row-desc">Twitter/X, Instagram, TikTok, Facebook, Reddit…</div></div><label class="toggle"><input type="checkbox" id="cfSocial" onchange="saveCf('blockSocial',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+    <div class="row"><div class="row-info"><div class="row-label">Block Gaming Sites</div><div class="row-desc">Poki, CrazyGames, Roblox, Friv…</div></div><label class="toggle"><input type="checkbox" id="cfGaming" onchange="saveCf('blockGaming',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+    <div class="row"><div class="row-info"><div class="row-label">Safe Search</div><div class="row-desc">Forces safe mode on Google, Bing, YouTube</div></div><label class="toggle"><input type="checkbox" id="cfSafe" onchange="saveCf('safeSearch',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+    <div style="padding:8px 14px 4px;border-top:1px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2)">Recent Blocks</span>
+        <button class="btn btn-ghost" style="padding:3px 10px;font-size:10px" onclick="clearBlockLog()">Clear</button>
+      </div>
+      <div class="block-log" id="blockLog"><div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0">No blocks this session.</div></div>
+    </div>
+    <div class="row" style="border-top:1px solid var(--border)"><div class="row-info"><div class="row-label">Advanced Filter Settings</div><div class="row-desc">Custom domains, keywords, whitelist, PIN</div></div><button class="btn btn-primary" onclick="openFilterSettings()">⚙️ Manage</button></div>
+  </div>
+</div>
 
 <div class="section">
   <div class="sec-title">Clear App Data</div>
   <div class="card">
-    <div class="row"><div class="row-info"><div class="row-label">Notepad</div><div class="row-desc">Delete all saved notepad text</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_notepad_text','Notepad cleared')">Clear</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">To-Do List</div><div class="row-desc">Delete all tasks</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_tasks','Tasks cleared')">Clear</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">Sticky Notes</div><div class="row-desc">Delete all sticky notes</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_sticky_notes','Sticky notes cleared')">Clear</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">Markdown Editor</div><div class="row-desc">Delete saved markdown content</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_markdown','Markdown cleared')">Clear</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">Recycle Bin</div><div class="row-desc">Permanently empty the recycle bin</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_recycle_bin','Recycle bin emptied')">Empty</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">Desktop Widgets</div><div class="row-desc">Remove all desktop widgets</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_widgets','Widgets cleared')">Clear</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">Notification History</div><div class="row-desc">Clear all stored notifications</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_notifs','Notifications cleared')">Clear</button></div>
-    <div class="row"><div class="row-info"><div class="row-label">Game History</div><div class="row-desc">Clear recently played and favourite games</div></div><button class="btn btn-ghost" onclick="clearGames()">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Notepad</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_notepad_text','Notepad cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">To-Do List</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_tasks','Tasks cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Sticky Notes</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_sticky_notes','Sticky notes cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Desktop Widgets</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_widgets','Widgets cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Notification History</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_notifs','Notifications cleared')">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Browser History &amp; Bookmarks</div></div><button class="btn btn-ghost" onclick="clearBrowser()">Clear</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Recent Apps</div></div><button class="btn btn-ghost" onclick="clearKey('serverplex_recents','Recents cleared')">Clear</button></div>
   </div>
 </div>
 
 <div class="section">
   <div class="sec-title">Data Management</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">Export All Settings</div><div class="row-desc">Download a backup of all OS data as JSON</div></div>
-      <button class="btn btn-primary" onclick="exportData()">📥 Export</button>
-    </div>
-    <div class="row">
-      <div class="row-info"><div class="row-label">Import Settings</div><div class="row-desc">Restore from a previously exported backup</div></div>
-      <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">📤 Import</button>
-      <input type="file" id="importFile" accept=".json" onchange="importData(event)">
-    </div>
+    <div class="row"><div class="row-info"><div class="row-label">Export All Settings</div><div class="row-desc">Download a JSON backup of all OS data</div></div><button class="btn btn-primary" onclick="exportData()">📥 Export</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Import Settings</div><div class="row-desc">Restore from a backup file</div></div><button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">📤 Import</button><input type="file" id="importFile" accept=".json" onchange="importData(event)"></div>
   </div>
 </div>
 
 <div class="section">
   <div class="sec-title">Danger Zone</div>
   <div class="card">
-    <div class="warn-banner">⚠️ The actions below are permanent and cannot be undone.</div>
-    <div class="row" style="margin-top:0">
-      <div class="row-info"><div class="row-label">Clear All OS Data</div><div class="row-desc">Factory reset — removes all settings, profile, app data, and personalization</div></div>
-      <button class="btn btn-danger" onclick="factoryReset()">🗑️ Factory Reset</button>
-    </div>
+    <div class="warn-banner">⚠️ These actions are permanent and cannot be undone.</div>
+    <div class="row"><div class="row-info"><div class="row-label">Factory Reset</div><div class="row-desc">Removes all settings, profile and app data</div></div><button class="btn btn-danger" onclick="factoryReset()">🗑️ Reset</button></div>
   </div>
 </div>
 
 <script>
-function clearKey(key, msg) {
-  if (!confirm('Clear ' + msg.replace(' cleared','').replace(' emptied','') + '?')) return;
-  localStorage.removeItem(key);
-  alert('✅ ' + msg);
+function loadCf(){try{return JSON.parse(localStorage.getItem('cf_user_settings')||'{}');}catch(e){return{};}}
+function saveCf(k,v){var s=loadCf();s[k]=v;localStorage.setItem('cf_user_settings',JSON.stringify(s));}
+function initFilter(){
+  var s=loadCf();
+  document.getElementById('cfSocial').checked=!!s.blockSocial;
+  document.getElementById('cfGaming').checked=!!s.blockGaming;
+  document.getElementById('cfSafe').checked=s.safeSearch!==false;
+  var log=[];try{log=JSON.parse(sessionStorage.getItem('cf_block_log')||'[]');}catch(e){}
+  document.getElementById('statBlocked').textContent=log.length;
+  document.getElementById('statCustom').textContent=((s.domains||[]).length+(s.keywords||[]).length);
+  document.getElementById('statWhitelist').textContent=(s.allowed||[]).length;
+  renderLog(log);
 }
-function clearGames() {
-  if (!confirm('Clear game history and favourites?')) return;
-  localStorage.removeItem('serverplex_game_recents');
-  localStorage.removeItem('serverplex_game_favs');
-  alert('✅ Game history cleared');
+function renderLog(log){
+  var c=document.getElementById('blockLog');
+  if(!log||!log.length){c.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0">No blocks this session.</div>';return;}
+  c.innerHTML=log.slice(0,10).map(function(e){
+    var host=e.url;try{host=new URL(e.url).hostname.replace('www.','');}catch(_){}
+    var t=e.time?new Date(e.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+    return '<div class="block-entry"><span>🚫</span><span class="block-url" title="'+e.url+'">'+host+'</span><span class="block-reason">'+(e.reason||'Blocked')+'</span><span class="block-time">'+t+'</span></div>';
+  }).join('');
 }
-
-function exportData() {
-  var data = {};
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && (k.startsWith('serverplex_') || k.startsWith('eclipseos_'))) data[k] = localStorage.getItem(k);
-  }
-  var blob = new Blob([JSON.stringify({exportDate:new Date().toISOString(),version:'2.0',data:data},null,2)],{type:'application/json'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'serverplexos-backup-' + new Date().toISOString().split('T')[0] + '.json';
-  a.click(); URL.revokeObjectURL(a.href);
+function clearBlockLog(){sessionStorage.removeItem('cf_block_log');initFilter();}
+function openFilterSettings(){
+  var ov=document.getElementById('filterOverlay'),fr=document.getElementById('filterFrame');
+  if(!fr.src||fr.src===window.location.href)fr.src='../os-apps/BrowserFiles/filter-settings.html';
+  ov.classList.add('open');
 }
-
-function importData(e) {
-  var file = e.target.files[0]; if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev){
-    try {
-      var imported = JSON.parse(ev.target.result);
-      if (!confirm('Import settings? This will overwrite your current OS settings.')) { e.target.value=''; return; }
-      var d = imported.data || {};
-      Object.keys(d).forEach(function(k){ localStorage.setItem(k, d[k]); });
-      alert('✅ Settings imported! Reloading…');
-      e.target.value = '';
-      setTimeout(function(){ (window.parent||window).location.reload(); }, 800);
-    } catch(err) { alert('❌ Invalid backup file'); e.target.value=''; }
-  };
-  reader.readAsText(file);
+function closeFilterSettings(){document.getElementById('filterOverlay').classList.remove('open');initFilter();}
+function clearKey(k,msg){if(!confirm('Clear '+msg.replace(' cleared','')+' data?'))return;localStorage.removeItem(k);alert('✅ '+msg);}
+function clearBrowser(){if(!confirm('Clear browser history and bookmarks?'))return;['bw_history','bw_bookmarks'].forEach(function(k){localStorage.removeItem(k);});alert('✅ Browser data cleared');}
+function exportData(){
+  var data={};
+  for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&(k.startsWith('serverplex_')||k.startsWith('cf_')||k.startsWith('bw_')))data[k]=localStorage.getItem(k);}
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({exportDate:new Date().toISOString(),version:'2.0',data:data},null,2)],{type:'application/json'}));
+  a.download='serverplexos-backup-'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(a.href);
 }
-
-function factoryReset() {
-  if (!confirm('FACTORY RESET\n\nThis will delete ALL ServerplexOS data permanently.\n\nThis cannot be undone. Continue?')) return;
-  if (!confirm('Last chance — are you absolutely sure?')) return;
-  var keys = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && (k.startsWith('serverplex_') || k.startsWith('eclipseos_'))) keys.push(k);
-  }
-  keys.forEach(function(k){ localStorage.removeItem(k); });
-  alert('✅ Factory reset complete. Reloading…');
-  setTimeout(function(){ (window.parent||window).location.replace('welcome.html'); }, 800);
+function importData(e){
+  var file=e.target.files[0];if(!file)return;
+  var r=new FileReader();
+  r.onload=function(ev){try{var d=JSON.parse(ev.target.result);if(!confirm('Import? This will overwrite current settings.')){e.target.value='';return;}Object.keys(d.data||{}).forEach(function(k){localStorage.setItem(k,d.data[k]);});alert('✅ Imported! Reloading…');e.target.value='';setTimeout(function(){(window.parent||window).location.reload();},800);}catch(err){alert('❌ Invalid backup file');e.target.value='';}};
+  r.readAsText(file);
 }
+function factoryReset(){
+  if(!confirm('FACTORY RESET — delete ALL data?'))return;
+  if(!confirm('Last chance — are you sure?'))return;
+  var keys=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&(k.startsWith('serverplex_')||k.startsWith('cf_')||k.startsWith('bw_')))keys.push(k);}
+  keys.forEach(function(k){localStorage.removeItem(k);});
+  alert('✅ Reset complete. Reloading…');
+  setTimeout(function(){(window.parent||window).location.replace('welcome.html');},800);
+}
+initFilter();
+setInterval(initFilter,5000);
 </script>
 </body>
 </html>

@@ -5,11 +5,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd;--danger:#ff3b30}
+:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
 body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
 body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
 body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
-h1{font-size:26px;font-weight:800;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .section{margin-bottom:32px}
 .sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
@@ -19,20 +19,18 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px;display:flex;align-items:ce
 .row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
 .row-desc{font-size:12px;color:var(--text2);line-height:1.5}
 .row-val{font-size:13px;color:var(--text2);flex-shrink:0}
-select,input[type="text"]{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none;cursor:pointer}
+select{padding:7px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none;cursor:pointer}
 .toggle{position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer}
 .toggle input{opacity:0;width:0;height:0}
 .toggle-track{position:absolute;inset:0;border-radius:12px;background:var(--border);transition:background .2s}
 .toggle input:checked + .toggle-track{background:var(--accent)}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
 .toggle input:checked ~ .toggle-thumb{left:21px}
-.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s;letter-spacing:.3px}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{opacity:.88;transform:translateY(-1px)}
-.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}
-.btn-ghost:hover{background:var(--border)}
+.btn-primary:hover{opacity:.88}
 .bar-wrap{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;max-width:200px}
-.bar-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.bar-fill{height:100%;border-radius:4px;transition:width .5s}
 .startup-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px}
 .startup-item{display:flex;align-items:center;gap:10px;font-size:13px}
 .startup-item input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
@@ -42,28 +40,20 @@ select,input[type="text"]{padding:7px 12px;border:1px solid var(--border);border
 <script>
 (function(){
   var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
+  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
+  if(dark.includes(t))document.body.classList.add('dark');
   else if(t==='grey')document.body.classList.add('grey');
   var acc=localStorage.getItem('serverplex_accent');
   if(acc)document.documentElement.style.setProperty('--accent',acc);
 })();
 </script>
-
 <h1>💻 System</h1>
-
 <div class="section">
   <div class="sec-title">Display</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">Screen Resolution</div><div class="row-desc">Your current display resolution</div></div>
-      <div class="row-val" id="res">—</div>
-    </div>
-    <div class="row">
-      <div class="row-info"><div class="row-label">Fullscreen Mode</div><div class="row-desc">Expand ServerplexOS to fill your screen</div></div>
-      <button class="btn btn-primary" onclick="goFullscreen()">Enter Fullscreen</button>
-    </div>
-    <div class="row">
-      <div class="row-info"><div class="row-label">Font Size</div><div class="row-desc">Adjust the OS interface font size</div></div>
+    <div class="row"><div class="row-info"><div class="row-label">Screen Resolution</div><div class="row-desc">Your current display resolution</div></div><div class="row-val" id="res">—</div></div>
+    <div class="row"><div class="row-info"><div class="row-label">Fullscreen Mode</div><div class="row-desc">Expand ServerplexOS to fill your screen</div></div><button class="btn btn-primary" onclick="goFullscreen()">Enter Fullscreen</button></div>
+    <div class="row"><div class="row-info"><div class="row-label">Font Size</div><div class="row-desc">Adjust the OS interface font size</div></div>
       <select id="fontSz" onchange="applyFont(this.value)">
         <option value="13">Small (13px)</option>
         <option value="14" selected>Default (14px)</option>
@@ -74,12 +64,10 @@ select,input[type="text"]{padding:7px 12px;border:1px solid var(--border);border
     </div>
   </div>
 </div>
-
 <div class="section">
   <div class="sec-title">Clock & Time</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">Clock Format</div><div class="row-desc">Choose between 12-hour and 24-hour time</div></div>
+    <div class="row"><div class="row-info"><div class="row-label">Clock Format</div><div class="row-desc">12-hour or 24-hour display</div></div>
       <select id="clockFmt" onchange="saveClock(this.value)">
         <option value="12">12-hour (3:00 PM)</option>
         <option value="24">24-hour (15:00)</option>
@@ -87,119 +75,64 @@ select,input[type="text"]{padding:7px 12px;border:1px solid var(--border);border
     </div>
   </div>
 </div>
-
 <div class="section">
   <div class="sec-title">Storage</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">Local Storage Usage</div><div class="row-desc" id="storageDesc">Calculating…</div></div>
-      <div class="bar-wrap"><div class="bar-fill" id="storageFill" style="background:var(--accent)"></div></div>
-    </div>
+    <div class="row"><div class="row-info"><div class="row-label">Local Storage Usage</div><div class="row-desc" id="storageDesc">Calculating…</div></div><div class="bar-wrap"><div class="bar-fill" id="storageFill"></div></div></div>
   </div>
 </div>
-
 <div class="section">
   <div class="sec-title">Notifications</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">System Notifications</div><div class="row-desc">Show notifications when apps open or events occur</div></div>
-      <label class="toggle"><input type="checkbox" id="notifToggle" onchange="saveSetting('serverplex_notifications_enabled',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
-    </div>
-    <div class="row">
-      <div class="row-info"><div class="row-label">Do Not Disturb</div><div class="row-desc">Suppress all notifications</div></div>
-      <label class="toggle"><input type="checkbox" id="dndToggle" onchange="saveSetting('serverplex_dnd',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
-    </div>
+    <div class="row"><div class="row-info"><div class="row-label">System Notifications</div><div class="row-desc">Show notifications when apps open</div></div><label class="toggle"><input type="checkbox" id="notifToggle" onchange="saveSetting('serverplex_notifications_enabled',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+    <div class="row"><div class="row-info"><div class="row-label">Do Not Disturb</div><div class="row-desc">Suppress all notifications</div></div><label class="toggle"><input type="checkbox" id="dndToggle" onchange="saveSetting('serverplex_dnd',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
   </div>
 </div>
-
 <div class="section">
   <div class="sec-title">Startup Apps</div>
-  <div class="card">
-    <div class="startup-list" id="startupList"></div>
-  </div>
+  <div class="card"><div class="startup-list" id="startupList"></div></div>
 </div>
-
 <div class="section">
   <div class="sec-title">Performance</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">Animations</div><div class="row-desc">Enable window open/close and icon animations</div></div>
-      <label class="toggle"><input type="checkbox" id="animToggle" checked onchange="saveSetting('serverplex_animations',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
-    </div>
-    <div class="row">
-      <div class="row-info"><div class="row-label">Startup Chime</div><div class="row-desc">Play a sound when the desktop loads</div></div>
-      <label class="toggle"><input type="checkbox" id="chimeToggle" checked onchange="saveSetting('serverplex_startup_chime',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
-    </div>
+    <div class="row"><div class="row-info"><div class="row-label">Animations</div><div class="row-desc">Enable window open/close animations</div></div><label class="toggle"><input type="checkbox" id="animToggle" onchange="saveSetting('serverplex_animations',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
+    <div class="row"><div class="row-info"><div class="row-label">Startup Chime</div><div class="row-desc">Play a sound when the desktop loads</div></div><label class="toggle"><input type="checkbox" id="chimeToggle" onchange="saveSetting('serverplex_startup_chime',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
   </div>
 </div>
-
 <script>
-var APPS = {browser:'🌐 Browser',notepad:'📝 Notepad',calculator:'🧮 Calculator',calendar:'📅 Calendar',terminal:'💻 Terminal',code:'👨‍💻 Code Editor',paint:'🎨 Paint',todolist:'📋 To-Do List',musicplayer:'🎵 Music Player',games:'🎮 Games',clock:'⏰ Clock',settings:'⚙️ Settings'};
-
-document.getElementById('res').textContent = window.screen.width + ' × ' + window.screen.height;
-
-// Storage
-var total = 0;
-for (var k in localStorage) { if (localStorage.hasOwnProperty(k)) total += (localStorage[k].length + k.length); }
-var kb = (total / 1024).toFixed(1), max = 5120;
-document.getElementById('storageDesc').textContent = kb + ' KB used of ~5 MB';
-document.getElementById('storageFill').style.width = Math.min((kb / max) * 100, 100) + '%';
-document.getElementById('storageFill').style.background = kb / max > 0.8 ? '#ff3b30' : kb / max > 0.6 ? '#f59e0b' : 'var(--accent)';
-
-// Load toggles
-function loadToggle(id, key, def) {
-  var val = localStorage.getItem(key);
-  document.getElementById(id).checked = val === null ? def : val === 'true';
-}
-loadToggle('notifToggle', 'serverplex_notifications_enabled', true);
-loadToggle('dndToggle',   'serverplex_dnd',                   false);
-loadToggle('animToggle',  'serverplex_animations',             true);
-loadToggle('chimeToggle', 'serverplex_startup_chime',          true);
-loadToggle('tickerToggle','serverplex_ticker',                  true);
-
-// Font
-var fs = localStorage.getItem('serverplex_os_font_size') || '14';
-document.getElementById('fontSz').value = fs;
-
-// Clock
-var cf = localStorage.getItem('serverplex_clock_format') || '12';
-document.getElementById('clockFmt').value = cf;
-
-// Startup apps
-var startupApps = JSON.parse(localStorage.getItem('serverplex_startup_apps') || '[]');
-var sl = document.getElementById('startupList');
-Object.keys(APPS).forEach(function(id) {
-  var div = document.createElement('div');
-  div.className = 'startup-item';
-  var chk = document.createElement('input');
-  chk.type = 'checkbox';
-  chk.checked = startupApps.includes(id);
-  chk.onchange = function() {
-    var arr = JSON.parse(localStorage.getItem('serverplex_startup_apps') || '[]');
-    if (this.checked) { if (!arr.includes(id)) arr.push(id); }
-    else arr = arr.filter(function(x){ return x !== id; });
-    localStorage.setItem('serverplex_startup_apps', JSON.stringify(arr));
-  };
-  var lbl = document.createElement('label');
-  lbl.textContent = APPS[id];
-  lbl.style.cursor = 'pointer';
-  lbl.onclick = function(){ chk.click(); };
-  div.appendChild(chk); div.appendChild(lbl);
-  sl.appendChild(div);
+var APPS={browser:'🌐 Browser',notepad:'📝 Notepad',calculator:'🧮 Calculator',calendar:'📅 Calendar',terminal:'💻 Terminal',code:'👨‍💻 Code Editor',paint:'🎨 Paint',todolist:'📋 To-Do List',musicplayer:'🎵 Music Player',games:'🎮 Games',clock:'⏰ Clock',settings:'⚙️ Settings'};
+document.getElementById('res').textContent=window.screen.width+' × '+window.screen.height;
+var total=0;for(var k in localStorage){if(localStorage.hasOwnProperty(k))total+=(localStorage[k].length+k.length);}
+var kb=(total/1024).toFixed(1);
+document.getElementById('storageDesc').textContent=kb+' KB used of ~5 MB';
+document.getElementById('storageFill').style.width=Math.min((kb/5120)*100,100)+'%';
+document.getElementById('storageFill').style.background=kb/5120>.8?'#ff3b30':kb/5120>.6?'#f59e0b':'var(--accent)';
+function loadToggle(id,key,def){var el=document.getElementById(id);if(!el)return;var v=localStorage.getItem(key);el.checked=v===null?def:v==='true';}
+loadToggle('notifToggle','serverplex_notifications_enabled',true);
+loadToggle('dndToggle','serverplex_dnd',false);
+loadToggle('animToggle','serverplex_animations',true);
+loadToggle('chimeToggle','serverplex_startup_chime',true);
+// BUG FIX: removed loadToggle('tickerToggle',...) — element does not exist
+var fs=localStorage.getItem('serverplex_os_font_size')||'14';
+document.getElementById('fontSz').value=fs;
+document.getElementById('clockFmt').value=localStorage.getItem('serverplex_clock_format')||'12';
+var startupApps=JSON.parse(localStorage.getItem('serverplex_startup_apps')||'[]');
+var sl=document.getElementById('startupList');
+Object.keys(APPS).forEach(function(id){
+  var div=document.createElement('div');div.className='startup-item';
+  var chk=document.createElement('input');chk.type='checkbox';chk.checked=startupApps.includes(id);
+  chk.onchange=function(){var arr=JSON.parse(localStorage.getItem('serverplex_startup_apps')||'[]');if(this.checked){if(!arr.includes(id))arr.push(id);}else arr=arr.filter(function(x){return x!==id;});localStorage.setItem('serverplex_startup_apps',JSON.stringify(arr));};
+  var lbl=document.createElement('label');lbl.textContent=APPS[id];lbl.style.cursor='pointer';lbl.onclick=function(){chk.click();};
+  div.appendChild(chk);div.appendChild(lbl);sl.appendChild(div);
 });
-
-function saveSetting(key, val) { localStorage.setItem(key, val); }
-  localStorage.setItem('serverplex_os_font_size', v);
-  if (window.parent && window.parent.document.body) window.parent.document.body.style.fontSize = v + 'px';
+function saveSetting(k,v){localStorage.setItem(k,v);}
+// BUG FIX: function body was missing — orphaned code crashed on page load
+function applyFont(v){
+  localStorage.setItem('serverplex_os_font_size',v);
+  if(window.parent&&window.parent.document.body)window.parent.document.body.style.fontSize=v+'px';
 }
-function saveClock(v) {
-  localStorage.setItem('serverplex_clock_format', v);
-  if (window.parent && window.parent.updateClock) window.parent.updateClock();
-}
-function goFullscreen() {
-  var el = window.parent ? window.parent.document.documentElement : document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen();
-}
+function saveClock(v){localStorage.setItem('serverplex_clock_format',v);if(window.parent&&window.parent.updateClock)window.parent.updateClock();}
+function goFullscreen(){var el=window.parent?window.parent.document.documentElement:document.documentElement;if(el.requestFullscreen)el.requestFullscreen();}
 </script>
 </body>
 </html>

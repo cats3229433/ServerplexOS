@@ -1,84 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="app-theme.js"></script>
 <meta charset="UTF-8"><title>Terminal</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Courier New',monospace;background:var(--bg);color: var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.term-header{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
-.term-title{font-family:'Oxanium',sans-serif;font-size:13px;color:var(--text3);flex:1}
+body{font-family:'Courier New',monospace;background:var(--app-bg);color: var(--app-text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.term-header{background:var(--app-surface);border-bottom:1px solid var(--app-border);padding:8px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.term-title{font-family:'Oxanium',sans-serif;font-size:13px;color:var(--app-text2);flex:1}
 .term-btns{display:flex;gap:6px}
-.term-btn{background:var(--border);border:1px solid var(--border);border-radius:4px;color:var(--text3);padding:4px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
-.term-btn:hover{background:var(--border2);color:var(--text)}
+.term-btn{background:var(--app-border);border:1px solid var(--app-border);border-radius:4px;color:var(--app-text2);padding:4px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
+.term-btn:hover{background:var(--app-border);color:var(--app-text)}
 .output{flex:1;overflow-y:auto;padding:14px 18px;line-height:1.65;font-size:14px}
 .line{margin-bottom:2px;word-break:break-all;white-space:pre-wrap}
-.line-prompt{color:var(--text3)}
-.line-cmd{color:var(--text)}
+.line-prompt{color:var(--app-text2)}
+.line-cmd{color:var(--app-text)}
 .line-out{color:#3fb950}
 .line-err{color:#f85149}
 .line-warn{color:#e3b341}
-.line-info{color:var(--accent)}
+.line-info{color:var(--app-accent)}
 .line-success{color:#3fb950}
 .line-title{color:#d2a8ff;font-weight:bold}
-.line-muted{color:var(--text3)}
-.input-line{display:flex;align-items:center;padding:8px 18px 14px;flex-shrink:0;border-top:1px solid var(--border)}
-.prompt-label{color:var(--accent);font-size:14px;flex-shrink:0;user-select:none}
-.cmd-input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'Courier New',monospace;font-size:14px;margin-left:8px;caret-color:#3fb950}
+.line-muted{color:var(--app-text2)}
+.input-line{display:flex;align-items:center;padding:8px 18px 14px;flex-shrink:0;border-top:1px solid var(--app-border)}
+.prompt-label{color:var(--app-accent);font-size:14px;flex-shrink:0;user-select:none}
+.cmd-input{flex:1;background:transparent;border:none;outline:none;color:var(--app-text);font-family:'Courier New',monospace;font-size:14px;margin-left:8px;caret-color:#3fb950}
 ::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--bg)}
-::-webkit-scrollbar-thumb{background:var(--bg2);border-radius:3px}
-
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
+::-webkit-scrollbar-track{background:var(--app-bg)}
+::-webkit-scrollbar-thumb{background:var(--app-surface2);border-radius:3px}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
 <div class="term-header">
   <div class="term-title">ServerplexOS Terminal — bash</div>
@@ -95,7 +48,7 @@ body.grey {
 <script>
 const output=document.getElementById('output');
 const input=document.getElementById('cmdInput');
-let history=[],histIdx=-1;
+let history=JSON.parse(localStorage.getItem('serverplex_terminal_history')||'[]'),histIdx=history.length;
 let cwd='~';
 let env={USER:'user',HOME:'~',SHELL:'bash',TERM:'xterm',LANG:'en_US.UTF-8',PATH:'/usr/local/bin:/usr/bin:/bin'};
 let vars={};
@@ -138,7 +91,8 @@ const commands={
     print('info','  env             Show environment');
     print('info','  export [k=v]    Set env variable');
     print('info','  calc [expr]     Calculate expression');
-    print('info','  history         Show command history');
+    print('info','  history         Show command history (persisted)');
+    print('info','  clear-history   Wipe saved history');
     print('info','  uptime          Show uptime');
     print('info','  version         OS version');
     print('info','  cowsay [text]   Important');
@@ -155,6 +109,7 @@ const commands={
   version:()=>print('out','ServerplexOS v1.0 — Build 2026.03.21'),
   uptime:()=>{const u=Math.floor(performance.now()/1000);const h=Math.floor(u/3600),m=Math.floor((u%3600)/60),s=u%60;print('out',`Uptime: ${h}h ${m}m ${s}s`);},
   history:()=>history.forEach((h,i)=>print('muted',`  ${String(i+1).padStart(3,' ')}  ${h}`)),
+  'clear-history':()=>{history=[];histIdx=0;localStorage.removeItem('serverplex_terminal_history');print('success','History cleared.');},
   calc:(args)=>{try{const r=Function('"use strict";return ('+args.join(' ')+')')();print('out',`= ${r}`);}catch(e){print('err','Invalid expression');}},
   theme:(args)=>{const t=args[0];if(!['white','black','grey'].includes(t)){print('err','Usage: theme [white|black|grey]');return;}if(window.parent&&window.parent.changeTheme){window.parent.changeTheme(t);print('success','Theme changed to '+t);}else{localStorage.setItem('serverplex_theme',t);print('warn','Theme saved, will apply on next OS load');}},
   ls:(args)=>{
@@ -259,6 +214,7 @@ function run(cmdStr){
   const trimmed=cmdStr.trim();
   if(!trimmed)return;
   history.push(trimmed);histIdx=history.length;
+  localStorage.setItem('serverplex_terminal_history',JSON.stringify(history.slice(-200)));
   print('prompt','');
   const last=output.lastChild;
   if(last){last.innerHTML=`<span style="color:#58a6ff">${env.USER}@serverplexos:${cwd}$</span> <span style="color:#e6edf3">${trimmed}</span>`;}

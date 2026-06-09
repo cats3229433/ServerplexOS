@@ -55,6 +55,14 @@ function openApp(appId) {
   windows[appId] = { element: el, minimized: false, maximized: false, vd: currentVd };
   constrainWindow(el);
 
+  // ── Add iframe overlay if custom cursor is active ──
+  var iframe = el.querySelector('iframe');
+  if (iframe && typeof _cursorPack !== 'undefined' && _cursorPack !== 'default') {
+    iframe.addEventListener('load', function() {
+      if (typeof syncCursorToAllFrames === 'function') syncCursorToAllFrames();
+    });
+  }
+
   el.querySelector('.min').addEventListener('click', function(){ minimizeWindow(appId); });
   el.querySelector('.max').addEventListener('click', function(){ toggleMaximize(appId); });
   el.querySelector('.cls').addEventListener('click', function(){ closeWindow(appId); });

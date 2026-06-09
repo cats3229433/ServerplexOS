@@ -185,7 +185,12 @@ function initContextMenu() {
       <div class="ctx-item" onclick="openApp('settings');closeCtxMenu()">⚙️ Settings</div>
       <div class="ctx-item" onclick="resetDesktopLayout();closeCtxMenu()">↺ Reset Icon Layout</div>
       <div class="ctx-sep"></div>
-      <div class="ctx-item" onclick="changeTheme(currentTheme==='white'?'black':'white');closeCtxMenu()">🎨 Toggle Theme</div>`;
+      <div class="ctx-item" onclick="changeTheme(currentTheme==='white'?'black':'white');closeCtxMenu()">🎨 Toggle Theme</div>
+      <div class="ctx-item" onclick="toggleShortcuts();closeCtxMenu()">⌨️ Keyboard Shortcuts</div>
+      <div class="ctx-sep"></div>
+      <div class="ctx-item" onclick="openAppInstaller();closeCtxMenu()">📦 Install App from URL</div>
+      <div class="ctx-item" onclick="backupOS();closeCtxMenu()">💾 Backup OS State</div>
+      <div class="ctx-item" onclick="restoreOS();closeCtxMenu()">📂 Restore OS State</div>`;
     var x = Math.min(e.clientX, window.innerWidth - 220), y = Math.min(e.clientY, window.innerHeight - 320);
     menu.style.left = x + 'px'; menu.style.top = y + 'px';
     menu.classList.add('open');

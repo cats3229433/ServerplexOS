@@ -1,78 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+<script src="app-theme.js"></script>
     <meta charset="UTF-8">
     <title>Search</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: var(--bg); height: 100vh; }
-        .container { max-width: 800px; margin: 0 auto; background: var(--surface); border-radius: 12px; padding: 24px; box-shadow: var(--shadow); }
-        h1 { font-size: 28px; margin-bottom: 20px; color: var(--text); }
-        .search-box { width: 100%; padding: 16px; border: 2px solid var(--accent); border-radius: 8px; font-size: 16px; margin-bottom: 24px; }
-        .search-box:focus { outline: none; border-color: #005a9e; }
+        body { font-family: 'Oxanium', sans-serif; padding: 20px; background: var(--app-bg); height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--app-surface); border-radius: 12px; padding: 24px; box-shadow: var(--app-shadow); }
+        h1 { font-size: 28px; margin-bottom: 20px; color: var(--app-text); }
+        .search-box { width: 100%; padding: 16px; border: 2px solid var(--app-accent); border-radius: 8px; font-size: 16px; margin-bottom: 24px; }
+        .search-box:focus { outline: none; border-color: var(--app-accent); }
         .category { margin-bottom: 24px; }
-        .category-title { font-size: 14px; color: var(--text2); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; }
-        .result { padding: 16px; background: var(--surface2); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
-        .result:hover { background: var(--bg2); transform: translateX(4px); }
+        .category-title { font-size: 14px; color: var(--app-text2); font-weight: 600; margin-bottom: 12px; text-transform: uppercase; }
+        .result { padding: 16px; background: var(--app-surface2); border-radius: 8px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+        .result:hover { background: var(--app-surface2); transform: translateX(4px); }
         .result-icon { font-size: 24px; }
         .result-info { flex: 1; }
         .result-name { font-weight: 600; margin-bottom: 4px; }
-        .result-desc { font-size: 13px; color: var(--text2); }
-        .no-results { text-align: center; padding: 40px; color: var(--text3); }
-    
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
-</style>
+        .result-desc { font-size: 13px; color: var(--app-text2); }
+        .no-results { text-align: center; padding: 40px; color: var(--app-text2); }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
     <div class="container">
         <h1>🔍 Search</h1>

@@ -36,6 +36,10 @@ const apps = {
   voicerecorder:  { name:'Voice Recorder',   icon:'🎙️', file:'os-apps/voicerecorder.html',  category:'Media' },
   screenrecorder: { name:'Screen Recorder',  icon:'📹', file:'os-apps/screenrecorder.html', category:'Media' },
   appstore:       { name:'App Store',        icon:'🏪', file:'os-apps/appstore.html',        category:'System' },
+  videorecorder:  { name:'Video Recorder',   icon:'🎥', file:'os-apps/videorecorder.html',  category:'Media' },
+  drawings:       { name:'Drawings',         icon:'✏️', file:'os-apps/drawings.html',         category:'Creative', width:1100, height:720 },
+  videoeditor:    { name:'Video Editor',     icon:'🎬', file:'os-apps/videoeditor.html',      category:'Media',   width:1200, height:740 },
+  vectoreditor:   { name:'Vector Editor',    icon:'🖊️', file:'os-apps/vectoreditor.html',     category:'Creative', width:1200, height:760 },
   mediastream:    { name:'Media',            icon:'🎶', file:'os-apps/mediastream.html',     category:'Media' },
 };
 

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="app-theme.js"></script>
+<meta charset="UTF-8"><title>Video Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#0d0d0d;color:#e8edf5;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* ── Top bar ── */
+.topbar{background:#161b22;border-bottom:1px solid #21262d;padding:6px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.topbar h1{font-size:14px;font-weight:700;color:#e8edf5;margin-right:6px}
+.tb-btn{padding:5px 12px;border:1px solid #30363d;border-radius:6px;background:rgba(128,128,128,.08);color:#c9d1d9;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.tb-btn:hover:not(:disabled){background:rgba(128,128,128,.18);border-color:#484f58}
+.tb-btn:disabled{opacity:.35;cursor:not-allowed}
+.tb-btn.accent{background:var(--app-accent,#0078d4);border-color:var(--app-accent,#0078d4);color:#fff}
+.tb-btn.accent:hover{opacity:.85}
+.tb-sep{width:1px;height:22px;background:#21262d;margin:0 2px}
+.tb-title{font-size:12px;font-weight:700;color:#8b949e;cursor:pointer;padding:3px 8px}
+.tb-title:hover{color:#e8edf5}
+.spacer{flex:1}
+
+/* ── Main layout ── */
+.main{flex:1;display:flex;overflow:hidden}
+
+/* ── Media bin ── */
+.media-bin{width:200px;background:#161b22;border-right:1px solid #21262d;display:flex;flex-direction:column;flex-shrink:0}
+.bin-header{padding:8px 12px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid #21262d;display:flex;align-items:center;justify-content:space-between}
+.bin-add{width:20px;height:20px;border-radius:4px;background:rgba(128,128,128,.1);border:1px solid #30363d;color:#8b949e;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+.bin-add:hover{background:rgba(0,120,212,.2);border-color:#0078d4;color:#4db8ff}
+.bin-list{flex:1;overflow-y:auto;padding:6px}
+.bin-list::-webkit-scrollbar{width:3px}
+.bin-list::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.bin-item{padding:6px 8px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:all .15s;margin-bottom:3px}
+.bin-item:hover{background:rgba(128,128,128,.08);border-color:#30363d}
+.bin-item.active{background:rgba(0,120,212,.12);border-color:rgba(0,120,212,.35)}
+.bin-thumb{width:100%;height:54px;border-radius:4px;background:#0d0d0d;object-fit:cover;display:block;margin-bottom:5px;position:relative;overflow:hidden}
+.bin-thumb-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#1c2128,#0d1117)}
+.bin-name{font-size:10px;font-weight:600;color:#c9d1d9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bin-meta{font-size:9px;color:#8b949e;margin-top:1px}
+.bin-empty{text-align:center;padding:24px 10px;color:#484f58;font-size:11px;line-height:1.7}
+.bin-drop-hint{border:2px dashed #30363d;border-radius:8px;margin:8px;padding:16px 8px;text-align:center;font-size:10px;color:#484f58;cursor:pointer;transition:all .15s}
+.bin-drop-hint:hover{border-color:#0078d4;color:#4db8ff}
+input[type=file]{display:none}
+
+/* ── Preview ── */
+.preview-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#0d0d0d}
+.preview-wrap{flex:1;display:flex;align-items:center;justify-content:center;background:#000;position:relative;overflow:hidden}
+#previewVid{max-width:100%;max-height:100%;display:block;background:#000}
+.preview-idle{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#484f58;pointer-events:none}
+.preview-idle.hidden{display:none}
+.preview-idle-icon{font-size:48px}
+.preview-idle-text{font-size:13px}
+
+/* Timecode overlay */
+.timecode{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);border-radius:5px;padding:3px 8px;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;pointer-events:none}
+
+/* Preview controls */
+.preview-controls{background:#161b22;border-top:1px solid #21262d;padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.pc-btn{width:32px;height:32px;border-radius:50%;border:1px solid #30363d;background:rgba(128,128,128,.08);color:#c9d1d9;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pc-btn:hover{background:rgba(128,128,128,.2)}
+.pc-btn.play{width:40px;height:40px;background:var(--app-accent,#0078d4);border-color:var(--app-accent,#0078d4);color:#fff;font-size:18px}
+.pc-btn.play:hover{opacity:.85}
+.time-display{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:#8b949e;min-width:90px}
+.vol-wrap{display:flex;align-items:center;gap:5px;font-size:13px;color:#8b949e;margin-left:4px}
+.vol-slider{width:70px;accent-color:var(--app-accent,#0078d4)}
+.speed-sel{padding:3px 6px;border:1px solid #30363d;border-radius:5px;background:#0d1117;color:#c9d1d9;font-family:'Oxanium',sans-serif;font-size:10px;outline:none;cursor:pointer}
+
+/* ── Properties panel ── */
+.props-panel{width:200px;background:#161b22;border-left:1px solid #21262d;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.props-header{padding:8px 12px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#8b949e;border-bottom:1px solid #21262d;flex-shrink:0}
+.props-body{flex:1;overflow-y:auto;padding:10px}
+.props-body::-webkit-scrollbar{width:3px}
+.props-body::-webkit-scrollbar-thumb{background:#30363d;border-radius:2px}
+.prop-section{margin-bottom:14px}
+.prop-label{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#8b949e;margin-bottom:6px}
+.prop-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:6px;font-size:11px;color:#c9d1d9}
+.prop-input{width:70px;padding:3px 6px;border:1px solid #30363d;border-radius:4px;background:#0d1117;color:#c9d1d9;font-family:'Oxanium',sans-serif;font-size:11px;outline:none}
+.prop-input:focus{border-color:var(--app-accent,#0078d4)}
+.prop-slider{width:100%;accent-color:var(--app-accent,#0078d4);margin:2px 0}
+.effect-btn{width:100%;padding:5px;border:1px solid #30363d;border-radius:5px;background:rgba(128,128,128,.06);color:#8b949e;font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;cursor:pointer;text-align:left;transition:all .15s;margin-bottom:3px}
+.effect-btn:hover{background:rgba(128,128,128,.15);color:#c9d1d9}
+.effect-btn.on{background:rgba(0,120,212,.12);border-color:rgba(0,120,212,.35);color:#4db8ff}
+
+/* ── Timeline ── */
+.timeline-area{height:220px;background:#161b22;border-top:1px solid #21262d;display:flex;flex-direction:column;flex-shrink:0}
+.tl-header{background:#0d1117;border-bottom:1px solid #21262d;padding:4px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.tl-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#8b949e}
+.tl-zoom{width:70px;accent-color:var(--app-accent,#0078d4)}
+.tl-body{flex:1;display:flex;overflow:hidden}
+.tl-tracks-label{width:100px;flex-shrink:0;border-right:1px solid #21262d;overflow:hidden}
+.tl-track-label{height:44px;border-bottom:1px solid #21262d;display:flex;align-items:center;padding:0 10px;font-size:10px;color:#8b949e;gap:6px}
+.tl-track-toggle{font-size:11px;cursor:pointer;opacity:.6;transition:opacity .15s}
+.tl-track-toggle:hover{opacity:1}
+.tl-scroll{flex:1;overflow-x:auto;overflow-y:hidden;position:relative}
+.tl-scroll::-webkit-scrollbar{height:5px}
+.tl-scroll::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px}
+.tl-inner{position:relative;min-width:100%;height:100%}
+/* Ruler */
+.tl-ruler{height:20px;background:#0d1117;border-bottom:1px solid #21262d;position:sticky;top:0;z-index:5;overflow:hidden}
+/* Tracks */
+.tl-track{height:44px;border-bottom:1px solid #21262d;position:relative}
+.tl-clip{position:absolute;top:4px;height:36px;border-radius:5px;overflow:hidden;cursor:grab;display:flex;align-items:center;border:1px solid rgba(128,128,128,.3);transition:opacity .15s;user-select:none}
+.tl-clip:hover{border-color:rgba(255,255,255,.3)}
+.tl-clip.selected{border-color:#0078d4;border-width:2px}
+.tl-clip-label{font-size:9px;font-weight:700;color:#fff;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.tl-clip-drag{position:absolute;top:0;bottom:0;width:5px;background:rgba(255,255,255,.25);cursor:ew-resize}
+.tl-clip-drag.right{right:0}
+.tl-clip-drag.left{left:0}
+/* Playhead */
+.tl-playhead{position:absolute;top:0;bottom:0;width:2px;background:#ef4444;pointer-events:none;z-index:10}
+.tl-playhead::before{content:'';position:absolute;top:0;left:-5px;border:5px solid transparent;border-top:8px solid #ef4444;border-bottom:none}
+
+/* Export modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:9999;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex;animation:fadeIn .15s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:#161b22;border:1px solid #30363d;border-radius:14px;width:380px;padding:22px;box-shadow:0 24px 60px rgba(0,0,0,.8)}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:14px}
+.modal-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:12px;color:#c9d1d9}
+.modal select,.modal input{padding:5px 8px;border:1px solid #30363d;border-radius:5px;background:#0d1117;color:#c9d1d9;font-family:'Oxanium',sans-serif;font-size:11px;outline:none}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.modal-btn{flex:1;padding:9px;border-radius:7px;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.modal-btn.primary{background:var(--app-accent,#0078d4);color:#fff}
+.modal-btn.ghost{background:rgba(128,128,128,.1);color:#8b949e;border:1px solid #30363d}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🎬</h1>
+  <button class="tb-btn" onclick="document.getElementById('mediaInput').click()">+ Import</button>
+  <input type="file" id="mediaInput" accept="video/*,audio/*" multiple onchange="importMedia(event)">
+  <div class="tb-sep"></div>
+  <button class="tb-btn" id="cutBtn" onclick="cutClip()" disabled>✂ Cut</button>
+  <button class="tb-btn" id="splitBtn" onclick="splitClip()" disabled>⚡ Split</button>
+  <button class="tb-btn" id="delClipBtn" onclick="deleteClip()" disabled>🗑 Delete</button>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" onclick="undo()">↩ Undo</button>
+  <button class="tb-btn" onclick="redo()">↪ Redo</button>
+  <div class="spacer"></div>
+  <span class="tb-title" id="projTitle" ondblclick="renameProj()">Untitled Project</span>
+  <div class="spacer"></div>
+  <button class="tb-btn accent" onclick="openExport()">⬇ Export</button>
+</div>
+
+<div class="main">
+  <!-- Media bin -->
+  <div class="media-bin">
+    <div class="bin-header">
+      Media
+      <div class="bin-add" onclick="document.getElementById('mediaInput').click()" title="Import media">+</div>
+    </div>
+    <label class="bin-drop-hint" for="mediaInput">
+      📁 Click or drop<br>video / audio files
+    </label>
+    <div class="bin-list" id="binList">
+      <div class="bin-empty">No media yet.<br>Import files to begin.</div>
+    </div>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-panel">
+    <div class="preview-wrap" id="previewWrap">
+      <video id="previewVid" onplay="onPlay()" onpause="onPause()" ontimeupdate="onTimeUpdate()" onended="onEnded()"></video>
+      <div class="preview-idle" id="previewIdle">
+        <div class="preview-idle-icon">🎬</div>
+        <div class="preview-idle-text">Import media and add clips to the timeline</div>
+      </div>
+      <div class="timecode" id="timecode">00:00:00</div>
+    </div>
+    <div class="preview-controls">
+      <button class="pc-btn" onclick="skipTo(-5)" title="−5s">⏮</button>
+      <button class="pc-btn" onclick="skipFrame(-1)" title="Prev frame">⏪</button>
+      <button class="pc-btn play" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="pc-btn" onclick="skipFrame(1)" title="Next frame">⏩</button>
+      <button class="pc-btn" onclick="skipTo(5)" title="+5s">⏭</button>
+      <div class="time-display" id="timeDisplay">00:00 / 00:00</div>
+      <div class="vol-wrap">🔊<input type="range" class="vol-slider" id="volSlider" min="0" max="100" value="80" oninput="setVol(this.value)"></div>
+      <select class="speed-sel" id="speedSel" onchange="setSpeed(this.value)">
+        <option value="0.25">0.25×</option><option value="0.5">0.5×</option>
+        <option value="0.75">0.75×</option><option value="1" selected>1×</option>
+        <option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+        <option value="2">2×</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="tb-btn" onclick="takeScreenshot()">📷 Screenshot</button>
+    </div>
+  </div>
+
+  <!-- Properties -->
+  <div class="props-panel">
+    <div class="props-header">Properties</div>
+    <div class="props-body" id="propsBody">
+      <div style="text-align:center;padding:24px 0;color:#484f58;font-size:11px">Select a clip to edit its properties</div>
+    </div>
+  </div>
+</div>
+
+<!-- Timeline -->
+<div class="timeline-area">
+  <div class="tl-header">
+    <span class="tl-title">Timeline</span>
+    <input type="range" class="tl-zoom" id="tlZoom" min="40" max="400" value="100" oninput="renderTimeline()">
+    <span style="font-size:10px;color:#8b949e" id="tlZoomLabel">1×</span>
+    <div class="spacer"></div>
+    <button class="tb-btn" onclick="addAudioTrack()" style="font-size:10px">+ Audio Track</button>
+  </div>
+  <div class="tl-body">
+    <div class="tl-tracks-label" id="tlLabels">
+      <div class="tl-track-label"><span class="tl-track-toggle" onclick="toggleTrack(0)">👁</span>Video 1</div>
+      <div class="tl-track-label"><span class="tl-track-toggle" onclick="toggleTrack(1)">👁</span>Audio 1</div>
+    </div>
+    <div class="tl-scroll" id="tlScroll">
+      <div class="tl-inner" id="tlInner">
+        <div class="tl-ruler" id="tlRuler"></div>
+        <div class="tl-track" id="track0" ondragover="e=>e.preventDefault()" ondrop="dropOnTrack(event,0)"></div>
+        <div class="tl-track" id="track1" ondragover="e=>e.preventDefault()" ondrop="dropOnTrack(event,1)"></div>
+        <div class="tl-playhead" id="tlPlayhead" style="left:0"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h3>🎬 Export Video</h3>
+    <div class="modal-row">Format <select id="expFmt"><option>WebM (VP9)</option><option>WebM (VP8)</option></select></div>
+    <div class="modal-row">Resolution <select id="expRes"><option>1080p</option><option>720p</option><option>480p</option><option>360p</option></select></div>
+    <div class="modal-row">Quality <input type="range" id="expQ" min="1" max="10" value="8" style="width:100px"> <span id="expQLabel">8</span></div>
+    <div style="font-size:10px;color:#8b949e;line-height:1.6;margin-top:8px;background:rgba(128,128,128,.06);border-radius:6px;padding:8px">
+      Note: Browser-based export uses MediaRecorder on the canvas. For production-quality export, use a desktop video editor.
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn primary" onclick="doExport()">Export</button>
+      <button class="modal-btn ghost" onclick="closeExport()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="exportCanvas" style="display:none"></canvas>
+
+<script>
+// ══════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════
+let mediaItems  = [];  // { id, name, duration, url, type:'video'|'audio', element }
+let tracks      = [    // video track 0, audio track 1
+  { id:0, type:'video', muted:false, clips:[] },
+  { id:1, type:'audio', muted:false, clips:[] },
+];
+let selectedClip = null;  // { trackIdx, clipIdx }
+let playheadSec  = 0;
+let isPlaying    = false;
+let totalDur     = 0;
+let undoStack    = [], redoStack = [];
+let pxPerSec     = 100;
+let draggingBin  = null;
+let projTitle    = 'Untitled Project';
+
+const vid = document.getElementById('previewVid');
+vid.volume = 0.8;
+
+// ══════════════════════════════════════════════
+//  MEDIA IMPORT
+// ══════════════════════════════════════════════
+function importMedia(e) {
+  Array.from(e.target.files).forEach(f => {
+    const url  = URL.createObjectURL(f);
+    const type = f.type.startsWith('audio') ? 'audio' : 'video';
+    const item = { id: Date.now() + Math.random(), name: f.name.replace(/\.[^.]+$/,''), url, type, duration: 0 };
+    // Get duration
+    const tmp = document.createElement(type);
+    tmp.src = url;
+    tmp.onloadedmetadata = () => { item.duration = tmp.duration; renderBin(); };
+    tmp.onerror = () => { item.duration = 0; renderBin(); };
+    mediaItems.push(item);
+    renderBin();
+  });
+  e.target.value = '';
+}
+
+function renderBin() {
+  const list = document.getElementById('binList');
+  if (!mediaItems.length) {
+    list.innerHTML = '<div class="bin-empty">No media yet.<br>Import files to begin.</div>';
+    return;
+  }
+  list.innerHTML = mediaItems.map((m, i) => `
+    <div class="bin-item" draggable="true"
+      ondragstart="startBinDrag(event,${i})"
+      ondblclick="addToTimeline(${i})">
+      <div class="bin-thumb">
+        <div class="bin-thumb-inner">${m.type==='audio'?'🎵':'🎬'}</div>
+      </div>
+      <div class="bin-name" title="${m.name}">${m.name}</div>
+      <div class="bin-meta">${m.type} · ${fmtDur(m.duration)}</div>
+    </div>`).join('');
+}
+
+function startBinDrag(e, idx) {
+  draggingBin = idx;
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+function dropOnTrack(e, trackIdx) {
+  e.preventDefault();
+  if (draggingBin === null) return;
+  const m = mediaItems[draggingBin]; draggingBin = null;
+  if (!m) return;
+  // Find drop position in seconds
+  const rect = document.getElementById('tlScroll').getBoundingClientRect();
+  const x    = e.clientX - rect.left + document.getElementById('tlScroll').scrollLeft;
+  const startSec = Math.max(0, x / pxPerSec);
+  addClipToTrack(trackIdx, m, startSec);
+}
+
+function addToTimeline(binIdx) {
+  const m = mediaItems[binIdx];
+  const preferTrack = m.type === 'audio' ? 1 : 0;
+  // Find end of last clip in preferred track
+  const t = tracks[preferTrack];
+  const lastEnd = t.clips.reduce((max, c) => Math.max(max, c.start + c.duration), 0);
+  addClipToTrack(preferTrack, m, lastEnd);
+}
+
+function addClipToTrack(trackIdx, m, startSec) {
+  tracks[trackIdx].clips.push({
+    id: Date.now() + Math.random(),
+    mediaId: m.id,
+    name: m.name,
+    type: m.type,
+    url: m.url,
+    start: startSec,
+    duration: m.duration || 5,
+    trimStart: 0,
+    trimEnd: m.duration || 5,
+    volume: 1,
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    speed: 1,
+  });
+  recalcTotal();
+  renderTimeline();
+  pushUndo();
+  // Load first video clip into preview
+  loadFirstClip();
+}
+
+function loadFirstClip() {
+  const vclips = tracks[0].clips;
+  if (!vclips.length) return;
+  const c = vclips.reduce((a, b) => a.start < b.start ? a : b);
+  vid.src = c.url;
+  document.getElementById('previewIdle').classList.add('hidden');
+}
+
+// ══════════════════════════════════════════════
+//  TIMELINE RENDER
+// ══════════════════════════════════════════════
+function renderTimeline() {
+  const zoom = parseInt(document.getElementById('tlZoom').value);
+  pxPerSec = zoom;
+  document.getElementById('tlZoomLabel').textContent = (zoom/100).toFixed(2) + '×';
+
+  const totalW = Math.max(totalDur * pxPerSec + 200, 800);
+  const inner  = document.getElementById('tlInner');
+  inner.style.width = totalW + 'px';
+
+  // Ruler
+  const ruler = document.getElementById('tlRuler');
+  ruler.style.width = totalW + 'px';
+  let rulerHtml = '';
+  const step = pxPerSec >= 100 ? 1 : pxPerSec >= 50 ? 2 : 5;
+  for (let s = 0; s <= Math.ceil(totalDur) + 10; s += step) {
+    rulerHtml += `<div style="position:absolute;left:${s*pxPerSec}px;top:0;height:20px;border-left:1px solid #30363d;padding-left:3px;font-size:9px;color:#8b949e;white-space:nowrap">${fmtDur(s)}</div>`;
+  }
+  ruler.innerHTML = rulerHtml;
+
+  // Tracks
+  const COLORS = { video:'#0078d4', audio:'#22c55e' };
+  tracks.forEach((t, ti) => {
+    const track = document.getElementById('track' + ti);
+    if (!track) return;
+    track.innerHTML = '';
+    t.clips.forEach((c, ci) => {
+      const div = document.createElement('div');
+      div.className = 'tl-clip' + (selectedClip && selectedClip.trackIdx===ti && selectedClip.clipIdx===ci ? ' selected' : '');
+      div.style.cssText = `left:${c.start*pxPerSec}px;width:${c.duration*pxPerSec}px;background:${COLORS[c.type]||'#484f58'}33;border-color:${COLORS[c.type]||'#484f58'}66`;
+      div.innerHTML = `<div class="tl-clip-drag left" onmousedown="startTrimDrag(event,${ti},${ci},'left')"></div>
+        <div class="tl-clip-label">${c.name}</div>
+        <div class="tl-clip-drag right" onmousedown="startTrimDrag(event,${ti},${ci},'right')"></div>`;
+      div.addEventListener('mousedown', e => { if (!e.target.classList.contains('tl-clip-drag')) startClipDrag(e, ti, ci); });
+      div.addEventListener('click', e => { e.stopPropagation(); selectClip(ti, ci); });
+      track.appendChild(div);
+    });
+  });
+
+  updatePlayhead();
+}
+
+// ── Clip drag ─────────────────────────────────
+let dragState = null;
+function startClipDrag(e, ti, ci) {
+  e.preventDefault();
+  dragState = { type:'move', ti, ci, startX:e.clientX, origStart: tracks[ti].clips[ci].start };
+  document.addEventListener('mousemove', doDrag);
+  document.addEventListener('mouseup',   endDrag);
+}
+function startTrimDrag(e, ti, ci, side) {
+  e.preventDefault(); e.stopPropagation();
+  const c = tracks[ti].clips[ci];
+  dragState = { type:'trim', ti, ci, side, startX:e.clientX, origStart:c.start, origDur:c.duration };
+  document.addEventListener('mousemove', doDrag);
+  document.addEventListener('mouseup',   endDrag);
+}
+function doDrag(e) {
+  if (!dragState) return;
+  const dx = (e.clientX - dragState.startX) / pxPerSec;
+  const c  = tracks[dragState.ti].clips[dragState.ci];
+  if (dragState.type === 'move') {
+    c.start = Math.max(0, dragState.origStart + dx);
+    recalcTotal(); renderTimeline();
+  } else if (dragState.type === 'trim') {
+    if (dragState.side === 'right') {
+      c.duration = Math.max(0.1, dragState.origDur + dx);
+    } else {
+      const shift = Math.min(dx, dragState.origDur - 0.1);
+      c.start    = Math.max(0, dragState.origStart + shift);
+      c.duration = Math.max(0.1, dragState.origDur  - shift);
+    }
+    recalcTotal(); renderTimeline();
+  }
+}
+function endDrag() {
+  dragState = null;
+  document.removeEventListener('mousemove', doDrag);
+  document.removeEventListener('mouseup',   endDrag);
+  pushUndo();
+}
+
+// ── Playhead drag ─────────────────────────────
+document.getElementById('tlScroll').addEventListener('click', e => {
+  if (dragState) return;
+  const rect = document.getElementById('tlScroll').getBoundingClientRect();
+  const x = e.clientX - rect.left + document.getElementById('tlScroll').scrollLeft;
+  playheadSec = Math.max(0, x / pxPerSec);
+  vid.currentTime = playheadSec;
+  updatePlayhead();
+  updateTimeDisplay();
+});
+
+function updatePlayhead() {
+  document.getElementById('tlPlayhead').style.left = (playheadSec * pxPerSec + 100) + 'px'; // +100 for labels
+}
+
+// ══════════════════════════════════════════════
+//  PLAYBACK
+// ══════════════════════════════════════════════
+function togglePlay() {
+  if (!vid.src) return;
+  if (isPlaying) vid.pause(); else vid.play();
+}
+function onPlay()  { isPlaying = true;  document.getElementById('playBtn').textContent = '⏸'; }
+function onPause() { isPlaying = false; document.getElementById('playBtn').textContent = '▶'; }
+function onEnded() { isPlaying = false; document.getElementById('playBtn').textContent = '▶'; }
+function onTimeUpdate() {
+  playheadSec = vid.currentTime;
+  updatePlayhead();
+  updateTimeDisplay();
+}
+function updateTimeDisplay() {
+  const dur = vid.duration || 0;
+  document.getElementById('timeDisplay').textContent = fmtDur(vid.currentTime) + ' / ' + fmtDur(dur);
+  document.getElementById('timecode').textContent = fmtTC(vid.currentTime);
+}
+function skipTo(s)     { vid.currentTime = Math.max(0, vid.currentTime + s); }
+function skipFrame(d)  { vid.currentTime = Math.max(0, vid.currentTime + d/30); }
+function setVol(v)     { vid.volume = v/100; }
+function setSpeed(v)   { vid.playbackRate = parseFloat(v); }
+
+// ══════════════════════════════════════════════
+//  CLIP OPERATIONS
+// ══════════════════════════════════════════════
+function selectClip(ti, ci) {
+  selectedClip = { trackIdx:ti, clipIdx:ci };
+  renderTimeline();
+  renderProps();
+  document.getElementById('cutBtn').disabled    = false;
+  document.getElementById('splitBtn').disabled  = false;
+  document.getElementById('delClipBtn').disabled = false;
+}
+
+function deleteClip() {
+  if (!selectedClip) return;
+  tracks[selectedClip.trackIdx].clips.splice(selectedClip.clipIdx, 1);
+  selectedClip = null;
+  document.getElementById('cutBtn').disabled    = true;
+  document.getElementById('splitBtn').disabled  = true;
+  document.getElementById('delClipBtn').disabled = true;
+  recalcTotal(); renderTimeline(); renderProps(); pushUndo();
+}
+
+function splitClip() {
+  if (!selectedClip) return;
+  const { trackIdx:ti, clipIdx:ci } = selectedClip;
+  const c = tracks[ti].clips[ci];
+  const splitAt = playheadSec - c.start;
+  if (splitAt <= 0 || splitAt >= c.duration) { alert('Move the playhead inside the clip to split.'); return; }
+  const newClip = { ...c, id: Date.now(), start: c.start + splitAt, duration: c.duration - splitAt };
+  c.duration = splitAt;
+  tracks[ti].clips.splice(ci + 1, 0, newClip);
+  recalcTotal(); renderTimeline(); pushUndo();
+}
+
+function cutClip() { deleteClip(); }
+
+function renderProps() {
+  const body = document.getElementById('propsBody');
+  if (!selectedClip) {
+    body.innerHTML = '<div style="text-align:center;padding:24px 0;color:#484f58;font-size:11px">Select a clip to edit its properties</div>';
+    return;
+  }
+  const c = tracks[selectedClip.trackIdx].clips[selectedClip.clipIdx];
+  body.innerHTML = `
+    <div class="prop-section">
+      <div class="prop-label">Clip</div>
+      <div class="prop-row">Name <span style="color:#8b949e;font-size:10px;overflow:hidden;text-overflow:ellipsis">${c.name}</span></div>
+      <div class="prop-row">Duration <span>${fmtDur(c.duration)}</span></div>
+      <div class="prop-row">Start <input class="prop-input" type="number" value="${c.start.toFixed(2)}" min="0" step="0.1" onchange="updateClipProp('start',this.value)"></div>
+    </div>
+    <div class="prop-section">
+      <div class="prop-label">Color</div>
+      <div class="prop-row">Brightness
+        <input type="range" class="prop-slider" min="0" max="200" value="${c.brightness}" oninput="updateClipProp('brightness',this.value);this.nextSibling.textContent=this.value+'%'">
+        <span style="font-size:10px;color:#8b949e;min-width:30px">${c.brightness}%</span>
+      </div>
+      <div class="prop-row">Contrast
+        <input type="range" class="prop-slider" min="0" max="200" value="${c.contrast}" oninput="updateClipProp('contrast',this.value);this.nextSibling.textContent=this.value+'%'">
+        <span style="font-size:10px;color:#8b949e;min-width:30px">${c.contrast}%</span>
+      </div>
+      <div class="prop-row">Saturation
+        <input type="range" class="prop-slider" min="0" max="200" value="${c.saturation}" oninput="updateClipProp('saturation',this.value);this.nextSibling.textContent=this.value+'%'">
+        <span style="font-size:10px;color:#8b949e;min-width:30px">${c.saturation}%</span>
+      </div>
+    </div>
+    <div class="prop-section">
+      <div class="prop-label">Speed</div>
+      <div class="prop-row">Rate
+        <select class="prop-input" onchange="updateClipProp('speed',this.value)">
+          ${[0.25,0.5,0.75,1,1.25,1.5,2].map(v=>`<option value="${v}" ${c.speed==v?'selected':''}>${v}×</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="prop-section">
+      <div class="prop-label">Filters</div>
+      <button class="effect-btn ${c._grayscale?'on':''}" onclick="toggleFilter('grayscale')">◑ Grayscale</button>
+      <button class="effect-btn ${c._sepia?'on':''}" onclick="toggleFilter('sepia')">🌅 Sepia</button>
+      <button class="effect-btn ${c._blur?'on':''}" onclick="toggleFilter('blur')">💧 Blur</button>
+      <button class="effect-btn ${c._invert?'on':''}" onclick="toggleFilter('invert')">⊖ Invert</button>
+    </div>`;
+}
+
+function updateClipProp(prop, val) {
+  if (!selectedClip) return;
+  const c = tracks[selectedClip.trackIdx].clips[selectedClip.clipIdx];
+  c[prop] = prop === 'start' ? parseFloat(val) : parseFloat(val);
+  applyVideoFilters(c);
+  if (prop === 'start') { recalcTotal(); renderTimeline(); }
+}
+
+function toggleFilter(f) {
+  if (!selectedClip) return;
+  const c = tracks[selectedClip.trackIdx].clips[selectedClip.clipIdx];
+  c['_' + f] = !c['_' + f];
+  applyVideoFilters(c);
+  renderProps();
+}
+
+function applyVideoFilters(c) {
+  const filters = [];
+  if (c.brightness !== 100) filters.push('brightness(' + c.brightness + '%)');
+  if (c.contrast   !== 100) filters.push('contrast('   + c.contrast   + '%)');
+  if (c.saturation !== 100) filters.push('saturate('   + c.saturation + '%)');
+  if (c._grayscale) filters.push('grayscale(100%)');
+  if (c._sepia)     filters.push('sepia(100%)');
+  if (c._blur)      filters.push('blur(4px)');
+  if (c._invert)    filters.push('invert(100%)');
+  vid.style.filter = filters.join(' ');
+}
+
+function toggleTrack(idx) { tracks[idx].muted = !tracks[idx].muted; }
+function addAudioTrack() { alert('Additional audio tracks coming in a future update.'); }
+
+// ══════════════════════════════════════════════
+//  UNDO / REDO
+// ══════════════════════════════════════════════
+function pushUndo() {
+  undoStack.push(JSON.stringify(tracks));
+  if (undoStack.length > 40) undoStack.shift();
+  redoStack = [];
+}
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(JSON.stringify(tracks));
+  tracks = JSON.parse(undoStack.pop());
+  recalcTotal(); renderTimeline();
+}
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(JSON.stringify(tracks));
+  tracks = JSON.parse(redoStack.pop());
+  recalcTotal(); renderTimeline();
+}
+
+// ══════════════════════════════════════════════
+//  EXPORT
+// ══════════════════════════════════════════════
+function openExport()  { document.getElementById('exportModal').classList.add('open'); }
+function closeExport() { document.getElementById('exportModal').classList.remove('open'); }
+function doExport() {
+  closeExport();
+  if (!vid.src) { alert('No video to export — add clips to the timeline first.'); return; }
+  // Simple approach: record the video element playing through via canvas+MediaRecorder
+  const res = document.getElementById('expRes').value;
+  const dims = { '1080p':[1920,1080],'720p':[1280,720],'480p':[854,480],'360p':[640,360] }[res] || [1280,720];
+  const canvas = document.getElementById('exportCanvas');
+  canvas.width = dims[0]; canvas.height = dims[1];
+  const ctx = canvas.getContext('2d');
+  const stream = canvas.captureStream(30);
+  const mr = new MediaRecorder(stream, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm' });
+  const expChunks = [];
+  mr.ondataavailable = e => expChunks.push(e.data);
+  mr.onstop = () => {
+    const blob = new Blob(expChunks, { type:'video/webm' });
+    Object.assign(document.createElement('a'), { href:URL.createObjectURL(blob), download: projTitle+'.webm' }).click();
+  };
+  vid.currentTime = 0;
+  vid.play();
+  mr.start();
+  const drawFrame = () => {
+    ctx.drawImage(vid, 0, 0, dims[0], dims[1]);
+    if (!vid.ended && !vid.paused) requestAnimationFrame(drawFrame);
+    else mr.stop();
+  };
+  requestAnimationFrame(drawFrame);
+}
+
+// ══════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════
+function recalcTotal() {
+  totalDur = 0;
+  tracks.forEach(t => t.clips.forEach(c => { totalDur = Math.max(totalDur, c.start + c.duration); }));
+}
+function fmtDur(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s/60), sec = Math.floor(s%60);
+  return m + ':' + String(sec).padStart(2,'0');
+}
+function fmtTC(s) {
+  const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.floor(s%60);
+  return [h,m,sec].map(n=>String(n).padStart(2,'0')).join(':');
+}
+function renameProj() {
+  const n = prompt('Project name:', projTitle);
+  if (n && n.trim()) { projTitle = n.trim(); document.getElementById('projTitle').textContent = projTitle; }
+}
+function takeScreenshot() {
+  if (!vid.src || vid.videoWidth === 0) return;
+  const c = Object.assign(document.createElement('canvas'), { width:vid.videoWidth, height:vid.videoHeight });
+  c.getContext('2d').drawImage(vid, 0, 0);
+  Object.assign(document.createElement('a'), { href:c.toDataURL('image/png'), download:'frame-'+fmtTC(vid.currentTime)+'.png' }).click();
+}
+document.getElementById('exportModal').addEventListener('click', e => { if (e.target===document.getElementById('exportModal')) closeExport(); });
+document.getElementById('expQ').addEventListener('input', function(){ document.getElementById('expQLabel').textContent = this.value; });
+document.querySelector('.tl-inner').addEventListener('click', e => { if (e.target.closest('.tl-clip')) return; selectedClip=null; renderTimeline(); renderProps(); });
+
+// ── Keyboard shortcuts ────────────────────────
+document.addEventListener('keydown', e => {
+  const ctrl = e.ctrlKey||e.metaKey;
+  if (e.key === ' ' && e.target.tagName !== 'INPUT') { e.preventDefault(); togglePlay(); }
+  if (ctrl && e.key === 'z') { e.preventDefault(); undo(); }
+  if (ctrl && e.key === 'y') { e.preventDefault(); redo(); }
+  if (e.key === 'Delete' || e.key === 'Backspace') { if (selectedClip && e.target.tagName !== 'INPUT') { e.preventDefault(); deleteClip(); } }
+  if (e.key === 'ArrowLeft')  vid.currentTime = Math.max(0, vid.currentTime - (e.shiftKey ? 5 : 1/30));
+  if (e.key === 'ArrowRight') vid.currentTime += (e.shiftKey ? 5 : 1/30);
+});
+
+// ── Init ──────────────────────────────────────
+renderTimeline();
+renderBin();
+</script>
+</body>
+</html>

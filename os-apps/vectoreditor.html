@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="app-theme.js"></script>
+<meta charset="UTF-8"><title>Vector Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Oxanium',sans-serif;background:#1a1a1a;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;user-select:none}
+
+/* ── Menu bar ── */
+.menu-bar{background:#2a2a2a;border-bottom:1px solid #3a3a3a;height:32px;display:flex;align-items:center;padding:0 8px;gap:2px;flex-shrink:0}
+.menu-item{padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;color:#ccc;transition:background .12s;position:relative}
+.menu-item:hover{background:#3a3a3a;color:#fff}
+.menu-dd{position:absolute;top:calc(100%+1px);left:0;background:#2a2a2a;border:1px solid #3a3a3a;border-radius:6px;min-width:180px;padding:4px 0;z-index:999;display:none;box-shadow:0 8px 24px rgba(0,0,0,.6)}
+.menu-item:hover .menu-dd{display:block}
+.mdi{padding:6px 14px;cursor:pointer;font-size:12px;color:#ccc;display:flex;justify-content:space-between;gap:16px;white-space:nowrap}
+.mdi:hover{background:#0078d4;color:#fff}
+.mdi-sep{height:1px;background:#3a3a3a;margin:3px 8px}
+.menu-spacer{flex:1}
+.doc-name{font-size:12px;color:#999;cursor:pointer;padding:4px 10px}
+.doc-name:hover{color:#fff}
+
+/* ── Layout ── */
+.app-body{flex:1;display:flex;overflow:hidden}
+
+/* ── Left toolbox ── */
+.toolbox{width:44px;background:#252525;border-right:1px solid #3a3a3a;display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:2px;flex-shrink:0;overflow:hidden}
+.tool-grp{display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:6px;border-bottom:1px solid #3a3a3a;margin-bottom:4px;width:100%}
+.tool-grp:last-child{border-bottom:none}
+.t{width:34px;height:34px;border-radius:5px;border:1px solid transparent;background:none;color:#aaa;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;position:relative;flex-shrink:0}
+.t:hover{background:#3a3a3a;color:#fff}
+.t.on{background:rgba(0,120,212,.2);border-color:#0078d4;color:#4db8ff}
+.t[data-tip]:hover::after{content:attr(data-tip);position:absolute;left:42px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.85);color:#fff;font-size:10px;padding:3px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;z-index:999}
+
+/* ── Canvas area ── */
+.canvas-zone{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.ruler-h{height:18px;background:#252525;border-bottom:1px solid #3a3a3a;position:relative;overflow:hidden;flex-shrink:0}
+.canvas-row{flex:1;display:flex;overflow:hidden}
+.ruler-v{width:18px;background:#252525;border-right:1px solid #3a3a3a;flex-shrink:0}
+.canvas-scroll{flex:1;overflow:auto;background:#1a1a1a;position:relative;display:flex;align-items:flex-start;justify-content:flex-start;padding:40px}
+.canvas-scroll::-webkit-scrollbar{width:8px;height:8px}
+.canvas-scroll::-webkit-scrollbar-track{background:#1a1a1a}
+.canvas-scroll::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:4px}
+.artboard-wrap{position:relative;flex-shrink:0;box-shadow:0 4px 32px rgba(0,0,0,.6)}
+#vsvg{display:block;background:#fff}
+
+/* Bezier point handles */
+.ctrl-pt{position:absolute;width:8px;height:8px;border-radius:50%;background:#4db8ff;border:1px solid #0078d4;transform:translate(-50%,-50%);cursor:move;pointer-events:all;z-index:20}
+.ctrl-line{position:absolute;pointer-events:none;z-index:15}
+.anch-pt{position:absolute;width:9px;height:9px;background:#fff;border:2px solid #0078d4;transform:translate(-50%,-50%) rotate(45deg);cursor:move;pointer-events:all;z-index:20}
+.anch-pt.selected-pt{background:#0078d4}
+
+/* ── Right panels ── */
+.right-panels{width:220px;background:#252525;border-left:1px solid #3a3a3a;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.rp-tabs{display:flex;border-bottom:1px solid #3a3a3a;flex-shrink:0}
+.rp-tab{flex:1;padding:7px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.5px;cursor:pointer;color:#666;border-bottom:2px solid transparent;transition:all .15s}
+.rp-tab:hover{color:#ccc}
+.rp-tab.on{color:#4db8ff;border-bottom-color:#0078d4}
+.rp-pane{display:none;flex:1;overflow-y:auto;flex-direction:column}
+.rp-pane.on{display:flex}
+.rp-pane::-webkit-scrollbar{width:3px}
+.rp-pane::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:2px}
+
+/* Panel sections */
+.ps{padding:10px}
+.ps+.ps{border-top:1px solid #3a3a3a}
+.ps-title{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#666;margin-bottom:8px}
+.ps-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px;font-size:11px;color:#bbb}
+.ps-input{width:70px;padding:3px 6px;border:1px solid #3a3a3a;border-radius:4px;background:#1a1a1a;color:#e0e0e0;font-family:'Oxanium',sans-serif;font-size:11px;outline:none}
+.ps-input:focus{border-color:#0078d4}
+.ps-swatch{width:28px;height:22px;border-radius:4px;border:1px solid #3a3a3a;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0}
+.ps-swatch input[type=color]{position:absolute;inset:-4px;opacity:0;cursor:pointer;width:200%;height:200%}
+.ps-slider{width:100%;accent-color:#0078d4;margin:3px 0}
+.ps-btn{padding:4px 10px;border:1px solid #3a3a3a;border-radius:4px;background:rgba(128,128,128,.08);color:#bbb;font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .12s}
+.ps-btn:hover{background:rgba(128,128,128,.2);color:#fff}
+.ps-btn.on{background:rgba(0,120,212,.15);border-color:#0078d4;color:#4db8ff}
+.align-row{display:flex;gap:4px;flex-wrap:wrap}
+.al-btn{width:28px;height:24px;border:1px solid #3a3a3a;border-radius:3px;background:rgba(128,128,128,.06);color:#bbb;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.al-btn:hover{background:rgba(128,128,128,.2);color:#fff}
+.stroke-dash select{width:100%;padding:3px 6px;border:1px solid #3a3a3a;border-radius:4px;background:#1a1a1a;color:#e0e0e0;font-family:'Oxanium',sans-serif;font-size:11px;outline:none}
+
+/* Layers */
+.layer-item{display:flex;align-items:center;gap:6px;padding:5px 10px;border-radius:4px;cursor:pointer;transition:background .12s;border:1px solid transparent}
+.layer-item:hover{background:#2f2f2f}
+.layer-item.on{background:rgba(0,120,212,.12);border-color:rgba(0,120,212,.25)}
+.layer-icon{font-size:12px;flex-shrink:0}
+.layer-name{flex:1;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layer-eye{font-size:11px;cursor:pointer;opacity:.5;transition:opacity .12s}
+.layer-eye:hover{opacity:1}
+.layer-lock{font-size:11px;cursor:pointer;opacity:.5;transition:opacity .12s}
+.layer-lock:hover{opacity:1}
+
+/* Status bar */
+.status-bar{height:22px;background:#252525;border-top:1px solid #3a3a3a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:10px;color:#666;flex-shrink:0}
+.status-bar span{display:flex;align-items:center;gap:5px}
+
+/* Gradient editor */
+.grad-stops{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.grad-stop{width:20px;height:20px;border-radius:3px;border:2px solid #3a3a3a;cursor:pointer;position:relative;overflow:hidden}
+.grad-stop input{position:absolute;inset:-4px;opacity:0;cursor:pointer;width:200%;height:200%}
+</style>
+</head>
+<body>
+
+<!-- Menu bar -->
+<div class="menu-bar">
+  <div class="menu-item">File
+    <div class="menu-dd">
+      <div class="mdi" onclick="newDoc()">New <span class="shortcut" style="color:#555">Ctrl+N</span></div>
+      <div class="mdi" onclick="openSvg()">Open SVG…</div>
+      <div class="mdi-sep"></div>
+      <div class="mdi" onclick="exportSvg()">Export SVG… <span style="color:#555">Ctrl+S</span></div>
+      <div class="mdi" onclick="exportPng()">Export PNG…</div>
+      <div class="mdi" onclick="exportPdf()">Export PDF…</div>
+    </div>
+  </div>
+  <div class="menu-item">Edit
+    <div class="menu-dd">
+      <div class="mdi" onclick="undo()">Undo <span style="color:#555">Ctrl+Z</span></div>
+      <div class="mdi" onclick="redo()">Redo <span style="color:#555">Ctrl+Y</span></div>
+      <div class="mdi-sep"></div>
+      <div class="mdi" onclick="copyEl()">Copy <span style="color:#555">Ctrl+C</span></div>
+      <div class="mdi" onclick="pasteEl()">Paste <span style="color:#555">Ctrl+V</span></div>
+      <div class="mdi" onclick="duplicateEl()">Duplicate <span style="color:#555">Ctrl+D</span></div>
+      <div class="mdi-sep"></div>
+      <div class="mdi" onclick="deleteEl()">Delete <span style="color:#555">Del</span></div>
+      <div class="mdi" onclick="selectAll()">Select All <span style="color:#555">Ctrl+A</span></div>
+    </div>
+  </div>
+  <div class="menu-item">Object
+    <div class="menu-dd">
+      <div class="mdi" onclick="bringToFront()">Bring to Front <span style="color:#555">Ctrl+]</span></div>
+      <div class="mdi" onclick="sendToBack()">Send to Back <span style="color:#555">Ctrl+[</span></div>
+      <div class="mdi-sep"></div>
+      <div class="mdi" onclick="groupSel()">Group <span style="color:#555">Ctrl+G</span></div>
+      <div class="mdi" onclick="ungroupSel()">Ungroup <span style="color:#555">Ctrl+Shift+G</span></div>
+      <div class="mdi-sep"></div>
+      <div class="mdi" onclick="flattenPath()">Flatten to Path</div>
+      <div class="mdi" onclick="outlineStroke()">Outline Stroke</div>
+    </div>
+  </div>
+  <div class="menu-item">View
+    <div class="menu-dd">
+      <div class="mdi" onclick="zoomTo(1)">Zoom 100% <span style="color:#555">Ctrl+0</span></div>
+      <div class="mdi" onclick="zoomTo(2)">Zoom 200%</div>
+      <div class="mdi" onclick="zoomFit()">Fit to Window <span style="color:#555">Ctrl+Shift+H</span></div>
+      <div class="mdi-sep"></div>
+      <div class="mdi" onclick="toggleGrid()">Toggle Grid <span style="color:#555">'</span></div>
+      <div class="mdi" onclick="toggleSnap()">Toggle Snap <span style="color:#555">;</span></div>
+      <div class="mdi" onclick="toggleRulers()">Toggle Rulers <span style="color:#555">Ctrl+R</span></div>
+    </div>
+  </div>
+  <div class="menu-spacer"></div>
+  <span class="doc-name" id="docNameEl" ondblclick="renameDoc()">Untitled.svg</span>
+  <div class="menu-spacer"></div>
+  <button style="padding:4px 12px;background:#0078d4;border:none;border-radius:5px;color:#fff;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;cursor:pointer" onclick="exportSvg()">Export SVG</button>
+</div>
+
+<div class="app-body">
+  <!-- Toolbox -->
+  <div class="toolbox">
+    <div class="tool-grp">
+      <button class="t on" id="t-sel"    onclick="setTool('sel')"    data-tip="Select (V)">↖</button>
+      <button class="t"    id="t-direct" onclick="setTool('direct')" data-tip="Direct Select (A)">↗</button>
+    </div>
+    <div class="tool-grp">
+      <button class="t" id="t-pen"    onclick="setTool('pen')"    data-tip="Pen (P)">🖊</button>
+      <button class="t" id="t-pencil" onclick="setTool('pencil')" data-tip="Pencil (N)">✏️</button>
+      <button class="t" id="t-text"   onclick="setTool('text')"   data-tip="Type (T)">T</button>
+    </div>
+    <div class="tool-grp">
+      <button class="t" id="t-rect"    onclick="setTool('rect')"    data-tip="Rectangle (R)">▭</button>
+      <button class="t" id="t-ellipse" onclick="setTool('ellipse')" data-tip="Ellipse (E)">⬭</button>
+      <button class="t" id="t-poly"    onclick="setTool('poly')"    data-tip="Polygon">⬡</button>
+      <button class="t" id="t-star"    onclick="setTool('star')"    data-tip="Star">★</button>
+      <button class="t" id="t-line"    onclick="setTool('line')"    data-tip="Line (L)">╱</button>
+    </div>
+    <div class="tool-grp">
+      <button class="t" id="t-scale"  onclick="setTool('scale')"  data-tip="Scale (S)">⤢</button>
+      <button class="t" id="t-rotate" onclick="setTool('rotate')" data-tip="Rotate (R)">↻</button>
+      <button class="t" id="t-shear"  onclick="setTool('shear')"  data-tip="Shear">⟋</button>
+    </div>
+    <div class="tool-grp">
+      <button class="t" id="t-eyedrop" onclick="setTool('eyedrop')" data-tip="Eyedropper (I)">💉</button>
+      <button class="t" id="t-zoom"    onclick="setTool('zoom')"    data-tip="Zoom (Z)">🔍</button>
+      <button class="t" id="t-hand"    onclick="setTool('hand')"    data-tip="Hand (H)">✋</button>
+    </div>
+    <!-- Fill/Stroke swatches at bottom -->
+    <div style="margin-top:auto;padding:8px 5px;display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="position:relative;width:28px;height:28px">
+        <div id="fillBox" style="position:absolute;top:0;left:0;width:22px;height:22px;border-radius:3px;border:1.5px solid #555;cursor:pointer" onclick="document.getElementById('fillPicker').click()"></div>
+        <div id="strokeBox" style="position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:3px;border:2px solid #555;background:transparent;cursor:pointer;box-sizing:border-box" onclick="document.getElementById('strokePicker').click()"></div>
+      </div>
+      <input type="color" id="fillPicker"   style="display:none" value="#4285f4" oninput="syncColors();applyToSel()">
+      <input type="color" id="strokePicker" style="display:none" value="#1a1a1a" oninput="syncColors();applyToSel()">
+      <button class="t" onclick="swapFillStroke()" style="font-size:12px" data-tip="Swap fill/stroke (X)">⇅</button>
+      <button class="t" onclick="setNone('fill')" style="font-size:11px;color:#ef4444" data-tip="No fill">∅</button>
+    </div>
+  </div>
+
+  <!-- Canvas zone -->
+  <div class="canvas-zone">
+    <div class="ruler-h" id="rulerH"></div>
+    <div class="canvas-row">
+      <div class="ruler-v" id="rulerV"></div>
+      <div class="canvas-scroll" id="canvasScroll">
+        <div class="artboard-wrap" id="artWrap" style="width:800px;height:600px">
+          <svg id="vsvg" width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="vgrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,0,0,.06)" stroke-width="1"/>
+              </pattern>
+              <marker id="varrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <polygon points="0 0, 8 3, 0 6" fill="#1a1a1a"/>
+              </marker>
+            </defs>
+            <rect id="vgridBg" width="800" height="600" fill="url(#vgrid)" opacity="0" pointer-events="none"/>
+            <g id="mainGroup"></g>
+            <g id="penPreview" fill="none" stroke="#0078d4" stroke-width="1" pointer-events="none">
+              <path id="penPrevPath" d=""/>
+              <line id="penPrevLine" stroke-dasharray="4,3"/>
+            </g>
+            <g id="selBox" pointer-events="none"></g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panels -->
+  <div class="right-panels">
+    <div class="rp-tabs">
+      <div class="rp-tab on" onclick="switchPanel('props')">Properties</div>
+      <div class="rp-tab"    onclick="switchPanel('layers')">Layers</div>
+      <div class="rp-tab"    onclick="switchPanel('swatches')">Swatches</div>
+    </div>
+
+    <!-- Properties pane -->
+    <div class="rp-pane on" id="pane-props">
+      <div class="ps">
+        <div class="ps-title">Transform</div>
+        <div class="ps-row">X <input class="ps-input" id="px" type="number" step="1" onchange="setTransform('x',this.value)">
+             Y <input class="ps-input" id="py" type="number" step="1" onchange="setTransform('y',this.value)"></div>
+        <div class="ps-row">W <input class="ps-input" id="pw" type="number" step="1" onchange="setTransform('w',this.value)">
+             H <input class="ps-input" id="ph" type="number" step="1" onchange="setTransform('h',this.value)"></div>
+        <div class="ps-row">° <input class="ps-input" id="prot" type="number" step="1" value="0" onchange="setTransform('rot',this.value)">
+          <div style="display:flex;gap:4px">
+            <button class="ps-btn" onclick="setTransform('flipH',null)">↔</button>
+            <button class="ps-btn" onclick="setTransform('flipV',null)">↕</button>
+          </div>
+        </div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Fill</div>
+        <div class="ps-row">
+          <div class="ps-swatch" id="fillSw"><input type="color" id="fillPk2" value="#4285f4" oninput="document.getElementById('fillPicker').value=this.value;syncColors();applyToSel()"></div>
+          <select style="flex:1;padding:3px 6px;border:1px solid #3a3a3a;border-radius:4px;background:#1a1a1a;color:#e0e0e0;font-family:'Oxanium',sans-serif;font-size:11px;outline:none" id="fillType" onchange="applyToSel()">
+            <option>Solid</option><option>Linear</option><option>Radial</option><option>None</option>
+          </select>
+        </div>
+        <div class="ps-row">Opacity <input type="range" class="ps-slider" id="fillOpacity" min="0" max="100" value="100" oninput="applyToSel();this.nextSibling.textContent=this.value+'%'"><span style="font-size:10px;min-width:32px">100%</span></div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Stroke</div>
+        <div class="ps-row">
+          <div class="ps-swatch" id="strokeSw"><input type="color" id="strokePk2" value="#1a1a1a" oninput="document.getElementById('strokePicker').value=this.value;syncColors();applyToSel()"></div>
+          <input class="ps-input" id="strokeW" type="number" value="1" min="0" step=".5" style="width:50px" onchange="applyToSel()"> px
+        </div>
+        <div class="ps-row">Dash
+          <div class="stroke-dash"><select id="dashSel" onchange="applyToSel()">
+            <option value="">Solid</option>
+            <option value="4,4">Dashed</option>
+            <option value="2,4">Dotted</option>
+            <option value="8,4,2,4">Dash-dot</option>
+          </select></div>
+        </div>
+        <div class="ps-row">Cap
+          <div style="display:flex;gap:3px">
+            <button class="ps-btn" onclick="setLinecap('butt')">|</button>
+            <button class="ps-btn" onclick="setLinecap('round')">( </button>
+            <button class="ps-btn" onclick="setLinecap('square')">□</button>
+          </div>
+        </div>
+        <div class="ps-row">Join
+          <div style="display:flex;gap:3px">
+            <button class="ps-btn" onclick="setLinejoin('miter')">⌐</button>
+            <button class="ps-btn" onclick="setLinejoin('round')">⌒</button>
+            <button class="ps-btn" onclick="setLinejoin('bevel')">⌺</button>
+          </div>
+        </div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Align</div>
+        <div class="align-row">
+          <button class="al-btn" onclick="align('left')"   title="Align left">⬱</button>
+          <button class="al-btn" onclick="align('hcenter')" title="Center H">⫿</button>
+          <button class="al-btn" onclick="align('right')"  title="Align right">⬰</button>
+          <button class="al-btn" onclick="align('top')"    title="Align top">⬆</button>
+          <button class="al-btn" onclick="align('vcenter')" title="Center V">↕</button>
+          <button class="al-btn" onclick="align('bottom')" title="Align bottom">⬇</button>
+        </div>
+        <div class="align-row" style="margin-top:4px">
+          <button class="al-btn" style="width:auto;padding:0 6px;font-size:10px" onclick="distributeH()">↔ H</button>
+          <button class="al-btn" style="width:auto;padding:0 6px;font-size:10px" onclick="distributeV()">↕ V</button>
+        </div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Typography</div>
+        <div class="ps-row">Size <input class="ps-input" id="fontSize" type="number" value="24" min="1" onchange="applyToSel()"> px</div>
+        <div class="ps-row">
+          <select class="ps-input" id="fontFamily" style="width:100%" onchange="applyToSel()">
+            <option>Oxanium</option><option>sans-serif</option><option>serif</option>
+            <option>monospace</option><option>cursive</option>
+          </select>
+        </div>
+        <div class="ps-row">
+          <button class="ps-btn" id="boldBtn"   onclick="toggleTextAttr('bold')">B</button>
+          <button class="ps-btn" id="italicBtn" onclick="toggleTextAttr('italic')"><i>I</i></button>
+          <button class="ps-btn" id="underBtn"  onclick="toggleTextAttr('underline')"><u>U</u></button>
+        </div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Effects</div>
+        <div class="ps-row">Shadow <input type="checkbox" id="fxShadow" onchange="applyToSel()"></div>
+        <div class="ps-row">Blur <input type="range" class="ps-slider" id="fxBlur" min="0" max="20" value="0" oninput="applyToSel();this.nextSibling.textContent=this.value+'px'"><span style="font-size:10px;min-width:28px">0px</span></div>
+        <div class="ps-row">Opacity <input type="range" class="ps-slider" id="objOpacity" min="0" max="100" value="100" oninput="applyToSel();this.nextSibling.textContent=this.value+'%'"><span style="font-size:10px;min-width:32px">100%</span></div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Artboard</div>
+        <div class="ps-row">W <input class="ps-input" id="abW" type="number" value="800" onchange="resizeArtboard()">
+             H <input class="ps-input" id="abH" type="number" value="600" onchange="resizeArtboard()"></div>
+        <div class="ps-row">
+          <button class="ps-btn" onclick="setArtboard(1920,1080)">1080p</button>
+          <button class="ps-btn" onclick="setArtboard(1280,720)">720p</button>
+          <button class="ps-btn" onclick="setArtboard(800,600)">800×600</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Layers pane -->
+    <div class="rp-pane" id="pane-layers">
+      <div style="display:flex;gap:4px;padding:8px;border-bottom:1px solid #3a3a3a;flex-shrink:0">
+        <button class="ps-btn" onclick="addLayer()" style="flex:1">+ Layer</button>
+        <button class="ps-btn" onclick="removeLayer()" style="flex:1">− Layer</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:4px" id="layerListPanel"></div>
+    </div>
+
+    <!-- Swatches pane -->
+    <div class="rp-pane" id="pane-swatches">
+      <div class="ps">
+        <div class="ps-title">Color Swatches</div>
+        <div id="swatchGrid" style="display:flex;flex-wrap:wrap;gap:4px"></div>
+        <div style="margin-top:8px;display:flex;gap:4px">
+          <button class="ps-btn" onclick="addSwatch()">+ Add</button>
+          <button class="ps-btn" onclick="clearSwatches()">Clear</button>
+        </div>
+      </div>
+      <div class="ps">
+        <div class="ps-title">Palettes</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <button class="ps-btn" onclick="loadPalette('material')" style="text-align:left">Material Design</button>
+          <button class="ps-btn" onclick="loadPalette('pastel')" style="text-align:left">Pastel</button>
+          <button class="ps-btn" onclick="loadPalette('mono')" style="text-align:left">Monochrome</button>
+          <button class="ps-btn" onclick="loadPalette('neon')" style="text-align:left">Neon</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <span id="stTool">Select</span>
+  <span>|</span>
+  <span id="stPos">0, 0</span>
+  <span>|</span>
+  <span id="stSel">Nothing selected</span>
+  <span>|</span>
+  <span id="stZoom">100%</span>
+  <div style="flex:1"></div>
+  <span id="stDoc">800 × 600</span>
+</div>
+
+<script>
+// ════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════
+let tool      = 'sel';
+let selected  = [];        // selected element IDs
+let clipboard = null;
+let zoom      = 1;
+let gridOn    = false;
+let snapOn    = true;
+let undoStack = [], redoStack = [];
+let elemCount = 0;
+let penPts    = [];        // pen tool anchor points
+let isPenDrawing = false;
+let noFill    = false;
+let docName   = 'Untitled.svg';
+let layers    = [{ id:'l0', name:'Layer 1', visible:true, locked:false }];
+let swatches  = ['#4285f4','#ea4335','#fbbc04','#34a853','#ff6b35','#9c27b0','#000','#fff','#888'];
+let artW = 800, artH = 600;
+
+const svg   = document.getElementById('vsvg');
+const group = document.getElementById('mainGroup');
+const PALETTES = {
+  material:['#f44336','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#03a9f4','#00bcd4','#009688','#4caf50','#8bc34a','#cddc39','#ffeb3b','#ffc107','#ff9800','#ff5722'],
+  pastel:  ['#ffb3ba','#ffdfba','#ffffba','#baffc9','#bae1ff','#e8baff','#ffd9ba','#c9ffba','#baffff','#f5baff'],
+  mono:    ['#000000','#1a1a1a','#333333','#4d4d4d','#666666','#808080','#999999','#b3b3b3','#cccccc','#e6e6e6','#ffffff'],
+  neon:    ['#ff00ff','#00ffff','#ffff00','#ff0080','#00ff80','#8000ff','#ff8000','#0080ff','#ff0040','#40ff00'],
+};
+
+// ── Tool ─────────────────────────────────────
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.t[id^=t-]').forEach(b => b.classList.remove('on'));
+  const btn = document.getElementById('t-' + t);
+  if (btn) btn.classList.add('on');
+  svg.style.cursor = { sel:'default', direct:'default', pen:'crosshair', pencil:'crosshair',
+    rect:'crosshair', ellipse:'crosshair', poly:'crosshair', star:'crosshair', line:'crosshair',
+    text:'text', zoom:'zoom-in', hand:'grab', eyedrop:'crosshair',
+    scale:'nwse-resize', rotate:'grab', shear:'col-resize' }[t] || 'default';
+  document.getElementById('stTool').textContent = t.charAt(0).toUpperCase() + t.slice(1);
+  if (t !== 'pen') { penPts = []; isPenDrawing = false; clearPenPreview(); }
+}
+
+// ── Colors ───────────────────────────────────
+function syncColors() {
+  const fc = document.getElementById('fillPicker').value;
+  const sc = document.getElementById('strokePicker').value;
+  document.getElementById('fillBox').style.background   = noFill ? 'transparent' : fc;
+  document.getElementById('fillSw').style.background    = noFill ? 'transparent' : fc;
+  document.getElementById('fillPk2').value              = fc;
+  document.getElementById('strokeBox').style.background = sc;
+  document.getElementById('strokeSw').style.background  = sc;
+  document.getElementById('strokePk2').value            = sc;
+  document.getElementById('varrow').querySelector('polygon').setAttribute('fill', sc);
+}
+function getFill()    { return noFill ? 'none' : document.getElementById('fillPicker').value; }
+function getStroke()  { return document.getElementById('strokePicker').value; }
+function getStrokeW() { return document.getElementById('strokeW').value; }
+function swapFillStroke() { const f=document.getElementById('fillPicker').value,s=document.getElementById('strokePicker').value; document.getElementById('fillPicker').value=s; document.getElementById('strokePicker').value=f; syncColors(); applyToSel(); }
+function setNone(which) { if(which==='fill'){noFill=!noFill;} syncColors(); applyToSel(); }
+
+// ── SVG helpers ───────────────────────────────
+function uid()  { return 'el' + (++elemCount); }
+function mkSvg(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k, v));
+  return el;
+}
+function svgPt(e) {
+  const r = svg.getBoundingClientRect();
+  return { x: (e.clientX - r.left) / zoom, y: (e.clientY - r.top) / zoom };
+}
+function snapV(v, grid=10) { return snapOn ? Math.round(v/grid)*grid : v; }
+
+// ── Mouse events ──────────────────────────────
+let isDragging=false, dragStart={x:0,y:0}, dragEl=null, origPos={};
+let isDrawing=false, drawStart={x:0,y:0};
+let pencilPts=[], pencilEl=null;
+
+svg.addEventListener('mousedown', e => {
+  const p = svgPt(e);
+  const x = snapV(p.x), y = snapV(p.y);
+
+  if (tool === 'hand')   { isDragging=true; dragStart={x:e.clientX,y:e.clientY}; svg.style.cursor='grabbing'; return; }
+  if (tool === 'zoom')   { zoomTo(e.shiftKey ? zoom/1.25 : zoom*1.25); return; }
+  if (tool === 'eyedrop'){ pickColor(e); return; }
+  if (tool === 'text')   { spawnText(x,y); return; }
+
+  if (tool === 'pen') { handlePen(x, y, e); return; }
+  if (tool === 'pencil') {
+    isDrawing = true;
+    pencilPts = [[x,y]];
+    pencilEl  = mkSvg('path', { id:uid(), d:'M'+x+','+y, fill:'none', stroke:getStroke(), 'stroke-width':getStrokeW(), 'stroke-linecap':'round', 'stroke-linejoin':'round', 'data-el':'1' });
+    group.appendChild(pencilEl);
+    return;
+  }
+
+  if (tool === 'sel') {
+    const target = e.target.closest('[data-el]');
+    if (target) {
+      if (!e.shiftKey) selected = [target.id];
+      else { selected.includes(target.id) ? (selected=selected.filter(i=>i!==target.id)) : selected.push(target.id); }
+      isDragging = true;
+      dragStart  = { x:e.clientX, y:e.clientY };
+      const bb   = target.getBBox();
+      origPos    = { x: bb.x, y: bb.y, el: target };
+      updateSel();
+    } else {
+      selected = []; updateSel();
+    }
+    return;
+  }
+
+  // Shape tools
+  isDrawing = true;
+  drawStart = { x, y };
+  const id  = uid();
+  const f   = getFill(), s = getStroke(), sw = getStrokeW();
+
+  if (tool === 'rect')    dragEl = mkSvg('rect',    { id, x, y, width:1, height:1, fill:f, stroke:s, 'stroke-width':sw, 'data-el':'1' });
+  if (tool === 'ellipse') dragEl = mkSvg('ellipse', { id, cx:x, cy:y, rx:1, ry:1, fill:f, stroke:s, 'stroke-width':sw, 'data-el':'1' });
+  if (tool === 'line')    dragEl = mkSvg('line',    { id, x1:x, y1:y, x2:x, y2:y, stroke:s, 'stroke-width':sw, 'data-el':'1' });
+  if (tool === 'poly')    dragEl = mkSvg('polygon', { id, points:polyPts(x,y,1,6), fill:f, stroke:s, 'stroke-width':sw, 'data-el':'1' });
+  if (tool === 'star')    dragEl = mkSvg('polygon', { id, points:starPts(x,y,1,.5,5), fill:f, stroke:s, 'stroke-width':sw, 'data-el':'1' });
+  if (dragEl) group.appendChild(dragEl);
+});
+
+svg.addEventListener('mousemove', e => {
+  const p  = svgPt(e);
+  const x  = snapV(p.x), y = snapV(p.y);
+  document.getElementById('stPos').textContent = Math.round(p.x)+', '+Math.round(p.y);
+
+  if (tool === 'hand' && isDragging) {
+    const sc = document.getElementById('canvasScroll');
+    sc.scrollLeft -= e.clientX - dragStart.x;
+    sc.scrollTop  -= e.clientY - dragStart.y;
+    dragStart = {x:e.clientX,y:e.clientY}; return;
+  }
+  if (tool === 'pen' && isPenDrawing) {
+    updatePenPreview(x,y); return;
+  }
+  if (tool === 'pencil' && isDrawing && pencilEl) {
+    pencilPts.push([x,y]);
+    pencilEl.setAttribute('d', pencilPts.reduce((d,pt,i)=>d+(i===0?'M':'L')+pt[0]+','+pt[1],''));
+    return;
+  }
+  if (tool === 'sel' && isDragging && origPos.el) {
+    const dx = (e.clientX - dragStart.x)/zoom;
+    const dy = (e.clientY - dragStart.y)/zoom;
+    selected.forEach(id => nudgeEl(document.getElementById(id), dx, dy, false));
+    dragStart = {x:e.clientX,y:e.clientY};
+    updateSel(); return;
+  }
+  if (!isDrawing || !dragEl) return;
+
+  const dx = x - drawStart.x, dy = y - drawStart.y;
+  const constrain = e.shiftKey;
+
+  if (tool==='rect')    { const [rx,ry,rw,rh]=constrain?squarize(drawStart.x,drawStart.y,dx,dy):[dx<0?x:drawStart.x,dy<0?y:drawStart.y,Math.abs(dx),Math.abs(dy)]; dragEl.setAttribute('x',rx);dragEl.setAttribute('y',ry);dragEl.setAttribute('width',rw||1);dragEl.setAttribute('height',rh||1); }
+  if (tool==='ellipse') { const r=constrain?Math.abs(dx)/2:undefined; dragEl.setAttribute('cx',drawStart.x+dx/2);dragEl.setAttribute('cy',drawStart.y+dy/2);dragEl.setAttribute('rx',r||Math.abs(dx)/2||1);dragEl.setAttribute('ry',constrain?r:Math.abs(dy)/2||1); }
+  if (tool==='line')    { dragEl.setAttribute('x2',x);dragEl.setAttribute('y2',constrain?drawStart.y:y); }
+  if (tool==='poly')    { const r=Math.sqrt(dx*dx+dy*dy); dragEl.setAttribute('points',polyPts(drawStart.x,drawStart.y,r||1,6)); }
+  if (tool==='star')    { const r=Math.sqrt(dx*dx+dy*dy); dragEl.setAttribute('points',starPts(drawStart.x,drawStart.y,r||1,r*.45||.5,5)); }
+});
+
+svg.addEventListener('mouseup', e => {
+  if (tool==='hand')   { isDragging=false; svg.style.cursor='grab'; return; }
+  if (tool==='pencil' && pencilEl) { pencilEl=null; pencilPts=[]; isDrawing=false; pushUndo(); renderLayerList(); return; }
+  if (isDrawing && dragEl) {
+    selected=[dragEl.id]; dragEl=null; isDrawing=false;
+    updateSel(); pushUndo(); renderLayerList();
+  }
+  if (tool==='sel' && isDragging) { isDragging=false; pushUndo(); }
+});
+
+// ── Pen tool ──────────────────────────────────
+let penPath='', penLastX=0, penLastY=0;
+
+function handlePen(x, y, e) {
+  if (e.detail === 2) { commitPen(); return; }
+  penPts.push({x,y});
+  if (penPts.length === 1) {
+    const id = uid();
+    const el = mkSvg('path', { id, d:'M'+x+','+y, fill:getFill(), stroke:getStroke(), 'stroke-width':getStrokeW(), 'stroke-linecap':'round', 'stroke-linejoin':'round', 'data-el':'1' });
+    group.appendChild(el);
+    selected = [id];
+    isPenDrawing = true;
+  } else {
+    const el = document.getElementById(selected[0]);
+    if (el) {
+      const d = el.getAttribute('d') + ' L' + x + ',' + y;
+      el.setAttribute('d', d);
+    }
+  }
+  penLastX=x; penLastY=y;
+  clearPenPreview();
+}
+
+function updatePenPreview(x, y) {
+  if (!isPenDrawing) return;
+  document.getElementById('penPrevLine').setAttribute('x1', penLastX);
+  document.getElementById('penPrevLine').setAttribute('y1', penLastY);
+  document.getElementById('penPrevLine').setAttribute('x2', x);
+  document.getElementById('penPrevLine').setAttribute('y2', y);
+}
+function clearPenPreview() {
+  document.getElementById('penPrevPath').setAttribute('d','');
+  document.getElementById('penPrevLine').setAttribute('x1',0);document.getElementById('penPrevLine').setAttribute('y1',0);
+  document.getElementById('penPrevLine').setAttribute('x2',0);document.getElementById('penPrevLine').setAttribute('y2',0);
+}
+function commitPen() { isPenDrawing=false; penPts=[]; clearPenPreview(); pushUndo(); }
+svg.addEventListener('dblclick', e => { if(tool==='pen') commitPen(); });
+
+// ── Geometry helpers ──────────────────────────
+function polyPts(cx,cy,r,sides) { const pts=[]; for(let i=0;i<sides;i++){const a=(i*360/sides-90)*Math.PI/180;pts.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1));} return pts.join(' '); }
+function starPts(cx,cy,outerR,innerR,pts) { const p=[]; for(let i=0;i<pts*2;i++){const r=i%2===0?outerR:innerR;const a=(i*360/(pts*2)-90)*Math.PI/180;p.push((cx+r*Math.cos(a)).toFixed(1)+','+(cy+r*Math.sin(a)).toFixed(1));} return p.join(' '); }
+function squarize(ox,oy,dx,dy) { const s=Math.max(Math.abs(dx),Math.abs(dy)); return [dx<0?ox-s:ox,dy<0?oy-s:oy,s,s]; }
+
+// ── Selection ─────────────────────────────────
+function updateSel() {
+  document.getElementById('selBox').innerHTML = '';
+  if (!selected.length) { document.getElementById('stSel').textContent='Nothing selected'; return; }
+  selected.forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    try {
+      const bb = el.getBBox();
+      const r  = mkSvg('rect',{x:bb.x-2,y:bb.y-2,width:bb.width+4,height:bb.height+4,fill:'none',stroke:'#0078d4','stroke-width':'1','stroke-dasharray':'5,3',pointer:'none'});
+      document.getElementById('selBox').appendChild(r);
+    } catch(e){}
+    // Update props panel
+    const fill   = el.getAttribute('fill')   || '#4285f4';
+    const stroke = el.getAttribute('stroke') || '#1a1a1a';
+    if(fill!=='none') document.getElementById('fillPicker').value=fill;
+    noFill = fill==='none';
+    document.getElementById('strokePicker').value=stroke!=='none'?stroke:'#1a1a1a';
+    document.getElementById('strokeW').value=el.getAttribute('stroke-width')||'1';
+    document.getElementById('objOpacity').value=Math.round((parseFloat(el.getAttribute('opacity')||'1'))*100);
+    syncColors();
+    try{ const bb=el.getBBox(); document.getElementById('px').value=Math.round(bb.x);document.getElementById('py').value=Math.round(bb.y);document.getElementById('pw').value=Math.round(bb.width);document.getElementById('ph').value=Math.round(bb.height);}catch(e){}
+  });
+  document.getElementById('stSel').textContent = selected.length===1?'1 object':selected.length+' objects';
+}
+
+function applyToSel() {
+  if (!selected.length) return;
+  selected.forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    if (el.tagName !== 'line') el.setAttribute('fill', getFill());
+    el.setAttribute('stroke', getStroke());
+    el.setAttribute('stroke-width', getStrokeW());
+    el.setAttribute('stroke-dasharray', document.getElementById('dashSel').value);
+    el.setAttribute('opacity', parseInt(document.getElementById('objOpacity').value)/100);
+    const blur = document.getElementById('fxBlur').value;
+    const shadow = document.getElementById('fxShadow').checked;
+    const filters=[];
+    if(blur>0)   filters.push('blur('+blur+'px)');
+    if(shadow)   filters.push('drop-shadow(3px 3px 6px rgba(0,0,0,0.4))');
+    el.style.filter = filters.join(' ');
+    if(el.tagName==='text'){
+      el.setAttribute('font-size',  document.getElementById('fontSize').value);
+      el.setAttribute('font-family',document.getElementById('fontFamily').value);
+    }
+  });
+  syncColors();
+}
+
+function setLinecap(v)  { selected.forEach(id=>{const e=document.getElementById(id);if(e)e.setAttribute('stroke-linecap',v);}); }
+function setLinejoin(v) { selected.forEach(id=>{const e=document.getElementById(id);if(e)e.setAttribute('stroke-linejoin',v);}); }
+function toggleTextAttr(attr) { /* simplified */ }
+
+// ── Nudge/move ────────────────────────────────
+function nudgeEl(el, dx, dy, absolute) {
+  if (!el) return;
+  const t = el.tagName;
+  if (absolute) {
+    if(t==='rect'||t==='text'||t==='image') { el.setAttribute('x',dx); el.setAttribute('y',dy); }
+    else if(t==='ellipse'||t==='circle') { el.setAttribute('cx',dx); el.setAttribute('cy',dy); }
+    return;
+  }
+  if(t==='rect'||t==='text'||t==='image') { el.setAttribute('x',+el.getAttribute('x')+dx);el.setAttribute('y',+el.getAttribute('y')+dy); }
+  else if(t==='ellipse'||t==='circle') { el.setAttribute('cx',+el.getAttribute('cx')+dx);el.setAttribute('cy',+el.getAttribute('cy')+dy); }
+  else if(t==='line') { ['x1','y1','x2','y2'].forEach((a,i)=>el.setAttribute(a,+el.getAttribute(a)+(i%2===0?dx:dy))); }
+  else if(t==='polygon'||t==='polyline') { el.setAttribute('points',el.getAttribute('points').replace(/(-?\d+\.?\d*),(-?\d+\.?\d*)/g,(_,x,y)=>(+x+dx).toFixed(1)+','+(+y+dy).toFixed(1))); }
+  else { const cur=el.getAttribute('transform')||'';el.setAttribute('transform',cur+' translate('+dx+','+dy+')'); }
+}
+
+// ── Transform panel ───────────────────────────
+function setTransform(prop, val) {
+  if (!selected.length) return;
+  const el = document.getElementById(selected[0]); if(!el) return;
+  try {
+    const bb = el.getBBox();
+    if(prop==='x') nudgeEl(el,+val-bb.x,0,false);
+    if(prop==='y') nudgeEl(el,0,+val-bb.y,false);
+    if(prop==='rot') el.setAttribute('transform',(el.getAttribute('transform')||'')+' rotate('+val+','+(bb.x+bb.width/2)+','+(bb.y+bb.height/2)+')');
+    if(prop==='flipH') el.setAttribute('transform',(el.getAttribute('transform')||'')+' scale(-1,1) translate(-'+(2*(bb.x+bb.width/2))+',0)');
+    if(prop==='flipV') el.setAttribute('transform',(el.getAttribute('transform')||'')+' scale(1,-1) translate(0,-'+(2*(bb.y+bb.height/2))+')');
+  } catch(e){}
+  pushUndo();
+}
+
+// ── Text ──────────────────────────────────────
+function spawnText(x, y) {
+  const id  = uid();
+  const val = prompt('Enter text:');
+  if (!val) return;
+  const el = mkSvg('text', { id, x, y, fill:getFill(), 'font-family':document.getElementById('fontFamily').value, 'font-size':document.getElementById('fontSize').value, 'data-el':'1' });
+  el.textContent = val;
+  group.appendChild(el);
+  selected=[id]; updateSel(); pushUndo(); renderLayerList();
+}
+
+// ── Edit ops ──────────────────────────────────
+function deleteEl()     { selected.forEach(id=>{const e=document.getElementById(id);if(e)e.remove();}); selected=[]; updateSel(); pushUndo(); renderLayerList(); }
+function copyEl()       { if(selected.length){ clipboard=selected.map(id=>document.getElementById(id)?.outerHTML).filter(Boolean); } }
+function pasteEl()      { if(!clipboard) return; clipboard.forEach(html=>{const tmp=document.createElement('div');tmp.innerHTML=html;const el=tmp.firstChild;const nid=uid();el.setAttribute('id',nid);el.setAttribute('data-el','1');nudgeEl(el,16,16,false);group.appendChild(document.adoptNode(el));selected=[nid];}); updateSel(); pushUndo(); renderLayerList(); }
+function duplicateEl()  { copyEl(); pasteEl(); }
+function selectAll()    { selected=Array.from(group.querySelectorAll('[data-el]')).map(e=>e.id); updateSel(); }
+function bringToFront() { selected.forEach(id=>{const e=document.getElementById(id);if(e)group.appendChild(e);}); }
+function sendToBack()   { selected.forEach(id=>{const e=document.getElementById(id);if(e)group.insertBefore(e,group.firstChild);}); }
+function groupSel()     { if(selected.length<2)return; const g=mkSvg('g',{id:uid(),'data-el':'1'}); selected.forEach(id=>{const e=document.getElementById(id);if(e)g.appendChild(e);}); group.appendChild(g); selected=[g.id]; updateSel(); pushUndo(); }
+function ungroupSel()   { selected.forEach(id=>{const g=document.getElementById(id);if(!g||g.tagName!=='g')return;const kids=Array.from(g.children);kids.forEach(k=>{k.setAttribute('data-el','1');group.appendChild(k);});g.remove();}); pushUndo(); }
+function flattenPath()  { /* complex path bool ops */ alert('Path flatten coming soon.'); }
+function outlineStroke(){ /* expand stroke to path */ alert('Outline stroke coming soon.'); }
+
+// ── Align ─────────────────────────────────────
+function align(dir) {
+  if(selected.length<1)return;
+  const bbs=selected.map(id=>{const e=document.getElementById(id);try{return{id,bb:e.getBBox(),el:e};}catch(e){return null;}}).filter(Boolean);
+  if(!bbs.length)return;
+  const minX=Math.min(...bbs.map(b=>b.bb.x)), maxX=Math.max(...bbs.map(b=>b.bb.x+b.bb.width));
+  const minY=Math.min(...bbs.map(b=>b.bb.y)), maxY=Math.max(...bbs.map(b=>b.bb.y+b.bb.height));
+  bbs.forEach(({id,bb,el})=>{
+    if(dir==='left')    nudgeEl(el,minX-bb.x,0,false);
+    if(dir==='right')   nudgeEl(el,(maxX-bb.width)-bb.x,0,false);
+    if(dir==='hcenter') nudgeEl(el,((minX+maxX)/2-bb.width/2)-bb.x,0,false);
+    if(dir==='top')     nudgeEl(el,0,minY-bb.y,false);
+    if(dir==='bottom')  nudgeEl(el,0,(maxY-bb.height)-bb.y,false);
+    if(dir==='vcenter') nudgeEl(el,0,((minY+maxY)/2-bb.height/2)-bb.y,false);
+  });
+  pushUndo();
+}
+function distributeH() { /* equal horizontal spacing */ }
+function distributeV() { /* equal vertical spacing */ }
+
+// ── Zoom ──────────────────────────────────────
+function zoomTo(z) {
+  zoom = Math.max(0.1, Math.min(8, typeof z==='number'?z:z));
+  svg.style.transform = 'scale('+zoom+')';
+  svg.style.transformOrigin = '0 0';
+  document.getElementById('artWrap').style.width  = (artW*zoom)+'px';
+  document.getElementById('artWrap').style.height = (artH*zoom)+'px';
+  document.getElementById('stZoom').textContent = Math.round(zoom*100)+'%';
+}
+function zoomFit() {
+  const sc = document.getElementById('canvasScroll');
+  const z  = Math.min((sc.offsetWidth-80)/artW, (sc.offsetHeight-80)/artH);
+  zoomTo(Math.min(z, 1));
+}
+
+// ── Grid / Snap / Rulers ──────────────────────
+function toggleGrid() { gridOn=!gridOn; document.getElementById('vgridBg').setAttribute('opacity',gridOn?'1':'0'); }
+function toggleSnap() { snapOn=!snapOn; document.getElementById('stTool').textContent = snapOn?tool+' [snap]':tool; }
+function toggleRulers() { document.getElementById('rulerH').style.display=document.getElementById('rulerH').style.display==='none'?'':'none'; document.getElementById('rulerV').style.display=document.getElementById('rulerV').style.display==='none'?'':'none'; }
+
+// ── Artboard ──────────────────────────────────
+function resizeArtboard() { artW=parseInt(document.getElementById('abW').value)||800; artH=parseInt(document.getElementById('abH').value)||600; applyArtboard(); }
+function setArtboard(w,h) { artW=w;artH=h;document.getElementById('abW').value=w;document.getElementById('abH').value=h;applyArtboard(); }
+function applyArtboard()  { svg.setAttribute('width',artW);svg.setAttribute('height',artH);document.getElementById('vgridBg').setAttribute('width',artW);document.getElementById('vgridBg').setAttribute('height',artH);document.getElementById('stDoc').textContent=artW+' × '+artH;zoomTo(zoom); }
+
+// ── Layers ────────────────────────────────────
+function renderLayerList() {
+  const p = document.getElementById('layerListPanel');
+  const shapes = Array.from(group.children).reverse();
+  const icons  = { rect:'▭', ellipse:'⬭', line:'╱', text:'T', path:'⟜', polygon:'⬡', g:'📁' };
+  let html = '';
+  layers.forEach(l => {
+    html += `<div style="padding:5px 8px;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#555;border-bottom:1px solid #2a2a2a">${l.name}</div>`;
+  });
+  html += shapes.map(el => {
+    const icon = icons[el.tagName]||'◈';
+    const label = el.id + ' (' + el.tagName + ')';
+    const isOn  = selected.includes(el.id);
+    return `<div class="layer-item ${isOn?'on':''}" onclick="selected=['${el.id}'];updateSel()">
+      <span class="layer-icon">${icon}</span>
+      <span class="layer-name">${label}</span>
+    </div>`;
+  }).join('');
+  p.innerHTML = html || '<div style="text-align:center;padding:20px;color:#555;font-size:11px">No objects</div>';
+}
+function addLayer()    { layers.push({id:'l'+Date.now(),name:'Layer '+(layers.length+1),visible:true,locked:false});renderLayerList(); }
+function removeLayer() { if(layers.length>1)layers.pop();renderLayerList(); }
+
+// ── Swatches ──────────────────────────────────
+function renderSwatches() {
+  const grid = document.getElementById('swatchGrid');
+  grid.innerHTML = swatches.map(c=>`<div style="width:22px;height:22px;border-radius:3px;background:${c};border:1px solid #3a3a3a;cursor:pointer" title="${c}" onclick="document.getElementById('fillPicker').value='${c}';syncColors();applyToSel()"></div>`).join('');
+}
+function addSwatch() { const c=document.getElementById('fillPicker').value; if(!swatches.includes(c))swatches.push(c); renderSwatches(); }
+function clearSwatches() { swatches=[]; renderSwatches(); }
+function loadPalette(name) { swatches=[...PALETTES[name]]; renderSwatches(); }
+
+// ── Eyedropper ────────────────────────────────
+function pickColor(e) {
+  const el = e.target.closest('[data-el]');
+  if(el){ const f=el.getAttribute('fill'); if(f&&f!=='none'){document.getElementById('fillPicker').value=f;syncColors();} }
+}
+
+// ── Undo/Redo ─────────────────────────────────
+function pushUndo() { undoStack.push(group.innerHTML); if(undoStack.length>50)undoStack.shift(); redoStack=[]; renderLayerList(); }
+function undo() { if(!undoStack.length)return; redoStack.push(group.innerHTML); group.innerHTML=undoStack.pop(); selected=[]; updateSel(); renderLayerList(); }
+function redo() { if(!redoStack.length)return; undoStack.push(group.innerHTML); group.innerHTML=redoStack.pop(); selected=[]; updateSel(); renderLayerList(); }
+
+// ── Export ────────────────────────────────────
+function exportSvg() {
+  const s=new XMLSerializer().serializeToString(svg);
+  Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([s],{type:'image/svg+xml'})),download:docName}).click();
+}
+function exportPng() {
+  const s=new XMLSerializer().serializeToString(svg);
+  const blob=new Blob([s],{type:'image/svg+xml'});
+  const url=URL.createObjectURL(blob);
+  const img=new Image(); img.onload=()=>{
+    const c=Object.assign(document.createElement('canvas'),{width:artW,height:artH});
+    c.getContext('2d').drawImage(img,0,0);URL.revokeObjectURL(url);
+    Object.assign(document.createElement('a'),{href:c.toDataURL('image/png'),download:docName.replace('.svg','.png')}).click();
+  };img.src=url;
+}
+function exportPdf() { alert('PDF export requires a server-side renderer. Export as SVG and convert with Inkscape or Illustrator.'); }
+function openSvg() {
+  const inp=Object.assign(document.createElement('input'),{type:'file',accept:'.svg,image/svg+xml'});
+  inp.onchange=e=>{const fr=new FileReader();fr.onload=ev=>{const p=new DOMParser().parseFromString(ev.target.result,'image/svg+xml');const g=p.querySelector('g');if(g)group.innerHTML=g.innerHTML;pushUndo();renderLayerList();};fr.readAsText(e.target.files[0]);};
+  inp.click();
+}
+function newDoc() { if(!confirm('Start a new document? Unsaved work will be lost.'))return; group.innerHTML=''; undoStack=[]; redoStack=[]; selected=[]; updateSel(); renderLayerList(); }
+
+// ── Panels ────────────────────────────────────
+function switchPanel(name) {
+  document.querySelectorAll('.rp-tab').forEach((t,i)=>{t.classList.toggle('on',['props','layers','swatches'][i]===name);});
+  document.querySelectorAll('.rp-pane').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pane-'+name).classList.add('on');
+}
+
+// ── Rename ────────────────────────────────────
+function renameDoc() { const n=prompt('Document name:',docName);if(n&&n.trim()){docName=n.trim();document.getElementById('docNameEl').textContent=docName;} }
+
+// ── Keyboard ──────────────────────────────────
+document.addEventListener('keydown', e => {
+  const ctrl=e.ctrlKey||e.metaKey;
+  if(['INPUT','TEXTAREA'].includes(e.target.tagName))return;
+  if(ctrl&&e.key==='z'){e.preventDefault();undo();}
+  if(ctrl&&e.key==='y'){e.preventDefault();redo();}
+  if(ctrl&&e.key==='c'){e.preventDefault();copyEl();}
+  if(ctrl&&e.key==='v'){e.preventDefault();pasteEl();}
+  if(ctrl&&e.key==='d'){e.preventDefault();duplicateEl();}
+  if(ctrl&&e.key==='a'){e.preventDefault();selectAll();}
+  if(ctrl&&e.key===']'){bringToFront();}
+  if(ctrl&&e.key==='['){sendToBack();}
+  if(ctrl&&e.key==='g'){e.preventDefault();groupSel();}
+  if((e.key==='Delete'||e.key==='Backspace')&&selected.length){e.preventDefault();deleteEl();}
+  if(!ctrl){
+    const map={v:'sel',a:'direct',p:'pen',n:'pencil',t:'text',r:'rect',e:'ellipse',l:'line',z:'zoom',h:'hand',s:'scale',i:'eyedrop'};
+    if(map[e.key])setTool(map[e.key]);
+    if(e.key==="'")toggleGrid();
+    if(e.key===';')toggleSnap();
+    // Arrow nudge
+    if(e.key==='ArrowLeft')  selected.forEach(id=>nudgeEl(document.getElementById(id),e.shiftKey?-10:-1,0,false));
+    if(e.key==='ArrowRight') selected.forEach(id=>nudgeEl(document.getElementById(id),e.shiftKey?10:1,0,false));
+    if(e.key==='ArrowUp')    selected.forEach(id=>nudgeEl(document.getElementById(id),0,e.shiftKey?-10:-1,false));
+    if(e.key==='ArrowDown')  selected.forEach(id=>nudgeEl(document.getElementById(id),0,e.shiftKey?10:1,false));
+  }
+  if(ctrl&&e.key==='0')zoomTo(1);
+  if(ctrl&&e.key==='+')zoomTo(zoom*1.25);
+  if(ctrl&&e.key==='-')zoomTo(zoom/1.25);
+});
+
+// ── Scroll zoom ───────────────────────────────
+document.getElementById('canvasScroll').addEventListener('wheel', e => {
+  if(!e.ctrlKey&&!e.metaKey)return;
+  e.preventDefault();
+  zoomTo(e.deltaY<0?zoom*1.1:zoom/1.1);
+},{passive:false});
+
+// ── Init ──────────────────────────────────────
+syncColors();
+renderSwatches();
+renderLayerList();
+pushUndo();
+setTool('sel');
+</script>
+</body>
+</html>

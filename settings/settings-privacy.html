@@ -2,71 +2,59 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="../CoreFiles/app-theme.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd;--green:#34c759}
-body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
-body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
-body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--app-bg);color:var(--app-text);overflow-y:auto;min-height:100vh}
 h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .section{margin-bottom:28px}
-.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
-.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--app-text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--app-border)}
+.card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--app-border)}
 .row:last-child{border-bottom:none}
 .row-info{flex:1}
-.row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
-.row-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.row-label{font-size:14px;font-weight:600;color:var(--app-text);margin-bottom:2px}
+.row-desc{font-size:12px;color:var(--app-text2);line-height:1.5}
 .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s;flex-shrink:0}
-.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.88}
-.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{background:var(--border)}
+.btn-primary{background:var(--app-accent);color:#fff}.btn-primary:hover{opacity:.88}
+.btn-ghost{background:var(--app-surface2);border:1px solid var(--app-border);color:var(--app-text)}.btn-ghost:hover{background:var(--app-border)}
 .btn-danger{background:rgba(255,59,48,.1);color:#ff3b30;border:1px solid rgba(255,59,48,.3)}.btn-danger:hover{background:rgba(255,59,48,.2)}
 .warn-banner{margin:14px 16px 0;padding:10px 14px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;font-size:12px;color:#f59e0b;line-height:1.5}
 .toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
 .toggle input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
-.toggle input:checked+.toggle-track{background:var(--accent)}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--app-border);transition:background .2s}
+.toggle input:checked+.toggle-track{background:var(--app-accent)}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
 .toggle input:checked~.toggle-thumb{left:21px}
 /* filter hero */
-.filter-hero{padding:14px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(0,120,212,.06),rgba(0,120,212,.02))}
-.filter-shield{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#0056a8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-.filter-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--border)}
-.stat-cell{padding:10px 12px;text-align:center;border-right:1px solid var(--border)}
+.filter-hero{padding:14px 16px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--app-border);background:linear-gradient(135deg,rgba(0,120,212,.06),rgba(0,120,212,.02))}
+.filter-shield{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,var(--app-accent),#0056a8);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.filter-stats{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--app-border)}
+.stat-cell{padding:10px 12px;text-align:center;border-right:1px solid var(--app-border)}
 .stat-cell:last-child{border-right:none}
-.stat-num{font-size:18px;font-weight:800;color:var(--accent)}
-.stat-lbl{font-size:9px;color:var(--text2);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.stat-num{font-size:18px;font-weight:800;color:var(--app-accent)}
+.stat-lbl{font-size:9px;color:var(--app-text2);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
 .block-log{padding:8px 14px;max-height:140px;overflow-y:auto}
-.block-entry{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:11px}
+.block-entry{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--app-border);font-size:11px}
 .block-entry:last-child{border-bottom:none}
-.block-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-weight:500}
-.block-reason{font-size:10px;color:var(--text2);background:var(--bg2);padding:2px 6px;border-radius:8px;flex-shrink:0}
-.block-time{font-size:10px;color:var(--text2);flex-shrink:0}
-.filter-overlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:none;flex-direction:column}
+.block-url{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--app-text);font-weight:500}
+.block-reason{font-size:10px;color:var(--app-text2);background:var(--app-surface2);padding:2px 6px;border-radius:8px;flex-shrink:0}
+.block-time{font-size:10px;color:var(--app-text2);flex-shrink:0}
+.filter-overlay{position:fixed;inset:0;background:var(--app-bg);z-index:9999;display:none;flex-direction:column}
 .filter-overlay.open{display:flex}
-.filter-overlay-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
-.filter-overlay-back{padding:7px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;color:var(--text)}
-.filter-overlay iframe{flex:1;border:none;width:100%;background:var(--bg)}
+.filter-overlay-header{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--app-border);background:var(--app-surface);flex-shrink:0}
+.filter-overlay-back{padding:7px 14px;background:var(--app-surface2);border:1px solid var(--app-border);border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;color:var(--app-text)}
+.filter-overlay iframe{flex:1;border:none;width:100%;background:var(--app-bg)}
 input[type=file]{display:none}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
-  if(dark.includes(t))document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
 <div class="filter-overlay" id="filterOverlay">
   <div class="filter-overlay-header">
     <button class="filter-overlay-back" onclick="closeFilterSettings()">← Back</button>
-    <span style="font-size:15px;font-weight:800;color:var(--text)">🛡️ Content Filter Settings</span>
+    <span style="font-size:15px;font-weight:800;color:var(--app-text)">🛡️ Content Filter Settings</span>
   </div>
   <iframe id="filterFrame" src="" title="Content Filter Settings"></iframe>
 </div>
@@ -78,8 +66,8 @@ input[type=file]{display:none}
   <div class="card">
     <div class="filter-hero">
       <div class="filter-shield">🛡️</div>
-      <div style="flex:1"><div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px">Browser Content Filter</div><div style="font-size:12px;color:var(--text2)">Blocks adult content, custom domains &amp; keywords.</div></div>
-      <div style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(52,199,89,.15);color:var(--green);border:1px solid rgba(52,199,89,.3)">● Active</div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:800;color:var(--app-text);margin-bottom:3px">Browser Content Filter</div><div style="font-size:12px;color:var(--app-text2)">Blocks adult content, custom domains &amp; keywords.</div></div>
+      <div style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:rgba(52,199,89,.15);color:#34c759;border:1px solid rgba(52,199,89,.3)">● Active</div>
     </div>
     <div class="filter-stats">
       <div class="stat-cell"><div class="stat-num" id="statBlocked">0</div><div class="stat-lbl">Blocked Today</div></div>
@@ -89,14 +77,14 @@ input[type=file]{display:none}
     <div class="row"><div class="row-info"><div class="row-label">Block Social Media</div><div class="row-desc">Twitter/X, Instagram, TikTok, Facebook, Reddit…</div></div><label class="toggle"><input type="checkbox" id="cfSocial" onchange="saveCf('blockSocial',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
     <div class="row"><div class="row-info"><div class="row-label">Block Gaming Sites</div><div class="row-desc">Poki, CrazyGames, Roblox, Friv…</div></div><label class="toggle"><input type="checkbox" id="cfGaming" onchange="saveCf('blockGaming',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
     <div class="row"><div class="row-info"><div class="row-label">Safe Search</div><div class="row-desc">Forces safe mode on Google, Bing, YouTube</div></div><label class="toggle"><input type="checkbox" id="cfSafe" onchange="saveCf('safeSearch',this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label></div>
-    <div style="padding:8px 14px 4px;border-top:1px solid var(--border)">
+    <div style="padding:8px 14px 4px;border-top:1px solid var(--app-border)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text2)">Recent Blocks</span>
+        <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--app-text2)">Recent Blocks</span>
         <button class="btn btn-ghost" style="padding:3px 10px;font-size:10px" onclick="clearBlockLog()">Clear</button>
       </div>
-      <div class="block-log" id="blockLog"><div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0">No blocks this session.</div></div>
+      <div class="block-log" id="blockLog"><div style="font-size:12px;color:var(--app-text2);text-align:center;padding:10px 0">No blocks this session.</div></div>
     </div>
-    <div class="row" style="border-top:1px solid var(--border)"><div class="row-info"><div class="row-label">Advanced Filter Settings</div><div class="row-desc">Custom domains, keywords, whitelist, PIN</div></div><button class="btn btn-primary" onclick="openFilterSettings()">⚙️ Manage</button></div>
+    <div class="row" style="border-top:1px solid var(--app-border)"><div class="row-info"><div class="row-label">Advanced Filter Settings</div><div class="row-desc">Custom domains, keywords, whitelist, PIN</div></div><button class="btn btn-primary" onclick="openFilterSettings()">⚙️ Manage</button></div>
   </div>
 </div>
 
@@ -145,7 +133,7 @@ function initFilter(){
 }
 function renderLog(log){
   var c=document.getElementById('blockLog');
-  if(!log||!log.length){c.innerHTML='<div style="font-size:12px;color:var(--text2);text-align:center;padding:10px 0">No blocks this session.</div>';return;}
+  if(!log||!log.length){c.innerHTML='<div style="font-size:12px;color:var(--app-text2);text-align:center;padding:10px 0">No blocks this session.</div>';return;}
   c.innerHTML=log.slice(0,10).map(function(e){
     var host=e.url;try{host=new URL(e.url).hostname.replace('www.','');}catch(_){}
     var t=e.time?new Date(e.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';

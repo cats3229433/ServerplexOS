@@ -1,195 +1,988 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="../app-theme.js"></script>
 <meta charset="UTF-8">
 <title>Settings — ServerplexOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e0e0e0;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
-body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#333}
-body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
-body{font-family:'Oxanium',sans-serif;height:100vh;display:flex;background:var(--bg);color:var(--text);overflow:hidden;transition:background .3s,color .3s}
+body{font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);height:100vh;display:flex;overflow:hidden}
 
-.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-header{padding:18px 18px 14px;border-bottom:1px solid var(--border)}
-.sidebar-header h2{font-size:17px;font-weight:800;letter-spacing:.5px}
-.sidebar-header .sub{font-size:10px;color:var(--text2);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+/* ── Sidebar ── */
+.sidebar{width:200px;background:var(--app-surface);border-right:1px solid var(--app-border);display:flex;flex-direction:column;flex-shrink:0;padding:12px 0}
+.sidebar-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);padding:8px 16px 6px}
+.nav-item{padding:9px 16px;cursor:pointer;font-size:13px;font-weight:600;color:var(--app-text2);border-left:3px solid transparent;transition:all .15s;display:flex;align-items:center;gap:9px}
+.nav-item:hover{background:var(--app-surface2);color:var(--app-text)}
+.nav-item.active{color:var(--app-accent);border-left-color:var(--app-accent);background:color-mix(in srgb,var(--app-accent) 8%,transparent)}
 
-.nav-item{padding:11px 18px;cursor:pointer;transition:background .15s,color .15s;display:flex;align-items:center;gap:10px;color:var(--text2);font-size:13px;font-weight:600;border-left:3px solid transparent}
-.nav-item:hover{background:var(--bg2);color:var(--text)}
-.nav-item.active{background:rgba(0,120,212,.12);color:var(--accent);border-left-color:var(--accent)}
-.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.nav-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;background:rgba(255,59,48,.15);color:#ff3b30;margin-left:auto;display:none}
-.nav-badge.show{display:block}
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:28px 28px 48px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:3px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-size:20px;font-weight:800;color:var(--app-text);margin-bottom:4px}
+.page-sub{font-size:12px;color:var(--app-text2);margin-bottom:24px}
 
-/* Save bar */
-.save-bar{padding:10px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface);flex-shrink:0}
-.save-btn{flex:1;padding:9px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px}
-.save-btn:hover{opacity:.88;transform:translateY(-1px)}
-.save-btn:disabled{opacity:.5;cursor:default;transform:none}
-.save-status{font-size:11px;color:var(--text2);min-width:80px;text-align:center;transition:color .2s}
-.save-status.saved{color:#34c759}
-.save-status.saving{color:var(--accent)}
+/* ── Cards ── */
+.card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.card-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);padding:12px 16px 8px;border-bottom:1px solid var(--app-border)}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--app-border);gap:16px}
+.row:last-child{border-bottom:none}
+.row-info{flex:1;min-width:0}
+.row-label{font-size:13px;font-weight:600;color:var(--app-text);margin-bottom:2px}
+.row-desc{font-size:11px;color:var(--app-text2);line-height:1.4}
 
-.sidebar-footer{padding:10px 18px;border-top:1px solid var(--border);font-size:10px;color:var(--text2);letter-spacing:1px}
+/* ── Controls ── */
+.s-select{padding:6px 10px;border:1px solid var(--app-border);border-radius:7px;background:var(--app-bg);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;cursor:pointer;min-width:130px}
+.s-input{padding:6px 10px;border:1px solid var(--app-border);border-radius:7px;background:var(--app-bg);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;min-width:130px}
+.s-input:focus,.s-select:focus{border-color:var(--app-accent)}
+.s-btn{padding:7px 16px;border-radius:7px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .15s}
+.s-btn-primary{background:var(--app-accent);color:#fff}
+.s-btn-primary:hover{opacity:.88}
+.s-btn-ghost{background:var(--app-surface2);color:var(--app-text);border:1px solid var(--app-border)}
+.s-btn-ghost:hover{background:var(--app-border)}
+.s-btn-danger{background:rgba(248,81,73,.1);color:#f85149;border:1px solid rgba(248,81,73,.25)}
+.s-btn-danger:hover{background:rgba(248,81,73,.2)}
 
-.content{flex:1;overflow:hidden}
-iframe{width:100%;height:100%;border:none;background:var(--bg)}
+/* Toggle */
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--app-border);transition:background .2s}
+.toggle input:checked+.toggle-track{background:var(--app-accent)}
+.toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.25);pointer-events:none}
+.toggle input:checked~.toggle-thumb{left:21px}
+
+/* Accent picker */
+.accent-grid{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px}
+.accent-swatch{width:28px;height:28px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .15s,border-color .15s;flex-shrink:0}
+.accent-swatch:hover{transform:scale(1.15)}
+.accent-swatch.active{border-color:#fff;box-shadow:0 0 0 2px var(--app-accent)}
+.accent-custom-wrap{display:flex;align-items:center;gap:8px;padding:0 16px 14px}
+.accent-custom-label{font-size:11px;color:var(--app-text2)}
+.accent-color-input{width:36px;height:28px;padding:0;border:1px solid var(--app-border);border-radius:6px;cursor:pointer;background:transparent}
+.accent-apply{padding:5px 12px;background:var(--app-accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700}
+
+/* Theme grid */
+.theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 16px}
+.theme-tile{border-radius:9px;padding:10px 6px;cursor:pointer;text-align:center;border:2px solid var(--app-border);transition:all .18s;font-size:11px;font-weight:700}
+.theme-tile:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.theme-tile.active{border-color:var(--app-accent);box-shadow:0 0 0 2px var(--app-accent)}
+.theme-tile-icon{font-size:20px;display:block;margin-bottom:4px}
+
+/* Font scale slider */
+.scale-row{display:flex;align-items:center;gap:12px;padding:13px 16px}
+.scale-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--app-border);outline:none;cursor:pointer}
+.scale-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--app-accent);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.scale-val{font-size:12px;font-weight:700;color:var(--app-text);width:40px;text-align:right}
+.scale-preview{font-size:12px;color:var(--app-text2);width:80px}
+
+/* Schedule */
+.sched-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px}
+.sched-item{display:flex;flex-direction:column;gap:4px}
+.sched-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--app-text2)}
+
+/* Taskbar modes */
+.tb-modes{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px}
+.tb-mode-btn{padding:7px 14px;border-radius:8px;border:2px solid var(--app-border);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;color:var(--app-text2);background:var(--app-bg);transition:all .18s}
+.tb-mode-btn:hover{border-color:var(--app-accent);color:var(--app-text)}
+.tb-mode-btn.active{border-color:var(--app-accent);background:color-mix(in srgb,var(--app-accent) 12%,transparent);color:var(--app-accent)}
+
+/* Cursor packs */
+.cursor-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px 16px}
+.cursor-btn{padding:9px 8px;border-radius:8px;border:2px solid var(--app-border);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;color:var(--app-text2);background:var(--app-bg);text-align:center;transition:all .18s}
+.cursor-btn:hover{border-color:var(--app-accent);color:var(--app-text)}
+.cursor-btn.active{border-color:var(--app-accent);background:color-mix(in srgb,var(--app-accent) 12%,transparent);color:var(--app-accent)}
+
+/* Startup apps */
+.startup-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px}
+.startup-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:8px;border:2px solid var(--app-border);cursor:pointer;transition:all .18s;background:var(--app-bg)}
+.startup-item:hover{border-color:var(--app-accent)}
+.startup-item.active{border-color:var(--app-accent);background:color-mix(in srgb,var(--app-accent) 10%,transparent)}
+.startup-icon{font-size:22px}
+.startup-name{font-size:10px;font-weight:700;color:var(--app-text2);text-align:center}
+
+/* Toast */
+.s-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--app-surface);border:1px solid var(--app-border);border-radius:10px;padding:9px 20px;font-size:12px;font-weight:600;color:var(--app-text);box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:9999;opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.s-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Icon pack */
+.icon-pack-preview{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px;padding:14px 16px}
+.icon-pack-item{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;background:var(--app-bg);border:1px solid var(--app-border);border-radius:8px;text-align:center}
+.icon-pack-item .ip-icon{font-size:26px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;overflow:hidden}
+.icon-pack-item .ip-icon img{width:100%;height:100%;object-fit:contain;border-radius:4px}
+.icon-pack-item .ip-label{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--app-text2);word-break:break-all}
+.ip-textarea{width:100%;min-height:110px;resize:vertical;font-size:11px;font-family:'Courier New',monospace;line-height:1.5}
+.ip-status{font-size:11px;min-height:16px;margin-top:4px}
+.ip-status.ok{color:#34c759}
+.ip-status.err{color:#f85149}
+
+/* About card */
+.about-logo{font-size:52px;margin-bottom:8px}
+.about-name{font-size:22px;font-weight:800;margin-bottom:4px}
+.about-ver{font-size:12px;color:var(--app-text2);margin-bottom:20px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.about-item{background:var(--app-surface2);border-radius:8px;padding:10px 14px}
+.about-item-label{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--app-text2);margin-bottom:3px}
+.about-item-val{font-size:13px;font-weight:600;color:var(--app-text)}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black'||t==='aurora'||t==='tokyo'||t==='forest'||t==='space'||t==='sunset'||t==='synth') document.body.classList.add('dark');
-  else if(t==='grey') document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc) document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
+<!-- Sidebar -->
 <div class="sidebar">
-  <div class="sidebar-header">
-    <h2>⚙️ Settings</h2>
-    <div class="sub">ServerplexOS</div>
-  </div>
-
-  <div class="nav-item active" data-page="system"          onclick="nav(this,'system')">         <span class="nav-icon">💻</span>System</div>
-  <div class="nav-item"        data-page="personalization"  onclick="nav(this,'personalization')"> <span class="nav-icon">🎨</span>Personalization</div>
-  <div class="nav-item"        data-page="apps"             onclick="nav(this,'apps')">            <span class="nav-icon">📱</span>Apps</div>
-  <div class="nav-item"        data-page="accounts"         onclick="nav(this,'accounts')">        <span class="nav-icon">👤</span>Accounts</div>
-  <div class="nav-item"        data-page="privacy"          onclick="nav(this,'privacy')">         <span class="nav-icon">🔒</span>Privacy & Security</div>
-  <div class="nav-item"        data-page="about"            onclick="nav(this,'about')">           <span class="nav-icon">ℹ️</span>About</div>
-
-  <!-- Save bar -->
-  <div style="flex:1"></div>
-  <div class="save-bar">
-    <button class="save-btn" id="saveBtn" onclick="saveAndApply()">
-      💾 Save & Apply
-    </button>
-    <span class="save-status" id="saveStatus">No changes</span>
-  </div>
-
-  <div class="sidebar-footer">Version 2.0 · Build 2026</div>
+  <div class="sidebar-title">Settings</div>
+  <div class="nav-item active" data-page="appearance" onclick="showPage('appearance')">🎨 Appearance</div>
+  <div class="nav-item" data-page="accent"     onclick="showPage('accent')">🖌️ Accent & Font</div>
+  <div class="nav-item" data-page="taskbar"    onclick="showPage('taskbar')">📌 Taskbar</div>
+  <div class="nav-item" data-page="schedule"   onclick="showPage('schedule')">🕐 Theme Schedule</div>
+  <div class="nav-item" data-page="cursor"     onclick="showPage('cursor')">🖱️ Cursor</div>
+  <div class="nav-item" data-page="iconpacks"  onclick="showPage('iconpacks')">🖼️ Icon Packs</div>
+  <div class="nav-item" data-page="startup"    onclick="showPage('startup')">🚀 Startup</div>
+  <div class="nav-item" data-page="locale"     onclick="showPage('locale')">🌍 Language & Time</div>
+  <div class="nav-item" data-page="account"    onclick="showPage('account')">👤 Account</div>
+  <div class="nav-item" data-page="system"     onclick="showPage('system')">⚙️ System</div>
+  <div class="nav-item" data-page="about"      onclick="showPage('about')">ℹ️ About</div>
 </div>
 
+<!-- Content -->
 <div class="content">
-  <iframe id="contentFrame" src="settings-system.html"></iframe>
-</div>
+
+  <!-- ── Appearance ── -->
+  <div class="page active" id="page-appearance">
+    <div class="page-title">Appearance</div>
+    <div class="page-sub">Choose a theme for ServerplexOS</div>
+    <div class="card">
+      <div class="card-title">Theme</div>
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Wallpaper</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Custom Wallpaper URL</div><div class="row-desc">Paste an image URL to use as wallpaper</div></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input class="s-input" id="wpUrl" placeholder="https://…" style="width:200px">
+          <button class="s-btn s-btn-primary" onclick="applyWallpaper()">Apply</button>
+          <button class="s-btn s-btn-ghost" onclick="clearWallpaper()">Clear</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Upload Wallpaper</div><div class="row-desc">Use an image from your device</div></div>
+        <button class="s-btn s-btn-ghost" onclick="uploadWallpaper()">📁 Browse…</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Accent & Font ── -->
+  <div class="page" id="page-accent">
+    <div class="page-title">Accent & Font</div>
+    <div class="page-sub">Personalise colours and text size</div>
+    <div class="card">
+      <div class="card-title">Accent Colour</div>
+      <div class="accent-grid" id="accentGrid"></div>
+      <div class="accent-custom-wrap">
+        <span class="accent-custom-label">Custom colour:</span>
+        <input type="color" class="accent-color-input" id="accentColorPicker" value="#0078d4">
+        <button class="accent-apply" onclick="applyAccent(document.getElementById('accentColorPicker').value)">Apply</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">UI Font Size</div>
+      <div class="scale-row">
+        <span class="scale-preview" id="scalePreview">Normal</span>
+        <input type="range" class="scale-slider" id="fontScaleSlider" min="11" max="18" value="13" oninput="previewFontScale(this.value)">
+        <span class="scale-val" id="scaleVal">13px</span>
+      </div>
+      <div class="row" style="border-top:1px solid var(--app-border)">
+        <div class="row-info"><div class="row-label">Apply font size to OS</div><div class="row-desc">Changes the base font size across all OS elements</div></div>
+        <button class="s-btn s-btn-primary" onclick="applyFontScale()">Apply</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Clock Format</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Time Format</div><div class="row-desc">Shown in the taskbar clock</div></div>
+        <select class="s-select" id="clockFormatSelect" onchange="saveClockFormat(this.value)">
+          <option value="12">12-hour (1:30 PM)</option>
+          <option value="24">24-hour (13:30)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Taskbar ── -->
+  <div class="page" id="page-taskbar">
+    <div class="page-title">Taskbar</div>
+    <div class="page-sub">Control how the taskbar looks and behaves</div>
+    <div class="card">
+      <div class="card-title">Taskbar Style</div>
+      <div class="tb-modes" id="tbModes">
+        <div class="tb-mode-btn" data-mode="blur"   onclick="setTbMode('blur')">💧 Blur</div>
+        <div class="tb-mode-btn" data-mode="solid"  onclick="setTbMode('solid')">⬛ Solid</div>
+        <div class="tb-mode-btn" data-mode="glass"  onclick="setTbMode('glass')">🪟 Glass</div>
+        <div class="tb-mode-btn" data-mode="hidden" onclick="setTbMode('hidden')">👁️ Minimal</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Start Button Icon</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Start button emoji</div><div class="row-desc">Single emoji shown on the start button</div></div>
+        <div style="display:flex;gap:6px">
+          <input class="s-input" id="startIconInput" placeholder="💠" maxlength="4" style="width:70px;text-align:center;font-size:18px">
+          <button class="s-btn s-btn-primary" onclick="applyStartIcon()">Apply</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Startup Chime</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Play startup sound</div><div class="row-desc">Chime plays when the OS boots</div></div>
+        <label class="toggle"><input type="checkbox" id="chimeToggle" onchange="saveChime(this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Theme Schedule ── -->
+  <div class="page" id="page-schedule">
+    <div class="page-title">Theme Schedule</div>
+    <div class="page-sub">Automatically switch themes based on time of day</div>
+    <div class="card">
+      <div class="card-title">Enable Schedule</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Auto-switch themes</div><div class="row-desc">Overrides manual theme changes</div></div>
+        <label class="toggle"><input type="checkbox" id="schedToggle" onchange="saveSchedToggle(this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Time Slots</div>
+      <div class="sched-grid">
+        <div class="sched-item">
+          <span class="sched-label">🌅 Morning (6–9)</span>
+          <select class="s-select" id="schedMorning" onchange="saveSched()"></select>
+        </div>
+        <div class="sched-item">
+          <span class="sched-label">☀️ Day (9–17)</span>
+          <select class="s-select" id="schedDay" onchange="saveSched()"></select>
+        </div>
+        <div class="sched-item">
+          <span class="sched-label">🌆 Evening (17–20)</span>
+          <select class="s-select" id="schedEvening" onchange="saveSched()"></select>
+        </div>
+        <div class="sched-item">
+          <span class="sched-label">🌙 Night (20–6)</span>
+          <select class="s-select" id="schedNight" onchange="saveSched()"></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Cursor ── -->
+  <div class="page" id="page-cursor">
+    <div class="page-title">Cursor</div>
+    <div class="page-sub">Choose a cursor style</div>
+    <div class="card">
+      <div class="card-title">Cursor Pack</div>
+      <div class="cursor-grid" id="cursorGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── Startup Apps ── -->
+  <div class="page" id="page-startup">
+    <div class="page-title">Startup Apps</div>
+    <div class="page-sub">Apps that open automatically when the OS boots</div>
+    <div class="card">
+      <div class="card-title">Launch on Boot</div>
+      <div class="startup-grid" id="startupGrid"></div>
+    </div>
+  </div>
+
+  <!-- ── Locale ── -->
+  <div class="page" id="page-locale">
+    <div class="page-title">Language & Region</div>
+    <div class="page-sub">Date formats, locale, and display language</div>
+    <div class="card">
+      <div class="card-title">Region</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Locale</div><div class="row-desc">Affects date, time, and number formatting</div></div>
+        <select class="s-select" id="localeSelect" onchange="saveLocale(this.value)">
+          <option value="en-US">English (US)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="fr-FR">Français (France)</option>
+          <option value="de-DE">Deutsch (Germany)</option>
+          <option value="es-ES">Español (Spain)</option>
+          <option value="pt-BR">Português (Brazil)</option>
+          <option value="ja-JP">日本語</option>
+          <option value="zh-CN">中文 (简体)</option>
+          <option value="ko-KR">한국어</option>
+          <option value="ar-SA">العربية</option>
+        </select>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Date Format Preview</div><div class="row-desc">How dates appear in the OS</div></div>
+        <span id="datePreview" style="font-size:13px;font-weight:700;color:var(--app-text)"></span>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Time Format Preview</div></div>
+        <span id="timePreview" style="font-size:13px;font-weight:700;color:var(--app-text)"></span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Clock</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Show seconds in taskbar</div></div>
+        <label class="toggle"><input type="checkbox" id="showSecsToggle" onchange="saveShowSecs(this.checked)"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Clock Format</div></div>
+        <select class="s-select" id="clockFmtSelect2" onchange="saveClockFormat(this.value)">
+          <option value="12">12-hour</option>
+          <option value="24">24-hour</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Account ── -->
+  <div class="page" id="page-account">
+    <div class="page-title">Account</div>
+    <div class="page-sub">Your profile and security settings</div>
+    <div class="card">
+      <div class="card-title">Profile</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Username</div></div>
+        <div style="display:flex;gap:6px">
+          <input class="s-input" id="usernameInput" placeholder="User">
+          <button class="s-btn s-btn-primary" onclick="saveUsername()">Save</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Avatar Emoji</div></div>
+        <div style="display:flex;gap:6px">
+          <input class="s-input" id="avatarInput" placeholder="👤" maxlength="4" style="width:70px;text-align:center;font-size:18px">
+          <button class="s-btn s-btn-primary" onclick="saveAvatar()">Save</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Security</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Change PIN</div><div class="row-desc">4-digit PIN used at login</div></div>
+        <button class="s-btn s-btn-ghost" onclick="changePin()">Change PIN</button>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Change Password</div></div>
+        <button class="s-btn s-btn-ghost" onclick="changePassword()">Change Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── System ── -->
+  <div class="page" id="page-system">
+    <div class="page-title">System</div>
+    <div class="page-sub">Backup, restore, and reset</div>
+    <div class="card">
+      <div class="card-title">OS State</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Backup OS</div><div class="row-desc">Download all settings as a JSON file</div></div>
+        <button class="s-btn s-btn-primary" onclick="osCall('backupOS')">💾 Backup Now</button>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Restore OS</div><div class="row-desc">Upload a backup file to restore settings</div></div>
+        <button class="s-btn s-btn-ghost" onclick="osCall('restoreOS')">📂 Restore…</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Reset</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Reset Desktop Layout</div><div class="row-desc">Return icons to default positions</div></div>
+        <button class="s-btn s-btn-danger" onclick="osCall('resetDesktopLayout')">Reset Icons</button>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Clear All Notifications</div></div>
+        <button class="s-btn s-btn-danger" onclick="osCall('clearNotifs')">Clear</button>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Factory Reset</div><div class="row-desc">Wipes all settings and returns to setup. Cannot be undone.</div></div>
+        <button class="s-btn s-btn-danger" onclick="factoryReset()">⚠️ Factory Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── About ── -->
+  <div class="page" id="page-about">
+    <div class="page-title">About</div>
+    <div class="page-sub">ServerplexOS system information</div>
+    <div class="card">
+      <div style="padding:24px;text-align:center">
+        <div class="about-logo">💠</div>
+        <div class="about-name">ServerplexOS</div>
+        <div class="about-ver">Version 1.0 — Build 2026</div>
+        <div class="about-grid" id="aboutGrid"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Storage</div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">localStorage used</div></div>
+        <span id="storageUsed" style="font-size:13px;font-weight:700;color:var(--app-text)"></span>
+      </div>
+      <div class="row">
+        <div class="row-info"><div class="row-label">Settings keys</div></div>
+        <span id="storageKeys" style="font-size:13px;font-weight:700;color:var(--app-text)"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Icon Packs ── -->
+  <div class="page" id="page-iconpacks">
+    <div class="page-title">Icon Packs</div>
+    <div class="page-sub">Override app icons with custom emoji, image URLs, or SVG data URIs</div>
+
+    <div class="card">
+      <div class="card-title">JSON Format</div>
+      <div class="row" style="flex-direction:column;align-items:flex-start;gap:10px">
+        <div class="row-info">
+          <div class="row-label">Icon pack JSON</div>
+          <div class="row-desc">Keys are app IDs (e.g. browser, terminal, notepad). Values are emoji, image URLs, or data URIs.</div>
+        </div>
+        <textarea class="s-input ip-textarea" id="iconPackJson" placeholder='{"browser":"https://example.com/icon.png","terminal":"💻","notepad":"📝"}'></textarea>
+        <div class="ip-status" id="ipStatus"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="s-btn s-btn-primary" onclick="applyIconPack()">✅ Apply Pack</button>
+          <button class="s-btn s-btn-ghost" onclick="validateIconPack()">🔍 Validate JSON</button>
+          <button class="s-btn s-btn-danger" onclick="clearIconPack()">🗑️ Clear Pack</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="ipPreviewCard" style="display:none">
+      <div class="card-title">Preview</div>
+      <div class="icon-pack-preview" id="ipPreview"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">App IDs Reference</div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr;gap:4px 24px" id="ipAppList"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tips</div>
+      <div class="row"><div class="row-info">
+        <div class="row-label">Emoji icons</div>
+        <div class="row-desc">Just paste an emoji: <code style="background:var(--app-bg);padding:1px 5px;border-radius:4px;font-size:11px">"browser":"🌍"</code></div>
+      </div></div>
+      <div class="row"><div class="row-info">
+        <div class="row-label">Image URL icons</div>
+        <div class="row-desc">Any https:// URL to a PNG/SVG/WebP: <code style="background:var(--app-bg);padding:1px 5px;border-radius:4px;font-size:11px">"games":"https://i.imgur.com/abc.png"</code></div>
+      </div></div>
+      <div class="row"><div class="row-info">
+        <div class="row-label">Applying changes</div>
+        <div class="row-desc">After applying, reload the desktop (Ctrl+Shift+B to backup first, then restart from Start menu) for icons to update on the desktop and taskbar.</div>
+      </div></div>
+    </div>
+  </div>
+
+</div><!-- end content -->
+
+<div class="s-toast" id="sToast"></div>
 
 <script>
-var currentPage = 'system';
-var pendingChanges = {};
-var saveTimer = null;
+// ── Helpers ──────────────────────────────────
+function get(k){ return localStorage.getItem(k); }
+function set(k,v){ localStorage.setItem(k,v); }
+function toast(msg){ var t=document.getElementById('sToast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(function(){ t.classList.remove('show'); },2200); }
 
-function nav(el, page) {
-  // Check for unsaved changes before switching
-  if (Object.keys(pendingChanges).length > 0) {
-    if (!confirm('You have unsaved changes. Switch page anyway? (Changes will be lost)')) return;
-    pendingChanges = {};
-    updateSaveStatus();
-  }
-  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-  el.classList.add('active');
-  currentPage = page;
-  document.getElementById('contentFrame').src = 'settings-' + page + '.html';
+// Call a function in the parent OS window
+function osCall(fn) {
+  try { if (window.parent && window.parent[fn]) { window.parent[fn](); toast('Done ✓'); } else toast('OS function not available'); }
+  catch(e){ toast('Error: '+e.message); }
 }
 
-// ── Receive change notifications from child pages ──
-window.addEventListener('message', function(e) {
-  if (!e.data) return;
-
-  // Theme sync from personalization
-  if (e.data.type === 'theme-change') {
-    document.body.className = '';
-    var t = e.data.theme;
-    if (['black','aurora','tokyo','forest','space','sunset','synth'].includes(t)) document.body.classList.add('dark');
-    else if (t === 'grey') document.body.classList.add('grey');
-  }
-
-  // Settings change notification from a child page
-  if (e.data.type === 'settings-changed') {
-    Object.assign(pendingChanges, e.data.changes || {});
-    markUnsaved();
-  }
-
-  // Immediate apply (like theme/accent — no need to wait for Save)
-  if (e.data.type === 'settings-apply-immediate') {
-    applyToOS(e.data);
-  }
-});
-
-function markUnsaved() {
-  document.getElementById('saveStatus').textContent = '● Unsaved';
-  document.getElementById('saveStatus').className = 'save-status';
-  document.getElementById('saveBtn').disabled = false;
+// Broadcast change to OS parent
+function broadcast(type, data) {
+  try { window.parent.postMessage(Object.assign({ type: type }, data), '*'); } catch(e){}
 }
 
-function updateSaveStatus() {
-  var hasChanges = Object.keys(pendingChanges).length > 0;
-  document.getElementById('saveStatus').textContent = hasChanges ? '● Unsaved' : 'No changes';
-  document.getElementById('saveStatus').className = 'save-status' + (hasChanges ? '' : '');
-  document.getElementById('saveBtn').disabled = !hasChanges;
+// ── Nav ──────────────────────────────────────
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  var pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  var ni = document.querySelector('[data-page="' + id + '"]');
+  if (ni) ni.classList.add('active');
 }
 
-function saveAndApply() {
-  var btn = document.getElementById('saveBtn');
-  var status = document.getElementById('saveStatus');
-  btn.disabled = true;
-  btn.textContent = '⏳ Applying…';
-  status.textContent = 'Saving…';
-  status.className = 'save-status saving';
+// ── Themes ──────────────────────────────────
+var THEMES = [
+  {id:'white',  label:'White',    bg:'#f0f0f0', text:'#000', icon:'☀️'},
+  {id:'black',  label:'Black',    bg:'#1a1a1a', text:'#fff', icon:'⬛'},
+  {id:'grey',   label:'Grey',     bg:'#808080', text:'#fff', icon:'🌫️'},
+  {id:'aurora', label:'Aurora',   bg:'#0a0e1a', text:'#00d4aa', icon:'🌌'},
+  {id:'tokyo',  label:'Tokyo',    bg:'#1a1b2e', text:'#ff2d55', icon:'🌆'},
+  {id:'forest', label:'Forest',   bg:'#0d1f0e', text:'#34c759', icon:'🌲'},
+  {id:'space',  label:'Space',    bg:'#020408', text:'#7c83fd', icon:'🚀'},
+  {id:'sunset', label:'Sunset',   bg:'#1a0a0a', text:'#ff6b35', icon:'🌅'},
+  {id:'arctic', label:'Arctic',   bg:'#e8f4fd', text:'#0096d6', icon:'❄️'},
+  {id:'synth',  label:'Synth',    bg:'#0d0015', text:'#e040fb', icon:'🎸'},
+  {id:'desert', label:'Desert',   bg:'#1a0f05', text:'#e8913a', icon:'🏜️'},
+  {id:'ocean',  label:'Ocean',    bg:'#020d1a', text:'#00b4d8', icon:'🌊'},
+  {id:'jungle', label:'Jungle',   bg:'#0a1a0a', text:'#2dc653', icon:'🌿'},
+  {id:'blizzard',label:'Blizzard',bg:'#c8dff0', text:'#0a1828', icon:'🌨️'},
+  {id:'matrix', label:'Matrix',   bg:'#000',    text:'#00ff41', icon:'💚'},
+  {id:'cyberpunk',label:'Cyber',  bg:'#0d0014', text:'#f637ec', icon:'🌃'},
+  {id:'retro',  label:'Retro',    bg:'#000',    text:'#33ff33', icon:'📺'},
+  {id:'coffee', label:'Coffee',   bg:'#1a0f08', text:'#c9813a', icon:'☕'},
+  {id:'autumn', label:'Autumn',   bg:'#1a0a05', text:'#e2693a', icon:'🍂'},
+  {id:'candle', label:'Candle',   bg:'#120a02', text:'#f5a623', icon:'🕯️'},
+];
 
-  // Save all pending changes to localStorage
-  Object.keys(pendingChanges).forEach(function(key) {
-    localStorage.setItem(key, pendingChanges[key]);
+function renderThemeGrid() {
+  var cur = get('serverplex_theme') || 'white';
+  var g = document.getElementById('themeGrid');
+  g.innerHTML = THEMES.map(function(t) {
+    return '<div class="theme-tile' + (t.id===cur?' active':'') + '" style="background:'+t.bg+';color:'+t.text+'" onclick="applyTheme(\''+t.id+'\')" title="'+t.label+'">' +
+      '<span class="theme-tile-icon">'+t.icon+'</span>' + t.label + '</div>';
+  }).join('');
+}
+
+function applyTheme(id) {
+  broadcast('theme-change', { theme: id });
+  set('serverplex_theme', id);
+  renderThemeGrid();
+  toast('Theme: ' + id);
+}
+
+// ── Accent ──────────────────────────────────
+var ACCENT_PRESETS = ['#0078d4','#ff2d55','#34c759','#ff9500','#af52de','#00b4d8','#e040fb','#f637ec','#00d4aa','#7c83fd','#ff6b35','#e8913a','#33ff33','#00ff41','#ffd700','#f85149'];
+
+function renderAccentGrid() {
+  var cur = get('serverplex_accent') || '#0078d4';
+  var g = document.getElementById('accentGrid');
+  g.innerHTML = ACCENT_PRESETS.map(function(c) {
+    return '<div class="accent-swatch'+(c===cur?' active':'')+ '" style="background:'+c+'" onclick="applyAccent(\''+c+'\')" title="'+c+'"></div>';
+  }).join('');
+  document.getElementById('accentColorPicker').value = cur;
+}
+
+function applyAccent(color) {
+  set('serverplex_accent', color);
+  set('serverplex_accent_override', color);
+  broadcast('accent-change', { accent: color });
+  renderAccentGrid();
+  toast('Accent updated');
+}
+
+// ── Font Scale ───────────────────────────────
+var SCALE_LABELS = {11:'Small',12:'Small',13:'Normal',14:'Normal',15:'Large',16:'Large',17:'X-Large',18:'X-Large'};
+function previewFontScale(v) {
+  document.getElementById('scaleVal').textContent = v + 'px';
+  document.getElementById('scalePreview').textContent = SCALE_LABELS[v] || v + 'px';
+}
+function applyFontScale() {
+  var v = document.getElementById('fontScaleSlider').value;
+  set('serverplex_os_font_size', v);
+  broadcast('font-scale', { size: v });
+  try { window.parent.document.body.style.fontSize = v + 'px'; } catch(e){}
+  toast('Font size: ' + v + 'px — restart apps to see full effect');
+}
+
+// ── Clock Format ─────────────────────────────
+function saveClockFormat(v) {
+  set('serverplex_clock_format', v);
+  // Sync both dropdowns
+  var a = document.getElementById('clockFormatSelect');
+  var b = document.getElementById('clockFmtSelect2');
+  if (a) a.value = v;
+  if (b) b.value = v;
+  broadcast('clock-format', { format: v });
+  toast('Clock format saved');
+}
+
+// ── Taskbar ──────────────────────────────────
+function setTbMode(mode) {
+  set('serverplex_tb_mode', mode);
+  broadcast('tb-mode', { mode: mode });
+  try { window.parent.setTaskbarMode(mode); } catch(e){}
+  document.querySelectorAll('.tb-mode-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.mode===mode); });
+  toast('Taskbar: ' + mode);
+}
+
+function applyStartIcon() {
+  var v = document.getElementById('startIconInput').value.trim();
+  if (!v) return;
+  set('serverplex_start_icon', v);
+  try { var sb = window.parent.document.getElementById('startButton'); if (sb) sb.textContent = v; } catch(e){}
+  toast('Start button updated');
+}
+
+function saveChime(on) {
+  set('serverplex_startup_chime', on ? 'true' : 'false');
+  toast(on ? 'Chime enabled' : 'Chime disabled');
+}
+
+// ── Schedule ─────────────────────────────────
+function buildSchedSelects() {
+  var ids = ['schedMorning','schedDay','schedEvening','schedNight'];
+  var keys = ['serverplex_theme_morning','serverplex_theme_day','serverplex_theme_evening','serverplex_theme_night'];
+  var defs = ['arctic','white','sunset','aurora'];
+  ids.forEach(function(id,i) {
+    var sel = document.getElementById(id);
+    sel.innerHTML = THEMES.map(function(t){ return '<option value="'+t.id+'">'+t.icon+' '+t.label+'</option>'; }).join('');
+    sel.value = get(keys[i]) || defs[i];
   });
-
-  // Send to OS parent to apply live
-  applyToOS(pendingChanges);
-
-  // Reload the current settings page to reflect saved state
-  setTimeout(function() {
-    var frame = document.getElementById('contentFrame');
-    frame.src = frame.src; // soft reload — just the iframe
-
-    pendingChanges = {};
-    btn.innerHTML = '💾 Save & Apply';
-    btn.disabled = true;
-    status.textContent = '✓ Saved!';
-    status.className = 'save-status saved';
-
-    setTimeout(function() {
-      status.textContent = 'No changes';
-      status.className = 'save-status';
-    }, 3000);
-  }, 400);
+}
+function saveSchedToggle(on) {
+  set('serverplex_scheduled_themes', on ? 'true' : 'false');
+  try { if (window.parent.checkScheduledTheme) window.parent.checkScheduledTheme(); } catch(e){}
+  toast(on ? 'Theme schedule enabled' : 'Theme schedule disabled');
+}
+function saveSched() {
+  set('serverplex_theme_morning', document.getElementById('schedMorning').value);
+  set('serverplex_theme_day',     document.getElementById('schedDay').value);
+  set('serverplex_theme_evening', document.getElementById('schedEvening').value);
+  set('serverplex_theme_night',   document.getElementById('schedNight').value);
+  toast('Schedule saved');
 }
 
-function applyToOS(changes) {
-  // Walk up to the top OS window and post a message
-  try {
-    var target = window.parent !== window ? window.parent : null;
-    if (!target) return;
-    // If nested inside eclipseos.html iframe, go one more level up
-    if (target.parent && target.parent !== target) target = target.parent;
-    target.postMessage({ type: 'settings-apply', ...changes }, '*');
-  } catch(e) {}
+// ── Cursor ───────────────────────────────────
+var CURSORS = [
+  {id:'default',  label:'Default',   icon:'🖱️'},
+  {id:'pixel',    label:'Pixel',     icon:'🔲'},
+  {id:'crosshair',label:'Crosshair', icon:'➕'},
+  {id:'quill',    label:'Quill',     icon:'✒️'},
+  {id:'sword',    label:'Sword',     icon:'⚔️'},
+  {id:'star',     label:'Star',      icon:'⭐'},
+  {id:'crystal',  label:'Crystal',   icon:'💎'},
+  {id:'paw',      label:'Paw',       icon:'🐾'},
+  {id:'matrix',   label:'Matrix',    icon:'💚'},
+  {id:'retro',    label:'Retro',     icon:'📺'},
+];
 
-  // Also try direct function calls if same origin
-  try {
-    var os = window.parent;
-    if (changes.theme    && os.changeTheme)     os.changeTheme(changes.theme);
-    if (changes.tbMode   && os.setTaskbarMode)  os.setTaskbarMode(changes.tbMode);
-    if (changes.wallpaper && os.setWallpaper)   os.setWallpaper(changes.wallpaper);
-    if (changes.accent) os.document.documentElement.style.setProperty('--accent', changes.accent);
-    if (changes.fontSize) os.document.body.style.fontSize = changes.fontSize + 'px';
-  } catch(e) {}
+function renderCursorGrid() {
+  var cur = get('serverplex_cursor') || 'default';
+  var g = document.getElementById('cursorGrid');
+  g.innerHTML = CURSORS.map(function(c) {
+    return '<div class="cursor-btn'+(c.id===cur?' active':'')+ '" onclick="applyCursor(\''+c.id+'\')">' +
+      '<div style="font-size:22px;margin-bottom:4px">'+c.icon+'</div>' + c.label + '</div>';
+  }).join('');
 }
 
-// Init save button state
-updateSaveStatus();
+function applyCursor(id) {
+  set('serverplex_cursor', id);
+  broadcast('cursor-change', { cursor: id });
+  try { if (window.parent.applyThemeCursor) window.parent.applyThemeCursor(window.parent.currentTheme, id); } catch(e){}
+  renderCursorGrid();
+  toast('Cursor: ' + id);
+}
+
+// ── Startup Apps ─────────────────────────────
+function renderStartupGrid() {
+  var list = JSON.parse(get('serverplex_startup_apps') || '[]');
+  var g = document.getElementById('startupGrid');
+  var appEntries;
+  try { appEntries = Object.entries(window.parent.apps); } catch(e) { appEntries = []; }
+  g.innerHTML = appEntries.map(function(entry) {
+    var id = entry[0], a = entry[1];
+    var on = list.includes(id);
+    return '<div class="startup-item'+(on?' active':'')+ '" onclick="toggleStartupApp(\''+id+'\')">' +
+      '<div class="startup-icon">'+a.icon+'</div>' +
+      '<div class="startup-name">'+a.name+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleStartupApp(id) {
+  var list = JSON.parse(get('serverplex_startup_apps') || '[]');
+  var idx = list.indexOf(id);
+  if (idx >= 0) list.splice(idx, 1); else list.push(id);
+  set('serverplex_startup_apps', JSON.stringify(list));
+  renderStartupGrid();
+  toast(idx >= 0 ? 'Removed from startup' : 'Added to startup');
+}
+
+// ── Locale ───────────────────────────────────
+function saveLocale(v) {
+  set('serverplex_locale', v);
+  updateLocalePreviews(v);
+  toast('Locale: ' + v);
+}
+function updateLocalePreviews(locale) {
+  var now = new Date();
+  try {
+    document.getElementById('datePreview').textContent = now.toLocaleDateString(locale, {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('timePreview').textContent = now.toLocaleTimeString(locale);
+  } catch(e) {
+    document.getElementById('datePreview').textContent = now.toLocaleDateString();
+    document.getElementById('timePreview').textContent = now.toLocaleTimeString();
+  }
+}
+function saveShowSecs(on) {
+  set('serverplex_clock_secs', on ? 'true' : 'false');
+  toast(on ? 'Seconds shown' : 'Seconds hidden');
+}
+
+// ── Account ──────────────────────────────────
+function saveUsername() {
+  var v = document.getElementById('usernameInput').value.trim();
+  if (!v) return;
+  set('serverplex_username', v);
+  try { var el = window.parent.document.getElementById('smUsername'); if (el) el.textContent = v; } catch(e){}
+  toast('Username saved');
+}
+function saveAvatar() {
+  var v = document.getElementById('avatarInput').value.trim();
+  if (!v) return;
+  set('serverplex_avatar', v);
+  try { var el = window.parent.document.getElementById('smAvatar'); if (el) el.textContent = v; } catch(e){}
+  toast('Avatar saved');
+}
+function changePin() {
+  var p = prompt('Enter new 4-digit PIN:');
+  if (p === null) return;
+  if (!/^\d{4}$/.test(p)) { alert('PIN must be exactly 4 digits.'); return; }
+  set('serverplex_pin', p);
+  toast('PIN updated');
+}
+function changePassword() {
+  var p = prompt('Enter new password (min 4 chars):');
+  if (p === null) return;
+  if (p.length < 4) { alert('Password too short.'); return; }
+  set('serverplex_password', btoa(p));
+  toast('Password updated');
+}
+
+// ── Wallpaper ────────────────────────────────
+function applyWallpaper() {
+  var url = document.getElementById('wpUrl').value.trim();
+  if (!url) return;
+  set('serverplex_wallpaper', url);
+  try { window.parent.setWallpaper(url); } catch(e){}
+  toast('Wallpaper applied');
+}
+function clearWallpaper() {
+  localStorage.removeItem('serverplex_wallpaper');
+  try { window.parent.setWallpaper('none'); } catch(e){}
+  document.getElementById('wpUrl').value = '';
+  toast('Wallpaper cleared');
+}
+function uploadWallpaper() {
+  var inp = document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var fr = new FileReader();
+    fr.onload = function(ev) {
+      var data = ev.target.result;
+      set('serverplex_wallpaper', data);
+      try { window.parent.setWallpaper(data); } catch(err){}
+      toast('Wallpaper applied');
+    };
+    fr.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+// ── Factory reset ────────────────────────────
+function factoryReset() {
+  if (!confirm('This will wipe ALL ServerplexOS settings and return to the setup screen.\n\nThis cannot be undone. Continue?')) return;
+  Object.keys(localStorage).filter(function(k){ return k.startsWith('serverplex_'); }).forEach(function(k){ localStorage.removeItem(k); });
+  sessionStorage.clear();
+  window.parent ? window.parent.location.replace('welcome.html') : location.replace('welcome.html');
+}
+
+// ── About grid ───────────────────────────────
+function renderAbout() {
+  var items = [
+    ['Platform', navigator.platform],
+    ['Browser', navigator.userAgent.split(' ').pop()],
+    ['Language', navigator.language],
+    ['Screen', screen.width + ' × ' + screen.height],
+    ['Theme', get('serverplex_theme') || 'white'],
+    ['Accent', get('serverplex_accent') || '#0078d4'],
+  ];
+  document.getElementById('aboutGrid').innerHTML = items.map(function(i) {
+    return '<div class="about-item"><div class="about-item-label">'+i[0]+'</div><div class="about-item-val">'+i[1]+'</div></div>';
+  }).join('');
+
+  // Storage
+  var totalChars = 0, keyCount = 0;
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k.startsWith('serverplex_')) { totalChars += (localStorage.getItem(k)||'').length; keyCount++; }
+  }
+  document.getElementById('storageUsed').textContent = (totalChars / 1024).toFixed(1) + ' KB';
+  document.getElementById('storageKeys').textContent = keyCount + ' keys';
+}
+
+
+// ── Icon Packs ────────────────────────────────
+var _IP_APP_IDS = ['browser','notepad','calculator','calendar','terminal','code','paint','todolist',
+  'stickynotes','imageviewer','clock','recyclebin','search','musicplayer','markdowneditor',
+  'settings','filemanager','games','voicerecorder','screenrecorder','appstore',
+  'videorecorder','drawings','videoeditor','vectoreditor','mediastream'];
+
+function ipStatus(msg, ok) {
+  var el = document.getElementById('ipStatus');
+  el.textContent = msg;
+  el.className = 'ip-status ' + (ok === true ? 'ok' : ok === false ? 'err' : '');
+}
+
+function parseIconPack() {
+  var raw = document.getElementById('iconPackJson').value.trim();
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch(e) { return null; }
+}
+
+function validateIconPack() {
+  var pack = parseIconPack();
+  if (!pack) { ipStatus('Invalid JSON — check for missing quotes or commas.', false); return false; }
+  var keys = Object.keys(pack).length;
+  if (keys === 0) { ipStatus('JSON is valid but empty.', null); return true; }
+  ipStatus('Valid JSON — ' + keys + ' icon' + (keys !== 1 ? 's' : '') + ' defined.', true);
+  renderIconPackPreview(pack);
+  return true;
+}
+
+function renderIconPackPreview(pack) {
+  var card = document.getElementById('ipPreviewCard');
+  var preview = document.getElementById('ipPreview');
+  var entries = Object.keys(pack);
+  if (!entries.length) { card.style.display = 'none'; return; }
+  card.style.display = '';
+  preview.innerHTML = entries.map(function(id) {
+    var val = pack[id];
+    var isUrl = typeof val === 'string' && (val.startsWith('http') || val.startsWith('data:'));
+    var iconHtml = isUrl
+      ? '<img src="' + val + '" onerror="this.style.display=\'none\';this.parentElement.textContent=\'?\'">'
+      : String(val);
+    return '<div class="icon-pack-item">' +
+      '<div class="ip-icon">' + iconHtml + '</div>' +
+      '<div class="ip-label">' + id + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function applyIconPack() {
+  if (!validateIconPack()) return;
+  var raw = document.getElementById('iconPackJson').value.trim();
+  if (!raw) { clearIconPack(); return; }
+  var pack = parseIconPack();
+  if (!pack) return;
+  set('serverplex_icon_pack', raw);
+  // Broadcast to OS parent so it can hot-apply without reload
+  try {
+    if (window.parent && window.parent.apps) {
+      Object.keys(pack).forEach(function(id) {
+        if (window.parent.apps[id]) {
+          var val = pack[id];
+          var isUrl = typeof val === 'string' && (val.startsWith('http') || val.startsWith('data:'));
+          if (isUrl) {
+            window.parent.apps[id].customIcon = val;
+          } else {
+            window.parent.apps[id].icon = val;
+            delete window.parent.apps[id].customIcon;
+          }
+        }
+      });
+      if (window.parent.renderDesktopIcons) window.parent.renderDesktopIcons();
+      if (window.parent.renderStartMenuApps) window.parent.renderStartMenuApps();
+      if (window.parent.renderPinnedApps) window.parent.renderPinnedApps();
+    }
+  } catch(e) {}
+  toast('Icon pack applied — ' + Object.keys(pack).length + ' icon(s) updated');
+}
+
+function clearIconPack() {
+  localStorage.removeItem('serverplex_icon_pack');
+  document.getElementById('iconPackJson').value = '';
+  document.getElementById('ipPreviewCard').style.display = 'none';
+  ipStatus('Icon pack cleared.', null);
+  // Reload desktop icons back to defaults
+  try {
+    if (window.parent && window.parent.loadCustomApps) {
+      // Soft-reload approach: tell user to restart
+    }
+  } catch(e) {}
+  toast('Icon pack cleared — restart desktop to restore defaults');
+}
+
+function renderAppIdList() {
+  var el = document.getElementById('ipAppList');
+  if (!el) return;
+  var appIds = _IP_APP_IDS;
+  try {
+    if (window.parent && window.parent.apps) {
+      appIds = Object.keys(window.parent.apps);
+    }
+  } catch(e) {}
+  el.innerHTML = appIds.map(function(id) {
+    return '<div style="font-size:11px;padding:3px 0;color:var(--app-text2)"><code style="background:var(--app-bg);padding:1px 5px;border-radius:3px;font-size:10px;color:var(--app-text)">' + id + '</code></div>';
+  }).join('');
+}
+
+
+(function init() {
+  renderThemeGrid();
+  renderAccentGrid();
+  renderCursorGrid();
+  buildSchedSelects();
+
+  // Font scale
+  var fs = parseInt(get('serverplex_os_font_size') || '13');
+  document.getElementById('fontScaleSlider').value = fs;
+  previewFontScale(fs);
+
+  // Clock format
+  var cf = get('serverplex_clock_format') || '12';
+  var cfs1 = document.getElementById('clockFormatSelect');
+  var cfs2 = document.getElementById('clockFmtSelect2');
+  if (cfs1) cfs1.value = cf;
+  if (cfs2) cfs2.value = cf;
+
+  // Taskbar mode
+  var tbm = get('serverplex_tb_mode') || 'blur';
+  document.querySelectorAll('.tb-mode-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.mode===tbm); });
+
+  // Start icon
+  var si = get('serverplex_start_icon') || '💠';
+  document.getElementById('startIconInput').value = si;
+
+  // Chime
+  document.getElementById('chimeToggle').checked = get('serverplex_startup_chime') !== 'false';
+
+  // Schedule
+  document.getElementById('schedToggle').checked = get('serverplex_scheduled_themes') === 'true';
+
+  // Locale
+  var loc = get('serverplex_locale') || navigator.language || 'en-US';
+  var locSel = document.getElementById('localeSelect');
+  if (locSel) { locSel.value = loc; }
+  updateLocalePreviews(loc);
+  document.getElementById('showSecsToggle').checked = get('serverplex_clock_secs') === 'true';
+
+  // Account
+  document.getElementById('usernameInput').value = get('serverplex_username') || '';
+  document.getElementById('avatarInput').value   = get('serverplex_avatar')   || '👤';
+
+  // Wallpaper
+  var wp = get('serverplex_wallpaper') || '';
+  if (wp && !wp.startsWith('data:')) document.getElementById('wpUrl').value = wp;
+
+  // Startup apps
+  renderStartupGrid();
+
+  // About
+  renderAbout();
+
+  // Icon pack
+  var savedPack = get('serverplex_icon_pack');
+  if (savedPack) {
+    document.getElementById('iconPackJson').value = savedPack;
+    try { renderIconPackPreview(JSON.parse(savedPack)); } catch(e) {}
+  }
+  renderAppIdList();
+})();
 </script>
 </body>
 </html>

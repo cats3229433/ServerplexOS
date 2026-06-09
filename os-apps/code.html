@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="app-theme.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Editor</title>
@@ -9,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Oxanium', sans-serif; background: var(--bg); color: var(--text2); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        body { font-family: 'Oxanium', sans-serif; background: var(--app-bg); color: var(--app-text2); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
 
         /* Menu bar */
         .menu-bar { background: #2d2d2d; height: 32px; display: flex; align-items: center; padding: 0 8px; border-bottom: 1px solid #1a1a1a; font-size: 13px; flex-shrink: 0; z-index: 100; position: relative; }
@@ -34,7 +35,7 @@
         .sb-btn { background: none; border: none; color: #777; cursor: pointer; font-size: 15px; padding: 2px 5px; border-radius: 3px; line-height: 1; }
         .sb-btn:hover { color: #ccc; background: #3e3e42; }
         .file-search { margin: 0 8px 6px; padding: 5px 8px; background: #3c3c3c; border: 1px solid #555; border-radius: 4px; color: #ccc; font-family: 'Oxanium', sans-serif; font-size: 12px; outline: none; width: calc(100% - 16px); flex-shrink: 0; }
-        .file-search:focus { border-color: var(--accent); }
+        .file-search:focus { border-color: var(--app-accent); }
         .file-search::placeholder { color: #555; }
         .file-tree { flex: 1; overflow-y: auto; }
         .file-item { padding: 5px 10px; cursor: pointer; display: flex; align-items: center; gap: 7px; font-size: 13px; transition: background 0.1s; }
@@ -52,7 +53,7 @@
         .tabs-bar::-webkit-scrollbar { display: none; }
         .etab { padding: 0 12px; height: 35px; display: flex; align-items: center; gap: 6px; font-size: 13px; border-right: 1px solid #1a1a1a; cursor: pointer; white-space: nowrap; min-width: 90px; color: #888; }
         .etab:hover { background: #2a2a2a; color: #ccc; }
-        .etab.active { background: #1e1e1e; color: #ccc; border-top: 2px solid var(--accent); }
+        .etab.active { background: #1e1e1e; color: #ccc; border-top: 2px solid var(--app-accent); }
         .tab-x { margin-left: auto; padding: 1px 4px; border-radius: 2px; font-size: 15px; color: #666; transition: all 0.1s; }
         .tab-x:hover { background: #555; color: #fff; }
         .editor-wrap { flex: 1; position: relative; overflow: hidden; }
@@ -61,20 +62,20 @@
         .welcome-screen p { color: #555; font-size: 13px; }
         .w-btns { display: flex; gap: 10px; margin-top: 8px; }
         .w-btn { padding: 8px 18px; border-radius: 4px; cursor: pointer; font-family: 'Oxanium', sans-serif; font-size: 13px; border: none; }
-        .w-btn-p { background: #0e639c; color: white; }
-        .w-btn-p:hover { background: #1177bb; }
+        .w-btn-p { background: var(--app-accent); color: white; }
+        .w-btn-p:hover { background: var(--app-accent); }
         .w-btn-s { background: #3e3e42; color: #ccc; }
         .w-btn-s:hover { background: #505057; }
         #monaco-editor { width: 100%; height: 100%; display: none; }
 
         /* Output panel */
-        .panel-resize { height: 4px; background: transparent; cursor: ns-resize; border-top: 1px solid #3a3a3a; flex-shrink: 0; }
-        .panel-resize:hover { background: var(--accent); }
+        .panel-resize { height: 4px; background: transparent; cursor: ns-resize; border-top: 1px solid var(--app-border); flex-shrink: 0; }
+        .panel-resize:hover { background: var(--app-accent); }
         .panel { display: none; flex-direction: column; flex-shrink: 0; height: 200px; border-top: 1px solid #1a1a1a; background: #1e1e1e; }
         .panel.open { display: flex; }
         .panel-header { display: flex; align-items: center; background: #2d2d2d; border-bottom: 1px solid #1a1a1a; padding-right: 8px; flex-shrink: 0; }
         .p-tab { padding: 6px 14px; font-size: 12px; cursor: pointer; color: #777; border-bottom: 2px solid transparent; }
-        .p-tab.active { color: #ccc; border-bottom-color: var(--accent); }
+        .p-tab.active { color: #ccc; border-bottom-color: var(--app-accent); }
         .p-close { margin-left: auto; background: none; border: none; color: #666; cursor: pointer; font-size: 16px; padding: 4px 8px; }
         .p-close:hover { color: #ccc; }
         .console-body { flex: 1; overflow: auto; padding: 8px 12px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.6; }
@@ -86,11 +87,11 @@
         #previewFrame { width: 100%; height: 100%; border: none; background: white; display: none; flex: 1; }
 
         /* Status bar */
-        .status-bar { background: var(--accent); color: white; height: 22px; display: flex; align-items: center; padding: 0 12px; font-size: 11px; flex-shrink: 0; }
+        .status-bar { background: var(--app-accent); color: white; height: 22px; display: flex; align-items: center; padding: 0 12px; font-size: 11px; flex-shrink: 0; }
         .sl { display: flex; gap: 12px; flex: 1; }
         .sr { display: flex; gap: 12px; }
         .si { cursor: pointer; padding: 0 4px; border-radius: 2px; }
-        .si:hover { background: rgba(255,255,255,0.15); }
+        .si:hover { background: rgba(128,128,128,0.15); }
 
         /* Context menu */
         .ctx-menu { position: fixed; background: #252526; border: 1px solid #454545; border-radius: 4px; padding: 4px 0; min-width: 160px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 9999; display: none; }
@@ -99,61 +100,35 @@
         .ctx-item:hover { background: #094771; color: white; }
         .ctx-sep { border-top: 1px solid #454545; margin: 4px 0; }
 
+
+        /* ── Live preview panel ── */
+        .live-preview-pane { width: 0; flex-shrink: 0; background: #fff; border-left: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; transition: width 0.2s ease; }
+        .live-preview-pane.open { width: 50%; }
+        .lp-header { background: #2d2d2d; border-bottom: 1px solid #1a1a1a; padding: 0 10px; height: 35px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .lp-title { font-size: 12px; color: #ccc; flex: 1; }
+        .lp-btn { padding: 3px 8px; border: 1px solid #454545; border-radius: 4px; background: #3e3e42; color: #ccc; font-family: 'Oxanium', sans-serif; font-size: 11px; cursor: pointer; transition: all .15s; }
+        .lp-btn:hover { background: #505057; color: #fff; }
+        .lp-btn.on { background: #094771; border-color: #0078d4; color: #fff; }
+        .lp-device { display: flex; gap: 4px; }
+        .lp-frame-wrap { flex: 1; position: relative; overflow: hidden; }
+        .lp-frame-wrap.phone  iframe { width: 375px; height: 667px; transform-origin: top center; position: absolute; top: 0; left: 50%; transform: translateX(-50%) scale(var(--lp-scale, 1)); }
+        .lp-frame-wrap.tablet iframe { width: 768px; height: 600px; transform-origin: top center; position: absolute; top: 0; left: 50%; transform: translateX(-50%) scale(var(--lp-scale, 1)); }
+        #liveFrame { width: 100%; height: 100%; border: none; display: block; background: #fff; }
+        .lp-err-bar { background: #f85149; color: #fff; padding: 4px 10px; font-size: 10px; font-family: 'Courier New', monospace; display: none; flex-shrink: 0; max-height: 60px; overflow-y: auto; }
+        .lp-err-bar.show { display: block; }
+        .lp-refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: #3fb950; flex-shrink: 0; transition: background .2s; }
+        .lp-refresh-dot.refreshing { background: #e3b341; animation: dotPulse .5s ease infinite alternate; }
+        @keyframes dotPulse { to { opacity: .3; } }
+        .device-frame { position: absolute; top: 0; left: 50%; transform: translateX(-50%); pointer-events: none; border: 12px solid #2a2a2a; border-radius: 32px; box-shadow: 0 0 0 3px #1a1a1a; display: none; }
+        .lp-toolbar-sep { width: 1px; height: 16px; background: #454545; }
+
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #1e1e1e; }
         ::-webkit-scrollbar-thumb { background: #424242; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #555; }
-    
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
-</style>
+    </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
 
 <div class="menu-bar" id="menuBar">
@@ -186,6 +161,7 @@ body.grey {
             <div class="md-item" onclick="decreaseFontSize()">🔡 Decrease Font <span class="shortcut">Ctrl+-</span></div>
             <div class="md-item sep" onclick="cycleTheme()">🎨 Switch Theme</div>
             <div class="md-item" onclick="togglePanel()">⬇️ Toggle Panel</div>
+            <div class="md-item" onclick="toggleLivePreview()">🌐 Live Preview <span class="shortcut">Ctrl+Shift+P</span></div>
         </div>
     </div>
     <div class="menu-item" data-m="run">Run
@@ -232,6 +208,28 @@ body.grey {
             </div>
             <div class="console-body" id="consoleBody"></div>
             <iframe id="previewFrame"></iframe>
+        </div>
+    </div>
+
+    <!-- Live preview pane -->
+    <div class="live-preview-pane" id="livePane">
+        <div class="lp-header">
+            <div class="lp-refresh-dot" id="lpDot"></div>
+            <span class="lp-title" id="lpTitle">Preview</span>
+            <div class="lp-device">
+                <button class="lp-btn" id="lpDeskBtn"  onclick="setDevice('desktop')"  title="Desktop">🖥</button>
+                <button class="lp-btn" id="lpTabBtn"   onclick="setDevice('tablet')"   title="Tablet">📱</button>
+                <button class="lp-btn" id="lpPhoneBtn" onclick="setDevice('phone')"    title="Phone">📞</button>
+            </div>
+            <div class="lp-toolbar-sep"></div>
+            <button class="lp-btn on" id="lpAutoBtn" onclick="toggleAutoRefresh()" title="Auto-refresh">⟳ Auto</button>
+            <button class="lp-btn" onclick="refreshPreview()" title="Refresh">↻</button>
+            <button class="lp-btn" onclick="popoutPreview()" title="Open in new tab">⬡</button>
+            <button class="lp-btn" onclick="toggleLivePreview()" title="Close">✕</button>
+        </div>
+        <div class="lp-err-bar" id="lpErrBar"></div>
+        <div class="lp-frame-wrap" id="lpFrameWrap">
+            <iframe id="liveFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups"></iframe>
         </div>
     </div>
 </div>
@@ -287,9 +285,25 @@ require(['vs/editor/editor.main'], () => {
     });
     editor.onDidChangeModelContent(() => {
         if (activeFile) { files[activeFile].content = editor.getValue(); saveFiles(); }
+        if (lpOpen && lpAutoRefresh) {
+            clearTimeout(lpDebounce);
+            document.getElementById('lpDot').classList.add('refreshing');
+            lpDebounce = setTimeout(refreshPreview, 600);
+        }
     });
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, downloadFile);
     editor.addCommand(monaco.KeyCode.F5, runCode);
+    // ── File-open bus ──
+    try {
+      var req=JSON.parse(localStorage.getItem('spx_file_open')||'null');
+      if(req&&Date.now()-req.timestamp<3000){
+        localStorage.removeItem('spx_file_open');
+        var ext=req.ext||'txt';
+        var lang=extMap[ext]||'plaintext';
+        files[req.name]={name:req.name,language:lang,content:req.content||''};
+        saveFiles();
+      }
+    } catch(e){}
     if (!Object.keys(files).length) createDefaultFiles();
     renderAll();
     const keys = Object.keys(files);
@@ -312,6 +326,7 @@ function openFile(name) {
     document.getElementById('sFile').textContent = '📄 ' + name;
     document.getElementById('sLang').textContent = f.language.charAt(0).toUpperCase() + f.language.slice(1);
     renderAll();
+    if (lpOpen) setTimeout(refreshPreview, 100);
 }
 
 function closeFile(name, e) {
@@ -503,6 +518,315 @@ document.addEventListener('mousemove', e => { if (!resizing) return; const h=Mat
 document.addEventListener('mouseup', () => resizing=false);
 
 function saveFiles() { localStorage.setItem('serverplex_code_files', JSON.stringify(files)); }
+
+// ─────────────────────────────────────────────
+//  LIVE PREVIEW
+// ─────────────────────────────────────────────
+let lpOpen       = false;
+let lpAutoRefresh = true;
+let lpDevice     = 'desktop';
+let lpDebounce   = null;
+const liveFrame  = document.getElementById('liveFrame');
+
+function toggleLivePreview() {
+    lpOpen = !lpOpen;
+    document.getElementById('livePane').classList.toggle('open', lpOpen);
+    if (lpOpen) refreshPreview();
+}
+
+function toggleAutoRefresh() {
+    lpAutoRefresh = !lpAutoRefresh;
+    document.getElementById('lpAutoBtn').classList.toggle('on', lpAutoRefresh);
+    document.getElementById('lpAutoBtn').textContent = lpAutoRefresh ? '⟳ Auto' : '⟳ Manual';
+}
+
+function setDevice(dev) {
+    lpDevice = dev;
+    const wrap = document.getElementById('lpFrameWrap');
+    wrap.className = 'lp-frame-wrap ' + (dev === 'desktop' ? '' : dev);
+    ['lpDeskBtn','lpTabBtn','lpPhoneBtn'].forEach(id => document.getElementById(id).classList.remove('on'));
+    const map = { desktop:'lpDeskBtn', tablet:'lpTabBtn', phone:'lpPhoneBtn' };
+    document.getElementById(map[dev]).classList.add('on');
+    // Scale iframe to fit wrap for tablet/phone
+    if (dev !== 'desktop') {
+        const dims = { tablet:[768,600], phone:[375,667] };
+        const [w] = dims[dev];
+        const wrapW = wrap.offsetWidth;
+        wrap.style.setProperty('--lp-scale', Math.min(1, wrapW / w));
+    } else {
+        liveFrame.style.width  = '100%';
+        liveFrame.style.height = '100%';
+    }
+}
+
+function refreshPreview() {
+    if (!lpOpen || !activeFile) return;
+    const f = files[activeFile];
+    if (!f) return;
+
+    const dot   = document.getElementById('lpDot');
+    const title = document.getElementById('lpTitle');
+    dot.classList.add('refreshing');
+    document.getElementById('lpErrBar').classList.remove('show');
+    title.textContent = 'Preview — ' + activeFile;
+
+    // HTML & Markdown → iframe
+    if (f.language === 'html') {
+        renderHtmlPreview(f);
+        return;
+    }
+    if (f.language === 'markdown') {
+        renderMarkdownPreview(f);
+        return;
+    }
+
+    // All code languages → execute via Piston API
+    executeCode(f);
+}
+
+// ── Piston language map ───────────────────────
+const PISTON_LANG = {
+    javascript: { lang:'javascript', version:'*' },
+    typescript: { lang:'typescript', version:'*' },
+    python:     { lang:'python',     version:'*' },
+    java:       { lang:'java',       version:'*' },
+    cpp:        { lang:'c++',        version:'*' },
+    c:          { lang:'c',          version:'*' },
+    csharp:     { lang:'csharp',     version:'*' },
+    rust:       { lang:'rust',       version:'*' },
+    go:         { lang:'go',         version:'*' },
+    kotlin:     { lang:'kotlin',     version:'*' },
+    swift:      { lang:'swift',      version:'*' },
+    php:        { lang:'php',        version:'*' },
+    r:          { lang:'r',          version:'*' },
+    julia:      { lang:'julia',      version:'*' },
+    sql:        { lang:'sqlite3',    version:'*' },
+};
+
+async function executeCode(f) {
+    const dot = document.getElementById('lpDot');
+    const map = PISTON_LANG[f.language];
+
+    if (!map) {
+        showOutputPane('⚠ No runner for language: ' + f.language + '\n\nSupported: ' + Object.keys(PISTON_LANG).join(', '), 'warn');
+        dot.classList.remove('refreshing');
+        return;
+    }
+
+    // SQL: use sql.js in-browser so no network needed
+    if (f.language === 'sql') {
+        executeSql(f.content);
+        dot.classList.remove('refreshing');
+        return;
+    }
+
+    showOutputPane('⏳ Running ' + (map.lang) + '…', 'running');
+
+    try {
+        const res = await fetch('https://emkc.org/api/v2/piston/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                language: map.lang,
+                version:  map.version,
+                files: [{ name: activeFile, content: f.content }],
+            }),
+        });
+
+        if (!res.ok) throw new Error('API returned ' + res.status);
+        const data = await res.json();
+        const run  = data.run || {};
+
+        const stdout = (run.stdout || '').trimEnd();
+        const stderr = (run.stderr || '').trimEnd();
+        const code   = run.code;
+
+        let output = '';
+        if (stdout) output += stdout;
+        if (stderr) output += (stdout ? '\n\n' : '') + stderr;
+        if (!output) output = '(no output)';
+
+        const status = code === 0 ? 'ok' : 'err';
+        const badge  = code === 0 ? '✓ Exited 0' : '✗ Exit code ' + code;
+        showOutputPane(output, status, badge, map.lang, data.language?.version);
+
+    } catch (e) {
+        if (e.message && e.message.includes('fetch')) {
+            showOutputPane('⚠ Could not reach the Piston execution API.\n\nMake sure you have an internet connection.\n\nError: ' + e.message, 'err');
+        } else {
+            showOutputPane('⚠ Execution error:\n' + e.message, 'err');
+        }
+    }
+
+    dot.classList.remove('refreshing');
+}
+
+// ── SQL: in-browser via sql.js ────────────────
+let _sqlJs = null;
+async function loadSqlJs() {
+    if (_sqlJs) return _sqlJs;
+    return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js';
+        s.onload = async () => {
+            _sqlJs = await window.initSqlJs({ locateFile: f => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/' + f });
+            resolve(_sqlJs);
+        };
+        s.onerror = reject;
+        document.head.appendChild(s);
+    });
+}
+
+async function executeSql(code) {
+    const dot = document.getElementById('lpDot');
+    dot.classList.add('refreshing');
+    showOutputPane('⏳ Initialising SQLite…', 'running');
+    try {
+        const SQL = await loadSqlJs();
+        const db  = new SQL.Database();
+        const stmts = code.split(';').map(s => s.trim()).filter(Boolean);
+        let html = '<style>body{font-family:Oxanium,sans-serif;background:#1e1e1e;color:#d4d4d4;padding:12px;font-size:12px;margin:0}table{border-collapse:collapse;width:100%;margin-bottom:14px}th{background:#094771;color:#fff;padding:5px 10px;text-align:left;font-size:11px}td{padding:4px 10px;border-bottom:1px solid #2a2a2a;font-size:11px;color:#ccc}.ok{color:#3fb950;margin-bottom:6px;font-size:11px}.err{color:#f85149;font-size:11px;margin-bottom:6px}.rows{color:#8b949e;font-size:10px;margin-top:-10px;margin-bottom:10px}</style>';
+        let totalRows = 0;
+        let hasError  = false;
+        for (const stmt of stmts) {
+            try {
+                const results = db.exec(stmt);
+                if (results.length) {
+                    for (const res of results) {
+                        html += '<table><thead><tr>' + res.columns.map(col => '<th>' + col + '</th>').join('') + '</tr></thead><tbody>';
+                        html += res.values.map(row => '<tr>' + row.map(cell => '<td>' + (cell === null ? '<em style="color:#555">NULL</em>' : cell) + '</td>').join('') + '</tr>').join('');
+                        html += '</tbody></table><div class="rows">' + res.values.length + ' row' + (res.values.length !== 1 ? 's' : '') + '</div>';
+                        totalRows += res.values.length;
+                    }
+                } else {
+                    html += '<div class="ok">✓ ' + stmt.split(/\s+/)[0].toUpperCase() + ' OK</div>';
+                }
+            } catch (e) {
+                html += '<div class="err">✗ ' + e.message + '</div>';
+                hasError = true;
+            }
+        }
+        db.close();
+        html = '<!DOCTYPE html><html><body>' + html + '</body></html>';
+        liveFrame.srcdoc = html;
+        liveFrame.style.display = 'block';
+        const outputEl = document.getElementById('lpOutput');
+        if (outputEl) outputEl.style.display = 'none';
+    } catch (e) {
+        showOutputPane('✗ SQLite error:\n' + e.message, 'err');
+    }
+    dot.classList.remove('refreshing');
+}
+
+// ── Output pane ───────────────────────────────
+function showOutputPane(text, status, badge, lang, version) {
+    liveFrame.style.display = 'none';
+
+    let existing = document.getElementById('lpOutput');
+    if (!existing) {
+        existing = document.createElement('div');
+        existing.id = 'lpOutput';
+        existing.style.cssText = 'flex:1;overflow:auto;font-family:"Courier New",monospace;font-size:12px;line-height:1.65;padding:12px 14px;background:#1e1e1e;color:#d4d4d4;white-space:pre-wrap;word-break:break-word;display:flex;flex-direction:column;box-sizing:border-box;height:100%';
+        document.getElementById('lpFrameWrap').appendChild(existing);
+    }
+    existing.style.display = 'flex';
+
+    const colors = { ok:'#3fb950', err:'#f85149', warn:'#e3b341', running:'#8b949e', info:'#4db8ff' };
+    const color  = colors[status] || '#d4d4d4';
+
+    let html = '';
+    if (lang || version) {
+        html += `<div style="font-size:10px;color:#555;margin-bottom:10px;letter-spacing:.5px">${lang||''}${version?' v'+version:''}</div>`;
+    }
+    if (status === 'running') {
+        html += `<div style="color:#8b949e">${text}</div>`;
+    } else {
+        // Colour stderr lines red within a mixed output
+        const lines = text.split('\n');
+        const formatted = lines.map(line => {
+            let col = '#d4d4d4';
+            if (/^error|^exception|traceback|cannot|fatal|undefined|typeerror|syntaxerror/i.test(line)) col = '#f85149';
+            else if (/^warning|^warn/i.test(line)) col = '#e3b341';
+            return `<span style="color:${col}">${line.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</span>`;
+        });
+        html += formatted.join('\n');
+    }
+    if (badge) {
+        html += `\n\n<span style="color:${color};font-size:10px;letter-spacing:.5px">${badge}</span>`;
+    }
+
+    existing.innerHTML = html;
+}
+
+// ── HTML preview ──────────────────────────────
+function renderHtmlPreview(f) {
+    const outputEl = document.getElementById('lpOutput');
+    if (outputEl) outputEl.style.display = 'none';
+    liveFrame.style.display = 'block';
+
+    let content = f.content;
+    const fileBlobs = {};
+    Object.keys(files).forEach(name => {
+        const ext   = name.split('.').pop().toLowerCase();
+        const types = { css:'text/css', js:'application/javascript', svg:'image/svg+xml' };
+        if (types[ext]) fileBlobs[name] = URL.createObjectURL(new Blob([files[name].content], { type: types[ext] }));
+    });
+    content = content.replace(/(src|href)="([^"#:]+)"/g, (m, attr, val) => fileBlobs[val] ? `${attr}="${fileBlobs[val]}"` : m);
+
+    const bridge = `<script>(function(){window.onerror=function(msg,s,line,col,err){window.parent.postMessage({type:'lp-error',msg:(err?err.toString():msg)+' (line '+line+')'}, '*');return false;};['log','warn','error','info'].forEach(function(m){var o=console[m];console[m]=function(){window.parent.postMessage({type:'lp-console',level:m,msg:Array.from(arguments).join(' ')},'*');o.apply(console,arguments)};});})()\<\/script>`;
+    content = content.includes('</head>') ? content.replace('</head>', bridge + '</head>') : bridge + content;
+    liveFrame.srcdoc = content;
+    setTimeout(() => document.getElementById('lpDot').classList.remove('refreshing'), 400);
+}
+
+// ── Markdown preview ──────────────────────────
+function renderMarkdownPreview(f) {
+    const outputEl = document.getElementById('lpOutput');
+    if (outputEl) outputEl.style.display = 'none';
+    liveFrame.style.display = 'block';
+    liveFrame.srcdoc = `<!DOCTYPE html><html><head>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"><\/script>
+<style>body{font-family:sans-serif;max-width:760px;margin:0 auto;padding:24px;color:#24292e;line-height:1.7}h1,h2{border-bottom:1px solid #eee;padding-bottom:8px}code{background:#f6f8fa;padding:2px 6px;border-radius:3px;font-family:monospace}pre{background:#f6f8fa;padding:16px;border-radius:6px;overflow-x:auto}blockquote{border-left:4px solid #dfe2e5;padding-left:16px;color:#6a737d;margin:0}</style>
+</head><body><div id="md"></div>
+<script>var r=${JSON.stringify(f.content)};document.getElementById('md').innerHTML=typeof marked!=='undefined'?marked.parse(r):'<pre>'+r.replace(/</g,'&lt;')+'</pre>';<\/script></body></html>`;
+    setTimeout(() => document.getElementById('lpDot').classList.remove('refreshing'), 400);
+}
+
+
+function popoutPreview() {
+    if (!activeFile || !files[activeFile]) return;
+    const f = files[activeFile];
+    const w = window.open('', '_blank');
+    if (f.language === 'html') {
+        w.document.write(f.content); w.document.close();
+    } else {
+        w.document.write('<pre style="font-family:monospace;padding:16px;white-space:pre-wrap">' + f.content.replace(/</g,'&lt;') + '</pre>');
+        w.document.close();
+    }
+}
+
+// ── Hook into existing editor events ──────────
+// Debounced auto-refresh when content changes
+var _origOnChange = null;
+function hookAutoRefresh() {
+    if (!editor) return;
+    editor.onDidChangeModelContent(function() {
+        if (activeFile) { files[activeFile].content = editor.getValue(); saveFiles(); }
+        if (lpOpen && lpAutoRefresh) {
+            clearTimeout(lpDebounce);
+            document.getElementById('lpDot').classList.add('refreshing');
+            lpDebounce = setTimeout(refreshPreview, 600);
+        }
+    });
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
+        e.preventDefault(); toggleLivePreview();
+    }
+});
+
 </script>
 </body>
 </html>

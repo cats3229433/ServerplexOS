@@ -1,164 +1,184 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="../CoreFiles/app-theme.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Games</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
-body.theme-white{--bg:#f0f2f5;--bg3:#e4e7ed;--surface:#fff;--surface2:#f7f8fa;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.14);--text:#0d0f14;--text2:#55606e;--text3:#8a95a3;--shadow:0 4px 20px rgba(0,0,0,.10);--shadow-lg:0 12px 48px rgba(0,0,0,.14)}
-body.theme-black{--bg:#060811;--bg3:#111420;--surface:#12151f;--surface2:#1a1e2e;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#e8edf5;--text2:#8b97b0;--text3:#5a6478;--shadow:0 4px 20px rgba(0,0,0,.5);--shadow-lg:0 16px 60px rgba(0,0,0,.7)}
-body.theme-grey{--bg:#3a3e4a;--bg3:#4e535e;--surface:#484c57;--surface2:#545862;--border:rgba(255,255,255,0.10);--border2:rgba(255,255,255,0.18);--text:#eef0f4;--text2:#b8bec8;--text3:#858ea0;--shadow:0 4px 20px rgba(0,0,0,.35);--shadow-lg:0 12px 48px rgba(0,0,0,.5)}
-:root{--accent:#0078d4;--glow:rgba(0,120,212,0.3);--r:12px;--spring:0.22s cubic-bezier(0.34,1.56,0.64,1)}
+:root {
+  --glow: color-mix(in srgb, var(--app-accent) 30%, transparent);
+  --r: 12px;
+  --spring: 0.22s cubic-bezier(0.34,1.56,0.64,1);
+}
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);overflow:hidden}
 .app{display:flex;flex-direction:column;height:100vh}
-.topbar{display:flex;align-items:center;gap:10px;padding:0 14px;height:50px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0;z-index:200}
-.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px var(--glow);flex-shrink:0}
+.topbar{display:flex;align-items:center;gap:10px;padding:0 14px;height:50px;background:var(--app-surface);border-bottom:1px solid var(--app-border);flex-shrink:0;z-index:200}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--app-accent),#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 4px 12px var(--glow);flex-shrink:0}
 .logo-text{font-size:15px;font-weight:800;letter-spacing:.5px}
-.logo-sub{font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.logo-sub{font-size:9px;color:var(--app-text2);letter-spacing:2px;text-transform:uppercase}
 .spacer{flex:1}
 .search-wrap{position:relative;display:flex;align-items:center}
-.search-wrap input{padding:7px 30px 7px 32px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;width:200px;outline:none;transition:all .2s}
-.search-wrap input:focus{border-color:var(--accent);background:var(--surface2);width:240px}
-.search-wrap input::placeholder{color:var(--text3)}
-.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--text3);pointer-events:none}
-.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:var(--text3);color:var(--bg);font-size:10px;font-weight:900;display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0}
-.search-clear:hover{background:var(--text2)}
+.search-wrap input{padding:7px 30px 7px 32px;border-radius:10px;border:1px solid var(--app-border);background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;width:200px;outline:none;transition:all .2s}
+.search-wrap input:focus{border-color:var(--app-accent);background:var(--app-surface2);width:240px}
+.search-wrap input::placeholder{color:var(--app-text2)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--app-text2);pointer-events:none}
+.search-clear{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:var(--app-text2);color:var(--app-bg);font-size:10px;font-weight:900;display:none;align-items:center;justify-content:center;cursor:pointer;line-height:1;transition:all .15s;flex-shrink:0}
+.search-clear:hover{background:var(--app-text2)}
 .search-clear.visible{display:flex}
-.tb-btn{padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap}
-.tb-btn:hover{color:var(--text);background:var(--bg3);border-color:var(--border2)}
-.tb-btn.active{background:rgba(0,120,212,0.15);border-color:rgba(0,120,212,0.4);color:var(--accent)}
-.tb-refresh{padding:6px 10px;font-size:15px;color:var(--text3)}
-.tb-select{padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;cursor:pointer;outline:none;transition:all .2s;-webkit-appearance:none;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7a99' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-.tb-select:hover{color:var(--text);border-color:var(--border2)}
-.tb-select option{background:var(--surface);color:var(--text)}
+.tb-btn{padding:6px 12px;border-radius:8px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;border:1px solid var(--app-border);background:transparent;color:var(--app-text2);transition:all .2s;white-space:nowrap}
+.tb-btn:hover{color:var(--app-text);background:var(--app-surface2);border-color:var(--app-border)}
+.tb-btn.active{background:rgba(0,120,212,0.15);border-color:rgba(0,120,212,0.4);color:var(--app-accent)}
+.tb-refresh{padding:6px 10px;font-size:15px;color:var(--app-text2)}
+.tb-select{padding:6px 10px;border-radius:8px;border:1px solid var(--app-border);background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;cursor:pointer;outline:none;transition:all .2s;-webkit-appearance:none;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7a99' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.tb-select:hover{color:var(--app-text);border-color:var(--app-border)}
+.tb-select option{background:var(--app-surface);color:var(--app-text)}
 .main{flex:1;display:flex;overflow:hidden}
-.sidebar{width:196px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.sidebar{width:196px;flex-shrink:0;background:var(--app-surface);border-right:1px solid var(--app-border);padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
 .sidebar::-webkit-scrollbar{width:4px}
-.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-.sb-label{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text3);padding:6px 10px 4px}
-.sb-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text2);border:none;background:transparent;font-family:'Oxanium',sans-serif;width:100%;text-align:left;transition:all .15s;position:relative}
-.sb-btn:hover{background:var(--bg3);color:var(--text)}
-.sb-btn.active{background:rgba(0,120,212,0.12);color:var(--accent)}
-.sb-btn.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 2px 2px 0;background:var(--accent)}
+.sidebar::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:2px}
+.sb-label{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--app-text2);padding:6px 10px 4px}
+.sb-btn{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;color:var(--app-text2);border:none;background:transparent;font-family:'Oxanium',sans-serif;width:100%;text-align:left;transition:all .15s;position:relative}
+.sb-btn:hover{background:var(--app-surface2);color:var(--app-text)}
+.sb-btn.active{background:rgba(0,120,212,0.12);color:var(--app-accent)}
+.sb-btn.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;border-radius:0 2px 2px 0;background:var(--app-accent)}
 .sb-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
-.sb-pill{font-size:10px;font-weight:700;background:rgba(255,255,255,0.07);color:var(--text3);padding:1px 7px;border-radius:20px;margin-left:auto;transition:all .2s}
-.sb-btn.active .sb-pill{background:rgba(0,120,212,0.2);color:var(--accent)}
-.sb-divider{height:1px;background:var(--border);margin:5px 10px}
+.sb-pill{font-size:10px;font-weight:700;background:rgba(128,128,128,0.07);color:var(--app-text2);padding:1px 7px;border-radius:20px;margin-left:auto;transition:all .2s}
+.sb-btn.active .sb-pill{background:rgba(0,120,212,0.2);color:var(--app-accent)}
+.sb-divider{height:1px;background:var(--app-border);margin:5px 10px}
 .content{flex:1;overflow-y:auto;padding:20px 22px}
 .content::-webkit-scrollbar{width:6px}
-.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.content::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:3px}
 .featured-wrap{margin-bottom:26px;border-radius:16px;overflow:hidden;cursor:pointer;position:relative;animation:fadeUp .35s ease}
 .featured-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1e3a5f,#1a1040 60%,#0f1a35)}
 .featured-glow{position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,120,212,.28),transparent 70%)}
 .featured-content{position:relative;padding:22px 26px;display:flex;align-items:center;gap:20px}
 .feat-img-wrap{position:relative;flex-shrink:0}
-.feat-img{width:82px;height:82px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,.15);box-shadow:0 8px 28px rgba(0,0,0,.4);display:block}
-.feat-img-fall{width:82px;height:82px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:42px}
+.feat-img{width:82px;height:82px;border-radius:14px;object-fit:cover;border:1px solid rgba(128,128,128,.15);box-shadow:0 8px 28px rgba(0,0,0,.4);display:block}
+.feat-img-fall{width:82px;height:82px;border-radius:14px;background:rgba(128,128,128,.08);border:1px solid rgba(128,128,128,.12);display:flex;align-items:center;justify-content:center;font-size:42px}
 .feat-badge{position:absolute;top:-7px;right:-7px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:20px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .feat-info{flex:1}
 .feat-eye{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(147,197,253,.7);margin-bottom:4px}
 .feat-name{font-size:22px;font-weight:800;color:#fff;margin-bottom:5px}
 .feat-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;margin-bottom:13px;max-width:420px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .feat-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.feat-meta{font-size:12px;color:rgba(255,255,255,.3)}
-.btn-feat{padding:7px 18px;border-radius:8px;border:1px solid rgba(255,255,255,.2);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .2s;background:rgba(255,255,255,.14);color:#fff}
-.btn-feat:hover:not(:disabled){background:rgba(255,255,255,.24);transform:translateY(-1px)}
+.feat-meta{font-size:12px;color:rgba(128,128,128,.3)}
+.btn-feat{padding:7px 18px;border-radius:8px;border:1px solid rgba(128,128,128,.2);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .2s;background:rgba(128,128,128,.14);color:#fff}
+.btn-feat:hover:not(:disabled){background:rgba(128,128,128,.24);transform:translateY(-1px)}
 .btn-feat:disabled{opacity:.4;cursor:not-allowed}
 .btn-feat.fav{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.sec-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
-.sec-count{font-size:12px;color:var(--text3)}
+.sec-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2)}
+.sec-count{font-size:12px;color:var(--app-text2)}
 .game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(172px,1fr));gap:12px;margin-bottom:28px}
-.game-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all var(--spring);position:relative;box-shadow:var(--shadow);animation:fadeUp .3s ease}
-.game-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:var(--shadow-lg);border-color:var(--border2)}
+.game-card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all var(--spring);position:relative;box-shadow:var(--app-shadow);animation:fadeUp .3s ease}
+.game-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:var(--app-shadow);border-color:var(--app-border)}
 .game-card:hover .card-overlay{opacity:1}
 .game-card:hover .card-fav-btn{opacity:1}
-.game-cover{width:100%;height:154px;object-fit:cover;display:block;background:var(--bg3)}
-.game-cover-fall{width:100%;height:154px;display:flex;align-items:center;justify-content:center;font-size:46px;background:linear-gradient(135deg,var(--bg3),var(--surface2))}
+.game-cover{width:100%;height:154px;object-fit:cover;display:block;background:var(--app-surface2)}
+.game-cover-fall{width:100%;height:154px;display:flex;align-items:center;justify-content:center;font-size:46px;background:linear-gradient(135deg,var(--app-surface2),var(--app-surface2))}
 .card-overlay{position:absolute;top:0;left:0;right:0;height:154px;background:linear-gradient(to top,rgba(0,0,0,.72),transparent 60%);opacity:0;transition:opacity .2s;display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px}
-.play-circle{width:42px;height:42px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 14px var(--glow)}
-.card-fav-btn{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;opacity:0;transition:all .15s;backdrop-filter:blur(6px)}
+.play-circle{width:42px;height:42px;border-radius:50%;background:var(--app-accent);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;box-shadow:0 4px 14px var(--glow)}
+.card-fav-btn{position:absolute;top:7px;right:7px;width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.58);border:1px solid rgba(128,128,128,.14);display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;opacity:0;transition:all .15s;backdrop-filter:blur(6px)}
 .card-fav-btn.is-fav{opacity:1;background:rgba(245,158,11,.35);border-color:rgba(245,158,11,.5)}
 .card-manual-badge{position:absolute;top:7px;left:7px;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:rgba(0,120,212,.3);color:#93c5fd;border:1px solid rgba(0,120,212,.45);backdrop-filter:blur(6px)}
 .card-body{padding:10px 12px 13px}
 .card-name{font-size:13px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.cat-tag{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:rgba(0,120,212,.12);color:var(--accent);border:1px solid rgba(0,120,212,.2)}
-.card-recent-dot{position:absolute;top:7px;left:7px;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;border:1px solid rgba(255,255,255,.3)}
-.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 30px;text-align:center;color:var(--text3);grid-column:1/-1}
+.cat-tag{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:rgba(0,120,212,.12);color:var(--app-accent);border:1px solid rgba(0,120,212,.2)}
+.card-recent-dot{position:absolute;top:7px;left:7px;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;border:1px solid rgba(128,128,128,.3)}
+.state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 30px;text-align:center;color:var(--app-text2);grid-column:1/-1}
 .state-icon{font-size:50px}
 .state-msg{font-size:14px}
 .spin{animation:spin 1s linear infinite;display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* Skeleton loading */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skeleton{background:linear-gradient(90deg,var(--app-surface2) 25%,var(--app-border) 50%,var(--app-surface2) 75%);background-size:800px 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:6px}
+.skel-card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:12px;overflow:hidden;animation:fadeUp .3s ease}
+.skel-cover{width:100%;height:154px}.skel-cover.skeleton{border-radius:0}
+.skel-body{padding:10px 12px 13px;display:flex;flex-direction:column;gap:6px}
+.skel-name{height:13px;width:75%}.skel-tag{height:11px;width:38%;border-radius:20px}
+
+/* Render progress bar */
+.render-bar{position:sticky;top:0;left:0;right:0;height:2px;background:transparent;z-index:100;pointer-events:none}
+.render-bar-fill{height:100%;background:var(--app-accent);width:0%;transition:width .12s linear;border-radius:0 2px 2px 0;box-shadow:0 0 6px var(--app-accent)}
 .detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);z-index:5000;display:none;align-items:center;justify-content:center;padding:20px}
 .detail-overlay.open{display:flex;animation:popIn .22s cubic-bezier(.34,1.56,.64,1)}
 @keyframes popIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.detail-modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:490px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow-lg)}
-.detail-hero{padding:20px 20px 16px;background:linear-gradient(180deg,var(--surface2),var(--surface));border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start}
-.detail-cover{width:76px;height:76px;border-radius:14px;border:1px solid var(--border2);flex-shrink:0;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:38px;overflow:hidden}
+.detail-modal{background:var(--app-surface);border:1px solid var(--app-border);border-radius:20px;width:100%;max-width:490px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--app-shadow)}
+.detail-hero{padding:20px 20px 16px;background:linear-gradient(180deg,var(--app-surface2),var(--app-surface));border-bottom:1px solid var(--app-border);display:flex;gap:14px;align-items:flex-start}
+.detail-cover{width:76px;height:76px;border-radius:14px;border:1px solid var(--app-border);flex-shrink:0;background:var(--app-surface2);display:flex;align-items:center;justify-content:center;font-size:38px;overflow:hidden}
 .detail-cover img{width:100%;height:100%;object-fit:cover}
 .detail-title{font-size:19px;font-weight:800;margin-bottom:3px}
-.detail-byline{font-size:12px;color:var(--text3);margin-bottom:8px}
+.detail-byline{font-size:12px;color:var(--app-text2);margin-bottom:8px}
 .detail-body{flex:1;overflow-y:auto;padding:16px 20px}
 .detail-body::-webkit-scrollbar{width:4px}
-.detail-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.detail-body::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:2px}
 .dsec{margin-bottom:16px}
-.dsec-title{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:8px}
-.dsec-title::after{content:'';flex:1;height:1px;background:var(--border)}
-.detail-desc{font-size:13px;color:var(--text2);line-height:1.75}
+.dsec-title{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--app-text2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.dsec-title::after{content:'';flex:1;height:1px;background:var(--app-border)}
+.detail-desc{font-size:13px;color:var(--app-text2);line-height:1.75}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.detail-cell{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 11px}
-.detail-key{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.detail-cell{background:var(--app-surface2);border:1px solid var(--app-border);border-radius:8px;padding:9px 11px}
+.detail-key{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);margin-bottom:3px}
 .detail-val{font-size:13px;font-weight:600}
-.detail-footer{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:7px;background:var(--surface);flex-shrink:0}
-.btn-play{flex:1;padding:10px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px var(--glow)}
+.detail-footer{padding:12px 16px;border-top:1px solid var(--app-border);display:flex;gap:7px;background:var(--app-surface);flex-shrink:0}
+.btn-play{flex:1;padding:10px;border-radius:10px;border:none;background:var(--app-accent);color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px var(--glow)}
 .btn-play:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 22px var(--glow)}
 .btn-play:disabled{opacity:.4;cursor:not-allowed}
-.btn-fav{padding:10px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:'Oxanium',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-fav{padding:10px 14px;border-radius:10px;border:1px solid var(--app-border);background:var(--app-surface2);color:var(--app-text2);font-family:'Oxanium',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
 .btn-fav.is-fav{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:#fcd34d}
-.btn-close{padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
-.btn-close:hover{background:var(--bg3);color:var(--text)}
-.statusbar{background:var(--surface);border-top:1px solid var(--border);padding:3px 16px;display:flex;gap:14px;font-size:10px;color:var(--text3);flex-shrink:0;letter-spacing:.5px}
-.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface);border:1px solid var(--border2);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow-lg);z-index:99999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.btn-close{padding:10px 14px;border-radius:10px;border:1px solid var(--app-border);background:transparent;color:var(--app-text2);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-close:hover{background:var(--app-surface2);color:var(--app-text)}
+.statusbar{background:var(--app-surface);border-top:1px solid var(--app-border);padding:3px 16px;display:flex;gap:14px;font-size:10px;color:var(--app-text2);flex-shrink:0;letter-spacing:.5px}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--app-surface);border:1px solid var(--app-border);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--app-shadow);z-index:99999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* Battery warning modals */
 .batt-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:99999;display:none;align-items:center;justify-content:center;padding:20px}
 .batt-overlay.open{display:flex;animation:popIn .2s ease}
-.batt-modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;padding:28px 28px 22px;max-width:360px;width:100%;text-align:center;box-shadow:var(--shadow-lg)}
+.batt-modal{background:var(--app-surface);border:1px solid var(--app-border);border-radius:18px;padding:28px 28px 22px;max-width:360px;width:100%;text-align:center;box-shadow:var(--app-shadow)}
 .batt-icon{font-size:48px;margin-bottom:12px;display:block}
 .batt-title{font-size:17px;font-weight:800;margin-bottom:8px}
-.batt-sub{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px}
+.batt-sub{font-size:13px;color:var(--app-text2);line-height:1.6;margin-bottom:20px}
 .batt-btns{display:flex;gap:8px}
 .batt-btn{flex:1;padding:10px;border-radius:10px;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
-.batt-btn.primary{background:var(--accent);color:#fff;box-shadow:0 4px 14px var(--glow)}
+.batt-btn.primary{background:var(--app-accent);color:#fff;box-shadow:0 4px 14px var(--glow)}
 .batt-btn.primary:hover{transform:translateY(-1px)}
-.batt-btn.ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border2)}
-.batt-btn.ghost:hover{color:var(--text);background:var(--bg3)}
-.batt-bar-wrap{width:100%;height:10px;background:var(--bg3);border-radius:6px;overflow:hidden;margin-bottom:6px}
+.batt-btn.ghost{background:var(--app-surface2);color:var(--app-text2);border:1px solid var(--app-border)}
+.batt-btn.ghost:hover{color:var(--app-text);background:var(--app-surface2)}
+.batt-bar-wrap{width:100%;height:10px;background:var(--app-surface2);border-radius:6px;overflow:hidden;margin-bottom:6px}
 .batt-bar-fill{height:100%;border-radius:6px;transition:width .5s ease}
-.game-player-overlay{position:fixed;inset:0;z-index:99998;background:#000;display:none;flex-direction:column}
+.game-player-overlay{position:fixed;inset:0;z-index:99998;background:#000;display:none;flex-direction:column;overflow:hidden}
 .game-player-overlay.open{display:flex;animation:popIn .2s ease}
-.game-player-bar{height:40px;background:#0d0f14;display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08)}
-.game-player-title{font-size:13px;font-weight:700;color:#e8edf5;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.game-player-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px}
-.game-player-btn:hover{background:rgba(255,255,255,0.12);color:#fff}
+.game-player-bar{height:40px;background:var(--app-bg);display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0;border-bottom:1px solid rgba(128,128,128,0.08)}
+.game-player-title{font-size:13px;font-weight:700;color:var(--app-text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-player-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(128,128,128,0.12);background:rgba(128,128,128,0.06);color:rgba(255,255,255,0.7);font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.3px}
+.game-player-btn:hover{background:rgba(128,128,128,0.12);color:#fff}
 .game-player-btn.exit{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.35);color:#fca5a5}
 .game-player-btn.exit:hover{background:rgba(239,68,68,0.25)}
 /* Script-run container (manual games) */
 .game-player-container{flex:1;width:100%;height:100%;overflow:auto;position:relative;background:#000}
+.game-loader{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999;transition:opacity .4s}
+.game-loader.hidden{opacity:0;pointer-events:none}
+.game-loader-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--app-accent);border-radius:50%;animation:gpSpin .8s linear infinite}
+.game-loader-name{font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,.8)}
+.game-loader-status{font-family:'Oxanium',sans-serif;font-size:11px;color:rgba(255,255,255,.4)}
+.game-loader-bar{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-top:4px}
+.game-loader-fill{height:100%;background:var(--app-accent);border-radius:2px;width:0%;transition:width .15s linear}
+@keyframes gpSpin{to{transform:rotate(360deg)}}
 /* Iframe container (registry games) */
 .game-player-frame{flex:1;border:none;width:100%;height:100%;display:block}
 ::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:3px}
 </style>
 </head>
 <body>
-<script>document.body.className='theme-'+(localStorage.getItem('serverplex_theme')||'black');</script>
 
 <div class="app">
   <div class="topbar">
@@ -177,6 +197,9 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
       <option value="az">A → Z</option>
       <option value="za">Z → A</option>
       <option value="recent">Recently Played</option>
+    </select>
+    <select id="sourceSelect" class="tb-select" onchange="setSource(this.value)" title="Filter by source">
+      <option value="all">All Sources</option>
     </select>
     <button class="tb-btn" id="favBtn" onclick="toggleFavFilter()">⭐ Favourites</button>
     <button class="tb-btn tb-refresh" onclick="loadGames()" title="Refresh">↻</button>
@@ -298,1749 +321,27 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--bg);colo
   </div>
   <!-- script-run container (manual games) -->
   <div class="game-player-container" id="gameContainer" style="display:none"></div>
+  <!-- loading overlay — sits after iframe so it renders on top -->
+  <div class="game-loader" id="gameLoader">
+    <div class="game-loader-spinner"></div>
+    <div class="game-loader-name" id="gameLoaderName">Loading…</div>
+    <div class="game-loader-bar"><div class="game-loader-fill" id="gameLoaderFill"></div></div>
+    <div class="game-loader-status" id="gameLoaderStatus">Fetching from CDN…</div>
+  </div>
   <!-- iframe (registry / external games) -->
   <iframe class="game-player-frame" id="gamePlayerFrame" style="display:none" allow="autoplay; fullscreen; gamepad"></iframe>
 </div>
 
 <div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
 
+<script src="games/games.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  MANUAL GAMES
 //  Add your own games here — they run as injected scripts (no iframe).
 //  Registry games from the JSON still load in an iframe as before.
 // ═══════════════════════════════════════════════════════════════
-const MANUAL_GAMES = [
-{
-  id: '1v1-lol',
-  name: '1v1.LOL',
-  icon: '🎯',
-  cover: 'https://worldsapps.com/img/apps/1508620125/icon-download-1v1-lol-battle-royale-game.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/1-9/1v1.html',
-  category: 'Action',
-  author: 'JustPlay.LOL',
-  description: 'A fast-paced third-person shooter with Fortnite-style building, featuring 1v1 duels, box fights, and competitive modes.',
-  featured: false,
-},
-
-{
-  id: '2048',
-  name: '2048',
-  icon: '🔢',
-  cover: 'https://logodix.com/logo/1649541.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/1-9/2048.html',
-  category: 'Puzzle',
-  author: 'Gabriele Cirulli',
-  description: 'A highly addictive sliding‑tile puzzle where you combine matching numbers to create larger values, planning each move carefully to avoid filling the board while pushing toward the 2048 tile.',
-  featured: false,
-},
-
-{
-  id: 'adventure-capitalist',
-  name: 'Adventure Capitalist',
-  icon: '💰',
-  cover: 'https://cdn2.steamgriddb.com/icon_thumb/29c5bc899fe290c1dcdab537dea8354d.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/A/AdventureCapitalist.html',
-  category: 'Strategy',
-  author: 'Hyper Hippo Games',
-  description: 'An idle business simulation game where you invest in increasingly profitable ventures, hire managers to automate production, and expand your empire across Earth, the Moon, and Mars while chasing exponential growth.',
-  featured: false,
-},
-
-{
-  id: 'among-us-fangame',
-  name: 'Among Us (Fan Game)',
-  icon: '🕵️‍♂️',
-  cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/73206bd9-257c-4f50-b1f3-59a306e24084/dfq2s3e-05782889-08c7-45d8-ab45-72232e9ec880.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzczMjA2YmQ5LTI1N2MtNGY1MC1iMWYzLTU5YTMwNmUyNDA4NFwvZGZxMnMzZS0wNTc4Mjg4OS0wOGM3LTQ1ZDgtYWI0NS03MjIzMmU5ZWM4ODAucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.tsJdAPG3U5txNM2O82P9Vyvv3ljM_UT4878py0ePH60',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/A/AmongUs.html',
-  category: 'Multiplayer',
-  author: 'Fan‑made / Unknown',
-  description: 'A browser‑based recreation of the classic social‑deduction gameplay, featuring tasks, sabotage, emergency meetings, and simple offline or local play without the official servers.',
-  featured: false,
-},
-
-{
-  id: 'backrooms-fan',
-  name: 'Backrooms 3D (FanGame)',
-  icon: '🚪',
-  cover: 'https://images.sftcdn.net/images/t_app-icon-l/p/8ec9a73e-204d-4402-af6b-3df5ce85b354/1627129876/backrooms-backrooms-icn.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/Backrooms.html',
-  category: 'Adventure',
-  author: 'Fan-Made / Unknown',
-  description: 'A fan-made exploration horror game set in the endless yellow halls of Level 0, focusing on eerie atmosphere, liminal spaces, and the unsettling search for an exit while avoiding mysterious entities.',
-  featured: false,
-},
-
-{
-  id: 'bacon-may-die',
-  name: 'Bacon May Die',
-  icon: '🥓',
-  cover: 'https://th.bing.com/th/id/OIP.CgwwOm35K21jOca_CzZs3AHaHa?w=163&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BaconMayDie.html',
-  category: 'Action',
-  author: 'SnoutUp Games',
-  description: 'A frantic beat-em-up where you play as a heavily armed pig battling waves of goofy enemies, unlocking weapons, outfits, and co‑op chaos while surviving increasingly intense combat.',
-  featured: false,
-},
-
-{
-  id: 'baldis-basics-fan',
-  name: "Baldi's Basics (Fan Game)",
-  icon: '📓',
-  cover: 'https://cdn2.steamgriddb.com/icon/d23a0a2880738ad75a04b1c9dc7d9b73/32/256x256.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BaldiBasics.html',
-  category: 'Adventure',
-  author: 'Fan-Made / Unknown',
-  description: 'A fan-made take on the Baldi’s Basics formula, featuring notebook collecting, maze-like school exploration, and custom twists on the original characters and mechanics while keeping the surreal edutainment-horror style.',
-  featured: false,
-},
-
-{
-  id: 'baseball-bros',
-  name: 'Baseball Bros',
-  icon: '⚾',
-  cover: 'https://baseballbrosgame.io/cache/data/image/game/baseball-bros-io-game-m208x208.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BaseballBros.html',
-  category: 'Sports',
-  author: 'Fan-Made / Unknown',
-  description: 'A fast-paced arcade baseball game focused on timing your swings, hitting for distance, collecting power-ups, and chaining perfect hits to rack up massive scores across increasingly challenging rounds.',
-  featured: false,
-},
-
-{
-  id: 'basket-random',
-  name: 'Basket Random',
-  icon: '🏀',
-  cover: 'https://play-lh.googleusercontent.com/gP8T5Z1O-ngxIloiwcBZzrzyLPYDp0R_1BDNKUDZboIRPVImeyWI8-7aExvB9gAGNKc',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketRandom.html',
-  category: 'Sports',
-  author: 'RHM Interactive',
-  description: 'A chaotic physics-based basketball game where each round changes the court, gravity, and player movement, creating unpredictable and hilarious matches as you try to score before your opponent.',
-  featured: false,
-},
-
-{
-  id: 'basketball-bros',
-  name: 'Basketball Bros',
-  icon: '🏀',
-  cover: 'https://www.basketball-bros.io/basketball-bros/logo.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketballBros.html',
-  category: 'Sports',
-  author: 'Fan-Made / Unknown',
-  description: 'A fast-paced 1v1 arcade basketball game focused on quick movement, flashy dunks, simple controls, and chaotic back-and-forth scoring. Players outmaneuver opponents, time jumps, and use aggressive blocks to win short, intense matches.',
-  featured: false,
-},
-
-{
-  id: 'basketball-stars',
-  name: 'Basketball Stars',
-  icon: '🏀',
-  cover: 'https://img.gamedistribution.com/69d78d071f704fa183d75b4114ae40ec-512x512.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketballStars.html',
-  category: 'Sports',
-  author: 'Madpuffers',
-  description: 'A fast-paced 1v1 and 2v2 basketball game featuring smooth animations, skill-based shooting, stealing, and blocking, with unlockable characters, outfits, and competitive tournament modes.',
-  featured: false,
-},
-
-{
-  id: 'bit-planes',
-  name: 'Bit Planes',
-  icon: '🛩️',
-  cover: 'https://th.bing.com/th/id/OIP.3uAc7AgCcWCTs2y_x2k0lgHaHa?w=166&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BitLife.html',
-  category: 'Arcade',
-  author: 'Fan-Made / Unknown',
-  description: 'A retro‑style arcade flying game where you pilot pixel aircraft through waves of enemies, dodge projectiles, collect power-ups, and survive increasingly intense levels with simple but fast-paced controls.',
-  featured: false,
-},
-
-{
-  id: 'bitlife',
-  name: 'BitLife',
-  icon: '📘',
-  cover: 'https://images.yourstory.com/cs/images/companies/a7dac95e969c-bitlife-1672665626585.png?fm=auto&ar=1:1&mode=fill&fill=solid&fill-color=fff',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BitLife.html',
-  category: 'Other',
-  author: 'Candywriter, LLC',
-  description: 'A life simulation game where every decision shapes your character’s journey from birth to death, letting you choose careers, relationships, education, and risky or wholesome paths to create unique life stories.',
-  featured: false,
-},
-
-{
-  id: 'bloxd-io',
-  name: 'Bloxd.io',
-  icon: '🧱',
-  cover: 'https://img-hws.y8.com/cloud/v2-y8-studio-banner/361/bloxd-1667995919-logo.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/Bloxd.html',
-  category: 'Multiplayer',
-  author: 'Bloxd.io',
-  description: 'A multiplayer block‑based game featuring parkour, sandbox building, creative modes, and competitive minigames inspired by Minecraft-style movement and mechanics.',
-  featured: false,
-},
-
-{
-  id: 'boxing-random',
-  name: 'Boxing Random',
-  icon: '🥊',
-  cover: 'https://games76ez.com/uploads/2025/8/boxing-random.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BoxingRandom.html',
-  category: 'Sports',
-  author: 'RHM Interactive',
-  description: 'A chaotic physics-based boxing game where each round changes fighter positions, platforms, and conditions, creating unpredictable and hilarious one-button matches.',
-  featured: false,
-},
-
-{
-  id: 'chess',
-  name: 'Chess',
-  icon: '♟️',
-  cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8a9db7bb-486f-4f74-ba59-513e78b175c4/dfy1l6k-3891a94b-1b8b-4d35-b0e5-c28da471c789.png/v1/fill/w_512,h_512/chess_com___icon_by_shamo45_dfy1l6k-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvOGE5ZGI3YmItNDg2Zi00Zjc0LWJhNTktNTEzZTc4YjE3NWM0XC9kZnkxbDZrLTM4OTFhOTRiLTFiOGItNGQzNS1iMGU1LWMyOGRhNDcxYzc4OS5wbmciLCJ3aWR0aCI6Ijw9NTEyIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.KJBGUzMYClczE0wyHEWIpcTb1D-4JXceZQJJzcH_ER8',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/chess.html',
-  category: 'Strategy',
-  author: 'Unknown',
-  description: 'A classic two‑player strategy game focused on tactical positioning, long-term planning, and outmaneuvering the opponent’s king through a combination of offense and defense.',
-  featured: false,
-},
-
-{
-  id: 'cookie-clicker',
-  name: 'Cookie Clicker',
-  icon: '🍪',
-  cover: 'https://play-lh.googleusercontent.com/Z1MOuuiD05ZN5LkVmMEvKF0mqAc-FknaQ2j8s4dZiO-LSPQX4EEA3RVJdlQEtxe96ok',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CookieClicker.html',
-  category: 'Strategy',
-  author: 'Orteil / DashNet',
-  description: 'An incremental idle game where you generate cookies by clicking and by purchasing buildings, upgrades, and synergies that exponentially increase your cookies per second.',
-  featured: false,
-},
-
-{
-  id: 'core-ball',
-  name: 'Core Ball',
-  icon: '🎯',
-  cover: 'https://mariogames.io/data/image/game/coreball.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CoreBall.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A timing-based arcade game where you launch numbered balls onto a rotating core without letting them collide, increasing in speed and difficulty across dozens of levels.',
-  featured: false,
-},
-
-{
-  id: 'crazy-cattle-3d',
-  name: 'Crazy Cattle 3D',
-  icon: '🐄',
-  cover: 'https://crazycattle3dgithub.io/data/image/crazy-cattle-3d-online.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CrazyCattle.html',
-  category: 'Action',
-  author: 'Unknown',
-  description: 'A chaotic physics-based action game where you control a wild cow rampaging through farms and towns, smashing obstacles, avoiding hazards, and maintaining momentum to cause maximum destruction.',
-  featured: false,
-},
-
-{
-  id: 'crossy-road',
-  name: 'Crossy Road',
-  icon: '🐔',
-  cover: 'https://cdn.jim-nielsen.com/ios/1024/crossy-road-2022-05-13.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/CrossyRoad.html',
-  category: 'Arcade',
-  author: 'Hipster Whale',
-  description: 'An endless arcade hopper where you dodge cars, trains, and hazards while crossing roads, rivers, and tracks, aiming to travel as far as possible and unlock dozens of quirky characters.',
-  featured: false,
-},
-
-{
-  id: 'deltarune',
-  name: 'Deltarune',
-  icon: '⭐',
-  cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8ef1af63-5387-4149-9fc7-91af014f7541/deurk9t-fa41a1c5-0302-48a0-9243-08f5a5ae564c.png/v1/fill/w_512,h_512/deltarune_dock_icon_by_usednoo25_by_usednoo25_deurk9t-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvOGVmMWFmNjMtNTM4Ny00MTQ5LTlmYzctOTFhZjAxNGY3NTQxXC9kZXVyazl0LWZhNDFhMWM1LTAzMDItNDhhMC05MjQzLTA4ZjVhNWFlNTY0Yy5wbmciLCJ3aWR0aCI6Ijw9NTEyIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.eF0TmiWOKHqzO5gQ2DRdwN1fX3kdw0uva-IDPwABz2U',
-  url: 'skip',
-  category: 'Adventure',
-  author: 'Toby Fox',
-  description: 'A story-driven adventure game where you and your classmates are pulled into a mysterious world, facing choices, puzzles, and turn-based encounters that shape the fate of its characters.',
-  featured: false,
-},
-
-{
-  id: 'drive-mad',
-  name: 'Drive Mad',
-  icon: '🚗',
-  cover: 'https://th.bing.com/th/id/OIP.odp26kFzqu9k2p8kmeAJGgHaHa?w=178&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/D/DriveMad.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A physics-based driving game where you navigate unstable vehicles across tricky obstacle courses, balancing speed and control to reach the finish without flipping.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-8-8-forge',
-  name: 'Eaglercraft 1.8.8 Forge',
-  icon: '🧩',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A community-made Forge-compatible variant of Eaglercraft 1.8.8 that allows select Minecraft Forge 1.8.8 mods to run directly in the browser using WebAssembly, enabling modded gameplay without a local Java installation.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-8-8-wasm',
-  name: 'Eaglercraft 1.8.8 WASM',
-  icon: '🌐',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A WebAssembly-compiled version of Eaglercraft 1.8.8 designed for faster performance, improved stability, and reduced input latency, allowing Minecraft 1.8.8 gameplay directly in the browser without Java.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-resent-client',
-  name: 'Eaglercraft Resent Client',
-  icon: '🔥',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A custom Eaglercraft client featuring enhanced UI, cosmetics, performance tweaks, and quality-of-life improvements designed to modernize the browser-based Minecraft 1.8.8 experience.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-12-2-wasm',
-  name: 'Eaglercraft 1.12.2 WASM',
-  icon: '🕸️',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A WebAssembly-based port of Eaglercraft running Minecraft 1.12.2 in the browser, offering improved performance, mod compatibility potential, and smoother gameplay compared to JavaScript builds.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-12-2',
-  name: 'Eaglercraft 1.12.2',
-  icon: '⛏️',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A browser-based port of Minecraft 1.12.2 built using JavaScript, enabling survival and creative gameplay directly in the browser without requiring Java installation.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-8-8-wasm',
-  name: 'Eaglercraft 1.8.8 WASM',
-  icon: '🌐',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A WebAssembly-based port of Eaglercraft 1.8.8 focused on higher performance, lower input latency, and improved stability compared to JavaScript builds, enabling smooth Minecraft 1.8.8 gameplay directly in the browser.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-8-8',
-  name: 'Eaglercraft 1.8.8',
-  icon: '🧱',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A browser-based recreation of Minecraft 1.8.8 that runs using JavaScript, allowing players to enjoy survival, creative, and multiplayer gameplay directly in the browser without Java.',
-  featured: false,
-},
-
-{
-  id: 'eaglercraft-1-5-2',
-  name: 'Eaglercraft 1.5.2',
-  icon: '📦',
-  cover: 'https://styles.redditmedia.com/t5_60aj9d/styles/communityIcon_serayq82g91a1.jpg?format=pjpg&s=3262e0b1499369a43c9123d5610d8fbfa462062c',
-  url: '',
-  category: 'Other',
-  author: 'Unknown',
-  description: 'A browser-based recreation of Minecraft 1.5.2 using JavaScript, offering classic survival and creative gameplay directly in the browser without requiring Java.',
-  featured: false,
-},
-
-{
-  id: 'epsteins-basics',
-  name: "Epstein's Basics",
-  icon: '📓',
-  cover: 'https://th.bing.com/th/id/OIP.CeK_3tEPDN3CsJPpFaenDgHaHa?w=195&h=195&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/E/EpsteinBasics.html',
-  category: 'Other',
-  author: 'Unknown',
-  description: "A fanmade parody remake of Baldi's Basics that replaces characters and themes with dark satirical elements, keeping the notebook-collecting gameplay and chaotic chase mechanics while reimagining the setting and cast.",
-  featured: false,
-},
-
-{
-  id: 'five-nights-at-epsteins',
-  name: "Five Nights At Epstein's",
-  icon: '🕹️',
-  cover: 'https://th.bing.com/th/id/OIP.GI4LJKOuMY2NA0XKl1s15wHaHa?w=157&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/F/FiveNightsAtEpstein.html',
-  category: 'Other',
-  author: 'Evan Productions',
-  description: 'A dark satirical fan-made survival game inspired by Five Nights at Freddy’s, where players monitor cameras, manage systems, and survive five nights against exaggerated, fictionalized antagonists.',
-  featured: false,
-},
-
-{
-  id: 'friday-night-funkin',
-  name: "Friday Night Funkin'",
-  icon: '🎤',
-  cover: 'https://gaamess.com/wp-content/uploads/2022/01/Friday.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/F/FridayNightFunkin.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: "A fanmade parody twist on Friday Night Funkin', featuring humorous remixes, altered characters, and intentionally offbeat charts while keeping the core rhythm‑battle gameplay intact.",
-  featured: false,
-},
-
-{
-  id: 'geometry-dash-lite',
-  name: 'Geometry Dash Lite',
-  icon: '📦',
-  cover: 'https://play-lh.googleusercontent.com/p7kWbWBFxQIrzolEqiV5uSvctLeyssZvBV7UBOX29wzZI52IdcSs4qCB_zsQJL1mt9A=s64',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/GeoDash/Lite.html',
-  category: 'Arcade',
-  author: 'RobTop Games',
-  description: 'A fast-paced rhythm-based platformer featuring a selection of classic Geometry Dash levels, challenging players to jump, fly, and flip through obstacle-filled stages synced to energetic music.',
-  featured: false,
-},
-
-{
-  id: 'geometry-dash-subzero',
-  name: 'Geometry Dash SubZero',
-  icon: '❄️',
-  cover: 'https://vignette.wikia.nocookie.net/geometry-dash/images/0/01/GeometryDashSubZero.png/revision/latest?cb=20181121033752',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/GeoDash/Subzero.html',
-  category: 'Arcade',
-  author: 'RobTop Games',
-  description: 'A fast-paced rhythm platformer featuring three exclusive icy-themed levels with intense visuals, tight timing, and music-driven gameplay designed to push players’ reflexes to the limit.',
-  featured: false,
-},
-
-{
-  id: 'geometry-dash-world',
-  name: 'Geometry Dash World',
-  icon: '🌍',
-  cover: 'https://grand-screen.com/wp-content/uploads/com.robtopx.geometrydashworld_icon.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/GeoDash/World.html',
-  category: 'Arcade',
-  author: 'RobTop Games',
-  description: 'A bite-sized Geometry Dash experience featuring short worlds, daily levels, quests, and new monsters, offering fast-paced rhythm platforming with a focus on quick progression.',
-  featured: false,
-},
-
-{
-  id: 'gorilla-tag',
-  name: 'Gorilla Tag',
-  icon: '🦍',
-  cover: 'https://th.bing.com/th/id/OIP.gVDHx01YS8hFyLYW73wCYgAAAA?w=144&h=182&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/G/GorillaTag.html',
-  category: 'Other',
-  author: 'Another Axiom',
-  description: 'A fast-paced VR movement game where players run, jump, and climb using only their arms, featuring tag-based game modes and physics-driven locomotion in social multiplayer environments.',
-  featured: false,
-},
-
-{
-  id: 'granny-1',
-  name: 'Granny',
-  icon: '👵',
-  cover: 'https://spielenmania.com/wp-content/uploads/thumbs/custom/G/granny-pc-spiel-thumbnail-spielenmania.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Granny/1.html',
-  category: 'Other',
-  author: 'DVloper',
-  description: 'A first-person horror escape game where you must survive five days inside Granny’s house by solving puzzles, avoiding traps, and staying quiet to keep from alerting Granny, who hears every sound.',
-  featured: false,
-},
-
-{
-  id: 'granny-2',
-  name: 'Granny Chapter Two',
-  icon: '🏚️',
-  cover: 'https://r2.fizzerz.com/game-source/granny-2/icon.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Granny/2.html',
-  category: 'Other',
-  author: 'DVloper',
-  description: 'A horror escape game where you must survive five days in a house patrolled by both Granny, who hears everything, and Grandpa, who has sharp vision. Solve puzzles, find items, and escape without being caught.',
-  featured: false,
-},
-
-{
-  id: 'granny-3',
-  name: 'Granny 3',
-  icon: '🔪',
-  cover: 'https://grand-screen.com/wp-content/uploads/com.DVloper.Granny3_icon.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Granny/3.html',
-  category: 'Other',
-  author: 'DVloper',
-  description: 'The third entry in the Granny horror series, featuring Granny, Grandpa, and Slendrina as you attempt to escape a larger house filled with traps, puzzles, and multiple escape routes.',
-  featured: false,
-},
-
-{
-  id: 'hole-io',
-  name: 'Hole.io',
-  icon: '🕳️',
-  cover: 'https://th.bing.com/th/id/OIP.AF8S_5xvpl_ZqqxXDOIJYgAAAA?w=143&h=146&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/H/Hole.io.html',
-  category: 'Arcade',
-  author: 'VOODOO',
-  description: 'A competitive arcade game where you control a growing black hole, swallowing objects, buildings, and opponents to become the largest hole on the map before time runs out.',
-  featured: false,
-},
-
-{
-  id: 'idle-breakout',
-  name: 'Idle Breakout',
-  icon: '🟦',
-  cover: 'https://th.bing.com/th/id/OIP.NXNnMYihpqJ3DUszIleJugAAAA?w=142&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/I/IdleBreakout.html',
-  category: 'Arcade',
-  author: 'Kodiqi',
-  description: 'An incremental twist on the classic brick‑breaker game where you buy and upgrade balls to automatically destroy bricks, earn cash, and progress through increasingly difficult levels.',
-  featured: false,
-},
-
-{
-  id: 'idle-miner-tycoon',
-  name: 'Idle Miner Tycoon',
-  icon: '⛏️',
-  cover: 'https://th.bing.com/th/id/OIP.lMlU5xlCphbRwf5IWMv2NgHaHa?w=162&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/I/IdleMinerTycoon.html',
-  category: 'Strategy',
-  author: 'Kolibri Games',
-  description: 'A management and incremental game where you automate mines, hire managers, upgrade shafts, and expand your mining empire to maximize profits over time.',
-  featured: false,
-},
-
-{
-  id: 'jelly-truck',
-  name: 'Jelly Truck',
-  icon: '🚚',
-  cover: 'https://th.bing.com/th/id/OIP.Q_H90sWnp2iw5oaX8b1aYQHaHa?w=182&h=181&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/J/JellyTruck.html',
-  category: 'Arcade',
-  author: 'GameTornado',
-  description: 'A physics-based driving game where you control a soft, jelly-like truck and navigate wobbly terrain, flipping, bouncing, and squeezing through obstacles to reach the finish.',
-  featured: false,
-},
-
-{
-  id: 'just-fall-lol',
-  name: 'Just Fall .lol',
-  icon: '🐧',
-  cover: 'https://th.bing.com/th/id/OIP.pGun1ac8cl8pQ8jve7OHhgAAAA?w=154&h=159&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/J/JustFall.html',
-  category: 'Multiplayer',
-  author: 'JustPlay.LOL',
-  description: 'A multiplayer platformer where penguins compete in obstacle-filled arenas, jumping, sliding, and surviving elimination rounds to be the last one standing.',
-  featured: false,
-},
-
-{
-  id: 'lucky-block-obby',
-  name: 'Lucky Block Obby',
-  icon: '🎲',
-  cover: 'https://th.bing.com/th/id/OIP.T5oVySkjHN0DDLPg4row2QHaHa?w=184&h=184&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/L/LuckyBlockObby.html',
-  category: 'Adventure',
-  author: 'Unknown',
-  description: 'An obstacle-course game themed around Lucky Blocks, where each block can help or sabotage you with random effects as you race to reach the end.',
-  featured: false,
-},
-
-{
-  id: 'monkey-mart',
-  name: 'Monkey Mart',
-  icon: '🐒',
-  cover: 'https://th.bing.com/th/id/OIP.PBnuZm9t0XMjAY693_8BewAAAA?w=100&h=100&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/M/MonkeyMart.html',
-  category: 'Arcade',
-  author: 'TinyDobbins',
-  description: 'A lighthearted management game where you run a supermarket as a monkey, harvesting crops, stocking shelves, serving customers, and expanding your store with new departments and upgrades.',
-  featured: false,
-},
-
-{
-  id: 'moto-x3m',
-  name: 'Moto X3M',
-  icon: '🏍️',
-  cover: 'https://vodogame.com/games/moto-x3m-3/thumb_1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/MotoX3M/1.html',
-  category: 'Arcade',
-  author: 'Madpuffers',
-  description: 'A fast-paced motorcycle stunt game featuring physics-based movement, explosive obstacles, and time‑trial challenges across increasingly difficult levels.',
-  featured: false,
-},
-
-{
-  id: 'moto-x3m-2',
-  name: 'Moto X3M 2',
-  icon: '🏍️',
-  cover: 'https://vodogame.com/games/moto-x3m-3/thumb_1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/MotoX3M/2.html',
-  category: 'Arcade',
-  author: 'Madpuffers',
-  description: 'The second entry in the Moto X3M series, featuring new stunt tracks, tougher obstacles, and faster-paced time‑trial challenges built on the same physics‑based motorcycle gameplay.',
-  featured: false,
-},
-
-{
-  id: 'moto-x3m-3',
-  name: 'Moto X3M 3',
-  icon: '🏍️',
-  cover: 'https://vodogame.com/games/moto-x3m-3/thumb_1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/MotoX3M/3.html',
-  category: 'Arcade',
-  author: 'Madpuffers',
-  description: 'The third Moto X3M game, featuring faster-paced stunt tracks, new hazards, and more complex physics-based challenges as you race for the best time.',
-  featured: false,
-},
-
-{
-  id: 'moto-x3m-pool-party',
-  name: 'Moto X3M: Pool Party',
-  icon: '🏖️',
-  cover: 'https://vodogame.com/games/moto-x3m-3/thumb_1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/MotoX3M/Party.html',
-  category: 'Arcade',
-  author: 'Madpuffers',
-  description: 'A summer-themed Moto X3M entry featuring bright beach environments, water slides, inflatables, and tricky stunt tracks that test your timing and precision.',
-  featured: false,
-},
-
-{
-  id: 'moto-x3m-spooky-land',
-  name: 'Moto X3M: Spooky Land',
-  icon: '🎃',
-  cover: 'https://vodogame.com/games/moto-x3m-3/thumb_1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/MotoX3M/Spooky.html',
-  category: 'Arcade',
-  author: 'Madpuffers',
-  description: 'A Halloween-themed Moto X3M entry featuring haunted tracks, spooky decorations, traps, and challenging stunt sections set in a dark, eerie atmosphere.',
-  featured: false,
-},
-
-{
-  id: 'moto-x3m-winter',
-  name: 'Moto X3M: Winter',
-  icon: '❄️',
-  cover: 'https://vodogame.com/games/moto-x3m-3/thumb_1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/MotoX3M/Winter.html',
-  category: 'Arcade',
-  author: 'Madpuffers',
-  description: 'A winter-themed Moto X3M entry featuring snowy stunt tracks, icy obstacles, slippery physics, and festive level designs that challenge your timing and control.',
-  featured: false,
-},
-
-{
-  id: 'n-gon',
-  name: 'N-Gon',
-  icon: '🔷',
-  cover: 'https://th.bing.com/th/id/OIP.OPNNVlnVYy9P27pro526mAAAAA?w=173&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/N/NGon.html',
-  category: 'Arcade',
-  author: 'Landfall',
-  description: 'A minimalist arena survival shooter where you control a tiny geometric ship and dodge, weave, and blast through escalating waves of shapes. Each enemy type has distinct movement patterns, forcing precise movement and quick reactions as the screen fills with chaos.',
-  featured: false,
-},
-
-{
-  id: 'operius',
-  name: 'Operius',
-  icon: '🚀',
-  cover: 'https://th.bing.com/th/id/OIP.CLXwTUqHscDB50sIXmJohQAAAA?w=180&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'skip',
-  category: 'Arcade',
-  author: 'Opera GX',
-  description: 'A fast, neon‑styled arcade shooter built directly into Opera GX. You pilot a small ship through tight corridors, blasting obstacles and weaving through hazards as the speed ramps up. Simple controls, clean visuals, and a pure reflex‑driven gameplay loop make it a compact but addictive high‑score chaser.',
-  featured: false,
-},
-
-{
-  id: 'origon-trail',
-  name: 'Origon Trail',
-  icon: '🛤️',
-  cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/47264ce6-f9be-440a-8fe5-de7b40f003e7/dfo1ymj-0f534155-ae7f-40b7-9474-254ee509f0b3.png/v1/fill/w_719,h_719,strp/oregon_trail__2022____icon_by_glassjester128_dfo1ymj-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NzE5IiwicGF0aCI6IlwvZlwvNDcyNjRjZTYtZjliZS00NDBhLThmZTUtZGU3YjQwZjAwM2U3XC9kZm8xeW1qLTBmNTM0MTU1LWFlN2YtNDBiNy05NDc0LTI1NGVlNTA5ZjBiMy5wbmciLCJ3aWR0aCI6Ijw9NzE5In1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.sUN9pRRsBWgE6pJc9CbO5F-GGQltlyzlg-pRsEI7SC4',
-  url: 'skip',
-  category: 'Adventure',
-  author: 'Unknown',
-  description: 'A retro‑styled parody of classic frontier survival games, sending players on a humorous but challenging journey across a pixelated wilderness. Manage supplies, avoid hazards, and make choices that determine whether your party reaches the end of the trail.',
-  featured: false,
-},
-
-{
-  id: 'ovo',
-  name: 'OvO',
-  icon: '⚪',
-  cover: 'https://play-lh.googleusercontent.com/v7KwGdPjJGjJjRXn46sck4DwDBdKSeRzGN44CjiXUtKV0jjOi51Bt4wcXud0m-SkXg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/OVO/1.html',
-  category: 'Arcade',
-  author: 'Dedra Games',
-  description: 'A fast, momentum‑based precision platformer built around sliding, wall‑jumping, and chaining movement to clear compact obstacle courses. Levels are short but technical, rewarding mastery of timing, speed, and clean execution.',
-  featured: false,
-},
-
-{
-  id: 'ovo-2',
-  name: 'OvO 2',
-  icon: '⚫',
-  cover: 'https://minigamesville.com/wp-content/uploads/2025/08/OvO_Dimensions.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/OVO/2.html',
-  category: 'Arcade',
-  author: 'Dedra Games',
-  description: 'A faster, harder evolution of the original OvO, expanding the momentum‑based platforming with trickier wall‑jumps, tighter timing windows, and more complex movement chains. Levels demand precision and mastery as you slide, launch, and parkour through increasingly technical obstacle layouts.',
-  featured: false,
-},
-
-{
-  id: 'ovo-3',
-  name: 'OvO 3',
-  icon: '⚪',
-  cover: 'https://minigamesville.com/wp-content/uploads/2025/08/OvO_Dimensions.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/OVO/3.html',
-  category: 'Arcade',
-  author: 'Dedra Games',
-  description: 'A major expansion of the OvO movement formula, introducing larger levels, new mechanics, and more technical momentum routes. Precision slides, boosted launches, and advanced wall‑tech become essential as stages grow more complex and speed‑focused.',
-  featured: false,
-},
-
-{
-  id: 'paper-io',
-  name: 'Paper.io',
-  icon: '📐',
-  cover: 'https://th.bing.com/th/id/OIP.lFzDDF94ju5OMSoo8Ebx4gAAAA?w=133&h=150&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Paper.io/regular.html',
-  category: 'Arcade',
-  author: 'VOODOO',
-  description: 'A territory‑capture arcade game where you expand your colored zone by drawing lines and enclosing shapes. Leave your trail exposed for too long and opponents can cut you off, making every expansion a risk‑reward decision in a constantly shifting arena.',
-  featured: false,
-},
-
-{
-  id: 'paper-io-3d',
-  name: 'Paper.io 3D',
-  icon: '🧊',
-  cover: 'https://th.bing.com/th/id/OIP.pfpI7W6cr9veKPwKZmbVTQHaHa?w=180&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Paper.io/3D.html',
-  category: 'Arcade',
-  author: 'VOODOO',
-  description: 'A 3D evolution of the classic territory‑capture formula, shifting the action onto rotating shapes and curved surfaces. You expand your zone by looping paths around the object while avoiding opponents who can cut your trail at any moment.',
-  featured: false,
-},
-
-{
-  id: 'paper-io-mania',
-  name: 'Paper.io Mania',
-  icon: '🌀',
-  cover: 'https://th.bing.com/th/id/OIP.-rFtkXPKyoz0gK9Eby0VSwHaHa?w=184&h=184&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Paper.io/Mania.html',
-  category: 'Arcade',
-  author: 'VOODOO',
-  description: 'A faster, more chaotic twist on the classic Paper.io formula, featuring tighter arenas, quicker movement, and aggressive opponents. You expand territory by drawing loops while defending your trail, turning every second into a high‑pressure risk‑reward decision.',
-  featured: false,
-},
-
-{
-  id: 'polytrack',
-  name: 'PolyTrack',
-  icon: '🏎️',
-  cover: 'https://th.bing.com/th/id/OIP.GUY6pC4EBCFwbVmkT5jeaAHaHa?w=164&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/P/PolyTrack.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A colorful low‑poly physics racer where you guide a tiny car across floating obstacle courses filled with jumps, loops, tight turns, and moving platforms. Precision control and quick resets make it a fast, replay‑heavy challenge built around mastering each track.',
-  featured: false,
-},
-
-{
-  id: 'prismarine-client',
-  name: 'Prismarine Client',
-  icon: '💎',
-  cover: 'https://th.bing.com/th/id/OIP.1BNfULtDpw3jMkTHpd2bTAAAAA?w=177&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: '',
-  category: 'Other',
-  author: 'Prismarine',
-  description: 'A lightweight browser-based Minecraft client recreation built for experimenting with rendering, movement, and block interaction. It captures the feel of classic Minecraft while running entirely in the browser, making it a fun tech demo and sandbox to explore.',
-  featured: false,
-},
-
-{
-  id: 'quantum-clicker',
-  name: 'Quantum Clicker',
-  icon: '⚛️',
-  cover: 'https://th.bing.com/th/id/OIP.CeK_3tEPDN3CsJPpFaenDgHaHa?w=195&h=195&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/Q/QuantumClicker.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A fast‑scaling incremental clicker built around quantum‑themed upgrades, exponential growth, and layered automation systems. You generate energy, unlock research paths, and push deeper into increasingly powerful progression loops.',
-  featured: false,
-},
-
-{
-  id: 'ragdoll-archers',
-  name: 'Ragdoll Archers',
-  icon: '🏹',
-  cover: 'https://geodashlite.io/data/image/game/ragdoll-archers.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RagdollArchers.html',
-  category: 'Action',
-  author: 'RHM Interactive',
-  description: 'A physics‑driven archery dueling game where floppy ragdoll characters fire arrows, tumble, and react dynamically to hits. Precision aim, timing, and power control are key as you battle waves of enemies or face off in chaotic one‑on‑one fights.',
-  featured: false,
-},
-
-{
-  id: 'ragdoll-soccer',
-  name: 'Ragdoll Soccer',
-  icon: '⚽',
-  cover: 'https://th.bing.com/th/id/OIP.98920O7j5jACX-A9TmegHQHaHa?w=161&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RagdollSoccer.html',
-  category: 'Sports',
-  author: 'Unknown',
-  description: 'A chaotic physics-based soccer game where floppy ragdoll players kick, tumble, collide, and bounce across the field. Matches are unpredictable and hilarious as momentum, timing, and wild physics determine every goal.',
-  featured: false,
-},
-
-{
-  id: 'redball-1',
-  name: 'Red Ball 1',
-  icon: '🔴',
-  cover: 'https://is2-ssl.mzstatic.com/image/thumb/Purple122/v4/9e/0d/7f/9e0d7fc2-613d-26cb-aff0-558f93769dc4/AppIcon-0-0-1x_U007emarketing-0-0-0-7-0-0-sRGB-0-0-0-GLES2_U002c0-512MB-85-220-0-0.png/512x512bb.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Redball/1.html',
-  category: 'Arcade',
-  author: 'Eugene Fedoseev',
-  description: 'A classic physics-based platformer where you roll, jump, and navigate a small red ball through obstacle-filled levels. Timing, momentum, and simple puzzle elements shape each stage as you guide the ball to the goal flag.',
-  featured: false,
-},
-
-{
-  id: 'redball-2',
-  name: 'Red Ball 2',
-  icon: '🟠',
-  cover: 'https://big8games.com/wp-content/uploads/2021/06/Red-ball-2.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Redball/2.html',
-  category: 'Arcade',
-  author: 'Eugene Fedoseev',
-  description: 'The sequel expands the classic Red Ball platforming with larger levels, new obstacles, and a light storyline about recovering the king’s crown. Roll, jump, and solve simple physics puzzles while avoiding enemies and hazards.',
-  featured: false,
-},
-
-{
-  id: 'redball-3',
-  name: 'Red Ball 3',
-  icon: '🔴',
-  cover: 'https://yepicdn.com/system/static/thumbs/tile_thumb/738/thumb150_red-ball-3.jpg?1492005833',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Redball/3.html',
-  category: 'Arcade',
-  author: 'Eugene Fedoseev',
-  description: 'A story‑driven continuation of the Red Ball series where you chase down the villains who kidnapped your girlfriend. Levels introduce moving platforms, enemies, traps, and more complex physics challenges as you roll, jump, and solve light puzzles.',
-  featured: false,
-},
-
-{
-  id: 'redball-4-vol-1',
-  name: 'Red Ball 4 (Vol. 1)',
-  icon: '🔴',
-  cover: 'https://buzzmavo.com/wp-content/uploads/thumbs/custom/0-9/512-5.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Redball/4.1.html',
-  category: 'Arcade',
-  author: 'FDG Entertainment',
-  description: 'The first volume of Red Ball 4 introduces a new threat: evil squares trying to turn the world into a cube. Roll, jump, and defeat enemies across polished forest levels featuring improved physics, animations, and environmental hazards.',
-  featured: false,
-},
-
-{
-  id: 'redball-4-vol-2',
-  name: 'Red Ball 4 (Vol. 2)',
-  icon: '🔴',
-  cover: 'https://buzzmavo.com/wp-content/uploads/thumbs/custom/0-9/512-5.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Redball/4.2.html',
-  category: 'Arcade',
-  author: 'FDG Entertainment',
-  description: 'The second volume continues the fight against the evil squares, introducing factory-themed levels with conveyor belts, crushers, lasers, and more precise physics challenges. Movement timing becomes more demanding as hazards increase.',
-  featured: false,
-},
-
-{
-  id: 'redball-4-vol-3',
-  name: 'Red Ball 4 (Vol. 3)',
-  icon: '🔴',
-  cover: 'https://buzzmavo.com/wp-content/uploads/thumbs/custom/0-9/512-5.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Redball/4.3.html',
-  category: 'Arcade',
-  author: 'FDG Entertainment',
-  description: 'The third volume takes the adventure into deep industrial zones filled with lasers, crushers, moving machinery, and tougher square enemies. Precision movement and timing become essential as hazards grow more complex.',
-  featured: false,
-},
-
-{
-  id: 'retro-bowl',
-  name: 'Retro Bowl',
-  icon: '🏈',
-  cover: 'https://cdn-1.webcatalog.io/catalog/poki-retro-bowl/poki-retro-bowl-icon-filled-256.png?v=1674454238752',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RBowl.html',
-  category: 'Arcade',
-  author: 'New Star Games',
-  description: 'A fan‑favorite 8‑bit style American football game focused on team management, drafting, coaching decisions, and quick arcade gameplay. Balance strategy and skill as you build a roster and lead your team to the Retro Bowl championship.',
-  featured: false,
-},
-
-{
-  id: 'retro-bowl-college',
-  name: 'Retro Bowl College',
-  icon: '🏈',
-  cover: 'https://th.bing.com/th/id/OIP.wXfME16LLjR4ISgqQ1M2ZAAAAA?w=115&h=128&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RBowlCollege.html',
-  category: 'Arcade',
-  author: 'New Star Games',
-  description: 'A college‑themed spin on Retro Bowl featuring campus recruiting, player development, and fast arcade football gameplay. Build your program, manage your roster, and compete for the national championship.',
-  featured: false,
-},
-
-{
-  id: 'rocket-goal',
-  name: 'Rocket Goal',
-  icon: '🚗',
-  cover: 'https://play-lh.googleusercontent.com/xYmXleDWgPjObguVDhC-hpcC8a5yP7399awTpyPdsxIzgV52VQEAndSZ9M4WhOXQQcBs248yuB_IMUKrWz061w',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RocketGoal.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A fast-paced physics soccer game where rocket-powered cars boost, flip, and slam into the ball to score goals. Simple controls and chaotic movement make every match unpredictable and fun.',
-  featured: true,
-},
-
-{
-  id: 'rocket-league-scratch-fanmade',
-  name: 'Rocket League (Scratch Fanmade)',
-  icon: '🚗',
-  cover: 'https://img.icons8.com/fluent/1200/rocket-league.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RocketLeague.html',
-  category: 'Arcade',
-  author: 'Fan-Made / Unknown',
-  description: 'A Scratch-built recreation of Rocket League featuring simplified physics, boost mechanics, and car-based soccer gameplay. Designed as a browser-friendly fan project that captures the core idea in a lightweight form.',
-  featured: false,
-},
-
-{
-  id: 'rolling-sky',
-  name: 'Rolling Sky',
-  icon: '🟢',
-  cover: 'https://images-na.ssl-images-amazon.com/images/I/61uZyMAv%2BHL.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RollingSky.html',
-  category: 'Arcade',
-  author: 'Cheetah Mobile',
-  description: 'A fast-paced reaction and rhythm game where you guide a rolling ball through obstacle-filled tracks. Each level features unique music, patterns, and hazards that demand quick reflexes and precise movement.',
-  featured: false,
-},
-
-{
-  id: 'rooftop-snipers',
-  name: 'Rooftop Snipers',
-  icon: '🔫',
-  cover: 'https://images.sftcdn.net/images/t_app-icon-m/p/131a66c0-92d4-40b2-b76c-3f8c693b295c/2345816855/rooftop-snipers-unblocked-game-logo',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RooftopSnipers.html',
-  category: 'Arcade',
-  author: 'New Eich Games',
-  description: 'A chaotic two-button dueling game where recoil-heavy weapons launch players backward as they try to knock each other off a rooftop. Fast rounds, simple controls, and unpredictable physics make every match hilarious.',
-  featured: false,
-},
-
-{
-  id: 'rooftop-snipers-2',
-  name: 'Rooftop Snipers 2',
-  icon: '🔫',
-  cover: 'https://images.sftcdn.net/images/t_app-icon-m/p/131a66c0-92d4-40b2-b76c-3f8c693b295c/2345816855/rooftop-snipers-unblocked-game-logo',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/R/RooftopSnipers2.html',
-  category: 'Arcade',
-  author: 'New Eich Games',
-  description: 'A sequel that expands the original’s chaotic two-button duels with new maps, weapons, character skins, and smoother physics. Players jump, shoot, and use recoil to knock opponents off platforms in fast-paced, unpredictable matches.',
-  featured: false,
-},
-
-{
-  id: 'run-1',
-  name: 'Run',
-  icon: '👾',
-  cover: 'https://www.noflashgame.com/wp-content/uploads/2021/12/run-1.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Run/1.html',
-  category: 'Arcade',
-  author: 'Player 03',
-  description: 'A classic endless runner set inside a twisting 3D tunnel where you run, jump, and rotate the world to avoid falling into space. Levels get progressively harder as gaps widen and speed increases.',
-  featured: false,
-},
-
-{
-  id: 'run-2',
-  name: 'Run 2',
-  icon: '👾',
-  cover: 'https://kevin.games/assets/images/games/run-2.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Run/2.html',
-  category: 'Arcade',
-  author: 'Player 03',
-  description: 'A sequel that adds new characters, alternate paths, and more complex 3D tunnel platforming. Each character has unique physics, letting you choose between speed or control as you navigate twisting levels and avoid falling into space.',
-  featured: false,
-},
-
-{
-  id: 'slither-io',
-  name: 'Slither.io',
-  icon: '🐍',
-  cover: 'https://th.bing.com/th/id/OIP.JR85ApfpXV4JGxQnycmHNgHaHa?w=179&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/S/Slither.html',
-  category: 'Arcade',
-  author: 'Steve Howse',
-  description: 'A massively popular .io game where you control a glowing snake, eat pellets to grow, and outmaneuver other players to make them crash. Simple controls, smooth movement, and competitive multiplayer make it highly addictive.',
-  featured: false,
-},
-
-{
-  id: 'slope-1',
-  name: 'Slope',
-  icon: '🟩',
-  cover: 'https://th.bing.com/th/id/OIP.r0PQCNQKzM9u6mN-j73sZQHaF5?w=191&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Slope/1.html',
-  category: 'Arcade',
-  author: 'Y8 / RobKay',
-  description: 'A fast, reflex‑based downhill runner where you guide a ball through a neon 3D course. The speed increases constantly as obstacles, gaps, and sharp turns demand precise movement and quick reactions.',
-  featured: false,
-},
-
-{
-  id: 'slope-2',
-  name: 'Slope 2',
-  icon: '🟩',
-  cover: 'https://th.bing.com/th/id/OIP.yJ31evfzJSioHzllLrb-JQAAAA?w=154&h=169&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Slope/2.html',
-  category: 'Arcade',
-  author: 'Y8 / RobKay',
-  description: 'A sequel that builds on the original’s fast downhill gameplay with sharper turns, harder obstacles, and more unpredictable course layouts. Speed ramps up quickly, demanding precise control and quick reactions.',
-  featured: false,
-},
-
-{
-  id: 'slope-3',
-  name: 'Slope 3',
-  icon: '🟩',
-  cover: 'https://th.bing.com/th/id/OIP.FHTE4dNZg6uWAvp9tLMVYgAAAA?w=169&h=169&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Slope/3.html',
-  category: 'Arcade',
-  author: 'Y8 / RobKay',
-  description: 'The third entry in the Slope series, featuring faster speeds, tighter turns, and more unpredictable obstacle layouts. The difficulty ramps up quickly, demanding sharp reflexes and precise control to survive the neon downhill chaos.',
-  featured: false,
-},
-
-{
-  id: 'snow-rider-3d',
-  name: 'Snow Rider 3D',
-  icon: '🛷',
-  cover: 'https://snow-rider3dgame.github.io/data/image/game/snow-rider-game.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/S/SnowRider.html',
-  category: 'Arcade',
-  author: 'Faramel Games',
-  description: 'A fast-paced downhill sledding game where you steer through snowy mountains, dodge obstacles, collect gifts, and try to survive as long as possible. Smooth controls and endless slopes make it a high-score chase favorite.',
-  featured: false,
-},
-
-{
-  id: 'snowball-io',
-  name: 'Snowball.io',
-  icon: '❄️',
-  cover: 'https://th.bing.com/th/id/OIP.IeYTLE9dQ-yP9CaS5uTD2QAAAA?w=142&h=150&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/S/Snowball.html',
-  category: 'Arcade',
-  author: 'Geisha Tokyo',
-  description: 'A competitive arena game where you roll giant snowballs to knock opponents off the platform. Movement, timing, and positioning decide who survives as the arena shrinks and chaos increases.',
-  featured: false,
-},
-
-{
-  id: 'soccer-random',
-  name: 'Soccer Random',
-  icon: '⚽',
-  cover: 'https://th.bing.com/th/id/OIP.2BAbi8rOVtnz2ugldhhlnAHaHu?w=156&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/S/SoccerRandom.html',
-  category: 'Sports',
-  author: 'RHM Interactive',
-  description: 'A chaotic physics-based soccer game where each round changes the field, players, weather, and gravity. One-button controls make every match unpredictable, hilarious, and perfect for quick 2‑player fun.',
-  featured: false,
-},
-
-{
-  id: 'space-waves',
-  name: 'Space Waves',
-  icon: '🌌',
-  cover: 'https://th.bing.com/th/id/OIP.oRL1Hv9QWUmLPCeL1hGAxgAAAA?w=158&h=169&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/S/SpaceWaves.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A fast‑paced reaction and rhythm‑style game where you guide a ship through neon space tunnels, dodging obstacles and following wave‑like patterns. Precision timing and smooth movement are key to surviving each track.',
-  featured: false,
-},
-
-{
-  id: 'steal-a-brainrot',
-  name: 'Steal A Brainrot',
-  icon: '🧠',
-  cover: 'https://th.bing.com/th/id/OIP._73hAk3mGhmtQgWdKVxlUgHaHa?w=175&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/S/StealABrainrot.html',
-  category: 'Arcade',
-  author: 'Unknown',
-  description: 'A chaotic meme‑style reaction game where you dodge obstacles, grab power‑ups, and race to steal the “brainrot” before opponents do. Fast movement, unpredictable hazards, and humor-driven visuals define the experience.',
-  featured: false,
-},
-
-{
-  id: 'subway-surfers-berlin',
-  name: 'Subway Surfers: Berlin',
-  icon: '🖌️',
-  cover: 'https://kankygames.com/assets/gamepic/gamemonetize-12881.jpg',
-  url: '',
-  category: 'Arcade',
-  author: 'SYBO Games',
-  description: 'A World Tour edition set in Germany’s vibrant capital, featuring neon-lit streets, graffiti art, techno-inspired visuals, and iconic Berlin landmarks. Players run through colorful tracks while collecting tokens and unlocking Berlin-exclusive characters and boards.',
-  featured: false,
-},
-
-{
-  id: 'terraria',
-  name: 'Terraria',
-  icon: '⛏️',
-  cover: 'https://th.bing.com/th/id/OIP.mHZL_Jrro3BO6DCCXQasIAAAAA?w=158&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/T/Terraria.html',
-  category: 'Adventure',
-  author: 'Re-Logic',
-  description: 'A 2D sandbox adventure game focused on exploration, building, crafting, and combat. Players dig, fight, and build their way through procedurally generated worlds filled with biomes, bosses, and countless items.',
-  featured: false,
-},
-
-{
-  id: 'tiny-fishing',
-  name: 'Tiny Fishing',
-  icon: '🎣',
-  cover: 'https://th.bing.com/th/id/OIP.WT3fKtopo7gU5ocBGk9ZbQHaHa?w=150&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/T/TinyFishing.html',
-  category: 'Arcade',
-  author: 'Mad Buffer',
-  description: 'A simple, addictive fishing game where you drop your line, catch fish to earn coins, and upgrade your depth, hook count, and earnings. Progressively deeper waters unlock rarer fish and bigger payouts.',
-  featured: false,
-},
-
-
-{
-  id: 'tomb-of-the-mask',
-  name: 'Tomb of the Mask',
-  icon: '🏺',
-  cover: 'https://th.bing.com/th/id/OIP.MNx6jGk4NWmIQWN8Zouk5QAAAA?w=157&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/T/TombOfTheMask.html',
-  category: 'Arcade',
-  author: 'Playgendary',
-  description: 'A fast-paced vertical maze runner where you dash through trap-filled tombs using swipe movement. Each level mixes retro pixel art with deadly spikes, enemies, and procedurally generated layouts for quick, skill-based runs.',
-  featured: false,
-},
-
-{
-  id: 'tung-tung-tung-sahur-obby',
-  name: 'Tung Tung Tung Sahur Obby',
-  icon: '🌙',
-  cover: 'https://th.bing.com/th/id/OIP.Hy10xtQZmwjaiAaNzUW8cwAAAA?w=136&h=150&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/T/TungTungTungSahurObby.html',
-  category: 'Adventure',
-  author: 'Unknown',
-  description: 'A Ramadan‑themed obby inspired by the “tung tung tung sahur” meme, where players race through humorous nighttime obstacle courses while avoiding traps and reaching the sahur checkpoint before time runs out.',
-  featured: false,
-},
-
-{
-  id: 'ultrakill',
-  name: 'ULTRAKILL (Demo)',
-  icon: '💥',
-  cover: 'https://cdn2.steamgriddb.com/icon/91ca305decc7727a939aa6f77529fbbc/32/256x256.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/U/Ultrakill.html',
-  category: 'Action',
-  author: 'Arsi “Hakita” Patala',
-  description: 'A hyper‑fast, retro‑styled FPS where you play as a blood‑powered machine tearing through the layers of Hell. Movement tech, weapon swapping, and stylish combos define the combat as you fight demons, machines, and bosses in a brutal, skill‑based campaign.',
-  featured: false,
-},
-
-{
-  id: 'vex-1',
-  name: 'Vex 1',
-  icon: '🗡️',
-  cover: 'https://assets.funnygames.org/2/19352/72762/1024x1024/vex.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/1.html',
-  category: 'Platformer',
-  author: 'Amazing Adam',
-  description: 'The first entry in the Vex series, introducing fast-paced stickman platforming with deadly traps, wall jumps, sliding, and precision movement. Players navigate challenging levels filled with spikes, saws, and timing-based obstacles.',
-  featured: false,
-},
-
-{
-  id: 'vex-2',
-  name: 'Vex 2',
-  icon: '🗡️',
-  cover: 'https://static4.ufreegames.io/covers/adventure/vex2.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/2.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'The sequel expands on the original with tougher levels, new traps, and smoother movement. Players navigate increasingly complex obstacle courses requiring precision timing and fast reactions.',
-  featured: false,
-},
-
-{
-  id: 'vex-3',
-  name: 'Vex 3',
-  icon: '🗡️',
-  cover: 'https://img.gamedistribution.com/762c932b4db74c6da0c1d101b2da8be6-512x512.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/3.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'A major step up in difficulty featuring new stage types, hidden stars, and challenge modes. Movement is faster and levels introduce more advanced mechanics and deadly traps.',
-  featured: false,
-},
-
-{
-  id: 'vex-4',
-  name: 'Vex 4',
-  icon: '🗡️',
-  cover: 'https://new66ez.github.io/img/vex4/vex4.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/4.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'Adds checkpoints, new hazards, and more polished level design. Players tackle increasingly dangerous acts with moving platforms, lasers, and precision-based challenges.',
-  featured: false,
-},
-
-{
-  id: 'vex-5',
-  name: 'Vex 5',
-  icon: '🗡️',
-  cover: 'https://cdn.now.gg/apps-content/com.nowgg.h5.pub483.app51034/icon/vex-5.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/5.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'Introduces new mechanics like zip lines, timed doors, and advanced traps. The game emphasizes speedrunning, mastery, and replayability with tougher acts and bonus stages.',
-  featured: false,
-},
-
-{
-  id: 'vex-6',
-  name: 'Vex 6',
-  icon: '🗡️',
-  cover: 'https://kevin.games/assets/images/new/vex-6.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/6.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'A polished entry with smoother animations, new enemies, and more dynamic hazards. Includes daily challenges, skins, and expanded level variety for long-term replay value.',
-  featured: false,
-},
-
-{
-  id: 'vex-7',
-  name: 'Vex 7',
-  icon: '🗡️',
-  cover: 'https://www.plonga.com/storage/games/WsD4TcjRJRoxYo4276cBaObeBICIRsR9JgGnPHA5.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/7.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'Adds combat elements, stealth sections, and more cinematic traps. Levels are larger and more complex, blending classic Vex platforming with new action-focused mechanics.',
-  featured: false,
-},
-
-{
-  id: 'vex-8',
-  name: 'Vex 8',
-  icon: '🗡️',
-  cover: 'https://imgs2.dab3games.com/vex-8-game-ft16.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/8.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'The newest entry featuring portals, multi-path levels, and advanced physics-based traps. Designed for high-skill players with intense difficulty spikes and speedrun-friendly layouts.',
-  featured: false,
-},
-
-{
-  id: 'vex-challenges',
-  name: 'Vex Challenges',
-  icon: '🔥',
-  cover: 'https://slopegame.cc/upload/images/vex-challenges.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/Challenges.html',
-  category: 'Action',
-  author: 'Amazing Adam',
-  description: 'A standalone challenge mode featuring short, intense levels focused on precision and speed. Each challenge tests specific skills with strict timing and deadly trap layouts.',
-  featured: false,
-},
-
-{
-  id: 'vex-x3m-1',
-  name: 'Vex X3M',
-  icon: '⚡',
-  cover: 'https://imgs2.dab3games.com/vex-x3m-1373484.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/VexX3M.html',
-  category: 'Action',
-  author: 'Fanmade / Unknown',
-  description: 'A fan-made spin-off inspired by the Vex series, featuring fast-paced stickman platforming with custom levels, unique traps, and a more chaotic difficulty curve.',
-  featured: false,
-},
-
-{
-  id: 'vex-x3m-2',
-  name: 'Vex X3M 2',
-  icon: '⚡',
-  cover: 'https://ragdollhitgame.org/cache/data/image/game/vex-x3m-2-m143x143.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/.Collections/Vex/2VexX3M.html',
-  category: 'Action',
-  author: 'Fanmade / Unknown',
-  description: 'The sequel to the fan-made X3M entry, adding harder levels, new mechanics, and more unpredictable trap patterns while keeping the classic Vex-inspired movement.',
-  featured: false,
-},
-
-{
-  id: 'volley-random',
-  name: 'Volley Random',
-  icon: '🏐',
-  cover: 'https://th.bing.com/th/id/OIP.fq7DBOtlWrq3zDNXq63u6wAAAA?w=143&h=150&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/V/VolleyRandom.html',
-  category: 'Sports',
-  author: 'RHM Interactive',
-  description: 'A chaotic physics-based volleyball game where each round changes the court, players, gravity, and movement. One-button controls create unpredictable, hilarious matches perfect for quick solo or 2‑player play.',
-  featured: false,
-},
-
-{
-  id: 'wordle',
-  name: 'Wordle',
-  icon: '🟩',
-  cover: 'https://th.bing.com/th/id/OIP.CwGYSrct0BTSkHsTMgdfxgAAAA?w=178&h=178&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/W/Wordle.html',
-  category: 'Puzzle',
-  author: 'Josh Wardle',
-  description: 'A daily word‑guessing puzzle where players have six attempts to find a hidden five‑letter word. Color clues guide each guess, rewarding logic, vocabulary, and deduction.',
-  featured: false,
-},
-
-{
-  id: 'yandere-simulator',
-  name: 'Yandere Simulator',
-  icon: '🔪',
-  cover: 'https://th.bing.com/th/id/OIP.YRXN6Y7uSy7ymAt5EfPlzQHaHG?w=164&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/Y/YandereSimulator.html',
-  category: 'Action',
-  author: 'YandereDev',
-  description: 'A stealth and strategy game where you play as a yandere girl eliminating rivals to win Senpai’s affection. Players use disguises, social manipulation, traps, and stealth tactics to avoid suspicion while navigating a school environment.',
-  featured: false,
-},
-
-{
-  id: 'yohoho-io',
-  name: 'Yohoho.io',
-  icon: '🏴‍☠️',
-  cover: 'https://th.bing.com/th/id/OIP.El96TM07LtcTqQljhZkjIQAAAA?w=162&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/Y/Yohoho.html',
-  category: 'Action',
-  author: 'Exodragon Games',
-  description: 'A pirate-themed battle royale where players collect coins, grow stronger, and slash opponents on shrinking islands. Movement, timing, and positioning decide who becomes the last pirate standing.',
-  featured: false,
-},
-
-{
-  id: 'fnf-mario-madness',
-  name: 'Friday Night Funkin: Mario Madness',
-  icon: '🍄',
-  cover: 'https://cdn2.steamgriddb.com/icon_thumb/1f1dd8f44c6c538628baf7c7cbf537b1.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/F/FridayNightFunkinMarioMadness.html',
-  category: 'Arcade',
-  author: 'Team Mania (FNF Mod Community)',
-  description: 'A high‑intensity FNF mod where Boyfriend faces corrupted, horror‑themed versions of Mario characters across fast, chaotic songs and glitchy visuals inspired by creepypasta-style Mario lore.',
-  featured: false,
-},
-
-{
-  id: 'blackjack-classic',
-  name: 'Blackjack',
-  icon: '🃏',
-  cover: 'https://static.vecteezy.com/system/resources/previews/007/214/654/non_2x/blackjack-color-icon-card-game-twenty-one-casino-isolated-illustration-vector.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/B/Blackjack.html',
-  category: 'Strategy',
-  author: 'Unknown',
-  description: 'A classic card game where players try to reach 21 without going over, using strategy and probability to beat the dealer.',
-  featured: false,
-},
-
-{
-  id: 'ages-of-conflict',
-  name: 'Ages Of Conflict',
-  icon: '⚔️',
-  cover: 'https://r2.fizzerz.com/game-source/ages-of-conflict/icon.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/A/AgesOfConflict.html',
-  category: 'Strategy',
-  author: 'JokuPelle',
-  description: 'A sandbox-style strategy game where nations rise, fall, and wage war across procedurally generated maps, letting players watch or influence chaotic world simulations.',
-  featured: false,
-},
-
-{
-  id: 'age-of-war',
-  name: 'Age of War',
-  icon: '🏹',
-  cover: 'https://img.gamedistribution.com/9467420d5c84482e9087276338a3a7b1-512x512.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/A/AgeOfWar.html',
-  category: 'Strategy',
-  author: 'Max Games',
-  description: 'A side‑scrolling strategy game where you evolve through eras, build units, and defend your base while pushing back enemy waves across multiple ages of warfare.',
-  featured: false,
-},
-
-{
-  id: 'age-of-war-2',
-  name: 'Age of War 2',
-  icon: '⚔️',
-  cover: 'https://play-lh.googleusercontent.com/cgfjh-wXhG7rh0mCejpGwYmBw4PoDnBRQ2P6ARrHpGG0dTeP109HovgHyC_6Cqu4WA',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/A/AgeOfWar2.html',
-  category: 'Strategy',
-  author: 'Max Games',
-  description: 'A sequel that expands the original Age of War with new eras, stronger units, improved base defenses, and more intense battles as you evolve through time to overpower enemy forces.',
-  featured: false,
-},
-
-{
-  id: 'duck-life-1',
-  name: 'Duck Life 1',
-  icon: '🦆',
-  cover: 'https://laparda14.github.io/W/imgs/gameicons/duck1.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/DuckLife/1.html',
-  category: 'Arcade',
-  author: 'Wix Games',
-  description: 'A lighthearted training game where you raise a duck by improving its running, flying, and swimming skills to compete in races and become the ultimate champion.',
-  featured: false,
-},
-
-{
-  id: 'duck-life-2',
-  name: 'Duck Life 2',
-  icon: '🏁',
-  cover: 'https://avbgames.net/wp-content/uploads/2025/10/duck-life-2.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/DuckLife/2.html',
-  category: 'Arcade',
-  author: 'Wix Games',
-  description: 'The sequel expands the duck‑training formula with new skills, tougher races, and world‑traveling tournaments as you train your duck to become a global racing champion.',
-  featured: false,
-},
-
-{
-  id: 'duck-life-3',
-  name: 'Duck Life 3',
-  icon: '🥚',
-  cover: 'https://snookagames.github.io/assets/images/ducklife3.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/DuckLife/3.html',
-  category: 'Arcade',
-  author: 'Wix Games',
-  description: 'The third entry introduces duck evolution, letting you choose different evolutionary paths with unique strengths as you train your duck through new challenges and race toward championship glory.',
-  featured: false,
-},
-
-{
-  id: 'duck-life-4',
-  name: 'Duck Life 4',
-  icon: '🏆',
-  cover: 'https://gamecomets.com/thumbs/duck-life-4-duck-life-4.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/DuckLife/4.html',
-  category: 'Arcade',
-  author: 'Wix Games',
-  description: 'The fourth game expands the series with new training minigames, larger race maps, and customizable ducks as you compete across multiple regions to become the ultimate racing champion.',
-  featured: false,
-},
-
-{
-  id: 'duck-life-5',
-  name: 'Duck Life 5',
-  icon: '👑',
-  cover: 'https://ducklife4.io/storage/uploads/thumbs/duck-life-5-treasure-hunt.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/DuckLife/5.html',
-  category: 'Arcade',
-  author: 'Wix Games',
-  description: 'A treasure‑hunting adventure where you explore a massive volcano, solve puzzles, avoid traps, and collect loot while training your duck to overcome new challenges.',
-  featured: false,
-},
-
-{
-  id: 'learn-to-fly-1',
-  name: 'Learn to Fly 1',
-  icon: '🐧',
-  cover: 'https://thumbnails.gamenora.com/Learn-To-Fly.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/LearnToFly/1.html',
-  category: 'Arcade',
-  author: 'Light Bringer Games',
-  description: 'A physics‑based launcher game where you help a determined penguin learn to fly by upgrading gliders, boosters, and techniques to reach greater distances.',
-  featured: false,
-},
-
-{
-  id: 'learn-to-fly-2',
-  name: 'Learn to Fly 2',
-  icon: '❄️',
-  cover: 'https://origin.giantbomb.com/a/uploads/scale_small/31/316204/2848923-image.jpeg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/LearnToFly/2.html',
-  category: 'Arcade',
-  author: 'Light Bringer Games',
-  description: 'The penguin returns with new launch mechanics, more upgrades, and tougher challenges as you try to break through icy obstacles and reach record distances.',
-  featured: false,
-},
-
-{
-  id: 'learn-to-fly-3',
-  name: 'Learn to Fly 3',
-  icon: '🚀',
-  cover: 'https://media.moddb.com/images/games/1/66/65367/ThankYouCard.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/LearnToFly/3.html',
-  category: 'Arcade',
-  author: 'Light Bringer Games',
-  description: 'A major evolution of the series where you build custom rockets, experiment with parts, and launch your penguin into space across multiple game modes.',
-  featured: false,
-},
-
-{
-  id: 'learn-to-fly-idle',
-  name: 'Learn to Fly: Idle',
-  icon: '🎯',
-  cover: 'https://cdn2.steamgriddb.com/thumb/aee081bf7a6402604acf995e994c2c6e.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/LearnToFly/Idle.html',
-  category: 'Arcade',
-  author: 'Light Bringer Games',
-  description: 'An idle spin‑off where you fire cannons at giant targets, upgrade your damage output, and automate your progress to reach massive numbers.',
-  featured: false,
-},
-
-{
-  id: 'grow-a-garden-offline',
-  name: 'Grow a Garden',
-  icon: '🌱',
-  cover: 'https://growagardengame.com/assets/grow-a-garden-logo.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/G/GrowAGarden.html',
-  category: 'Puzzle',
-  author: 'Unknown',
-  description: 'A simple offline gardening game where you plant seeds, water crops, and watch your garden grow at your own pace without needing an internet connection.',
-  featured: false,
-},
-
-{
-  id: 'growden-io',
-  name: 'Growden.io',
-  icon: '🌿',
-  cover: 'https://dinosaur-game.io/data/image/game/growden-io/growden-io-game.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/G/Growden.html',
-  category: 'Multiplayer',
-  author: 'Unknown',
-  description: 'A multiplayer garden‑growth game where players plant, water, and expand their gardens while interacting, competing, or cooperating with others in a shared world.',
-  featured: false,
-},
-
-{
-  id: 'plants-vs-zombies-1',
-  name: 'Plants Vs Zombies 1',
-  icon: '🧟‍♂️',
-  cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/3bc2e591-7f06-4273-b443-2d3cf6346c3c/d4k7h2a-38ff6a79-6e9c-42a3-892b-fba1bb539db2.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzNiYzJlNTkxLTdmMDYtNDI3My1iNDQzLTJkM2NmNjM0NmMzY1wvZDRrN2gyYS0zOGZmNmE3OS02ZTljLTQyYTMtODkyYi1mYmExYmI1MzlkYjIucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.yldyLWsfHjT9etHvIGY2C7hR5WYA_Q8aeO2xgG9A7Ks',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/P/PlantsVsZombies.html',
-  category: 'Strategy',
-  author: 'PopCap Games',
-  description: 'A tower‑defense classic where you place unique plants to stop waves of zombies from invading your home, balancing strategy, timing, and resource management.',
-  featured: false,
-},
-
-{
-  id: 'plants-vs-zombies-2',
-  name: 'Plants Vs Zombies 2',
-  icon: '🌻',
-  cover: 'https://i.pinimg.com/originals/3e/8d/80/3e8d801fb41752c10b44482b16f89b42.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/P/PlantsVsZombies2.html',
-  category: 'Strategy',
-  author: 'PopCap Games',
-  description: 'A time‑traveling tower‑defense sequel where you battle zombies across themed worlds, unlock new plants, and use powerful abilities to defend your brains.',
-  featured: false,
-},
-
-{
-  id: 'papas-bakeria',
-  name: "Papa's Bakeria",
-  icon: '🥧',
-  cover: 'https://gamingkool.com/wp-content/uploads/2025/07/4ED63A69-971B-4C1D-96BA-D1CA88E8B2CE.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Bakeria.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Bake pies, manage orders, and serve customers with precision in this bakery‑themed time‑management game.',
-  featured: false,
-},
-
-{
-  id: 'papas-burgeria',
-  name: "Papa's Burgeria",
-  icon: '🍔',
-  cover: 'https://gogamego.io/wp-content/uploads/thumbs/custom/P/papas-burgeria.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Burger.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Grill patties, stack burgers, and satisfy customers in one of the earliest Papa Louie classics.',
-  featured: false,
-},
-
-{
-  id: 'papas-cheeseria',
-  name: "Papa's Cheeseria",
-  icon: '🧀',
-  cover: 'https://www.y9freegames.com/wp-content/uploads/thumbs/custom/P/Papas-Cheeseria.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Cheese.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Craft grilled cheese sandwiches, fry sides, and keep customers happy in this cheesy fan favorite.',
-  featured: false,
-},
-
-{
-  id: 'papas-cupcakeria',
-  name: "Papa's Cupcakeria",
-  icon: '🧁',
-  cover: 'https://cdn.reludi.com/media/games/cqrsawje3lac.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Cupcake.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Bake, frost, and decorate cupcakes while juggling customer orders and seasonal holidays.',
-  featured: false,
-},
-
-{
-  id: 'papas-donuteria',
-  name: "Papa's Donuteria",
-  icon: '🍩',
-  cover: 'https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/ac42fc62543c257861731ffbf401bf75/papas-donuteria.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Donut.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Fry, fill, and decorate donuts for a theme‑park crowd with fast‑paced multitasking.',
-  featured: false,
-},
-
-{
-  id: 'papas-freezeria',
-  name: "Papa's Freezeria",
-  icon: '🍨',
-  cover: 'https://gogamego.io/wp-content/uploads/thumbs/custom/P/papas-freezeria.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Freeze.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Blend sundaes, add toppings, and serve customers on a relaxing tropical island.',
-  featured: false,
-},
-
-{
-  id: 'papas-hot-doggeria',
-  name: "Papa's Hot Doggeria",
-  icon: '🌭',
-  cover: 'https://all-papasgames.com/storage/images/games/papas-hot-doggeria/hd300jpg.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/HotDog.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Serve hot dogs, popcorn, and drinks to hungry fans at a bustling baseball stadium.',
-  featured: false,
-},
-
-{
-  id: 'papas-pancakeria',
-  name: "Papa's Pancakeria",
-  icon: '🥞',
-  cover: 'https://img.poki-cdn.com/cdn-cgi/image/quality=78,width=1200,height=1200,fit=cover,f=png/29ee26d83d0e533f31629e8195e9b1db.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Pancake.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Stack pancakes, waffles, and French toast with toppings in this breakfast‑themed entry.',
-  featured: false,
-},
-
-{
-  id: 'papas-pastaria',
-  name: "Papa's Pastaria",
-  icon: '🍝',
-  cover: 'https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/b412fa2255f0dd1098b6759f71824cd7/papas-pastaria.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Pasta.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Boil pasta, prepare sauces, and bake breadsticks while managing a busy Italian restaurant.',
-  featured: false,
-},
-
-{
-  id: 'papas-pizzeria',
-  name: "Papa's Pizzeria",
-  icon: '🍕',
-  cover: 'https://imgr2.ant.games/games/papas-pizzeria/s600x600.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Pizza.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Take orders, top pizzas, bake them perfectly, and slice with precision in the original Papa’s game.',
-  featured: false,
-},
-
-{
-  id: 'papas-scooperia',
-  name: "Papa's Scooperia",
-  icon: '🍪',
-  cover: 'https://img.poki-cdn.com/cdn-cgi/image/q=78,scq=50,width=1200,height=1200,fit=cover,f=png/7da94623f93b04e8cf801e6a0803fb76/papas-scooperia.png',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Scoop.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Bake cookies, scoop ice cream, and build towering desserts for picky customers.',
-  featured: false,
-},
-
-{
-  id: 'papas-sushiria',
-  name: "Papa's Sushiria",
-  icon: '🍣',
-  cover: 'https://gogamego.io/wp-content/uploads/thumbs/custom/P/papas-sushiria.webp',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Sushi.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Roll sushi, prepare tea, and serve customers in one of the most complex Papa Louie games.',
-  featured: false,
-},
-
-{
-  id: 'papas-taco-mia',
-  name: "Papa's Taco Mia",
-  icon: '🌮',
-  cover: 'https://kbhgames.com/wp-content/uploads/2011/05/Papas-Taco-Mia.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Taco.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Grill meats, build tacos, and keep customers satisfied with fast service and accuracy.',
-  featured: false,
-},
-
-{
-  id: 'papas-wingeria',
-  name: "Papa's Wingeria",
-  icon: '🍗',
-  cover: 'https://poki.us.org/wp-content/uploads/2025/08/papas-wingeria.jpg',
-  url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@main/Games/.Collections/Papaeria/Wing.html',
-  category: 'Arcade',
-  author: 'Flipline Studios',
-  description: 'Fry wings, toss sauces, and plate sides in this fast‑paced chicken‑wing restaurant.',
-  featured: false,
-}
-
-];
+// Games loaded from games/games.js
 
 // ═══════════════════════════════════════════════════════════════
 //  REGISTRY
@@ -2112,11 +413,29 @@ function sortList(list) {
   return list;
 }
 
+// Skeleton helpers
+function skeletonGrid(count) {
+  var cards = '';
+  for (var i = 0; i < count; i++) {
+    cards += '<div class="skel-card" style="animation-delay:' + (i * 0.03) + 's">' +
+      '<div class="skel-cover skeleton"></div>' +
+      '<div class="skel-body"><div class="skel-name skeleton"></div><div class="skel-tag skeleton"></div></div>' +
+    '</div>';
+  }
+  return '<div class="render-bar"><div class="render-bar-fill" id="renderBarFill"></div></div>' +
+         '<div class="game-grid">' + cards + '</div>';
+}
+
+function setRenderBar(pct) {
+  var el = document.getElementById('renderBarFill');
+  if (el) el.style.width = pct + '%';
+}
+
 // Load
 async function loadGames() {
-  document.getElementById('content').innerHTML =
-    '<div class="game-grid"><div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Connecting to games library…</p></div></div>';
-  document.getElementById('statusText').textContent = 'Connecting…';
+  // Show skeletons immediately so user sees activity
+  document.getElementById('content').innerHTML = skeletonGrid(12);
+  document.getElementById('statusText').textContent = 'Loading games…';
 
   var registryGames = [];
   try {
@@ -2125,12 +444,13 @@ async function loadGames() {
       if (!r.ok && REGISTRY_FALLBACK) r = await fetch(REGISTRY_FALLBACK + '?t=' + Date.now());
       if (r && r.ok) { var d = await r.json(); registryGames = d.games || []; }
     }
-  } catch(e) { /* registry silently skipped — does not affect manual games */ }
+  } catch(e) { /* registry silently skipped */ }
+
   if (!MANUAL_GAMES.length && !registryGames.length) {
     document.getElementById('statusText').textContent = 'No games found';
     document.getElementById('content').innerHTML =
       '<div class="game-grid"><div class="state-box"><span class="state-icon">🎮</span>' +
-      '<div style="font-size:17px;font-weight:700;color:var(--text2)">No Games Yet</div>' +
+      '<div style="font-size:17px;font-weight:700;color:var(--app-text2)">No Games Yet</div>' +
       '<div style="font-size:13px;line-height:1.6;max-width:320px">Add games to the MANUAL_GAMES array to get started.</div>' +
       '</div></div>';
     return;
@@ -2142,11 +462,122 @@ async function loadGames() {
 
   var localNote = MANUAL_GAMES.length ? ' (' + MANUAL_GAMES.length + ' local)' : '';
   document.getElementById('statusText').textContent = games.length + ' games available' + localNote;
+  buildSourceDropdown();
 
   var myBtn = document.getElementById('myGamesSbBtn');
   if (myBtn) myBtn.style.display = MANUAL_GAMES.length ? '' : 'none';
 
   updateCounts();
+  render();
+}
+
+var _renderToken = 0; // cancel stale renders
+
+function render() {
+  var token = ++_renderToken;
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  var list = games.slice();
+
+  if (showFavs) {
+    list = list.filter(function(g){ return isFav(g.id); });
+  } else if (currentCat === 'recent') {
+    list = recents.map(function(id){ return games.find(function(g){ return g.id === id; }); }).filter(Boolean);
+  } else if (currentCat === 'manual') {
+    list = list.filter(function(g){ return g._manual; });
+  } else if (currentCat !== 'all') {
+    list = list.filter(function(g){ return g.category === currentCat; });
+  }
+  if (currentSource !== 'all') {
+    list = list.filter(function(g){ return g.source === currentSource; });
+  }
+  if (q) list = list.filter(function(g){
+    return g.name.toLowerCase().includes(q) ||
+           (g.description||'').toLowerCase().includes(q) ||
+           (g.author||'').toLowerCase().includes(q);
+  });
+  if (currentCat !== 'recent' || q) list = sortList(list);
+
+  document.getElementById('statusFavs').textContent = favs.length ? '⭐ ' + favs.length + ' favourited' : '';
+
+  var c = document.getElementById('content');
+  if (!list.length) {
+    var ei = showFavs ? '⭐' : currentCat === 'recent' ? '🕐' : '🔍';
+    var em = showFavs ? 'No favourites yet' : currentCat === 'recent' ? 'No recently played games yet' : currentCat === 'manual' ? 'No local games added yet' : 'No games found';
+    c.innerHTML = '<div class="game-grid"><div class="state-box"><span class="state-icon">' + ei + '</span><p class="state-msg">' + em + '</p></div></div>';
+    return;
+  }
+
+  // Show skeletons while we build real content
+  var skeletonCount = Math.min(list.length + (list.length > 4 ? 4 : 0), 24);
+  c.innerHTML = skeletonGrid(skeletonCount);
+  setRenderBar(10);
+
+  // Yield to browser so skeleton paints before heavy work
+  setTimeout(function() {
+    if (token !== _renderToken) return; // stale render, bail
+
+    var feat = !q && currentCat === 'all' && !showFavs ? games.find(function(g){ return g.featured; }) : null;
+    var workList = feat ? list.filter(function(g){ return g.id !== feat.id; }) : list;
+
+    var sections = [];
+    if (feat) sections.push({ label: null, list: [feat], isFeat: true });
+
+    if (currentCat === 'all' && !q && !showFavs) {
+      var manual   = workList.filter(function(g){ return g._manual; });
+      var registry = workList.filter(function(g){ return !g._manual; });
+      if (manual.length)   sections.push({ label: 'My Games',  list: manual });
+      if (registry.length) sections.push({ label: 'All Games', list: registry });
+    } else {
+      var label = showFavs ? 'Favourites' : currentCat === 'recent' ? 'Recently Played' : currentCat === 'manual' ? 'My Games' : currentCat === 'all' ? 'All Games' : currentCat;
+      sections.push({ label: label, list: workList });
+    }
+
+    setRenderBar(30);
+
+    // Build HTML in one shot on next frame so the skeleton is visible first
+    requestAnimationFrame(function() {
+      if (token !== _renderToken) return;
+      var html = '<div class="render-bar"><div class="render-bar-fill" id="renderBarFill" style="width:30%"></div></div>';
+      sections.forEach(function(sec) {
+        if (sec.isFeat) { html += renderFeatured(sec.list[0]); }
+        else            { html += renderSection(sec.label, sec.list); }
+      });
+      c.innerHTML = html;
+      // Animate bar to 100% then fade
+      requestAnimationFrame(function() {
+        setRenderBar(100);
+        setTimeout(function() {
+          var bar = document.getElementById('renderBarFill');
+          if (bar) { bar.style.transition = 'opacity .4s'; bar.style.opacity = '0'; }
+        }, 300);
+      });
+    });
+  }, 16);
+}
+
+function buildSourceDropdown() {
+  var sel = document.getElementById('sourceSelect');
+  if (!sel) return;
+  var total = games.length;
+  var counts = {};
+  games.forEach(function(g) {
+    var s = g.source || 'Unknown';
+    counts[s] = (counts[s] || 0) + 1;
+  });
+  sel.innerHTML = '<option value="all">All Sources (' + total + ')</option>';
+  Object.keys(counts).sort().forEach(function(s) {
+    var count = counts[s];
+    var pct   = Math.round(count / total * 100);
+    var opt   = document.createElement('option');
+    opt.value       = s;
+    opt.textContent = s + ' · ' + count + ' (' + pct + '%)';
+    sel.appendChild(opt);
+  });
+  sel.value = currentSource;
+}
+
+function setSource(val) {
+  currentSource = val;
   render();
 }
 
@@ -2174,51 +605,6 @@ function updateCounts() {
   if (recEl) recEl.textContent = recents.filter(function(id){ return games.find(function(g){ return g.id === id; }); }).length;
   var manEl = document.getElementById('cnt-manual');
   if (manEl) manEl.textContent = games.filter(function(g){ return g._manual; }).length;
-}
-
-function render() {
-  var q = document.getElementById('searchInput').value.toLowerCase();
-  var list = games.slice();
-  if (showFavs) {
-    list = list.filter(function(g){ return isFav(g.id); });
-  } else if (currentCat === 'recent') {
-    list = recents.map(function(id){ return games.find(function(g){ return g.id === id; }); }).filter(Boolean);
-  } else if (currentCat === 'manual') {
-    list = list.filter(function(g){ return g._manual; });
-  } else if (currentCat !== 'all') {
-    list = list.filter(function(g){ return g.category === currentCat; });
-  }
-  if (q) list = list.filter(function(g){
-    return g.name.toLowerCase().includes(q) ||
-           (g.description||'').toLowerCase().includes(q) ||
-           (g.author||'').toLowerCase().includes(q);
-  });
-  if (currentCat !== 'recent' || q) list = sortList(list);
-
-  document.getElementById('statusFavs').textContent = favs.length ? '⭐ ' + favs.length + ' favourited' : '';
-
-  var c = document.getElementById('content');
-  if (!list.length) {
-    var ei = showFavs ? '⭐' : currentCat === 'recent' ? '🕐' : '🔍';
-    var em = showFavs ? 'No favourites yet' : currentCat === 'recent' ? 'No recently played games yet' : currentCat === 'manual' ? 'No local games added yet' : 'No games found';
-    c.innerHTML = '<div class="game-grid"><div class="state-box"><span class="state-icon">' + ei + '</span><p class="state-msg">' + em + '</p></div></div>';
-    return;
-  }
-
-  var html = '';
-  var feat = !q && currentCat === 'all' && !showFavs ? games.find(function(g){ return g.featured; }) : null;
-  if (feat) { html += renderFeatured(feat); list = list.filter(function(g){ return g.id !== feat.id; }); }
-
-  if (currentCat === 'all' && !q && !showFavs) {
-    var manual   = list.filter(function(g){ return g._manual; });
-    var registry = list.filter(function(g){ return !g._manual; });
-    if (manual.length)   html += renderSection('My Games',  manual);
-    if (registry.length) html += renderSection('All Games', registry);
-  } else {
-    var label = showFavs ? 'Favourites' : currentCat === 'recent' ? 'Recently Played' : currentCat === 'manual' ? 'My Games' : currentCat === 'all' ? 'All Games' : currentCat;
-    html += renderSection(label, list);
-  }
-  c.innerHTML = html;
 }
 
 function renderFeatured(feat) {
@@ -2290,7 +676,7 @@ function openDetail(id) {
   document.getElementById('dByline').textContent = [g.author?'by '+clean(g.author):'',g.category].filter(Boolean).join(' · ');
   var tags = '<span class="cat-tag">'+(g.category||'Other')+'</span>';
   if (g.featured) tags += '<span class="cat-tag" style="background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.3)">⭐ Featured</span>';
-  if (g._manual)  tags += '<span class="cat-tag" style="background:rgba(0,120,212,.15);color:var(--accent);border-color:rgba(0,120,212,.35)">My Game</span>';
+  if (g._manual)  tags += '<span class="cat-tag" style="background:rgba(0,120,212,.15);color:var(--app-accent);border-color:rgba(0,120,212,.35)">My Game</span>';
   document.getElementById('dTags').innerHTML = tags;
   document.getElementById('dDesc').textContent = clean(g.description)||'No description.';
   document.getElementById('dGrid').innerHTML =
@@ -2329,6 +715,16 @@ function _launchDirect() {
   document.getElementById('gpIcon').textContent  = activeGame.icon || '🎮';
   document.getElementById('gamePlayerOverlay').classList.add('open');
 
+  // Show loader
+  var loader = document.getElementById('gameLoader');
+  var loaderName = document.getElementById('gameLoaderName');
+  var loaderStatus = document.getElementById('gameLoaderStatus');
+  if (loader) {
+    loader.classList.remove('hidden');
+    loaderName.textContent = activeGame.name || 'Loading…';
+    loaderStatus.textContent = 'Fetching from CDN…';
+  }
+
   // Always use the iframe — container div is unused now
   var container = document.getElementById('gameContainer');
   var frame     = document.getElementById('gamePlayerFrame');
@@ -2342,7 +738,38 @@ function _launchDirect() {
     // Fetch HTML, rewrite relative paths, wrap in a blob URL.
     // The iframe loads the blob — fully isolated, no shared CSS/JS.
     fetch(activeGame.url)
-      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        var contentLength = r.headers.get('Content-Length');
+        var total = contentLength ? parseInt(contentLength) : 0;
+        var received = 0;
+        var fill   = document.getElementById('gameLoaderFill');
+        var status = document.getElementById('gameLoaderStatus');
+        if (!r.body || !total) {
+          if (status) status.textContent = 'Downloading…';
+          if (fill) { fill.style.transition = 'none'; fill.style.width = '0%'; setTimeout(function(){ fill.style.transition = ''; }, 50); }
+          return r.text();
+        }
+        var reader = r.body.getReader();
+        var chunks = [];
+        function pump() {
+          return reader.read().then(function(result) {
+            if (result.done) {
+              var allChunks = new Uint8Array(received);
+              var pos = 0;
+              chunks.forEach(function(c){ allChunks.set(c, pos); pos += c.length; });
+              return new TextDecoder().decode(allChunks);
+            }
+            chunks.push(result.value);
+            received += result.value.length;
+            var pct = Math.min(Math.round(received / total * 100), 99);
+            if (fill)   fill.style.width = pct + '%';
+            if (status) status.textContent = pct + '% — ' + Math.round(received/1024) + ' KB / ' + Math.round(total/1024) + ' KB';
+            return pump();
+          });
+        }
+        return pump();
+      })
       .then(function(html) {
         // Inject <base> so relative asset paths still resolve
         var base = activeGame.url;
@@ -2353,18 +780,36 @@ function _launchDirect() {
         // Revoke any previous blob to free memory
         if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
         _blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        if (loaderStatus) loaderStatus.textContent = 'Starting game…';
+        if (document.getElementById('gameLoaderFill')) document.getElementById('gameLoaderFill').style.width = '100%';
+        frame.onload = function() {
+          var l = document.getElementById('gameLoader');
+          if (l) l.classList.add('hidden');
+          frame.onload = null;
+        };
         frame.src = _blobUrl;
       })
       .catch(function() {
-        frame.srcdoc = '<body style="background:#000;color:#fca5a5;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:14px;margin:0">⚠️ Could not load game — check the URL</body>';
+        var l = document.getElementById('gameLoader');
+        if (l) l.classList.add('hidden');
+        frame.srcdoc = '<body style="background:#000;color:#fca5a5;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:14px;margin:0">Could not load game - check the URL</body>';
       });
   } else {
     frame.src = activeGame.url;
+    frame.onload = function() {
+      var l = document.getElementById('gameLoader');
+      if (l) l.classList.add('hidden');
+      frame.onload = null;
+    };
   }
 }
 
 function closeGamePlayer() {
   document.getElementById('gamePlayerOverlay').classList.remove('open');
+  var l = document.getElementById('gameLoader');
+  if (l) l.classList.remove('hidden');
+  var f = document.getElementById('gameLoaderFill');
+  if (f) f.style.width = '0%';
   var frame = document.getElementById('gamePlayerFrame');
   frame.src = 'about:blank';
   frame.style.display = 'none';

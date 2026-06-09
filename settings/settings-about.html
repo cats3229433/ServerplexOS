@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="../CoreFiles/app-theme.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
-body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
-body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
-body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--app-bg);color:var(--app-text);overflow-y:auto;min-height:100vh}
 h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .hero{background:linear-gradient(135deg,#0d1b2a,#1a1040 60%,#0f1a35);border-radius:16px;padding:32px;text-align:center;margin-bottom:28px;position:relative;overflow:hidden}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(0,120,212,.28),transparent 70%);pointer-events:none}
@@ -16,30 +14,21 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .hero-name{font-size:28px;font-weight:800;color:#fff;letter-spacing:.5px;margin-bottom:4px}
 .hero-ver{font-size:13px;color:rgba(255,255,255,.5);letter-spacing:2px}
 .section{margin-bottom:28px}
-.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--app-text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--app-border)}
 .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.info-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
-.info-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
-.info-value{font-size:15px;font-weight:700;color:var(--text)}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
-.desc-block{padding:16px;font-size:13px;color:var(--text2);line-height:1.75}
-.links{display:flex;justify-content:center;gap:20px;padding:16px;border-top:1px solid var(--border)}
-.links a{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;padding:6px 14px;border-radius:20px;border:1px solid var(--border);transition:all .18s}
-.links a:hover{background:var(--bg2)}
-.stat-bar{height:4px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
-.stat-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .6s ease}
+.info-card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:10px;padding:14px 16px}
+.info-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);margin-bottom:6px}
+.info-value{font-size:15px;font-weight:700;color:var(--app-text)}
+.card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.desc-block{padding:16px;font-size:13px;color:var(--app-text2);line-height:1.75}
+.links{display:flex;justify-content:center;gap:20px;padding:16px;border-top:1px solid var(--app-border)}
+.links a{font-size:13px;font-weight:600;color:var(--app-accent);text-decoration:none;padding:6px 14px;border-radius:20px;border:1px solid var(--app-border);transition:all .18s}
+.links a:hover{background:var(--app-surface2)}
+.stat-bar{height:4px;background:var(--app-surface2);border-radius:2px;margin-top:8px;overflow:hidden}
+.stat-fill{height:100%;border-radius:2px;background:var(--app-accent);transition:width .6s ease}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
 <h1>ℹ️ About</h1>
 

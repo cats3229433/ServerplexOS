@@ -1,240 +1,606 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><title>Voice Recorder</title>
+<script src="app-theme.js"></script>
+<meta charset="UTF-8"><title>Video Recorder</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.header h1{font-size:18px;font-weight:700}
-.main{flex:1;display:flex;overflow:hidden}
-.recorder-panel{width:320px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:20px;border-right:1px solid var(--border)}
-.mic-btn{width:100px;height:100px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:40px;transition:all .2s;background:var(--border);border:2px solid var(--border2)}
-.mic-btn:hover{background:var(--border2);transform:scale(1.05)}
-.mic-btn.recording{background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.5);animation:micPulse 1s ease infinite}
-@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)}50%{box-shadow:0 0 0 16px rgba(239,68,68,0)}}
-.timer{font-size:42px;font-weight:800;letter-spacing:3px;font-variant-numeric:tabular-nums}
-.timer.recording{color:#ef4444}
-.status-label{font-size:13px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
-.waveform{width:100%;height:60px;border-radius:8px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
-.recordings-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.panel-title{padding:14px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
-.recordings-list{flex:1;overflow-y:auto;padding:10px}
-.recording-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:all .15s}
-.recording-item:hover{border-color:var(--border2)}
-.ri-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.ri-name{font-size:14px;font-weight:600;cursor:pointer}
-.ri-name:hover{color:#58a6ff}
-.ri-meta{font-size:11px;color:var(--text3)}
-.ri-actions{display:flex;gap:6px}
-.ri-btn{padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,0.04);color:var(--text);font-family:'Oxanium',sans-serif;font-size:11px;cursor:pointer;transition:all .15s}
-.ri-btn:hover{background:rgba(255,255,255,0.1)}
-.ri-btn.danger:hover{background:rgba(239,68,68,0.15);color:#f85149;border-color:rgba(239,68,68,0.3)}
-audio{width:100%;margin-top:4px;height:32px}
-audio::-webkit-media-controls-panel{background:var(--bg)}
-.empty-recs{text-align:center;padding:40px;color:var(--text3)}
-.empty-recs div{font-size:48px;margin-bottom:12px}
-.perm-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:16px;text-align:center;font-size:13px;color:#fca5a5;line-height:1.6}
+body{font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
 
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
-.sp-accent{color:var(--accent)}</style>
+.header{background:var(--app-surface);border-bottom:1px solid var(--app-border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header h1{font-size:17px;font-weight:700}
+
+/* ── Tab bar ── */
+.tabs{display:flex;background:var(--app-surface);border-bottom:1px solid var(--app-border);flex-shrink:0}
+.tab{flex:1;padding:10px;text-align:center;font-size:12px;font-weight:700;letter-spacing:.5px;cursor:pointer;color:var(--app-text2);border-bottom:2px solid transparent;transition:all .2s}
+.tab:hover{color:var(--app-text);background:rgba(128,128,128,.06)}
+.tab.active{color:var(--app-accent);border-bottom-color:var(--app-accent)}
+
+.main{flex:1;display:flex;overflow:hidden}
+
+/* ── Left panel — camera/preview ── */
+.camera-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000;position:relative}
+
+.video-wrap{flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000}
+video{width:100%;height:100%;object-fit:cover;display:block}
+#previewVideo{display:none;width:100%;height:100%;object-fit:contain;background:#000}
+
+/* Overlays */
+.cam-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,.25);pointer-events:none}
+.cam-placeholder div{font-size:52px}
+.cam-placeholder p{font-size:13px;letter-spacing:1px}
+.cam-placeholder.hidden{display:none}
+
+.rec-badge{position:absolute;top:14px;left:14px;display:none;align-items:center;gap:7px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(239,68,68,.4);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#fff}
+.rec-badge.show{display:flex}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:recPulse .8s ease-in-out infinite alternate}
+@keyframes recPulse{from{opacity:1}to{opacity:.3}}
+
+.rec-timer{position:absolute;top:14px;right:14px;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;display:none}
+.rec-timer.show{display:block}
+
+/* Snapshot flash */
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .05s}
+.flash.snap{opacity:.7;transition:none}
+
+/* ── Camera controls ── */
+.cam-controls{background:rgba(0,0,0,.85);backdrop-filter:blur(10px);border-top:1px solid rgba(255,255,255,.08);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:14px;flex-shrink:0}
+
+.ctrl-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.ctrl-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3)}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.ctrl-btn.active{background:rgba(var(--app-accent-rgb,0,120,212),.25);border-color:var(--app-accent)}
+
+/* Main record button */
+.rec-btn-wrap{position:relative;width:62px;height:62px;flex-shrink:0}
+.rec-btn-ring{position:absolute;inset:0;border-radius:50%;border:3px solid rgba(239,68,68,.5)}
+.rec-btn{width:100%;height:100%;border-radius:50%;border:3px solid rgba(255,255,255,.3);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0}
+.rec-btn:hover{border-color:rgba(255,255,255,.6)}
+.rec-btn-inner{width:36px;height:36px;border-radius:50%;background:#ef4444;transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.rec-btn.recording .rec-btn-inner{border-radius:6px;width:22px;height:22px;background:#ef4444}
+.rec-btn.recording .rec-btn-ring{animation:ringPulse 1s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+
+/* Snapshot button */
+.snap-btn{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;transition:all .18s}
+.snap-btn:hover{background:rgba(255,255,255,.2);border-color:rgba(255,255,255,.5)}
+.snap-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* Camera select */
+.cam-select-wrap{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);z-index:10}
+.cam-select{padding:5px 10px;border:1px solid rgba(255,255,255,.2);border-radius:8px;background:rgba(0,0,0,.6);color:#fff;font-family:'Oxanium',sans-serif;font-size:11px;outline:none;cursor:pointer;backdrop-filter:blur(6px)}
+.cam-select option{background:#1a1a1a;color:#fff}
+
+/* Quality badge */
+.quality-badge{position:absolute;bottom:82px;right:14px;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.7)}
+
+/* ── Right panel — recordings ── */
+.recordings-panel{width:260px;flex-shrink:0;background:var(--app-surface);border-left:1px solid var(--app-border);display:flex;flex-direction:column;overflow:hidden}
+.panel-header{padding:12px 14px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);border-bottom:1px solid var(--app-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.clear-btn{font-size:10px;font-weight:700;color:var(--app-text2);cursor:pointer;padding:3px 7px;border:1px solid var(--app-border);border-radius:5px;background:none;font-family:'Oxanium',sans-serif;transition:all .15s}
+.clear-btn:hover{color:#ef4444;border-color:rgba(239,68,68,.4)}
+.recordings-list{flex:1;overflow-y:auto;padding:8px}
+.recordings-list::-webkit-scrollbar{width:4px}
+.recordings-list::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:2px}
+
+.rec-item{background:var(--app-bg);border:1px solid var(--app-border);border-radius:10px;margin-bottom:8px;overflow:hidden;transition:border-color .15s}
+.rec-item:hover{border-color:var(--app-border)}
+.rec-thumb{width:100%;height:80px;object-fit:cover;display:block;background:#000;cursor:pointer}
+.rec-thumb-placeholder{width:100%;height:80px;background:linear-gradient(135deg,var(--app-surface2),var(--app-bg));display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer}
+.rec-body{padding:8px 10px}
+.rec-name{font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-name:hover{color:var(--app-accent)}
+.rec-meta{font-size:10px;color:var(--app-text2);margin-top:2px}
+.rec-actions{display:flex;gap:5px;margin-top:7px}
+.rec-action{flex:1;padding:5px;border:1px solid var(--app-border);border-radius:6px;background:rgba(128,128,128,.06);color:var(--app-text2);font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.rec-action:hover{color:var(--app-text);background:rgba(128,128,128,.15)}
+.rec-action.danger:hover{color:#ef4444;border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+
+.empty-recs{text-align:center;padding:40px 16px;color:var(--app-text2)}
+.empty-recs div{font-size:40px;margin-bottom:10px}
+.empty-recs p{font-size:12px;line-height:1.7}
+
+/* ── Snapshots tab ── */
+.snapshots-grid{flex:1;overflow-y:auto;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;align-content:start}
+.snap-card{border-radius:8px;overflow:hidden;cursor:pointer;position:relative;aspect-ratio:16/9;background:var(--app-bg)}
+.snap-card img{width:100%;height:100%;object-fit:cover;display:block}
+.snap-card-actions{position:absolute;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;gap:8px}
+.snap-card:hover .snap-card-actions{display:flex}
+.snap-card-btn{padding:5px 10px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:rgba(0,0,0,.4);color:#fff;font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s}
+.snap-card-btn:hover{background:rgba(255,255,255,.2)}
+.empty-snaps{grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--app-text2)}
+.empty-snaps div{font-size:36px;margin-bottom:10px}
+
+/* ── Preview modal ── */
+.preview-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.preview-overlay.open{display:flex}
+.preview-overlay video,
+.preview-overlay img{max-width:90vw;max-height:75vh;border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.8)}
+.preview-close{padding:8px 20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.preview-close:hover{background:rgba(255,255,255,.2)}
+
+/* ── Perm error ── */
+.perm-error{margin:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:14px;text-align:center;font-size:12px;color:#fca5a5;line-height:1.6;display:none}
+.perm-error.show{display:block}
+
+/* Settings bar */
+.settings-row{background:var(--app-surface);border-bottom:1px solid var(--app-border);padding:6px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;font-size:11px}
+.setting-item{display:flex;align-items:center;gap:6px;color:var(--app-text2)}
+.setting-item select{padding:3px 6px;border:1px solid var(--app-border);border-radius:5px;background:var(--app-bg);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:11px;outline:none;cursor:pointer}
+</style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
-<div class="header"><div>🎙️</div><h1>Voice Recorder</h1></div>
-<div class="main">
-  <div class="recorder-panel">
-    <canvas class="waveform" id="waveform" width="260" height="60"></canvas>
-    <div class="timer" id="timer">00:00</div>
-    <div class="status-label" id="statusLabel">Ready to record</div>
-    <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
-    <div id="permError"></div>
+<div class="header">
+  <div>🎥</div>
+  <h1>Video Recorder</h1>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tabRecordings" onclick="switchTab('recordings')">📹 Recordings</div>
+  <div class="tab" id="tabSnapshots" onclick="switchTab('snapshots')">📸 Snapshots</div>
+</div>
+
+<div class="settings-row">
+  <div class="setting-item">
+    <span>Quality</span>
+    <select id="qualitySelect" onchange="updateQuality()">
+      <option value="high">1080p</option>
+      <option value="medium" selected>720p</option>
+      <option value="low">480p</option>
+    </select>
   </div>
-  <div class="recordings-panel">
-    <div class="panel-title">Recordings</div>
-    <div class="recordings-list" id="recordingsList"></div>
+  <div class="setting-item">
+    <span>Camera</span>
+    <select id="cameraSelect" onchange="switchCamera()"></select>
+  </div>
+  <div class="setting-item">
+    <span>Audio</span>
+    <select id="audioSelect">
+      <option value="1">On</option>
+      <option value="0">Off</option>
+    </select>
   </div>
 </div>
+
+<div class="main">
+  <!-- Camera panel -->
+  <div class="camera-panel">
+    <div class="video-wrap" id="videoWrap">
+      <video id="liveVideo" autoplay muted playsinline></video>
+      <video id="previewVideo" controls></video>
+      <div class="cam-placeholder" id="camPlaceholder">
+        <div>📷</div>
+        <p>Camera not started</p>
+      </div>
+      <div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+      <div class="rec-timer" id="recTimer">00:00</div>
+      <div class="flash" id="flash"></div>
+    </div>
+    <div class="perm-error" id="permError">
+      🎥 Camera access denied.<br>Please allow camera access in your browser settings and reload.
+    </div>
+    <div class="cam-controls">
+      <!-- Flip -->
+      <button class="ctrl-btn" id="btnFlip" onclick="toggleFlip()" title="Mirror" disabled>↔️</button>
+      <!-- Record -->
+      <div class="rec-btn-wrap">
+        <div class="rec-btn-ring" id="recRing"></div>
+        <button class="rec-btn" id="recBtn" onclick="toggleRecord()" disabled>
+          <div class="rec-btn-inner"></div>
+        </button>
+      </div>
+      <!-- Snapshot -->
+      <button class="snap-btn" id="snapBtn" onclick="takeSnapshot()" title="Take photo" disabled>📷</button>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="recordings-panel">
+    <!-- Recordings tab -->
+    <div id="paneRecordings">
+      <div class="panel-header">
+        <span>Recordings</span>
+        <button class="clear-btn" onclick="clearRecordings()">Clear all</button>
+      </div>
+      <div class="recordings-list" id="recordingsList"></div>
+    </div>
+    <!-- Snapshots tab -->
+    <div id="paneSnapshots" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="panel-header">
+        <span>Snapshots</span>
+        <button class="clear-btn" onclick="clearSnapshots()">Clear all</button>
+      </div>
+      <div class="snapshots-grid" id="snapshotsGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview overlay -->
+<div class="preview-overlay" id="previewOverlay">
+  <video id="overlayVideo" controls style="display:none"></video>
+  <img id="overlayImg" src="" alt="" style="display:none">
+  <div style="display:flex;gap:10px">
+    <button class="preview-close" id="overlayDownload" onclick="downloadPreview()">⬇️ Download</button>
+    <button class="preview-close" onclick="closePreview()">✕ Close</button>
+  </div>
+</div>
+
+<canvas id="snapCanvas" style="display:none"></canvas>
+
 <script>
-let mediaRecorder = null, chunks = [], timerInt = null, seconds = 0;
-let recordings = JSON.parse(localStorage.getItem('serverplex_voice_recordings') || '[]');
-let audioCtx = null, analyser = null, animFrame = null;
+// ── State ──────────────────────────────────────────────────────
+let stream = null;
+let mediaRecorder = null;
+let chunks = [];
+let isRecording = false;
+let timerInterval = null;
+let seconds = 0;
+let mirrored = false;
+let currentDeviceId = null;
+let recordings = JSON.parse(localStorage.getItem('spx_video_recordings') || '[]');
+let snapshots  = JSON.parse(localStorage.getItem('spx_video_snapshots')  || '[]');
+let activePreviewUrl = null;
+let activePreviewType = 'video';
 
-function save() { localStorage.setItem('serverplex_voice_recordings', JSON.stringify(recordings.map(r => ({...r, url: undefined})))); }
+const QUALITY = {
+  high:   { width:1920, height:1080 },
+  medium: { width:1280, height:720  },
+  low:    { width:854,  height:480  },
+};
 
-function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
+// ── Init ───────────────────────────────────────────────────────
+async function init() {
+  await populateCameras();
+  startCamera();
+}
 
-async function toggleRecording() {
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    stopRecording(); return;
-  }
+async function populateCameras() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    startRecording(stream);
-  } catch(e) {
-    document.getElementById('permError').innerHTML = '<div class="perm-error">🎙️ Microphone access denied.<br>Please allow microphone access in your browser settings.</div>';
-  }
-}
-
-function startRecording(stream) {
-  chunks = []; seconds = 0;
-  mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.ondataavailable = e => chunks.push(e.data);
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    const url = URL.createObjectURL(blob);
-    const rec = { id: Date.now(), name: 'Recording ' + (recordings.length+1), duration: seconds, date: new Date().toLocaleString(), url };
-    recordings.unshift(rec);
-    save(); renderRecordings();
-    stream.getTracks().forEach(t => t.stop());
-    stopWaveform();
-  };
-  mediaRecorder.start();
-  document.getElementById('micBtn').classList.add('recording');
-  document.getElementById('micBtn').textContent = '⏹️';
-  document.getElementById('statusLabel').textContent = 'Recording…';
-  document.getElementById('timer').classList.add('recording');
-  timerInt = setInterval(() => { seconds++; document.getElementById('timer').textContent = fmt(seconds); }, 1000);
-  startWaveform(stream);
-}
-
-function stopRecording() {
-  if (!mediaRecorder) return;
-  mediaRecorder.stop();
-  clearInterval(timerInt);
-  document.getElementById('micBtn').classList.remove('recording');
-  document.getElementById('micBtn').textContent = '🎙️';
-  document.getElementById('statusLabel').textContent = 'Ready to record';
-  document.getElementById('timer').classList.remove('recording');
-  document.getElementById('timer').textContent = '00:00';
-}
-
-function startWaveform(stream) {
-  audioCtx = new AudioContext();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  audioCtx.createMediaStreamSource(stream).connect(analyser);
-  const canvas = document.getElementById('waveform');
-  const ctx = canvas.getContext('2d');
-  const data = new Uint8Array(analyser.frequencyBinCount);
-  function draw() {
-    animFrame = requestAnimationFrame(draw);
-    analyser.getByteFrequencyData(data);
-    ctx.fillStyle = '#161b22'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    const bw = canvas.width / data.length;
-    data.forEach((v,i) => {
-      const h = (v/255) * canvas.height;
-      ctx.fillStyle = `rgba(239,68,68,${0.4+v/512})`;
-      ctx.fillRect(i*bw, canvas.height-h, bw-1, h);
+    // Need a temporary permission request to enumerate labelled devices
+    const tmp = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    tmp.getTracks().forEach(t => t.stop());
+  } catch(e) {}
+  try {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    const cams = devices.filter(d => d.kind === 'videoinput');
+    const sel = document.getElementById('cameraSelect');
+    sel.innerHTML = '';
+    cams.forEach((d, i) => {
+      const opt = document.createElement('option');
+      opt.value = d.deviceId;
+      opt.textContent = d.label || 'Camera ' + (i + 1);
+      sel.appendChild(opt);
     });
-  }
-  draw();
-}
-function stopWaveform() {
-  cancelAnimationFrame(animFrame);
-  if (audioCtx) audioCtx.close();
-  const canvas = document.getElementById('waveform');
-  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
+    if (cams.length) currentDeviceId = cams[0].deviceId;
+  } catch(e) {}
 }
 
+async function startCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+
+  const quality = QUALITY[document.getElementById('qualitySelect').value] || QUALITY.medium;
+  const constraints = {
+    video: {
+      deviceId: currentDeviceId ? { ideal: currentDeviceId } : undefined,
+      width:  { ideal: quality.width  },
+      height: { ideal: quality.height },
+    },
+    audio: document.getElementById('audioSelect').value === '1',
+  };
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const lv = document.getElementById('liveVideo');
+    lv.srcObject = stream;
+    lv.style.display = 'block';
+    document.getElementById('previewVideo').style.display = 'none';
+    document.getElementById('camPlaceholder').classList.add('hidden');
+    document.getElementById('permError').classList.remove('show');
+    document.getElementById('recBtn').disabled = false;
+    document.getElementById('snapBtn').disabled = false;
+    document.getElementById('btnFlip').disabled = false;
+    applyMirror();
+    updateQualityBadge();
+  } catch(e) {
+    document.getElementById('permError').classList.add('show');
+    document.getElementById('camPlaceholder').classList.remove('hidden');
+    console.warn('Camera error:', e);
+  }
+}
+
+function updateQuality() { startCamera(); }
+function switchCamera() {
+  currentDeviceId = document.getElementById('cameraSelect').value;
+  startCamera();
+}
+
+function toggleFlip() {
+  mirrored = !mirrored;
+  applyMirror();
+  document.getElementById('btnFlip').classList.toggle('active', mirrored);
+}
+function applyMirror() {
+  document.getElementById('liveVideo').style.transform = mirrored ? 'scaleX(-1)' : '';
+}
+
+function updateQualityBadge() {
+  const q = document.getElementById('qualitySelect').value;
+  const labels = { high:'1080p', medium:'720p', low:'480p' };
+}
+
+// ── Recording ──────────────────────────────────────────────────
+function toggleRecord() {
+  if (isRecording) stopRecord();
+  else startRecord();
+}
+
+function startRecord() {
+  if (!stream) return;
+  chunks = [];
+  const opts = MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')
+    ? { mimeType: 'video/webm;codecs=vp9,opus' }
+    : MediaRecorder.isTypeSupported('video/webm')
+    ? { mimeType: 'video/webm' }
+    : {};
+
+  try {
+    mediaRecorder = new MediaRecorder(stream, opts);
+  } catch(e) {
+    mediaRecorder = new MediaRecorder(stream);
+  }
+
+  mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  mediaRecorder.onstop = finishRecord;
+  mediaRecorder.start(100);
+
+  isRecording = true;
+  seconds = 0;
+  document.getElementById('recBtn').classList.add('recording');
+  document.getElementById('recBadge').classList.add('show');
+  document.getElementById('recTimer').classList.add('show');
+  document.getElementById('snapBtn').disabled = true;
+  timerInterval = setInterval(() => {
+    seconds++;
+    document.getElementById('recTimer').textContent = fmt(seconds);
+  }, 1000);
+}
+
+function stopRecord() {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+  mediaRecorder.stop();
+  clearInterval(timerInterval);
+  isRecording = false;
+  document.getElementById('recBtn').classList.remove('recording');
+  document.getElementById('recBadge').classList.remove('show');
+  document.getElementById('recTimer').classList.remove('show');
+  document.getElementById('recTimer').textContent = '00:00';
+  document.getElementById('snapBtn').disabled = false;
+}
+
+function finishRecord() {
+  const mimeType = mediaRecorder.mimeType || 'video/webm';
+  const blob = new Blob(chunks, { type: mimeType });
+  const url  = URL.createObjectURL(blob);
+  const ext  = mimeType.includes('mp4') ? 'mp4' : 'webm';
+  const name = 'Video ' + (recordings.length + 1);
+
+  // Generate thumbnail from first frame
+  const tmpVid = document.createElement('video');
+  tmpVid.src = url;
+  tmpVid.muted = true;
+  tmpVid.currentTime = 0.5;
+  tmpVid.onloadeddata = () => {
+    const c = document.getElementById('snapCanvas');
+    c.width  = 320;
+    c.height = 180;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(tmpVid, 0, 0, 320, 180);
+    const thumb = c.toDataURL('image/jpeg', 0.7);
+    const rec = {
+      id:    Date.now(),
+      name,
+      url,
+      blob:  null,   // runtime only — url survives session
+      size:  blob.size,
+      dur:   seconds,
+      date:  new Date().toLocaleString(),
+      ext,
+      thumb,
+    };
+    recordings.unshift(rec);
+    saveRecordings();
+    renderRecordings();
+  };
+  tmpVid.onerror = () => {
+    const rec = { id:Date.now(), name, url, size:blob.size, dur:seconds, date:new Date().toLocaleString(), ext, thumb:null };
+    recordings.unshift(rec);
+    saveRecordings();
+    renderRecordings();
+  };
+  // Store blob for download (runtime)
+  recordings._blobs = recordings._blobs || {};
+  recordings._blobs[Date.now()] = blob;
+}
+
+// ── Snapshots ──────────────────────────────────────────────────
+function takeSnapshot() {
+  if (!stream) return;
+  const lv = document.getElementById('liveVideo');
+  const c  = document.getElementById('snapCanvas');
+  c.width  = lv.videoWidth  || 1280;
+  c.height = lv.videoHeight || 720;
+  const ctx = c.getContext('2d');
+  if (mirrored) {
+    ctx.translate(c.width, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(lv, 0, 0, c.width, c.height);
+  const dataUrl = c.toDataURL('image/jpeg', 0.92);
+
+  // Flash effect
+  const flash = document.getElementById('flash');
+  flash.classList.add('snap');
+  setTimeout(() => flash.classList.remove('snap'), 80);
+
+  snapshots.unshift({ id: Date.now(), url: dataUrl, date: new Date().toLocaleString() });
+  saveSnapshots();
+  renderSnapshots();
+}
+
+// ── Persist ────────────────────────────────────────────────────
+function saveRecordings() {
+  // Only save metadata (not blob urls — they're session-only)
+  const meta = recordings.map(r => ({ id:r.id, name:r.name, size:r.size, dur:r.dur, date:r.date, ext:r.ext, thumb:r.thumb }));
+  try { localStorage.setItem('spx_video_recordings', JSON.stringify(meta)); } catch(e) {}
+}
+function saveSnapshots() {
+  try { localStorage.setItem('spx_video_snapshots', JSON.stringify(snapshots.slice(0, 40))); } catch(e) {}
+}
+
+// ── Render ─────────────────────────────────────────────────────
 function renderRecordings() {
   const list = document.getElementById('recordingsList');
-  if (!recordings.length) { list.innerHTML = '<div class="empty-recs"><div>🎙️</div><p>No recordings yet</p></div>'; return; }
-  list.innerHTML = recordings.map(r => `
-    <div class="recording-item" id="rec-${r.id}">
-      <div class="ri-header">
-        <div>
-          <div class="ri-name" ondblclick="renameRec(${r.id})">${r.name}</div>
-          <div class="ri-meta">${r.date} · ${fmt(r.duration)}</div>
-        </div>
-        <div class="ri-actions">
-          <button class="ri-btn" onclick="downloadRec(${r.id})">💾</button>
-          <button class="ri-btn danger" onclick="deleteRec(${r.id})">🗑️</button>
+  if (!recordings.length) {
+    list.innerHTML = '<div class="empty-recs"><div>🎬</div><p>No recordings yet.<br>Press the red button to start.</p></div>';
+    return;
+  }
+  list.innerHTML = recordings.map((r, i) => `
+    <div class="rec-item">
+      ${r.thumb
+        ? `<img class="rec-thumb" src="${r.thumb}" onclick="openPreview(${i},'video')" title="Preview">`
+        : `<div class="rec-thumb-placeholder" onclick="openPreview(${i},'video')">🎬</div>`}
+      <div class="rec-body">
+        <div class="rec-name" ondblclick="renameRec(${i})" title="Double-click to rename">${r.name}</div>
+        <div class="rec-meta">${r.date} · ${fmt(r.dur)} · ${fmtSize(r.size)}</div>
+        <div class="rec-actions">
+          <button class="rec-action" onclick="openPreview(${i},'video')">▶ Play</button>
+          <button class="rec-action" onclick="downloadRec(${i})">⬇️</button>
+          <button class="rec-action danger" onclick="deleteRec(${i})">🗑️</button>
         </div>
       </div>
-      ${r.url ? `<audio controls src="${r.url}"></audio>` : '<div style="font-size:11px;color:#8b949e;margin-top:4px">Reload to play</div>'}
     </div>`).join('');
 }
 
-function renameRec(id) {
-  const r = recordings.find(x => x.id === id);
-  const nw = prompt('Rename:', r.name); if (!nw) return;
-  r.name = nw; save(); renderRecordings();
+function renderSnapshots() {
+  const grid = document.getElementById('snapshotsGrid');
+  if (!snapshots.length) {
+    grid.innerHTML = '<div class="empty-snaps"><div>📷</div><p>No snapshots yet.</p></div>';
+    return;
+  }
+  grid.innerHTML = snapshots.map((s, i) => `
+    <div class="snap-card">
+      <img src="${s.url}" alt="Snapshot ${i+1}">
+      <div class="snap-card-actions">
+        <button class="snap-card-btn" onclick="openPreview(${i},'snap')">🔍</button>
+        <button class="snap-card-btn" onclick="downloadSnap(${i})">⬇️</button>
+        <button class="snap-card-btn" onclick="deleteSnap(${i})">🗑️</button>
+      </div>
+    </div>`).join('');
 }
-function deleteRec(id) {
+
+// ── Actions ────────────────────────────────────────────────────
+function renameRec(i) {
+  const n = prompt('Rename recording:', recordings[i].name);
+  if (n && n.trim()) { recordings[i].name = n.trim(); saveRecordings(); renderRecordings(); }
+}
+function deleteRec(i) {
   if (!confirm('Delete this recording?')) return;
-  recordings = recordings.filter(x => x.id !== id); save(); renderRecordings();
+  if (recordings[i].url) URL.revokeObjectURL(recordings[i].url);
+  recordings.splice(i, 1);
+  saveRecordings(); renderRecordings();
 }
-function downloadRec(id) {
-  const r = recordings.find(x => x.id === id);
-  if (!r || !r.url) return;
-  const a = Object.assign(document.createElement('a'), {href:r.url, download:r.name+'.webm'});
+function downloadRec(i) {
+  const r = recordings[i];
+  if (!r.url) { alert('This recording is no longer available. Recordings are session-based — download before closing.'); return; }
+  const a = Object.assign(document.createElement('a'), { href: r.url, download: r.name + '.' + (r.ext || 'webm') });
   a.click();
 }
-
-renderRecordings();
-
-function saveToFileManager(name, blob) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      let fs = JSON.parse(localStorage.getItem('serverplex_fs') || 'null');
-      if (!fs) return;
-      if (!fs['~'].children.Music) fs['~'].children.Music = {type:'dir',children:{}};
-      fs['~'].children.Music.children[name] = { type:'file', content: e.target.result, size: blob.size, modified: Date.now() };
-      localStorage.setItem('serverplex_fs', JSON.stringify(fs));
-    } catch(err) {}
-  };
-  reader.readAsDataURL(blob);
+function clearRecordings() {
+  if (!recordings.length) return;
+  if (!confirm('Delete all recordings?')) return;
+  recordings.forEach(r => { if (r.url) URL.revokeObjectURL(r.url); });
+  recordings = [];
+  saveRecordings(); renderRecordings();
 }
 
+function deleteSnap(i) {
+  if (!confirm('Delete this snapshot?')) return;
+  snapshots.splice(i, 1);
+  saveSnapshots(); renderSnapshots();
+}
+function downloadSnap(i) {
+  const a = Object.assign(document.createElement('a'), { href: snapshots[i].url, download: 'snapshot-' + Date.now() + '.jpg' });
+  a.click();
+}
+function clearSnapshots() {
+  if (!snapshots.length) return;
+  if (!confirm('Delete all snapshots?')) return;
+  snapshots = [];
+  saveSnapshots(); renderSnapshots();
+}
+
+// ── Preview overlay ────────────────────────────────────────────
+function openPreview(i, type) {
+  const ov = document.getElementById('previewOverlay');
+  const vid = document.getElementById('overlayVideo');
+  const img = document.getElementById('overlayImg');
+  activePreviewType = type;
+  if (type === 'video') {
+    const r = recordings[i];
+    if (!r.url) { alert('Recording not available for playback in this session.'); return; }
+    vid.src = r.url;
+    vid.style.display = 'block';
+    img.style.display = 'none';
+    activePreviewUrl = r.url;
+  } else {
+    img.src = snapshots[i].url;
+    img.style.display = 'block';
+    vid.style.display = 'none';
+    activePreviewUrl = snapshots[i].url;
+  }
+  ov.classList.add('open');
+}
+function closePreview() {
+  document.getElementById('previewOverlay').classList.remove('open');
+  document.getElementById('overlayVideo').src = '';
+}
+function downloadPreview() {
+  if (!activePreviewUrl) return;
+  const ext = activePreviewType === 'video' ? 'webm' : 'jpg';
+  const a = Object.assign(document.createElement('a'), { href: activePreviewUrl, download: 'recording-' + Date.now() + '.' + ext });
+  a.click();
+}
+document.getElementById('previewOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('previewOverlay')) closePreview();
+});
+
+// ── Tab switcher ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tabRecordings').classList.toggle('active', tab === 'recordings');
+  document.getElementById('tabSnapshots').classList.toggle('active', tab === 'snapshots');
+  document.getElementById('paneRecordings').style.display = tab === 'recordings' ? '' : 'none';
+  const ps = document.getElementById('paneSnapshots');
+  ps.style.display = tab === 'snapshots' ? 'flex' : 'none';
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function fmt(s) {
+  const m = Math.floor(s / 60), sec = s % 60;
+  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+function fmtSize(b) {
+  if (!b) return '—';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' KB';
+  return (b/(1024*1024)).toFixed(1) + ' MB';
+}
+
+// ── Boot ───────────────────────────────────────────────────────
+renderRecordings();
+renderSnapshots();
+init();
 </script>
 </body>
 </html>

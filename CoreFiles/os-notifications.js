@@ -1,6 +1,7 @@
 // ══════════════════════════════════════════════
 //  OS-NOTIFICATIONS.JS
 //  + toast popup on every new notification
+//  + proper badge bubble on bell icon
 // ══════════════════════════════════════════════
 
 var _toastTimer = null;
@@ -15,13 +16,22 @@ function pushNotif(icon, app, title, body) {
   if (notifications.length > 50) notifications.pop();
   localStorage.setItem('serverplex_notifs', JSON.stringify(notifications));
   renderNotifList();
-
-  // Badge count
-  var badge = document.getElementById('notifIcon');
-  if (badge) badge.textContent = '🔔' + (notifications.length > 0 ? ' ' + notifications.length : '');
+  updateNotifBadge();
 
   // Toast popup
   showToast(icon || '💬', title || app || '', body || '');
+}
+
+function updateNotifBadge() {
+  var bubble = document.getElementById('notifBadgeBubble');
+  if (!bubble) return;
+  var count = notifications.length;
+  if (count > 0) {
+    bubble.textContent = count > 99 ? '99+' : count;
+    bubble.classList.add('show');
+  } else {
+    bubble.classList.remove('show');
+  }
 }
 
 function showToast(icon, title, msg) {
@@ -66,16 +76,21 @@ function dismissNotif(id) {
   notifications = notifications.filter(function(n){ return n.id !== id; });
   localStorage.setItem('serverplex_notifs', JSON.stringify(notifications));
   renderNotifList();
+  updateNotifBadge();
 }
 
 function clearNotifs() {
   notifications = [];
   localStorage.setItem('serverplex_notifs', '[]');
   renderNotifList();
-  var badge = document.getElementById('notifIcon');
-  if (badge) badge.textContent = '🔔';
+  updateNotifBadge();
 }
 
 function toggleNotifPanel() {
   document.getElementById('notifPanel').classList.toggle('open');
+  // Clear badge when user opens the panel
+  if (document.getElementById('notifPanel').classList.contains('open')) {
+    var bubble = document.getElementById('notifBadgeBubble');
+    if (bubble) bubble.classList.remove('show');
+  }
 }

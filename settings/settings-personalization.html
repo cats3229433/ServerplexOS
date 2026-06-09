@@ -2,27 +2,40 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script src="../CoreFiles/app-theme.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--accent:#0078d4;--bg:#f0f0f0;--bg2:#e8e8e8;--surface:#fff;--text:#000;--text2:#555;--border:#ddd}
-body.dark{--bg:#060811;--bg2:#1a1e2e;--surface:#12151f;--text:#e8edf5;--text2:#8b97b0;--border:#2a2a3a}
-body.grey{--bg:#3a3e4a;--bg2:#4e535e;--surface:#484c57;--text:#eef0f4;--text2:#b8bec8;--border:#666}
-body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--bg);color:var(--text);overflow-y:auto;min-height:100vh}
+body{font-family:'Oxanium',sans-serif;padding:24px;background:var(--app-bg);color:var(--app-text);overflow-y:auto;min-height:100vh}
 h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .section{margin-bottom:28px}
-.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
-.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--border)}
+.sec-title{font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--app-text2);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--app-border)}
+.card{background:var(--app-surface);border:1px solid var(--app-border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;gap:16px;border-bottom:1px solid var(--app-border)}
 .row:last-child{border-bottom:none}
 .row-info{flex:1}
-.row-label{font-size:14px;font-weight:600;color:var(--text);margin-bottom:2px}
-.row-desc{font-size:12px;color:var(--text2)}
+.row-label{font-size:14px;font-weight:600;color:var(--app-text);margin-bottom:2px}
+.row-desc{font-size:12px;color:var(--app-text2)}
 .theme-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;padding:14px 16px}
-.theme-card{border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;overflow:hidden;position:relative}
+.theme-card{border:2px solid var(--app-border);border-radius:12px;cursor:pointer;transition:all .2s;overflow:hidden;position:relative}
 .theme-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
-.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
+.theme-card.active{border-color:var(--app-accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
 .theme-card.active::after{content:'✓';position:absolute;top:5px;right:7px;font-size:12px;font-weight:900;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+/* hover preview */
+.theme-hover-preview{position:fixed;pointer-events:none;z-index:9999;width:220px;border-radius:12px;overflow:hidden;box-shadow:0 16px 40px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);display:none;transition:opacity .15s}
+.thp-desktop{height:120px;position:relative;display:flex;align-items:flex-end}
+.thp-taskbar{height:22px;width:100%;display:flex;align-items:center;padding:0 6px;gap:4px}
+.thp-dot{width:5px;height:5px;border-radius:50%}
+.thp-bar-item{height:12px;border-radius:3px;flex:1;max-width:44px}
+.thp-clock{margin-left:auto;height:10px;width:28px;border-radius:2px}
+.thp-window{position:absolute;top:10px;left:12px;width:100px;height:65px;border-radius:6px;border-width:1px;border-style:solid;overflow:hidden}
+.thp-titlebar{height:16px;display:flex;align-items:center;padding:0 5px;gap:3px}
+.thp-wdot{width:5px;height:5px;border-radius:50%}
+.thp-content{padding:5px;display:flex;flex-direction:column;gap:3px}
+.thp-line{height:4px;border-radius:2px;opacity:.4}
+/* wallpaper upload */
+.wp-upload-btn{padding:8px 14px;background:var(--app-surface2);border:1px dashed var(--app-border);border-radius:8px;color:var(--app-text2);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:600;transition:all .18s;text-align:center}
+.wp-upload-btn:hover{border-color:var(--app-accent);color:var(--app-accent);background:var(--app-bg)}
 .theme-preview{height:70px}
 .theme-preview-bar{height:14px;opacity:.7}
 .theme-name{text-align:center;font-size:11px;font-weight:700;padding:7px 4px;background:rgba(0,0,0,.25);color:#fff}
@@ -33,30 +46,30 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 .wp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px}
 .wp-opt{height:64px;border-radius:9px;cursor:pointer;border:2px solid transparent;transition:all .18s}
 .wp-opt:hover{transform:scale(1.04)}
-.wp-opt.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
-.wp-url-row{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--border)}
-.wp-url-row input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
+.wp-opt.selected{border-color:var(--app-accent);box-shadow:0 0 0 3px rgba(0,120,212,.2)}
+.wp-url-row{padding:10px 16px;display:flex;gap:8px;border-top:1px solid var(--app-border)}
+.wp-url-row input{flex:1;padding:8px 12px;border:1px solid var(--app-border);border-radius:8px;background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none}
 .tb-mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:14px 16px}
-.tb-card{border:2px solid var(--border);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .18s;font-size:12px;font-weight:600}
-.tb-card:hover{background:var(--bg2)}
-.tb-card.active{border-color:var(--accent);background:rgba(0,120,212,.1);color:var(--accent)}
+.tb-card{border:2px solid var(--app-border);border-radius:10px;padding:12px 8px;cursor:pointer;text-align:center;transition:all .18s;font-size:12px;font-weight:600}
+.tb-card:hover{background:var(--app-surface2)}
+.tb-card.active{border-color:var(--app-accent);background:rgba(0,120,212,.1);color:var(--app-accent)}
 .tb-card-icon{font-size:20px;display:block;margin-bottom:5px}
 .toggle{position:relative;width:40px;height:22px;flex-shrink:0;cursor:pointer}
 .toggle input{opacity:0;width:0;height:0}
-.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--border);transition:background .2s}
-.toggle input:checked+.toggle-track{background:var(--accent)}
+.toggle-track{position:absolute;inset:0;border-radius:11px;background:var(--app-border);transition:background .2s}
+.toggle input:checked+.toggle-track{background:var(--app-accent)}
 .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
 .toggle input:checked~.toggle-thumb{left:21px}
 .btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;transition:all .18s}
-.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.88}
-.btn-ghost{background:var(--bg2);border:1px solid var(--border);color:var(--text)}.btn-ghost:hover{background:var(--border)}
+.btn-primary{background:var(--app-accent);color:#fff}.btn-primary:hover{opacity:.88}
+.btn-ghost{background:var(--app-surface2);border:1px solid var(--app-border);color:var(--app-text)}.btn-ghost:hover{background:var(--app-border)}
 /* custom builder */
 .builder-body{padding:16px}
 .color-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.color-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:9px}
-.color-row label{font-size:12px;font-weight:600;color:var(--text);flex:1}
-.color-row input[type=color]{width:34px;height:28px;border:1px solid var(--border);border-radius:6px;cursor:pointer;background:none;padding:2px}
-.preview-box{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:14px}
+.color-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--app-surface2);border:1px solid var(--app-border);border-radius:9px}
+.color-row label{font-size:12px;font-weight:600;color:var(--app-text);flex:1}
+.color-row input[type=color]{width:34px;height:28px;border:1px solid var(--app-border);border-radius:6px;cursor:pointer;background:none;padding:2px}
+.preview-box{border-radius:10px;overflow:hidden;border:1px solid var(--app-border);margin-bottom:14px}
 .pv-top{height:48px;display:flex;align-items:center;padding:0 12px;gap:8px}
 .pv-dot{width:8px;height:8px;border-radius:50%}
 .pv-block{height:14px;border-radius:3px}
@@ -68,17 +81,9 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
-  if(dark.includes(t))document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
+
 <h1>🎨 Personalization</h1>
+<div class="theme-hover-preview" id="themeHoverPreview"></div>
 
 <div class="section">
   <div class="sec-title">Theme</div>
@@ -89,10 +94,10 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
   <div class="sec-title">Accent Color</div>
   <div class="card">
     <div class="accent-row" id="accentRow"></div>
-    <div class="row" style="border-top:1px solid var(--border)">
+    <div class="row" style="border-top:1px solid var(--app-border)">
       <div class="row-info"><div class="row-label">Custom Accent</div><div class="row-desc">Override theme default</div></div>
       <div style="display:flex;align-items:center;gap:10px">
-        <input type="color" id="accentCustom" style="width:38px;height:30px;border:1px solid var(--border);border-radius:7px;cursor:pointer;background:none;padding:2px" onchange="setAccent(this.value,true)">
+        <input type="color" id="accentCustom" style="width:38px;height:30px;border:1px solid var(--app-border);border-radius:7px;cursor:pointer;background:none;padding:2px" onchange="setAccent(this.value,true)">
         <button class="btn btn-ghost" onclick="clearAccentOverride()">Reset</button>
       </div>
     </div>
@@ -107,6 +112,35 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
       <input type="text" id="wpUrl" placeholder="Paste image URL…">
       <button class="btn btn-primary" onclick="applyWpUrl()">Apply</button>
       <button class="btn btn-ghost" onclick="resetWp()">Reset</button>
+    </div>
+    <div class="wp-url-row" style="border-top:1px solid var(--app-border)">
+      <button class="wp-upload-btn" style="width:100%" onclick="uploadWallpaper()">📁 Upload from computer</button>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="sec-title">Per-Theme Wallpapers</div>
+  <div class="card">
+    <!-- Theme selector -->
+    <div class="row">
+      <div class="row-info"><div class="row-label">Select Theme</div><div class="row-desc">Set a unique wallpaper for each theme</div></div>
+      <select id="twThemeSelect" onchange="onTwThemeChange(this.value)" style="padding:7px 12px;border:1px solid var(--app-border);border-radius:8px;background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none;cursor:pointer"></select>
+    </div>
+    <!-- Preview -->
+    <div style="padding:0 16px 14px">
+      <div id="twPreview" style="height:120px;border-radius:10px;border:1px solid var(--app-border);background:var(--app-surface2);background-size:cover;background-position:center;position:relative;overflow:hidden;transition:background .3s">
+        <div id="twPreviewLabel" style="position:absolute;bottom:8px;left:10px;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.7);text-shadow:0 1px 3px rgba(0,0,0,.8);text-transform:uppercase">No custom wallpaper</div>
+      </div>
+    </div>
+    <!-- Controls -->
+    <div class="wp-url-row" style="border-top:1px solid var(--app-border)">
+      <input type="text" id="twUrl" placeholder="Paste image URL for this theme…" oninput="twUrlChanged()">
+      <button class="btn btn-primary" id="twApplyBtn" onclick="applyThemeWallpaper()" disabled>Apply</button>
+    </div>
+    <div class="wp-url-row" style="border-top:1px solid var(--app-border);gap:6px">
+      <button class="wp-upload-btn" style="flex:1" onclick="uploadThemeWallpaper()">📁 Upload image</button>
+      <button class="btn btn-ghost" style="flex-shrink:0" onclick="resetThemeWallpaper()">✕ Reset</button>
     </div>
   </div>
 </div>
@@ -131,14 +165,58 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
   </div>
 </div>
 
+
+<div class="section">
+  <div class="sec-title">Scheduled Themes</div>
+  <div class="card">
+    <div class="row">
+      <div class="row-info"><div class="row-label">Auto-switch by time of day</div><div class="row-desc">Automatically change theme based on the hour</div></div>
+      <label class="toggle"><input type="checkbox" id="schedToggle" onchange="toggleScheduled(this.checked)"><span class="toggle-track"></span><span class="toggle-thumb"></span></label>
+    </div>
+    <div id="schedRows" style="display:none">
+      <div class="row"><div class="row-info"><div class="row-label">🌅 Morning <span style="opacity:.45;font-size:11px">6am – 9am</span></div></div><select id="sched-morning" onchange="saveSched('morning',this.value)" style="padding:7px 10px;border:1px solid var(--app-border);border-radius:8px;background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none"></select></div>
+      <div class="row"><div class="row-info"><div class="row-label">☀️ Day <span style="opacity:.45;font-size:11px">9am – 5pm</span></div></div><select id="sched-day" onchange="saveSched('day',this.value)" style="padding:7px 10px;border:1px solid var(--app-border);border-radius:8px;background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none"></select></div>
+      <div class="row"><div class="row-info"><div class="row-label">🌆 Evening <span style="opacity:.45;font-size:11px">5pm – 8pm</span></div></div><select id="sched-evening" onchange="saveSched('evening',this.value)" style="padding:7px 10px;border:1px solid var(--app-border);border-radius:8px;background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none"></select></div>
+      <div class="row"><div class="row-info"><div class="row-label">🌙 Night <span style="opacity:.45;font-size:11px">8pm – 6am</span></div></div><select id="sched-night" onchange="saveSched('night',this.value)" style="padding:7px 10px;border:1px solid var(--app-border);border-radius:8px;background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none"></select></div>
+    </div>
+  </div>
+</div>
+
 <div class="section">
   <div class="sec-title">Custom Theme Builder</div>
   <div class="card">
     <div class="builder-body">
-      <div class="preview-box" id="pvBox">
-        <div class="pv-top" id="pvTop"><div class="pv-dot" id="pvDot"></div><div class="pv-block" id="pvBlock1" style="flex:1;max-width:70px"></div></div>
-        <div class="pv-bar" id="pvBar"><div class="pv-block" style="width:32px"></div><div class="pv-block" style="width:48px"></div><div class="pv-block" style="width:40px"></div></div>
-        <div class="pv-body" id="pvBody"><div class="pv-win" id="pvWin1"></div><div class="pv-win" id="pvWin2"></div></div>
+      <div class="preview-box" id="pvBox" style="height:160px;position:relative;overflow:hidden">
+        <!-- Desktop area -->
+        <div id="pvDesktop" style="position:absolute;inset:0 0 26px 0;display:flex;align-items:flex-start;padding:10px;gap:8px">
+          <!-- Window -->
+          <div id="pvWindow" style="width:130px;border-radius:7px;border-width:1px;border-style:solid;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.3)">
+            <div id="pvTitlebar" style="height:22px;display:flex;align-items:center;padding:0 7px;gap:5px">
+              <div id="pvWdot1" style="width:7px;height:7px;border-radius:50%;background:#ff5f57"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#ffbd2e"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#28c840"></div>
+              <div id="pvWtitle" style="flex:1;height:6px;border-radius:2px;margin-left:4px;opacity:.3"></div>
+            </div>
+            <div id="pvWbody" style="padding:7px;display:flex;flex-direction:column;gap:4px">
+              <div id="pvLine1" style="height:5px;border-radius:2px;opacity:.5;width:80%"></div>
+              <div id="pvLine2" style="height:5px;border-radius:2px;opacity:.3;width:60%"></div>
+              <div id="pvLine3" style="height:5px;border-radius:2px;opacity:.3;width:70%"></div>
+            </div>
+          </div>
+          <!-- Desktop icons -->
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+            <div id="pvIcon1" style="width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;border-width:1px;border-style:solid">📁</div>
+            <div id="pvIcon2" style="width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;border-width:1px;border-style:solid">🌐</div>
+          </div>
+        </div>
+        <!-- Taskbar -->
+        <div id="pvTaskbar" style="position:absolute;bottom:0;left:0;right:0;height:26px;display:flex;align-items:center;padding:0 8px;gap:5px;border-top-width:1px;border-top-style:solid">
+          <div id="pvStart" style="width:20px;height:16px;border-radius:3px;opacity:.8"></div>
+          <div id="pvTbApp" style="height:16px;width:50px;border-radius:3px;opacity:.6"></div>
+          <div id="pvTbApp2" style="height:16px;width:38px;border-radius:3px;opacity:.4"></div>
+          <div style="flex:1"></div>
+          <div id="pvTbClock" style="height:10px;width:32px;border-radius:2px;opacity:.4"></div>
+        </div>
       </div>
       <div class="color-grid">
         <div class="color-row"><label>Background</label><input type="color" id="cp-bg"     value="#0a0e1a" oninput="livePreview()"></div>
@@ -166,17 +244,27 @@ h1{font-size:26px;font-weight:800;margin-bottom:24px}
 
 <script>
 var THEMES=[
-  {id:'white', name:'White',  bg:'linear-gradient(135deg,#fff,#e0e0e0)',     bar:'#f0f0f0',accent:'#0078d4'},
-  {id:'black', name:'Black',  bg:'linear-gradient(135deg,#1a1a1a,#000)',     bar:'#0a0a0a',accent:'#0078d4'},
-  {id:'grey',  name:'Grey',   bg:'linear-gradient(135deg,#808080,#555)',     bar:'#505050',accent:'#4a9eff'},
-  {id:'aurora',name:'Aurora', bg:'linear-gradient(135deg,#0a0e1a,#0d1b33)', bar:'#080c1c',accent:'#00d4aa'},
-  {id:'tokyo', name:'Tokyo',  bg:'linear-gradient(135deg,#1a1b2e,#0f3460)', bar:'#16213e',accent:'#ff2d55'},
-  {id:'forest',name:'Forest', bg:'linear-gradient(135deg,#0d1f0e,#1a321b)', bar:'#0a1a0b',accent:'#34c759'},
-  {id:'space', name:'Space',  bg:'linear-gradient(135deg,#020408,#080d1a)', bar:'#020408',accent:'#7c83fd'},
-  {id:'sunset',name:'Sunset', bg:'linear-gradient(135deg,#1a0a0a,#2a1005)', bar:'#180a0a',accent:'#ff6b35'},
-  {id:'arctic',name:'Arctic', bg:'linear-gradient(135deg,#e8f4fd,#f0f8ff)', bar:'#d0e8f8',accent:'#0096d6'},
-  {id:'synth', name:'Synth',  bg:'linear-gradient(135deg,#0d0015,#1e0030)', bar:'#0e0018',accent:'#e040fb'},
-  {id:'custom',name:'Custom', bg:'linear-gradient(135deg,#0a0e1a,#12151f)', bar:'#1e2030',accent:'#0078d4',isCustom:true},
+  {id:'white',    name:'White',    bg:'linear-gradient(135deg,#fff,#e0e0e0)',      bar:'#f0f0f0',accent:'#0078d4', img:''},
+  {id:'black',    name:'Black',    bg:'linear-gradient(135deg,#1a1a1a,#000)',      bar:'#0a0a0a',accent:'#0078d4', img:''},
+  {id:'grey',     name:'Grey',     bg:'linear-gradient(135deg,#808080,#555)',      bar:'#505050',accent:'#4a9eff', img:''},
+  {id:'aurora',   name:'Aurora',   bg:'linear-gradient(135deg,#0a0e1a,#0d1b33)',  bar:'#080c1c',accent:'#00d4aa', img:'https://i.ibb.co/DP2tgPfn/aurora-Serverplex-OS-Wallpaper.png'},
+  {id:'tokyo',    name:'Tokyo',    bg:'linear-gradient(135deg,#1a1b2e,#0f3460)',  bar:'#16213e',accent:'#ff2d55', img:'https://i.ibb.co/b58zxdTL/tokyo-Serverplex-OS-Wallpaper.png'},
+  {id:'forest',   name:'Forest',   bg:'linear-gradient(135deg,#0d1f0e,#1a321b)',  bar:'#0a1a0b',accent:'#34c759', img:'https://i.ibb.co/GQwcYKkH/forest-Serverplex-OS-Wallpaper.png'},
+  {id:'space',    name:'Space',    bg:'linear-gradient(135deg,#020408,#080d1a)',  bar:'#020408',accent:'#7c83fd', img:'https://i.ibb.co/N60DVLbm/space-Serverplex-OS-Wallpaper.png'},
+  {id:'sunset',   name:'Sunset',   bg:'linear-gradient(135deg,#1a0a0a,#2a1005)',  bar:'#180a0a',accent:'#ff6b35', img:'https://i.ibb.co/svtJ81w2/sunset-Serverplex-OS-Wallpaper.png'},
+  {id:'arctic',   name:'Arctic',   bg:'linear-gradient(135deg,#e8f4fd,#f0f8ff)',  bar:'#d0e8f8',accent:'#0096d6', img:'https://i.ibb.co/xtK281kN/arctic-Serverplex-OS-Wallpaper.png'},
+  {id:'synth',    name:'Synth',    bg:'linear-gradient(135deg,#0d0015,#1e0030)',  bar:'#0e0018',accent:'#e040fb', img:'https://i.ibb.co/LdvjTzS1/synth-Serverplex-OS-Wallpaper.png'},
+  {id:'desert',   name:'Desert',   bg:'linear-gradient(135deg,#1a0f05,#2e1c0a)',  bar:'#1e1208',accent:'#e8913a', img:'https://i.ibb.co/XfVHdn87/desert-Serverplex-OS-Wallpaper.png'},
+  {id:'ocean',    name:'Ocean',    bg:'linear-gradient(135deg,#020d1a,#081e30)',  bar:'#03101e',accent:'#00b4d8', img:'https://i.ibb.co/QFvMhDxC/ocean-Serverplex-OS-Wallpaper.png'},
+  {id:'jungle',   name:'Jungle',   bg:'linear-gradient(135deg,#050f08,#0c1c14)',  bar:'#060f09',accent:'#2dc653', img:'https://i.ibb.co/tPZvz6pt/jungle-Serverplex-OS-Wallpaper.png'},
+  {id:'blizzard', name:'Blizzard', bg:'linear-gradient(135deg,#0a1520,#162840)',  bar:'#0c1825',accent:'#90c8f0', img:'https://i.ibb.co/ns3gQcHL/blizzard-Serverplex-OS-Wallpaper.png'},
+  {id:'matrix',   name:'Matrix',   bg:'linear-gradient(135deg,#000,#002000)',     bar:'#001000',accent:'#00ff41', img:'https://i.ibb.co/jPFTrkHs/matrix-Serverplex-OS-Wallpaper.png'},
+  {id:'cyberpunk',name:'Cyberpunk',bg:'linear-gradient(135deg,#0a0010,#1a0030)', bar:'#0d0018',accent:'#f637ec', img:'https://i.ibb.co/z143HgZ/cyberpunk-Serverplex-OS-Wallpaper.png'},
+  {id:'retro',    name:'Retro',    bg:'linear-gradient(135deg,#000,#101810)',     bar:'#050f05',accent:'#33ff33', img:'https://i.ibb.co/GfwmVZYn/retro-Serverplex-OS-Wallpaper.png'},
+  {id:'coffee',   name:'Coffee',   bg:'linear-gradient(135deg,#120a02,#28160a)',  bar:'#160c04',accent:'#c9813a', img:'https://i.ibb.co/QvGQ03yP/coffee-Serverplex-OS-Wallpaper.png'},
+  {id:'autumn',   name:'Autumn',   bg:'linear-gradient(135deg,#120802,#261508)',  bar:'#160a03',accent:'#e2693a', img:'https://i.ibb.co/mVb88wxz/autumn-Serverplex-OS-Wallpaper.png'},
+  {id:'candle',   name:'Candle',   bg:'linear-gradient(135deg,#0f0800,#201405)',  bar:'#130a01',accent:'#f5a623', img:'https://i.ibb.co/SDLnHZCj/candle-Serverplex-OS-Wallpaper.png'},
+  {id:'custom',   name:'Custom',   bg:'linear-gradient(135deg,#0a0e1a,#12151f)', bar:'#1e2030',accent:'#0078d4', img:'', isCustom:true},
 ];
 var PRESETS={
   dark: {bg:'#0a0e1a',bg2:'#12151f',text:'#e8edf5',text2:'#6a7590',border:'#1e2030',accent:'#0078d4'},
@@ -206,10 +294,23 @@ THEMES.forEach(function(th){
   var d=document.createElement('div');d.className='theme-card'+(th.id===curTheme?' active':'');d.id='thcard-'+th.id;
   var customVars=JSON.parse(localStorage.getItem('serverplex_custom_theme')||'null');
   var pvBg=th.isCustom&&customVars?customVars.bg:null;
-  d.innerHTML='<div class="theme-preview" style="'+(pvBg?'background:'+pvBg:th.bg)+'"></div><div class="theme-preview-bar" style="background:'+th.bar+'"></div><div class="theme-name" style="background:'+th.accent+'">'+th.name+'</div>';
+  // Build preview: image with gradient overlay if image exists, else plain gradient
+  var previewStyle;
+  if(pvBg){
+    previewStyle='background:'+pvBg;
+  } else if(th.img){
+    previewStyle='background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.35)),url('+th.img+') center/cover no-repeat,'+th.bg;
+  } else {
+    previewStyle='background:'+th.bg;
+  }
+  d.innerHTML=
+    '<div class="theme-preview" style="'+previewStyle+'"></div>'+
+    '<div class="theme-preview-bar" style="background:'+th.bar+'"></div>'+
+    '<div class="theme-name" style="background:'+th.accent+'">'+th.name+'</div>';
   d.onclick=function(){if(th.isCustom){applyCustom();return;}applyTheme(th.id,th.accent);};
   tg.appendChild(d);
 });
+setupHoverPreviews();
 
 // Accent dots
 var ar=document.getElementById('accentRow');
@@ -244,9 +345,7 @@ function applyTheme(id,acc){
   setAccent(override||acc,!!override);
   if(window.parent&&window.parent.changeTheme)window.parent.changeTheme(id);
   window.parent&&window.parent.postMessage({type:'theme-change',theme:id},'*');
-  document.body.className=document.body.className.replace(/\b(dark|grey)\b/g,'').trim();
-  var dark=['black','aurora','tokyo','forest','space','sunset','synth'];
-  if(dark.includes(id))document.body.classList.add('dark');else if(id==='grey')document.body.classList.add('grey');
+  setTimeout(function(){ location.reload(); }, 300);
 }
 function setAccent(c,isOverride){
   curAccent=c;document.documentElement.style.setProperty('--accent',c);
@@ -261,6 +360,7 @@ function applyTbMode(mode){
   curTbMode=mode;localStorage.setItem('serverplex_tb_mode',mode);
   ['blur','glass','solid','hidden'].forEach(function(m){var el=document.getElementById('tb-'+m);if(el)el.classList.toggle('active',m===mode);});
   if(window.parent&&window.parent.setTaskbarMode)window.parent.setTaskbarMode(mode);
+  setTimeout(function(){ location.reload(); }, 300);
 }
 function applyWp(val){localStorage.setItem('serverplex_wallpaper',val);if(window.parent&&window.parent.setWallpaper)window.parent.setWallpaper(val);}
 function applyWpUrl(){var url=document.getElementById('wpUrl').value.trim();if(!url)return;applyWp("url('"+url+"') center/cover no-repeat");}
@@ -271,13 +371,110 @@ function resetLayout(){if(window.parent&&window.parent.resetDesktopLayout)window
 function getVars(){return{bg:document.getElementById('cp-bg').value,bg2:document.getElementById('cp-bg2').value,text:document.getElementById('cp-text').value,text2:document.getElementById('cp-text2').value,border:document.getElementById('cp-border').value,accent:document.getElementById('cp-accent').value};}
 function livePreview(){
   var v=getVars();
-  document.getElementById('pvBox').style.background=v.bg;document.getElementById('pvBox').style.borderColor=v.border;
-  document.getElementById('pvTop').style.background=v.bg2;document.getElementById('pvBar').style.background=v.bg2;
-  document.getElementById('pvBody').style.background=v.bg;
-  document.getElementById('pvDot').style.background=v.accent;
-  document.getElementById('pvBlock1').style.background=v.text2;
-  document.querySelectorAll('.pv-block').forEach(function(b){b.style.background=v.text2;b.style.opacity='.45';});
-  document.querySelectorAll('.pv-win').forEach(function(w){w.style.background=v.bg2;w.style.borderColor=v.border;});
+  var set=function(id,prop,val){var el=document.getElementById(id);if(el)el.style[prop]=val;};
+  set('pvBox','background',v.bg);set('pvBox','borderColor',v.border);
+  set('pvDesktop','background',v.bg);
+  set('pvWindow','background',v.bg2);set('pvWindow','borderColor',v.border);
+  set('pvTitlebar','background',v.bg2);
+  set('pvWtitle','background',v.text2);
+  set('pvWbody','background',v.bg2);
+  ['pvLine1','pvLine2','pvLine3'].forEach(function(id){set(id,'background',v.text2);});
+  set('pvIcon1','background',v.bg2);set('pvIcon1','borderColor',v.border);
+  set('pvIcon2','background',v.bg2);set('pvIcon2','borderColor',v.border);
+  set('pvTaskbar','background',v.bg2);set('pvTaskbar','borderTopColor',v.border);
+  set('pvStart','background',v.accent);
+  set('pvTbApp','background',v.accent);
+  set('pvTbApp2','background',v.text2);
+  set('pvTbClock','background',v.text2);
+}
+
+// ── Hover preview ─────────────────────────────
+var THEME_VARS={
+  white: {bg:'#f0f0f0',bg2:'#fff',text:'#000',text2:'#444',border:'#ccc',accent:'#0078d4'},
+  black: {bg:'#000',bg2:'#1e1e1e',text:'#fff',text2:'#aaa',border:'#444',accent:'#0078d4'},
+  grey:  {bg:'#808080',bg2:'#707070',text:'#fff',text2:'#ddd',border:'#999',accent:'#4a9eff'},
+  aurora:{bg:'#0a0e1a',bg2:'#0d1220',text:'#e8f4f8',text2:'#8ba7c0',border:'#1e2d45',accent:'#00d4aa'},
+  tokyo: {bg:'#1a1b2e',bg2:'#1a1b2e',text:'#eef2ff',text2:'#a9b2cc',border:'#2d3561',accent:'#ff2d55'},
+  forest:{bg:'#0d1f0e',bg2:'#0f2210',text:'#d4edda',text2:'#88b890',border:'#1e3d20',accent:'#34c759'},
+  space: {bg:'#020408',bg2:'#03060e',text:'#c8d8f0',text2:'#6a7d9e',border:'#0e1728',accent:'#7c83fd'},
+  sunset:{bg:'#1a0a0a',bg2:'#1e0c0c',text:'#fde8d8',text2:'#c4896a',border:'#3d1e1e',accent:'#ff6b35'},
+  arctic:{bg:'#e8f4fd',bg2:'#f0f8ff',text:'#0d2d4a',text2:'#3a6a8a',border:'#a0c8e8',accent:'#0096d6'},
+  synth: {bg:'#0d0015',bg2:'#100018',text:'#f0e0ff',text2:'#b070d0',border:'#2d0050',accent:'#e040fb'},
+  desert:{bg:'#1a0f05',bg2:'#1e1208',text:'#f5e6d0',text2:'#c4956a',border:'#3d2510',accent:'#e8913a'},
+  ocean: {bg:'#020d1a',bg2:'#03101e',text:'#d0eaf8',text2:'#5a9ab8',border:'#0e2840',accent:'#00b4d8'},
+  jungle:{bg:'#050f08',bg2:'#060f09',text:'#d4f0da',text2:'#5a9a6a',border:'#102818',accent:'#2dc653'},
+  blizzard:{bg:'#0a1520',bg2:'#0c1825',text:'#e8f4ff',text2:'#8ab0d0',border:'#1e3048',accent:'#90c8f0'},
+  matrix:{bg:'#000',bg2:'#001000',text:'#00ff41',text2:'#008f11',border:'#003300',accent:'#00ff41'},
+  cyberpunk:{bg:'#0a0010',bg2:'#0d0018',text:'#f0e0ff',text2:'#a060c0',border:'#280040',accent:'#f637ec'},
+  retro: {bg:'#000',bg2:'#050f05',text:'#33ff33',text2:'#1a8a1a',border:'#0f2a0f',accent:'#33ff33'},
+  coffee:{bg:'#120a02',bg2:'#160c04',text:'#f5e6d0',text2:'#a07850',border:'#352010',accent:'#c9813a'},
+  autumn:{bg:'#120802',bg2:'#160a03',text:'#fde8d0',text2:'#c47850',border:'#381808',accent:'#e2693a'},
+  candle:{bg:'#0f0800',bg2:'#130a01',text:'#fdecd0',text2:'#c09050',border:'#301a05',accent:'#f5a623'},
+};
+function buildHoverPreview(v){
+  return '<div style="background:'+v.bg+';height:120px;position:relative">'+
+    '<div style="position:absolute;top:8px;left:8px;width:110px;background:'+v.bg2+';border:1px solid '+v.border+';border-radius:6px;overflow:hidden">'+
+      '<div style="height:18px;background:'+v.bg2+';border-bottom:1px solid '+v.border+';display:flex;align-items:center;padding:0 6px;gap:3px">'+
+        '<div style="width:6px;height:6px;border-radius:50%;background:#ff5f57"></div>'+
+        '<div style="width:6px;height:6px;border-radius:50%;background:#ffbd2e"></div>'+
+        '<div style="width:6px;height:6px;border-radius:50%;background:#28c840"></div>'+
+        '<div style="flex:1;height:4px;border-radius:2px;background:'+v.text2+';opacity:.3;margin-left:4px"></div>'+
+      '</div>'+
+      '<div style="padding:6px;display:flex;flex-direction:column;gap:3px">'+
+        '<div style="height:4px;border-radius:2px;background:'+v.text2+';opacity:.5;width:80%"></div>'+
+        '<div style="height:4px;border-radius:2px;background:'+v.text2+';opacity:.3;width:55%"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="position:absolute;bottom:0;left:0;right:0;height:22px;background:'+v.bg2+';border-top:1px solid '+v.border+';display:flex;align-items:center;padding:0 6px;gap:4px">'+
+      '<div style="width:16px;height:12px;border-radius:2px;background:'+v.accent+'"></div>'+
+      '<div style="width:38px;height:12px;border-radius:3px;background:'+v.accent+';opacity:.6"></div>'+
+      '<div style="flex:1"></div>'+
+      '<div style="width:24px;height:8px;border-radius:2px;background:'+v.text2+';opacity:.4"></div>'+
+    '</div>'+
+  '</div>'+
+  '<div style="padding:7px 10px;background:'+v.bg2+';border-top:1px solid '+v.border+';display:flex;align-items:center;justify-content:space-between">'+
+    '<span style="font-size:11px;font-weight:700;color:'+v.text+'">Preview</span>'+
+    '<div style="width:40px;height:14px;border-radius:10px;background:'+v.accent+'"></div>'+
+  '</div>';
+}
+var hoverEl=null;
+function setupHoverPreviews(){
+  hoverEl=document.getElementById('themeHoverPreview');
+  document.querySelectorAll('.theme-card').forEach(function(card){
+    card.addEventListener('mouseenter',function(e){
+      var id=card.id.replace('thcard-','');
+      var v=THEME_VARS[id];
+      if(!v||id==='custom')return;
+      hoverEl.innerHTML=buildHoverPreview(v);
+      hoverEl.style.display='block';
+      positionHover(e);
+    });
+    card.addEventListener('mousemove',positionHover);
+    card.addEventListener('mouseleave',function(){hoverEl.style.display='none';});
+  });
+}
+function positionHover(e){
+  if(!hoverEl)return;
+  var x=e.clientX+14,y=e.clientY-60;
+  if(x+224>window.innerWidth)x=e.clientX-238;
+  if(y+160>window.innerHeight)y=window.innerHeight-170;
+  hoverEl.style.left=x+'px';hoverEl.style.top=y+'px';
+}
+
+// ── Wallpaper upload ──────────────────────────
+function uploadWallpaper(){
+  var inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.onchange=function(e){
+    var file=e.target.files[0];if(!file)return;
+    var reader=new FileReader();
+    reader.onload=function(ev){
+      var dataUrl=ev.target.result;
+      applyWp("url('"+dataUrl+"') center/cover no-repeat");
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
 }
 function loadPreset(name){var p=PRESETS[name];if(!p)return;Object.keys(p).forEach(function(k){var el=document.getElementById('cp-'+k);if(el)el.value=p[k];});livePreview();}
 function applyCustom(){
@@ -288,10 +485,165 @@ function applyCustom(){
   document.querySelectorAll('.theme-card').forEach(function(c){c.classList.remove('active');});
   var card=document.getElementById('thcard-custom');
   if(card){card.classList.add('active');card.querySelector('.theme-preview').style.background=v.bg;card.querySelector('.theme-preview-bar').style.background=v.bg2;card.querySelector('.theme-name').style.background=v.accent;}
-  var badge=document.getElementById('appliedBadge');badge.classList.add('show');setTimeout(function(){badge.classList.remove('show');},2000);
+  var badge=document.getElementById('appliedBadge');badge.classList.add('show');
   window.parent&&window.parent.postMessage({type:'theme-change',theme:'custom'},'*');
+  setTimeout(function(){ location.reload(); }, 600);
 }
 function resetCustom(){localStorage.removeItem('serverplex_custom_theme');loadPreset('dark');}
+
+// ── Scheduled Themes ──────────────────────────
+var ALL_THEMES=[
+  {id:'white',name:'White'},{id:'black',name:'Black'},{id:'grey',name:'Grey'},
+  {id:'aurora',name:'Aurora'},{id:'tokyo',name:'Tokyo'},{id:'forest',name:'Forest'},
+  {id:'space',name:'Space'},{id:'sunset',name:'Sunset'},{id:'arctic',name:'Arctic'},
+  {id:'synth',name:'Synth'},{id:'desert',name:'Desert'},{id:'ocean',name:'Ocean'},
+  {id:'jungle',name:'Jungle'},{id:'blizzard',name:'Blizzard'},{id:'matrix',name:'Matrix'},
+  {id:'cyberpunk',name:'Cyberpunk'},{id:'retro',name:'Retro'},{id:'coffee',name:'Coffee'},
+  {id:'autumn',name:'Autumn'},{id:'candle',name:'Candle'},
+];
+var SCHED_DEFAULTS={morning:'arctic',day:'white',evening:'sunset',night:'aurora'};
+function buildSchedSelects(){
+  ['morning','day','evening','night'].forEach(function(slot){
+    var sel=document.getElementById('sched-'+slot);
+    if(!sel)return;
+    var saved=localStorage.getItem('serverplex_theme_'+slot)||SCHED_DEFAULTS[slot];
+    ALL_THEMES.forEach(function(t){
+      var opt=document.createElement('option');
+      opt.value=t.id;opt.textContent=t.name;
+      if(t.id===saved)opt.selected=true;
+      sel.appendChild(opt);
+    });
+  });
+}
+function toggleScheduled(on){
+  localStorage.setItem('serverplex_scheduled_themes',on);
+  document.getElementById('schedRows').style.display=on?'':'none';
+}
+function saveSched(slot,val){
+  localStorage.setItem('serverplex_theme_'+slot,val);
+}
+// Init scheduled section
+(function(){
+  var on=localStorage.getItem('serverplex_scheduled_themes')==='true';
+  document.getElementById('schedToggle').checked=on;
+  document.getElementById('schedRows').style.display=on?'':'none';
+  buildSchedSelects();
+})();
+
+
+// ── Per-Theme Wallpapers ──────────────────────
+var twCurrentTheme = curTheme;
+
+function buildTwThemeSelect() {
+  var sel = document.getElementById('twThemeSelect');
+  THEMES.filter(function(t){ return !t.isCustom; }).forEach(function(t) {
+    var opt = document.createElement('option');
+    opt.value = t.id;
+    opt.textContent = t.name;
+    if (t.id === curTheme) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  onTwThemeChange(curTheme);
+}
+
+function onTwThemeChange(themeId) {
+  twCurrentTheme = themeId;
+  var saved = localStorage.getItem('serverplex_wallpaper_' + themeId);
+  var urlInput = document.getElementById('twUrl');
+  var preview  = document.getElementById('twPreview');
+  var label    = document.getElementById('twPreviewLabel');
+
+  // Find default wallpaper for this theme from THEMES img
+  var th = THEMES.find(function(t){ return t.id === themeId; });
+  var defaultImg = th && th.img ? th.img : '';
+
+  if (saved) {
+    var isData = saved.startsWith('data:');
+    preview.style.backgroundImage = "url('" + saved + "')";
+    preview.style.backgroundSize  = 'cover';
+    label.textContent = isData ? '📁 Custom upload' : '🔗 Custom URL';
+    urlInput.value = isData ? '' : saved;
+  } else if (defaultImg) {
+    preview.style.backgroundImage = "url('" + defaultImg + "')";
+    preview.style.backgroundSize  = 'cover';
+    label.textContent = 'Default wallpaper';
+    urlInput.value = '';
+  } else {
+    preview.style.backgroundImage = th ? th.bg : 'none';
+    preview.style.backgroundSize  = '';
+    label.textContent = 'Gradient only (no image)';
+    urlInput.value = '';
+  }
+  document.getElementById('twApplyBtn').disabled = !urlInput.value;
+}
+
+function twUrlChanged() {
+  var val = document.getElementById('twUrl').value.trim();
+  document.getElementById('twApplyBtn').disabled = !val;
+  // Live preview while typing a URL
+  if (val.startsWith('http')) {
+    document.getElementById('twPreview').style.backgroundImage = "url('" + val + "')";
+  }
+}
+
+function applyThemeWallpaper() {
+  var url = document.getElementById('twUrl').value.trim();
+  if (!url) return;
+  localStorage.setItem('serverplex_wallpaper_' + twCurrentTheme, url);
+  document.getElementById('twPreviewLabel').textContent = '🔗 Custom URL';
+  // Apply live if this is the active theme
+  try {
+    if (window.parent && window.parent.currentTheme === twCurrentTheme && window.parent.setWallpaper)
+      window.parent.setWallpaper("url('" + url + "') center/cover no-repeat");
+  } catch(e) {}
+  showTwToast('Wallpaper saved for ' + twCurrentTheme + '!');
+}
+
+function uploadThemeWallpaper() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var dataUrl = ev.target.result;
+      localStorage.setItem('serverplex_wallpaper_' + twCurrentTheme, dataUrl);
+      document.getElementById('twPreview').style.backgroundImage = "url('" + dataUrl + "')";
+      document.getElementById('twPreviewLabel').textContent = '📁 Custom upload';
+      document.getElementById('twUrl').value = '';
+      try {
+        if (window.parent && window.parent.currentTheme === twCurrentTheme && window.parent.setWallpaper)
+          window.parent.setWallpaper("url('" + dataUrl + "') center/cover no-repeat");
+      } catch(e) {}
+      showTwToast('Wallpaper uploaded for ' + twCurrentTheme + '!');
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function resetThemeWallpaper() {
+  localStorage.removeItem('serverplex_wallpaper_' + twCurrentTheme);
+  document.getElementById('twUrl').value = '';
+  onTwThemeChange(twCurrentTheme);
+  // Revert live if active theme
+  try {
+    if (window.parent && window.parent.currentTheme === twCurrentTheme && window.parent.setWallpaper)
+      window.parent.setWallpaper('none');
+  } catch(e) {}
+  showTwToast('Reset to default for ' + twCurrentTheme);
+}
+
+function showTwToast(msg) {
+  // Reuse applied badge as a quick toast
+  var b = document.getElementById('appliedBadge');
+  if (!b) return;
+  b.textContent = '✓ ' + msg;
+  b.classList.add('show');
+  setTimeout(function(){ b.classList.remove('show'); }, 2500);
+}
+
+buildTwThemeSelect();
 </script>
 </body>
 </html>

@@ -1,227 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><title>Calculator</title>
+<script src="app-theme.js"></script>
+<meta charset="UTF-8"><title>Calendar</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
-.calc{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
-.mode-row{display:flex;gap:6px;margin-bottom:14px}
-.mode-btn{flex:1;padding:7px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--text3);font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer;transition:all 0.2s}
-.mode-btn.active{background:var(--accent);color:white;border-color:var(--accent)}
-.display{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;min-height:90px;display:flex;flex-direction:column;align-items:flex-end;justify-content:flex-end;gap:4px}
-.display-expr{font-size:13px;color:var(--text3);min-height:18px;word-break:break-all;text-align:right}
-.display-val{font-size:36px;font-weight:700;color:var(--text);word-break:break-all;text-align:right}
-.history-btn{font-size:11px;color:var(--text3);cursor:pointer;text-align:right;margin-bottom:8px}
-.history-btn:hover{color:#4db8ff}
-.history-panel{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:10px;max-height:100px;overflow-y:auto;display:none}
-.history-item{font-size:12px;color:var(--text3);padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);cursor:pointer}
-.history-item:hover{color:var(--text)}
-.history-item:last-child{border-bottom:none}
-.sci-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.btn{padding:0;height:56px;border:none;border-radius:10px;font-family:'Oxanium',sans-serif;font-size:16px;font-weight:600;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center}
-.btn:active{transform:scale(0.94)}
-.btn-num{background:var(--bg2);color:var(--text)}
-.btn-num:hover{background:var(--bg2)}
-.btn-op{background:var(--accent);color:white}
-.btn-op:hover{background:var(--accent-bright, #0090ff)}
-.btn-eq{background:#238636;color:white}
-.btn-eq:hover{background:#2ea043}
-.btn-clear{background:#da3633;color:white}
-.btn-clear:hover{background:#f85149}
-.btn-fn{background:var(--surface);color:#79c0ff;border:1px solid var(--border);font-size:12px}
-.btn-fn:hover{background:var(--bg2)}
-.btn-span2{grid-column:span 2}
-.sci-panel{display:none}
-.sci-panel.show{display:block}
-
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
+body{font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{padding:16px 20px;background:var(--app-surface);border-bottom:1px solid var(--app-border);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.nav-btn{background:rgba(128,128,128,0.05);border:1px solid var(--app-border);border-radius:8px;color:var(--app-text);padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px;transition:all 0.2s}
+.nav-btn:hover{background:var(--app-border)}
+.month-title{font-size:20px;font-weight:700;flex:1;text-align:center}
+.today-btn{background:var(--app-accent);border:none;border-radius:8px;color:white;padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px}
+.view-btns{display:flex;gap:4px}
+.view-btn{background:rgba(128,128,128,0.05);border:1px solid var(--app-border);border-radius:6px;color:var(--app-text2);padding:5px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
+.view-btn.active{background:var(--app-accent);color:white;border-color:var(--app-accent)}
+.main{flex:1;display:flex;overflow:hidden}
+.cal-wrap{flex:1;padding:16px;overflow-y:auto}
+.day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+.day-header{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--app-text2);padding:8px 0;text-transform:uppercase}
+.day-header.weekend{color:var(--app-accent)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.day-cell{min-height:90px;background:var(--app-surface);border:1px solid rgba(128,128,128,0.04);border-radius:8px;padding:8px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:3px}
+.day-cell:hover{background:var(--app-surface2);border-color:var(--app-border)}
+.day-cell.other{opacity:0.3}
+.day-cell.today{border-color:var(--app-accent);background:color-mix(in srgb, var(--app-accent) 15%, var(--app-bg))}
+.day-num{font-size:13px;font-weight:600;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%}
+.day-cell.today .day-num{background:var(--app-accent);color:white}
+.event-dot{font-size:10px;padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar{width:260px;background:var(--app-surface);border-left:1px solid var(--app-border);padding:16px;overflow-y:auto;flex-shrink:0}
+.sidebar h3{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--app-text2);margin-bottom:12px}
+.add-event{width:100%;padding:10px;background:var(--app-accent);border:none;border-radius:8px;color:white;font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;margin-bottom:16px}
+.add-event:hover{background:var(--app-accent)}
+.event-form{background:var(--app-bg);border:1px solid var(--app-border);border-radius:8px;padding:12px;margin-bottom:16px;display:none}
+.event-form input,.event-form select{width:100%;padding:7px 10px;background:var(--app-surface);border:1px solid var(--app-border);border-radius:6px;color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;margin-bottom:8px}
+.event-form input::placeholder{color:var(--app-text2)}
+.form-btns{display:flex;gap:6px}
+.form-btn{flex:1;padding:7px;border:none;border-radius:6px;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer}
+.form-save{background:#238636;color:white}
+.form-cancel{background:var(--app-surface2);color:#ccc}
+.upcoming-event{padding:8px;background:var(--app-bg);border-left:3px solid var(--app-accent);border-radius:0 6px 6px 0;margin-bottom:6px;font-size:12px}
+.ue-title{font-weight:600;color:var(--app-text)}
+.ue-date{color:var(--app-text2);font-size:11px;margin-top:2px}
+.ev-colors{display:flex;gap:6px;margin-bottom:8px}
+.ev-color{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent}
+.ev-color.selected{border-color:white}
+.no-events{color:var(--app-text2);font-size:12px;padding:8px 0}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
-<div class="calc">
-  <div class="mode-row">
-    <button class="mode-btn active" onclick="setMode('standard')">Standard</button>
-    <button class="mode-btn" onclick="setMode('scientific')">Scientific</button>
-  </div>
-  <div class="display">
-    <div class="display-expr" id="expr"></div>
-    <div class="display-val" id="val">0</div>
-  </div>
-  <div class="history-btn" onclick="toggleHistory()">History ▾</div>
-  <div class="history-panel" id="historyPanel"></div>
-  <div class="sci-panel" id="sciPanel">
-    <div class="sci-grid">
-      <button class="btn btn-fn" onclick="sci('sin')">sin</button>
-      <button class="btn btn-fn" onclick="sci('cos')">cos</button>
-      <button class="btn btn-fn" onclick="sci('tan')">tan</button>
-      <button class="btn btn-fn" onclick="sci('log')">log</button>
-      <button class="btn btn-fn" onclick="sci('asin')">sin⁻¹</button>
-      <button class="btn btn-fn" onclick="sci('acos')">cos⁻¹</button>
-      <button class="btn btn-fn" onclick="sci('atan')">tan⁻¹</button>
-      <button class="btn btn-fn" onclick="sci('ln')">ln</button>
-      <button class="btn btn-fn" onclick="sci('sqrt')">√x</button>
-      <button class="btn btn-fn" onclick="sci('pow2')">x²</button>
-      <button class="btn btn-fn" onclick="pushOp('^')">xʸ</button>
-      <button class="btn btn-fn" onclick="sci('inv')">1/x</button>
-      <button class="btn btn-fn" onclick="pushNum('3.14159265')">π</button>
-      <button class="btn btn-fn" onclick="pushNum('2.71828182')">e</button>
-      <button class="btn btn-fn" onclick="sci('abs')">|x|</button>
-      <button class="btn btn-fn" onclick="sci('fact')">n!</button>
+<div class="header">
+  <button class="nav-btn" onclick="changeMonth(-1)">←</button>
+  <div class="month-title" id="monthTitle"></div>
+  <button class="nav-btn" onclick="changeMonth(1)">→</button>
+  <button class="today-btn" onclick="goToday()">Today</button>
+</div>
+<div class="main">
+  <div class="cal-wrap">
+    <div class="day-headers">
+      <div class="day-header weekend">Sun</div>
+      <div class="day-header">Mon</div>
+      <div class="day-header">Tue</div>
+      <div class="day-header">Wed</div>
+      <div class="day-header">Thu</div>
+      <div class="day-header">Fri</div>
+      <div class="day-header weekend">Sat</div>
     </div>
+    <div class="cal-grid" id="calGrid"></div>
   </div>
-  <div class="grid">
-    <button class="btn btn-clear" onclick="clear()">C</button>
-    <button class="btn btn-fn" onclick="backspace()">⌫</button>
-    <button class="btn btn-fn" onclick="toggleSign()">±</button>
-    <button class="btn btn-op" onclick="pushOp('/')">÷</button>
-    <button class="btn btn-num" onclick="pushNum('7')">7</button>
-    <button class="btn btn-num" onclick="pushNum('8')">8</button>
-    <button class="btn btn-num" onclick="pushNum('9')">9</button>
-    <button class="btn btn-op" onclick="pushOp('*')">×</button>
-    <button class="btn btn-num" onclick="pushNum('4')">4</button>
-    <button class="btn btn-num" onclick="pushNum('5')">5</button>
-    <button class="btn btn-num" onclick="pushNum('6')">6</button>
-    <button class="btn btn-op" onclick="pushOp('-')">−</button>
-    <button class="btn btn-num" onclick="pushNum('1')">1</button>
-    <button class="btn btn-num" onclick="pushNum('2')">2</button>
-    <button class="btn btn-num" onclick="pushNum('3')">3</button>
-    <button class="btn btn-op" onclick="pushOp('+')">+</button>
-    <button class="btn btn-num btn-span2" onclick="pushNum('0')">0</button>
-    <button class="btn btn-num" onclick="pushNum('.')">.</button>
-    <button class="btn btn-eq" onclick="calculate()">=</button>
+  <div class="sidebar">
+    <h3>Events</h3>
+    <button class="add-event" onclick="toggleForm()">+ Add Event</button>
+    <div class="event-form" id="eventForm">
+      <input type="text" id="evTitle" placeholder="Event title">
+      <input type="date" id="evDate">
+      <input type="time" id="evTime" placeholder="Time (optional)">
+      <input type="text" id="evNote" placeholder="Notes (optional)">
+      <div class="ev-colors" id="evColors"></div>
+      <div class="form-btns">
+        <button class="form-btn form-save" onclick="saveEvent()">Save</button>
+        <button class="form-btn form-cancel" onclick="toggleForm()">Cancel</button>
+      </div>
+    </div>
+    <h3>Upcoming</h3>
+    <div id="upcomingList"></div>
   </div>
 </div>
 <script>
-let cur='0',op=null,prev=null,waiting=false,expr='';
-let history=JSON.parse(localStorage.getItem('serverplex_calc_history')||'[]');
-let mode='standard';
+const COLORS=['var(--app-accent)','#238636','#da3633','#e3b341','#8957e5','#f78166'];
+let events=JSON.parse(localStorage.getItem('serverplex_calendar_events')||'[]');
+let cur=new Date(),selColor=COLORS[0];
+const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const today=new Date();
 
-function upd(){
-  document.getElementById('val').textContent=cur.length>14?parseFloat(cur).toExponential(6):cur;
-  document.getElementById('expr').textContent=expr;
-}
-function setMode(m){
-  mode=m;
-  document.querySelectorAll('.mode-btn').forEach((b,i)=>b.classList.toggle('active',i===(m==='standard'?0:1)));
-  document.getElementById('sciPanel').classList.toggle('show',m==='scientific');
-}
-function pushNum(n){
-  if(waiting){cur=n==='.'?'0.':n;waiting=false;}
-  else if(n==='.'&&cur.includes('.'))return;
-  else cur=cur==='0'&&n!=='.'?n:cur+n;
-  upd();
-}
-function pushOp(o){
-  if(op&&!waiting)calculate(true);
-  prev=cur;op=o;waiting=true;
-  expr=prev+' '+(o==='/'?'÷':o==='*'?'×':o)+' ';
-  upd();
-}
-function calculate(chain=false){
-  if(!op||!prev)return;
-  const a=parseFloat(prev),b=parseFloat(cur);
-  let r;
-  switch(op){
-    case'+':r=a+b;break;case'-':r=a-b;break;
-    case'*':r=a*b;break;case'/':r=b!==0?a/b:'Error';break;
-    case'^':r=Math.pow(a,b);break;
+function save(){localStorage.setItem('serverplex_calendar_events',JSON.stringify(events));}
+function dateStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+
+function render(){
+  document.getElementById('monthTitle').textContent=`${months[cur.getMonth()]} ${cur.getFullYear()}`;
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  const y=cur.getFullYear(),m=cur.getMonth();
+  const first=new Date(y,m,1).getDay();
+  const days=new Date(y,m+1,0).getDate();
+  const prevDays=new Date(y,m,0).getDate();
+  for(let i=first-1;i>=0;i--){
+    const cell=document.createElement('div');
+    cell.className='day-cell other';
+    cell.innerHTML=`<div class="day-num">${prevDays-i}</div>`;
+    grid.appendChild(cell);
   }
-  const entry=`${prev} ${op==='/'?'÷':op==='*'?'×':op} ${cur} = ${r}`;
-  if(!chain){addHistory(entry);expr=entry;}
-  cur=typeof r==='number'?parseFloat(r.toFixed(10)).toString():'Error';
-  op=null;prev=null;waiting=!chain;
-  upd();
-}
-function sci(fn){
-  const v=parseFloat(cur);let r;
-  switch(fn){
-    case'sin':r=Math.sin(v*Math.PI/180);break;
-    case'cos':r=Math.cos(v*Math.PI/180);break;
-    case'tan':r=Math.tan(v*Math.PI/180);break;
-    case'asin':r=Math.asin(v)*180/Math.PI;break;
-    case'acos':r=Math.acos(v)*180/Math.PI;break;
-    case'atan':r=Math.atan(v)*180/Math.PI;break;
-    case'ln':r=Math.log(v);break;
-    case'log':r=Math.log10(v);break;
-    case'sqrt':r=Math.sqrt(v);break;
-    case'pow2':r=Math.pow(v,2);break;
-    case'inv':r=1/v;break;
-    case'abs':r=Math.abs(v);break;
-    case'fact':r=factorial(v);break;
+  for(let d=1;d<=days;d++){
+    const dateS=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
+    const cell=document.createElement('div');
+    cell.className='day-cell'+(isToday?' today':'');
+    const dayEvs=events.filter(e=>e.date===dateS);
+    cell.innerHTML=`<div class="day-num">${d}</div>${dayEvs.map(e=>`<div class="event-dot" style="background:${e.color}22;color:${e.color};border-left:2px solid ${e.color}">${e.time?e.time+' ':''} ${e.title}</div>`).join('')}`;
+    cell.onclick=()=>clickDay(dateS);
+    grid.appendChild(cell);
   }
-  addHistory(`${fn}(${cur}) = ${r}`);
-  cur=parseFloat(r.toFixed(10)).toString();waiting=true;upd();
+  renderUpcoming();
 }
-function factorial(n){if(n<0)return NaN;if(n===0||n===1)return 1;let r=1;for(let i=2;i<=n;i++)r*=i;return r;}
-function toggleSign(){cur=(parseFloat(cur)*-1).toString();upd();}
-function backspace(){cur=cur.length>1?cur.slice(0,-1):'0';upd();}
-function clear(){cur='0';op=null;prev=null;waiting=false;expr='';upd();}
-function addHistory(e){history.unshift(e);if(history.length>50)history.pop();localStorage.setItem('serverplex_calc_history',JSON.stringify(history));}
-function toggleHistory(){
-  const p=document.getElementById('historyPanel');
-  const show=p.style.display==='block';p.style.display=show?'none':'block';
-  if(!show){p.innerHTML=history.length?history.map(h=>`<div class="history-item" onclick="useHistory('${h}')">${h}</div>`).join(''):'<div style="color:#8b949e;font-size:12px;padding:4px">No history yet</div>';}
+
+function renderUpcoming(){
+  const list=document.getElementById('upcomingList');
+  const todayS=dateStr(today);
+  const upcoming=events.filter(e=>e.date>=todayS).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,10);
+  list.innerHTML=upcoming.length?upcoming.map(e=>`<div class="upcoming-event" style="border-color:${e.color}"><div class="ue-title">${e.title}</div><div class="ue-date">${e.date}${e.time?' · '+e.time:''}</div></div>`).join(''):`<div class="no-events">No upcoming events</div>`;
 }
-function useHistory(h){const m=h.match(/= (.+)$/);if(m){cur=m[1];upd();}}
-document.addEventListener('keydown',e=>{
-  if(e.key>='0'&&e.key<='9')pushNum(e.key);
-  if(e.key==='.')pushNum('.');
-  if(e.key==='+'||e.key==='-'||e.key==='*'||e.key==='/')pushOp(e.key);
-  if(e.key==='Enter'||e.key==='=')calculate();
-  if(e.key==='Backspace')backspace();
-  if(e.key==='Escape')clear();
+
+function clickDay(date){
+  document.getElementById('evDate').value=date;
+  document.getElementById('eventForm').style.display='block';
+  document.getElementById('evTitle').focus();
+}
+
+function toggleForm(){
+  const f=document.getElementById('eventForm');
+  f.style.display=f.style.display==='block'?'none':'block';
+  if(f.style.display==='block'&&!document.getElementById('evDate').value){
+    document.getElementById('evDate').value=dateStr(new Date());
+  }
+}
+
+function saveEvent(){
+  const title=document.getElementById('evTitle').value.trim();
+  const date=document.getElementById('evDate').value;
+  if(!title||!date)return;
+  events.push({id:Date.now(),title,date,time:document.getElementById('evTime').value,note:document.getElementById('evNote').value,color:selColor});
+  save();
+  document.getElementById('evTitle').value='';
+  document.getElementById('evTime').value='';
+  document.getElementById('evNote').value='';
+  document.getElementById('eventForm').style.display='none';
+  render();
+}
+
+function changeMonth(d){cur.setMonth(cur.getMonth()+d);render();}
+function goToday(){cur=new Date(today);render();}
+
+// Color picker
+const cp=document.getElementById('evColors');
+COLORS.forEach(c=>{
+  const d=document.createElement('div');
+  d.className='ev-color'+(c===selColor?' selected':'');
+  d.style.background=c;
+  d.onclick=()=>{selColor=c;document.querySelectorAll('.ev-color').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');};
+  cp.appendChild(d);
 });
-upd();
+
+render();
 </script>
 </body>
 </html>

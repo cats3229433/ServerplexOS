@@ -1,240 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><title>Voice Recorder</title>
+<script src="app-theme.js"></script>
+<meta charset="UTF-8"><title>Screen Recorder</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
-.header h1{font-size:18px;font-weight:700}
-.main{flex:1;display:flex;overflow:hidden}
-.recorder-panel{width:320px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:20px;border-right:1px solid var(--border)}
-.mic-btn{width:100px;height:100px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:40px;transition:all .2s;background:var(--border);border:2px solid var(--border2)}
-.mic-btn:hover{background:var(--border2);transform:scale(1.05)}
-.mic-btn.recording{background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.5);animation:micPulse 1s ease infinite}
-@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)}50%{box-shadow:0 0 0 16px rgba(239,68,68,0)}}
-.timer{font-size:42px;font-weight:800;letter-spacing:3px;font-variant-numeric:tabular-nums}
-.timer.recording{color:#ef4444}
-.status-label{font-size:13px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
-.waveform{width:100%;height:60px;border-radius:8px;background:var(--surface);border:1px solid var(--border);overflow:hidden}
-.recordings-panel{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.panel-title{padding:14px 16px;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border)}
-.recordings-list{flex:1;overflow-y:auto;padding:10px}
-.recording-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:all .15s}
-.recording-item:hover{border-color:var(--border2)}
-.ri-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.ri-name{font-size:14px;font-weight:600;cursor:pointer}
-.ri-name:hover{color:#58a6ff}
-.ri-meta{font-size:11px;color:var(--text3)}
-.ri-actions{display:flex;gap:6px}
-.ri-btn{padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,0.04);color:var(--text);font-family:'Oxanium',sans-serif;font-size:11px;cursor:pointer;transition:all .15s}
-.ri-btn:hover{background:rgba(255,255,255,0.1)}
-.ri-btn.danger:hover{background:rgba(239,68,68,0.15);color:#f85149;border-color:rgba(239,68,68,0.3)}
-audio{width:100%;margin-top:4px;height:32px}
-audio::-webkit-media-controls-panel{background:var(--bg)}
-.empty-recs{text-align:center;padding:40px;color:var(--text3)}
-.empty-recs div{font-size:48px;margin-bottom:12px}
-.perm-error{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:16px;text-align:center;font-size:13px;color:#fca5a5;line-height:1.6}
+body{font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.header{background:var(--app-surface);border-bottom:1px solid var(--app-border);padding:10px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.header h1{font-size:17px;font-weight:700}
 
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
-.sp-accent{color:var(--accent)}</style>
+/* ── Settings bar ── */
+.settings-bar{background:var(--app-surface);border-bottom:1px solid var(--app-border);padding:7px 14px;display:flex;align-items:center;gap:16px;flex-shrink:0;flex-wrap:wrap}
+.setting-group{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--app-text2)}
+.setting-group select{padding:3px 7px;border:1px solid var(--app-border);border-radius:5px;background:var(--app-bg);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:11px;outline:none;cursor:pointer}
+.toggle-wrap{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--app-text2)}
+.mini-toggle{position:relative;width:32px;height:18px;flex-shrink:0;cursor:pointer}
+.mini-toggle input{opacity:0;width:0;height:0}
+.mini-track{position:absolute;inset:0;border-radius:9px;background:var(--app-border);transition:background .2s}
+.mini-toggle input:checked+.mini-track{background:var(--app-accent)}
+.mini-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.mini-toggle input:checked~.mini-thumb{left:16px}
+
+.main{flex:1;display:flex;overflow:hidden}
+
+/* ── Preview panel ── */
+.preview-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000;position:relative}
+.preview-wrap{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:#0a0a0a;overflow:hidden}
+#previewVideo{width:100%;height:100%;object-fit:contain;display:block}
+
+.idle-state{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none}
+.idle-state.hidden{display:none}
+.idle-icon{font-size:56px;opacity:.25}
+.idle-text{font-size:13px;color:rgba(255,255,255,.3);letter-spacing:1px;text-transform:uppercase}
+.idle-hint{font-size:11px;color:rgba(255,255,255,.18)}
+
+.rec-badge{position:absolute;top:12px;left:12px;display:none;align-items:center;gap:7px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border:1px solid rgba(239,68,68,.45);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#fff}
+.rec-badge.show{display:flex}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:recPulse .8s ease-in-out infinite alternate}
+@keyframes recPulse{from{opacity:1}to{opacity:.25}}
+
+.rec-timer{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 12px;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff;display:none}
+.rec-timer.show{display:block}
+
+.paused-badge{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(4px)}
+.paused-badge.show{display:flex}
+.paused-pill{background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:10px 24px;font-size:16px;font-weight:700;color:#fff;letter-spacing:2px}
+
+.perm-error{display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;text-align:center}
+.perm-error.show{display:flex}
+.perm-icon{font-size:48px;opacity:.4}
+.perm-title{font-size:15px;font-weight:700;color:rgba(255,255,255,.6)}
+.perm-desc{font-size:12px;color:rgba(255,255,255,.3);line-height:1.7;max-width:300px}
+.perm-retry{padding:9px 22px;background:var(--app-accent);border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px}
+
+/* Countdown */
+.countdown-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:5}
+.countdown-overlay.show{display:flex}
+.countdown-num{font-size:96px;font-weight:800;color:#fff;animation:countPop .85s ease forwards}
+@keyframes countPop{0%{transform:scale(1.4);opacity:0}30%{opacity:1;transform:scale(1)}90%{opacity:1}100%{opacity:0;transform:scale(.8)}}
+
+/* ── Controls bar ── */
+.controls-bar{background:rgba(0,0,0,.88);backdrop-filter:blur(12px);border-top:1px solid rgba(255,255,255,.07);padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:12px;flex-shrink:0}
+
+.ctrl-btn{height:40px;padding:0 16px;border-radius:8px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);color:#fff;font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .18s;white-space:nowrap}
+.ctrl-btn:hover:not(:disabled){background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3)}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.ctrl-btn.red{border-color:rgba(239,68,68,.4);color:#fca5a5}
+.ctrl-btn.red:hover:not(:disabled){background:rgba(239,68,68,.15)}
+
+.rec-btn-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.rec-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(239,68,68,.4);pointer-events:none}
+.rec-btn{width:52px;height:52px;border-radius:50%;border:3px solid rgba(255,255,255,.25);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.rec-btn:hover{border-color:rgba(255,255,255,.5)}
+.rec-btn-inner{width:30px;height:30px;border-radius:50%;background:#ef4444;transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.rec-btn.recording .rec-btn-inner{border-radius:5px;width:18px;height:18px}
+.rec-btn.recording .rec-ring{animation:ringPulse 1s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:.4}50%{transform:scale(1.2);opacity:1}}
+
+/* ── Sidebar ── */
+.sidebar{width:260px;flex-shrink:0;background:var(--app-surface);border-left:1px solid var(--app-border);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:12px 14px;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);border-bottom:1px solid var(--app-border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.sidebar-clear{font-size:10px;font-weight:700;color:var(--app-text2);cursor:pointer;padding:3px 7px;border:1px solid var(--app-border);border-radius:5px;background:none;font-family:'Oxanium',sans-serif;transition:all .15s}
+.sidebar-clear:hover{color:#ef4444;border-color:rgba(239,68,68,.4)}
+.recordings-list{flex:1;overflow-y:auto;padding:8px}
+.recordings-list::-webkit-scrollbar{width:3px}
+.recordings-list::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:2px}
+
+.rec-item{background:var(--app-bg);border:1px solid var(--app-border);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.rec-thumb{width:100%;height:78px;object-fit:cover;cursor:pointer;display:block;background:#000}
+.rec-thumb-placeholder{width:100%;height:78px;background:linear-gradient(135deg,#1a1a2e,#0a0a1a);display:flex;align-items:center;justify-content:center;font-size:28px;cursor:pointer;color:#555}
+.rec-body{padding:8px 10px}
+.rec-name{font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-name:hover{color:var(--app-accent)}
+.rec-meta{font-size:10px;color:var(--app-text2);margin-top:2px}
+.rec-actions{display:flex;gap:5px;margin-top:7px}
+.rec-action{flex:1;padding:5px;border:1px solid var(--app-border);border-radius:6px;background:rgba(128,128,128,.06);color:var(--app-text2);font-family:'Oxanium',sans-serif;font-size:10px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.rec-action:hover{color:var(--app-text);background:rgba(128,128,128,.12)}
+.rec-action.del:hover{color:#ef4444;border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.08)}
+
+.empty-list{text-align:center;padding:36px 16px;color:var(--app-text2)}
+.empty-list div{font-size:38px;margin-bottom:10px}
+.empty-list p{font-size:12px;line-height:1.7}
+
+/* ── Playback overlay ── */
+.playback-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(10px);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px}
+.playback-overlay.open{display:flex}
+.playback-overlay video{max-width:90vw;max-height:75vh;border-radius:12px;box-shadow:0 24px 60px rgba(0,0,0,.9)}
+.overlay-actions{display:flex;gap:10px}
+.overlay-btn{padding:8px 20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.overlay-btn:hover{background:rgba(255,255,255,.2)}
+</style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
-<div class="header"><div>🎙️</div><h1>Voice Recorder</h1></div>
-<div class="main">
-  <div class="recorder-panel">
-    <canvas class="waveform" id="waveform" width="260" height="60"></canvas>
-    <div class="timer" id="timer">00:00</div>
-    <div class="status-label" id="statusLabel">Ready to record</div>
-    <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎙️</button>
-    <div id="permError"></div>
+<div class="header">
+  <div>🖥️</div>
+  <h1>Screen Recorder</h1>
+</div>
+
+<div class="settings-bar">
+  <div class="setting-group">
+    Quality
+    <select id="qualitySelect">
+      <option value="high">High (1080p)</option>
+      <option value="medium" selected>Medium (720p)</option>
+      <option value="low">Low (480p)</option>
+    </select>
   </div>
-  <div class="recordings-panel">
-    <div class="panel-title">Recordings</div>
+  <div class="setting-group">
+    FPS
+    <select id="fpsSelect">
+      <option value="60">60 fps</option>
+      <option value="30" selected>30 fps</option>
+      <option value="15">15 fps</option>
+    </select>
+  </div>
+  <div class="setting-group">
+    Format
+    <select id="formatSelect">
+      <option value="webm">WebM</option>
+      <option value="mp4">MP4</option>
+    </select>
+  </div>
+  <div class="toggle-wrap">
+    <label class="mini-toggle">
+      <input type="checkbox" id="micToggle" checked>
+      <span class="mini-track"></span>
+      <span class="mini-thumb"></span>
+    </label>
+    Microphone
+  </div>
+  <div class="toggle-wrap">
+    <label class="mini-toggle">
+      <input type="checkbox" id="countdownToggle" checked>
+      <span class="mini-track"></span>
+      <span class="mini-thumb"></span>
+    </label>
+    Countdown
+  </div>
+</div>
+
+<div class="main">
+  <div class="preview-panel">
+    <div class="preview-wrap">
+      <video id="previewVideo" muted playsinline></video>
+      <div class="idle-state" id="idleState">
+        <div class="idle-icon">🖥️</div>
+        <div class="idle-text">Ready to record</div>
+        <div class="idle-hint">Click the red button — your browser will ask what to capture</div>
+      </div>
+      <div class="perm-error" id="permError">
+        <div class="perm-icon">🚫</div>
+        <div class="perm-title">Screen access denied</div>
+        <div class="perm-desc">Click Allow when the browser asks for screen capture permission, then try again.</div>
+        <button class="perm-retry" onclick="handleRecordClick()">Try Again</button>
+      </div>
+      <div class="rec-badge" id="recBadge"><div class="rec-dot"></div>REC</div>
+      <div class="rec-timer" id="recTimer">00:00</div>
+      <div class="paused-badge" id="pausedBadge"><div class="paused-pill">⏸ PAUSED</div></div>
+      <div class="countdown-overlay" id="countdownOverlay">
+        <div class="countdown-num" id="countdownNum">3</div>
+      </div>
+    </div>
+    <div class="controls-bar">
+      <div class="rec-btn-wrap">
+        <div class="rec-ring" id="recRing"></div>
+        <button class="rec-btn" id="recBtn" onclick="handleRecordClick()" title="Start / Stop recording">
+          <div class="rec-btn-inner"></div>
+        </button>
+      </div>
+      <button class="ctrl-btn" id="pauseBtn" onclick="togglePause()" disabled>⏸ Pause</button>
+      <button class="ctrl-btn red" id="stopBtn" onclick="stopRecording()" disabled>⏹ Stop</button>
+      <button class="ctrl-btn" id="snapBtn" onclick="takeScreenshot()" disabled>📷 Screenshot</button>
+      <button class="ctrl-btn red" id="discardBtn" onclick="discardRecording()" disabled>✕ Discard</button>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-header">
+      Recordings
+      <button class="sidebar-clear" onclick="clearAll()">Clear all</button>
+    </div>
     <div class="recordings-list" id="recordingsList"></div>
   </div>
 </div>
+
+<div class="playback-overlay" id="playbackOverlay">
+  <video id="overlayVideo" controls></video>
+  <div class="overlay-actions">
+    <button class="overlay-btn" onclick="downloadOverlay()">⬇️ Download</button>
+    <button class="overlay-btn" onclick="closePlayback()">✕ Close</button>
+  </div>
+</div>
+
+<canvas id="snapCanvas" style="display:none"></canvas>
+
 <script>
-let mediaRecorder = null, chunks = [], timerInt = null, seconds = 0;
-let recordings = JSON.parse(localStorage.getItem('serverplex_voice_recordings') || '[]');
-let audioCtx = null, analyser = null, animFrame = null;
+let displayStream = null, micStream = null, mediaRecorder = null;
+let chunks = [], isRecording = false, isPaused = false;
+let seconds = 0, timerInterval = null;
+let recordings = JSON.parse(localStorage.getItem('spx_screenrec') || '[]');
+let overlayBlobId = null;
 
-function save() { localStorage.setItem('serverplex_voice_recordings', JSON.stringify(recordings.map(r => ({...r, url: undefined})))); }
+const QUALITY = { high:{width:1920,height:1080}, medium:{width:1280,height:720}, low:{width:854,height:480} };
 
-function fmt(s) { return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); }
-
-async function toggleRecording() {
-  if (mediaRecorder && mediaRecorder.state === 'recording') {
-    stopRecording(); return;
-  }
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    startRecording(stream);
-  } catch(e) {
-    document.getElementById('permError').innerHTML = '<div class="perm-error">🎙️ Microphone access denied.<br>Please allow microphone access in your browser settings.</div>';
-  }
+// ── Record ─────────────────────────────────────────────────────
+function handleRecordClick() {
+  if (isRecording) { stopRecording(); return; }
+  if (document.getElementById('countdownToggle').checked) runCountdown(startRecording);
+  else startRecording();
 }
 
-function startRecording(stream) {
-  chunks = []; seconds = 0;
-  mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.ondataavailable = e => chunks.push(e.data);
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(chunks, { type: 'audio/webm' });
-    const url = URL.createObjectURL(blob);
-    const rec = { id: Date.now(), name: 'Recording ' + (recordings.length+1), duration: seconds, date: new Date().toLocaleString(), url };
-    recordings.unshift(rec);
-    save(); renderRecordings();
-    stream.getTracks().forEach(t => t.stop());
-    stopWaveform();
-  };
-  mediaRecorder.start();
-  document.getElementById('micBtn').classList.add('recording');
-  document.getElementById('micBtn').textContent = '⏹️';
-  document.getElementById('statusLabel').textContent = 'Recording…';
-  document.getElementById('timer').classList.add('recording');
-  timerInt = setInterval(() => { seconds++; document.getElementById('timer').textContent = fmt(seconds); }, 1000);
-  startWaveform(stream);
+async function startRecording() {
+  const q   = QUALITY[document.getElementById('qualitySelect').value] || QUALITY.medium;
+  const fps = parseInt(document.getElementById('fpsSelect').value) || 30;
+
+  try {
+    displayStream = await navigator.mediaDevices.getDisplayMedia({
+      video: { width: q.width, height: q.height, frameRate: fps },
+      audio: true,
+    });
+  } catch(e) {
+    document.getElementById('permError').classList.add('show');
+    document.getElementById('idleState').classList.add('hidden');
+    return;
+  }
+
+  document.getElementById('permError').classList.remove('show');
+
+  // Mic audio
+  let audioTracks = [...displayStream.getAudioTracks()];
+  if (document.getElementById('micToggle').checked) {
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioTracks = [...audioTracks, ...micStream.getAudioTracks()];
+    } catch(e) {}
+  }
+
+  const combined = new MediaStream([...displayStream.getVideoTracks(), ...audioTracks]);
+  const pv = document.getElementById('previewVideo');
+  pv.srcObject = combined;
+  pv.play();
+  document.getElementById('idleState').classList.add('hidden');
+
+  // If user stops share from browser UI
+  displayStream.getVideoTracks()[0].addEventListener('ended', () => { if (isRecording) stopRecording(); });
+
+  // Best MIME type
+  const fmt = document.getElementById('formatSelect').value;
+  const mime = (fmt === 'mp4'
+    ? ['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm']
+    : ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm']
+  ).find(m => MediaRecorder.isTypeSupported(m)) || '';
+
+  mediaRecorder = new MediaRecorder(combined, mime ? { mimeType: mime } : {});
+  chunks = [];
+  mediaRecorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  mediaRecorder.onstop = finishRecording;
+  mediaRecorder.start(200);
+
+  isRecording = true; isPaused = false; seconds = 0;
+  setUI('recording');
+  timerInterval = setInterval(() => {
+    if (!isPaused) { seconds++; document.getElementById('recTimer').textContent = fmtTime(seconds); }
+  }, 1000);
 }
 
 function stopRecording() {
-  if (!mediaRecorder) return;
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
   mediaRecorder.stop();
-  clearInterval(timerInt);
-  document.getElementById('micBtn').classList.remove('recording');
-  document.getElementById('micBtn').textContent = '🎙️';
-  document.getElementById('statusLabel').textContent = 'Ready to record';
-  document.getElementById('timer').classList.remove('recording');
-  document.getElementById('timer').textContent = '00:00';
+  clearInterval(timerInterval);
+  isRecording = false; isPaused = false;
+  if (displayStream) displayStream.getTracks().forEach(t => t.stop());
+  if (micStream)     micStream.getTracks().forEach(t => t.stop());
+  displayStream = micStream = null;
+  document.getElementById('previewVideo').srcObject = null;
+  document.getElementById('recTimer').textContent = '00:00';
+  setUI('idle');
+  document.getElementById('idleState').classList.remove('hidden');
 }
 
-function startWaveform(stream) {
-  audioCtx = new AudioContext();
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  audioCtx.createMediaStreamSource(stream).connect(analyser);
-  const canvas = document.getElementById('waveform');
-  const ctx = canvas.getContext('2d');
-  const data = new Uint8Array(analyser.frequencyBinCount);
-  function draw() {
-    animFrame = requestAnimationFrame(draw);
-    analyser.getByteFrequencyData(data);
-    ctx.fillStyle = '#161b22'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    const bw = canvas.width / data.length;
-    data.forEach((v,i) => {
-      const h = (v/255) * canvas.height;
-      ctx.fillStyle = `rgba(239,68,68,${0.4+v/512})`;
-      ctx.fillRect(i*bw, canvas.height-h, bw-1, h);
-    });
+function togglePause() {
+  if (!mediaRecorder) return;
+  if (isPaused) {
+    mediaRecorder.resume(); isPaused = false;
+    document.getElementById('pauseBtn').textContent = '⏸ Pause';
+    document.getElementById('pausedBadge').classList.remove('show');
+  } else {
+    mediaRecorder.pause(); isPaused = true;
+    document.getElementById('pauseBtn').textContent = '▶ Resume';
+    document.getElementById('pausedBadge').classList.add('show');
   }
-  draw();
-}
-function stopWaveform() {
-  cancelAnimationFrame(animFrame);
-  if (audioCtx) audioCtx.close();
-  const canvas = document.getElementById('waveform');
-  canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);
 }
 
-function renderRecordings() {
-  const list = document.getElementById('recordingsList');
-  if (!recordings.length) { list.innerHTML = '<div class="empty-recs"><div>🎙️</div><p>No recordings yet</p></div>'; return; }
-  list.innerHTML = recordings.map(r => `
-    <div class="recording-item" id="rec-${r.id}">
-      <div class="ri-header">
-        <div>
-          <div class="ri-name" ondblclick="renameRec(${r.id})">${r.name}</div>
-          <div class="ri-meta">${r.date} · ${fmt(r.duration)}</div>
-        </div>
-        <div class="ri-actions">
-          <button class="ri-btn" onclick="downloadRec(${r.id})">💾</button>
-          <button class="ri-btn danger" onclick="deleteRec(${r.id})">🗑️</button>
-        </div>
-      </div>
-      ${r.url ? `<audio controls src="${r.url}"></audio>` : '<div style="font-size:11px;color:#8b949e;margin-top:4px">Reload to play</div>'}
-    </div>`).join('');
+function discardRecording() {
+  if (!isRecording || !confirm('Discard current recording?')) return;
+  mediaRecorder.ondataavailable = null;
+  mediaRecorder.onstop = null;
+  chunks = [];
+  stopRecording();
 }
 
-function renameRec(id) {
-  const r = recordings.find(x => x.id === id);
-  const nw = prompt('Rename:', r.name); if (!nw) return;
-  r.name = nw; save(); renderRecordings();
+function finishRecording() {
+  const mimeType = mediaRecorder.mimeType || 'video/webm';
+  const ext  = mimeType.includes('mp4') ? 'mp4' : 'webm';
+  const blob = new Blob(chunks, { type: mimeType });
+  const url  = URL.createObjectURL(blob);
+  const id   = Date.now();
+
+  const tmp = document.createElement('video');
+  tmp.src = url; tmp.muted = true; tmp.currentTime = 0.5;
+  tmp.onloadeddata = () => {
+    const c = document.getElementById('snapCanvas');
+    c.width = 320; c.height = 180;
+    c.getContext('2d').drawImage(tmp, 0, 0, 320, 180);
+    addRec({ id, name:'Recording '+(recordings.length+1), dur:seconds, size:blob.size, date:new Date().toLocaleString(), ext, thumb:c.toDataURL('image/jpeg',.7), url });
+  };
+  tmp.onerror = () => addRec({ id, name:'Recording '+(recordings.length+1), dur:seconds, size:blob.size, date:new Date().toLocaleString(), ext, thumb:null, url });
 }
-function deleteRec(id) {
-  if (!confirm('Delete this recording?')) return;
-  recordings = recordings.filter(x => x.id !== id); save(); renderRecordings();
+
+function addRec(rec) {
+  recordings.unshift(rec);
+  persistMeta();
+  renderList();
 }
-function downloadRec(id) {
-  const r = recordings.find(x => x.id === id);
-  if (!r || !r.url) return;
-  const a = Object.assign(document.createElement('a'), {href:r.url, download:r.name+'.webm'});
+
+function persistMeta() {
+  const meta = recordings.map(r => ({ id:r.id, name:r.name, dur:r.dur, size:r.size, date:r.date, ext:r.ext, thumb:r.thumb }));
+  try { localStorage.setItem('spx_screenrec', JSON.stringify(meta)); } catch(e) {}
+}
+
+// ── Screenshot ─────────────────────────────────────────────────
+function takeScreenshot() {
+  const pv = document.getElementById('previewVideo');
+  if (!pv.srcObject) return;
+  const c = document.getElementById('snapCanvas');
+  c.width = pv.videoWidth || 1280; c.height = pv.videoHeight || 720;
+  c.getContext('2d').drawImage(pv, 0, 0, c.width, c.height);
+  const a = Object.assign(document.createElement('a'), { href:c.toDataURL('image/png'), download:'screenshot-'+Date.now()+'.png' });
   a.click();
 }
 
-renderRecordings();
-
-function saveToFileManager(name, blob) {
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      let fs = JSON.parse(localStorage.getItem('serverplex_fs') || 'null');
-      if (!fs) return;
-      if (!fs['~'].children.Music) fs['~'].children.Music = {type:'dir',children:{}};
-      fs['~'].children.Music.children[name] = { type:'file', content: e.target.result, size: blob.size, modified: Date.now() };
-      localStorage.setItem('serverplex_fs', JSON.stringify(fs));
-    } catch(err) {}
-  };
-  reader.readAsDataURL(blob);
+// ── Countdown ──────────────────────────────────────────────────
+function runCountdown(cb) {
+  const overlay = document.getElementById('countdownOverlay');
+  const numEl   = document.getElementById('countdownNum');
+  let count = 3;
+  overlay.classList.add('show');
+  numEl.textContent = count;
+  function tick() {
+    numEl.style.animation = 'none'; void numEl.offsetWidth; numEl.style.animation = '';
+    count--;
+    if (count <= 0) { setTimeout(() => { overlay.classList.remove('show'); cb(); }, 850); }
+    else { numEl.textContent = count; setTimeout(tick, 900); }
+  }
+  setTimeout(tick, 900);
 }
 
+// ── List ───────────────────────────────────────────────────────
+function renderList() {
+  const list = document.getElementById('recordingsList');
+  if (!recordings.length) {
+    list.innerHTML = '<div class="empty-list"><div>🖥️</div><p>No recordings yet.<br>Press the red button to start capturing.</p></div>';
+    return;
+  }
+  list.innerHTML = recordings.map((r, i) => `
+    <div class="rec-item">
+      ${r.thumb
+        ? `<img class="rec-thumb" src="${r.thumb}" onclick="playRec(${i})" title="Play">`
+        : `<div class="rec-thumb-placeholder" onclick="playRec(${i})">🖥️</div>`}
+      <div class="rec-body">
+        <div class="rec-name" ondblclick="renameRec(${i})">${r.name}</div>
+        <div class="rec-meta">${r.date} · ${fmtTime(r.dur)} · ${fmtSize(r.size)}</div>
+        <div class="rec-actions">
+          <button class="rec-action" onclick="playRec(${i})">▶ Play</button>
+          <button class="rec-action" onclick="downloadRec(${i})">⬇️</button>
+          <button class="rec-action del" onclick="deleteRec(${i})">🗑️</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renameRec(i) {
+  const n = prompt('Rename:', recordings[i].name);
+  if (n && n.trim()) { recordings[i].name = n.trim(); persistMeta(); renderList(); }
+}
+function downloadRec(i) {
+  const r = recordings[i];
+  if (!r.url) { alert('Recording not available — download in the same session it was recorded.'); return; }
+  Object.assign(document.createElement('a'), { href:r.url, download:r.name+'.'+r.ext }).click();
+}
+function deleteRec(i) {
+  if (!confirm('Delete this recording?')) return;
+  if (recordings[i].url) URL.revokeObjectURL(recordings[i].url);
+  recordings.splice(i, 1);
+  persistMeta(); renderList();
+}
+function clearAll() {
+  if (!recordings.length || !confirm('Delete all recordings?')) return;
+  recordings.forEach(r => { if (r.url) URL.revokeObjectURL(r.url); });
+  recordings = [];
+  localStorage.removeItem('spx_screenrec');
+  renderList();
+}
+
+// ── Playback ───────────────────────────────────────────────────
+function playRec(i) {
+  const r = recordings[i];
+  if (!r.url) { alert('Recording not available for playback — download during the session it was recorded.'); return; }
+  overlayBlobId = r.id;
+  document.getElementById('overlayVideo').src = r.url;
+  document.getElementById('playbackOverlay').classList.add('open');
+}
+function closePlayback() {
+  document.getElementById('playbackOverlay').classList.remove('open');
+  document.getElementById('overlayVideo').src = '';
+}
+function downloadOverlay() {
+  const r = recordings.find(x => x.id === overlayBlobId);
+  if (r && r.url) Object.assign(document.createElement('a'), { href:r.url, download:r.name+'.'+r.ext }).click();
+}
+document.getElementById('playbackOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('playbackOverlay')) closePlayback();
+});
+
+// ── UI state ───────────────────────────────────────────────────
+function setUI(state) {
+  const on = state === 'recording';
+  document.getElementById('recBtn').classList.toggle('recording', on);
+  document.getElementById('recBadge').classList.toggle('show', on);
+  document.getElementById('recTimer').classList.toggle('show', on);
+  document.getElementById('pausedBadge').classList.remove('show');
+  document.getElementById('pauseBtn').disabled   = !on;
+  document.getElementById('stopBtn').disabled    = !on;
+  document.getElementById('snapBtn').disabled    = !on;
+  document.getElementById('discardBtn').disabled = !on;
+  if (!on) document.getElementById('pauseBtn').textContent = '⏸ Pause';
+}
+
+// ── Helpers ────────────────────────────────────────────────────
+function fmtTime(s) { const m=Math.floor(s/60),sc=s%60; return String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0'); }
+function fmtSize(b) { if(!b)return'—'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+
+renderList();
 </script>
 </body>
 </html>

@@ -6,7 +6,53 @@
 <title>ServerplexOS</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;overflow:hidden;height:100vh;width:100vw;user-select:none}
+body{font-family:'Oxanium',sans-serif;overflow:hidden;height:100vh;width:100vw;user-select:none;color:var(--text)}
+/* ── Theme transition ── */
+body,body *{transition:background-color .35s ease,border-color .35s ease,color .35s ease,box-shadow .35s ease}
+body .desktop{transition:background .5s ease}
+body .window,body .taskbar,body .start-menu,body .qs-panel,body .notif-panel,body .cal-popup,body .mini-player{transition:background .35s ease,border-color .35s ease,box-shadow .35s ease}
+/* ── Cursor packs (applied via body class) ── */
+body.cursor-pixel    *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect x='0' y='0' width='4' height='12' fill='white'/%3E%3Crect x='4' y='4' width='4' height='4' fill='white'/%3E%3Crect x='8' y='8' width='4' height='4' fill='white'/%3E%3Crect x='1' y='1' width='2' height='10' fill='black'/%3E%3Crect x='5' y='5' width='2' height='2' fill='black'/%3E%3Crect x='9' y='9' width='2' height='2' fill='black'/%3E%3C/svg%3E") 0 0,auto!important}
+body.cursor-crosshair *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='5' fill='none' stroke='white' stroke-width='1.5'/%3E%3Ccircle cx='12' cy='12' r='1.5' fill='white'/%3E%3Cline x1='12' y1='1' x2='12' y2='7' stroke='white' stroke-width='1.5'/%3E%3Cline x1='12' y1='17' x2='12' y2='23' stroke='white' stroke-width='1.5'/%3E%3Cline x1='1' y1='12' x2='7' y2='12' stroke='white' stroke-width='1.5'/%3E%3Cline x1='17' y1='12' x2='23' y2='12' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E") 12 12,crosshair!important}
+body.cursor-quill    *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpath d='M20 2C20 2 14 4 10 10C8 13 7 16 7 18L6 22L10 21C12 21 15 20 18 16C22 12 22 6 20 2Z' fill='%23f5f5f5' stroke='%23999' stroke-width='.5'/%3E%3Cpath d='M7 18 L3 22' stroke='%23555' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") 3 21,auto!important}
+body.cursor-sword    *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cline x1='3' y1='21' x2='18' y2='6' stroke='%23d0d8e8' stroke-width='2' stroke-linecap='round'/%3E%3Cline x1='16' y1='4' x2='20' y2='8' stroke='%23d0d8e8' stroke-width='2.5' stroke-linecap='round'/%3E%3Cline x1='13' y1='9' x2='9' y2='5' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3Ccircle cx='3.5' cy='20.5' r='1.5' fill='%23c9a84c'/%3E%3C/svg%3E") 3 21,auto!important}
+body.cursor-star     *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cpolygon points='12,2 14.4,9.2 22,9.2 16,14 18.4,21.2 12,17 5.6,21.2 8,14 2,9.2 9.6,9.2' fill='%23FFD700' stroke='%23FFA500' stroke-width='1'/%3E%3C/svg%3E") 12 12,auto!important}
+body.cursor-crystal  *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cellipse cx='12' cy='13' rx='7' ry='9' fill='%23a78bfa' opacity='.85'/%3E%3Cellipse cx='12' cy='13' rx='7' ry='9' fill='none' stroke='%23c4b5fd' stroke-width='1'/%3E%3Cellipse cx='9' cy='10' rx='2' ry='3' fill='white' opacity='.35' transform='rotate(-20 9 10)'/%3E%3Ccircle cx='12' cy='4' r='2' fill='%23c4b5fd'/%3E%3C/svg%3E") 12 12,auto!important}
+body.cursor-paw      *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cellipse cx='12' cy='15' rx='6' ry='5' fill='%23f4a261'/%3E%3Ccircle cx='7' cy='9' r='2.2' fill='%23f4a261'/%3E%3Ccircle cx='12' cy='7' r='2.5' fill='%23f4a261'/%3E%3Ccircle cx='17' cy='9' r='2.2' fill='%23f4a261'/%3E%3Cellipse cx='10' cy='15' rx='1.2' ry='1.5' fill='%23c1440e' opacity='.5'/%3E%3Cellipse cx='12' cy='16' rx='1.2' ry='1.5' fill='%23c1440e' opacity='.5'/%3E%3Cellipse cx='14' cy='15' rx='1.2' ry='1.5' fill='%23c1440e' opacity='.5'/%3E%3C/svg%3E") 12 12,auto!important}
+body.cursor-matrix   *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='20'%3E%3Ctext y='16' font-size='16' fill='%2300ff41'%3E%E2%96%88%3C/text%3E%3C/svg%3E") 2 16,auto!important}
+body.cursor-retro    *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='18'%3E%3Crect width='10' height='16' fill='%2333ff33'/%3E%3C/svg%3E") 2 16,auto!important}
+/* exclude things that should never transition */
+body .desktop::before,body .desktop::after{transition:none!important}
+/* ── App Installer Modal ── */
+.ai-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:99996;display:none;align-items:center;justify-content:center;padding:20px}
+.ai-overlay.open{display:flex;animation:fadeIn .18s ease}
+.ai-box{background:var(--glass);border:1px solid var(--border);border-radius:16px;width:460px;max-width:100%;box-shadow:0 24px 60px rgba(0,0,0,.5);backdrop-filter:blur(24px);overflow:hidden}
+.ai-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.ai-title{font-size:15px;font-weight:800;color:var(--text)}
+.ai-close{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:5px;font-family:'Oxanium',sans-serif}
+.ai-close:hover{background:var(--bg2);color:var(--text)}
+.ai-body{padding:20px}
+.ai-field{margin-bottom:14px}
+.ai-field label{display:block;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.ai-input{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.ai-input:focus{border-color:var(--accent)}
+.ai-input::placeholder{color:var(--text2);opacity:.5}
+.ai-row{display:flex;gap:8px}
+.ai-row .ai-field{flex:1}
+.ai-err{font-size:11px;color:#f85149;margin-top:-8px;margin-bottom:8px;min-height:16px}
+.ai-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px}
+.ai-save{flex:1;padding:10px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Oxanium',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.ai-save:hover{opacity:.88}
+.ai-cancel{padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer}
+.ai-cancel:hover{color:var(--text)}
+.ai-installed{max-height:160px;overflow-y:auto;margin-top:4px}
+.ai-installed-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;font-size:12px;color:var(--text)}
+.ai-installed-icon{font-size:18px;flex-shrink:0}
+.ai-installed-name{flex:1;font-weight:600}
+.ai-uninstall{background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);border-radius:5px;color:#f85149;padding:3px 8px;font-size:11px;cursor:pointer;font-family:'Oxanium',sans-serif}
+.ai-uninstall:hover{background:rgba(248,81,73,.25)}
+.ai-section{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;margin-top:4px}
+
 body.theme-white{--bg:#f0f0f0;--bg2:#e0e0e0;--bg3:#d0d0d0;--text:#000;--text2:#444;--border:#ccc;--win-bg:#fff;--tb-bg:rgba(243,243,243,0.82);--accent:#0078d4;--glass:rgba(255,255,255,0.55);--icon-glow:rgba(0,120,212,0.15);--win-frost:blur(16px)}
 body.theme-black{--bg:#000;--bg2:#1a1a1a;--bg3:#2a2a2a;--text:#fff;--text2:#aaa;--border:#444;--win-bg:#1e1e1e;--tb-bg:rgba(10,10,10,0.82);--accent:#0078d4;--glass:rgba(20,20,20,0.55);--icon-glow:rgba(0,120,212,0.2);--win-frost:blur(20px)}
 body.theme-grey{--bg:#808080;--bg2:#6a6a6a;--bg3:#555;--text:#fff;--text2:#ddd;--border:#999;--win-bg:#707070;--tb-bg:rgba(50,50,50,0.82);--accent:#4a9eff;--glass:rgba(80,80,80,0.55);--icon-glow:rgba(74,158,255,0.2);--win-frost:blur(16px)}
@@ -17,30 +63,83 @@ body.theme-space{--bg:#020408;--bg2:#05080f;--bg3:#080d1a;--text:#c8d8f0;--text2
 body.theme-sunset{--bg:#1a0a0a;--bg2:#241010;--bg3:#2e1515;--text:#fde8d8;--text2:#c4896a;--border:#3d1e1e;--win-bg:#1e0c0c;--tb-bg:rgba(24,10,10,0.88);--accent:#ff6b35;--glass:rgba(28,10,10,0.6);--icon-glow:rgba(255,107,53,0.25);--win-frost:blur(18px)}
 body.theme-arctic{--bg:#e8f4fd;--bg2:#d0e8f8;--bg3:#b8d8f0;--text:#0d2d4a;--text2:#3a6a8a;--border:#a0c8e8;--win-bg:#f0f8ff;--tb-bg:rgba(232,244,253,0.88);--accent:#0096d6;--glass:rgba(240,248,255,0.65);--icon-glow:rgba(0,150,214,0.18);--win-frost:blur(16px)}
 body.theme-synth{--bg:#0d0015;--bg2:#150022;--bg3:#1e0030;--text:#f0e0ff;--text2:#b070d0;--border:#2d0050;--win-bg:#100018;--tb-bg:rgba(14,0,24,0.9);--accent:#e040fb;--glass:rgba(16,0,28,0.65);--icon-glow:rgba(224,64,251,0.28);--win-frost:blur(22px)}
+body.theme-desert{--bg:#1a0e05;--bg2:#2a1a08;--bg3:#3a2510;--text:#f5e6d0;--text2:#c4956a;--border:#4a3018;--win-bg:#1e1008;--tb-bg:rgba(26,14,5,0.88);--accent:#e8913a;--glass:rgba(30,16,8,0.6);--icon-glow:rgba(232,145,58,0.25);--win-frost:blur(18px)}
+body.theme-ocean{--bg:#020d1a;--bg2:#051525;--bg3:#081e30;--text:#d0eef8;--text2:#5a9ab8;--border:#0a2535;--win-bg:#030f1e;--tb-bg:rgba(2,13,26,0.9);--accent:#00b4d8;--glass:rgba(3,15,30,0.6);--icon-glow:rgba(0,180,216,0.25);--win-frost:blur(20px)}
+body.theme-jungle{--bg:#0a1a0a;--bg2:#0f2510;--bg3:#152f15;--text:#d4edd4;--text2:#6aaa6a;--border:#1a3a1a;--win-bg:#0c1e0c;--tb-bg:rgba(10,26,10,0.9);--accent:#2dc653;--glass:rgba(12,30,12,0.6);--icon-glow:rgba(45,198,83,0.22);--win-frost:blur(18px)}
+body.theme-blizzard{--bg:#c8dff0;--bg2:#b8d0e8;--bg3:#a8c0e0;--text:#0a1828;--text2:#3a6888;--border:#98b0d0;--win-bg:#d8eeff;--tb-bg:rgba(200,223,240,0.88);--accent:#90c8f0;--glass:rgba(216,238,255,0.65);--icon-glow:rgba(144,200,240,0.2);--win-frost:blur(16px)}
+body.theme-matrix{--bg:#000;--bg2:#050f05;--bg3:#0a180a;--text:#00ff41;--text2:#00aa2a;--border:#003a10;--win-bg:#030f03;--tb-bg:rgba(0,5,0,0.92);--accent:#00ff41;--glass:rgba(0,8,0,0.7);--icon-glow:rgba(0,255,65,0.3);--win-frost:blur(16px)}
+body.theme-cyberpunk{--bg:#0d0014;--bg2:#160020;--bg3:#1e002c;--text:#f8d0ff;--text2:#b070c8;--border:#2a0040;--win-bg:#100018;--tb-bg:rgba(13,0,20,0.9);--accent:#f637ec;--glass:rgba(16,0,24,0.65);--icon-glow:rgba(246,55,236,0.28);--win-frost:blur(22px)}
+body.theme-retro{--bg:#050e05;--bg2:#0a160a;--bg3:#0f1f0f;--text:#33ff33;--text2:#22aa22;--border:#1a3a1a;--win-bg:#060f06;--tb-bg:rgba(5,14,5,0.95);--accent:#33ff33;--glass:rgba(6,15,6,0.75);--icon-glow:rgba(51,255,51,0.25);--win-frost:blur(14px)}
+body.theme-coffee{--bg:#1a0f08;--bg2:#261610;--bg3:#321e14;--text:#f5e6d4;--text2:#c4956a;--border:#3d2818;--win-bg:#1e1208;--tb-bg:rgba(26,15,8,0.9);--accent:#c9813a;--glass:rgba(30,18,8,0.6);--icon-glow:rgba(201,129,58,0.25);--win-frost:blur(18px)}
+body.theme-autumn{--bg:#1a0a05;--bg2:#261208;--bg3:#32180a;--text:#f8dcc8;--text2:#c47048;--border:#3d1c0a;--win-bg:#1e0c05;--tb-bg:rgba(26,10,5,0.9);--accent:#e2693a;--glass:rgba(30,12,5,0.6);--icon-glow:rgba(226,105,58,0.25);--win-frost:blur(18px)}
+body.theme-candle{--bg:#120a02;--bg2:#1e1005;--bg3:#2a1608;--text:#f8e0c0;--text2:#c4906a;--border:#3a1e08;--win-bg:#160c03;--tb-bg:rgba(18,10,2,0.92);--accent:#f5a623;--glass:rgba(22,12,3,0.65);--icon-glow:rgba(245,166,35,0.28);--win-frost:blur(20px)}
 
 /* ── Existing theme wallpapers ── */
-body.theme-aurora .desktop{background:linear-gradient(180deg,rgba(8,12,26,.55) 0%,rgba(10,20,40,.4) 50%,rgba(8,12,26,.6) 100%),url('https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&q=80') center/cover no-repeat;overflow:hidden}
+body.theme-aurora .desktop{background:linear-gradient(180deg,rgba(8,12,26,.55) 0%,rgba(10,20,40,.4) 50%,rgba(8,12,26,.6) 100%) center/cover no-repeat;overflow:hidden}
 body.theme-aurora .desktop::before{content:'';position:absolute;inset:0;background:rgba(5,8,20,0.55),radial-gradient(ellipse 80% 40% at 20% 60%,rgba(0,212,170,0.25) 0%,transparent 60%),radial-gradient(ellipse 60% 30% at 80% 40%,rgba(100,0,255,0.15) 0%,transparent 60%);animation:auroraPulse 8s ease-in-out infinite alternate;pointer-events:none;z-index:0}
 @keyframes auroraPulse{0%{opacity:.6;transform:scaleY(1)}100%{opacity:1;transform:scaleY(1.1)}}
-body.theme-tokyo .desktop{background:linear-gradient(180deg,rgba(10,11,26,.6) 0%,rgba(22,33,62,.5) 40%,rgba(26,27,46,.65) 100%),url('https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=1600&q=80') center/cover no-repeat;overflow:hidden}
+body.theme-tokyo .desktop{background:linear-gradient(180deg,rgba(10,11,26,.6) 0%,rgba(22,33,62,.5) 40%,rgba(26,27,46,.65) 100%) center/cover no-repeat;overflow:hidden}
 body.theme-tokyo .desktop::before{content:'';position:absolute;inset:0;background:rgba(10,8,20,0.6),radial-gradient(ellipse 40% 60% at 70% 80%,rgba(255,45,85,0.2) 0%,transparent 60%);pointer-events:none;z-index:0;animation:tokyoGlow 6s ease-in-out infinite alternate}
 @keyframes tokyoGlow{0%{opacity:.7}100%{opacity:1}}
-body.theme-forest .desktop{background:linear-gradient(180deg,rgba(5,15,6,.65) 0%,rgba(10,26,11,.5) 40%,rgba(13,32,16,.6) 100%),url('https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=80') center/cover no-repeat}
+body.theme-forest .desktop{background:linear-gradient(180deg,rgba(5,15,6,.65) 0%,rgba(10,26,11,.5) 40%,rgba(13,32,16,.6) 100%) center/cover no-repeat}
 body.theme-forest .desktop::before{content:'';position:absolute;inset:0;background:rgba(5,12,6,0.55),radial-gradient(ellipse 60% 40% at 50% 20%,rgba(52,199,89,0.12) 0%,transparent 60%);animation:forestMist 10s ease-in-out infinite alternate;pointer-events:none;z-index:0}
 @keyframes forestMist{0%{opacity:.5;transform:translateX(-10px)}100%{opacity:1;transform:translateX(10px)}}
-body.theme-space .desktop{background:linear-gradient(180deg,rgba(2,4,8,.4) 0%,rgba(5,8,20,.3) 100%),url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986?w=1600&q=80') center/cover no-repeat;overflow:hidden}
+body.theme-space .desktop{background:linear-gradient(180deg,rgba(2,4,8,.4) 0%,rgba(5,8,20,.3) 100%) center/cover no-repeat;overflow:hidden}
 body.theme-space .desktop::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.8) 1px,transparent 1px),radial-gradient(circle,rgba(255,255,255,0.5) 1px,transparent 1px);background-size:200px 200px,350px 350px;background-position:0 0,100px 100px;animation:starDrift 60s linear infinite;pointer-events:none;z-index:0;opacity:.6}
 @keyframes starDrift{from{transform:translateY(0)}to{transform:translateY(-200px)}}
-body.theme-sunset .desktop{background:linear-gradient(180deg,rgba(13,0,5,.5) 0%,rgba(26,5,16,.4) 30%,rgba(42,16,5,.45) 60%,rgba(26,10,0,.6) 100%),url('https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=1600&q=80') center/cover no-repeat}
+body.theme-sunset .desktop{background:linear-gradient(180deg,rgba(13,0,5,.5) 0%,rgba(26,5,16,.4) 30%,rgba(42,16,5,.45) 60%,rgba(26,10,0,.6) 100%) center/cover no-repeat}
 body.theme-sunset .desktop::before{content:'';position:absolute;inset:0;background:rgba(10,4,0,0.45),radial-gradient(ellipse 70% 40% at 50% 65%,rgba(255,107,53,0.22) 0%,transparent 60%);animation:sunsetPulse 7s ease-in-out infinite alternate;pointer-events:none;z-index:0}
 @keyframes sunsetPulse{0%{opacity:.6}100%{opacity:1}}
-body.theme-arctic .desktop{background:linear-gradient(180deg,rgba(200,232,255,.55) 0%,rgba(224,242,255,.45) 40%,rgba(240,248,255,.5) 100%),url('https://images.unsplash.com/photo-1551582045-6ec9c11d8697?w=1600&q=80') center/cover no-repeat}
+body.theme-arctic .desktop{background:linear-gradient(180deg,rgba(200,232,255,.55) 0%,rgba(224,242,255,.45) 40%,rgba(240,248,255,.5) 100%) center/cover no-repeat}
 body.theme-arctic .desktop::before{content:'';position:absolute;inset:0;background:rgba(220,240,255,0.3),radial-gradient(ellipse 60% 30% at 50% 10%,rgba(255,255,255,0.5) 0%,transparent 60%);animation:arcticShimmer 8s ease-in-out infinite alternate;pointer-events:none;z-index:0}
 @keyframes arcticShimmer{0%{opacity:.7}100%{opacity:1}}
-body.theme-synth .desktop{background:linear-gradient(180deg,rgba(13,0,21,.7) 0%,rgba(30,0,48,.6) 100%),url('https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1600&q=80') center/cover no-repeat;overflow:hidden}
+body.theme-synth .desktop{background:linear-gradient(180deg,rgba(13,0,21,.7) 0%,rgba(30,0,48,.6) 100%) center/cover no-repeat;overflow:hidden}
 body.theme-synth .desktop::before{content:'';position:absolute;inset:0;background:rgba(8,0,15,0.6);pointer-events:none;z-index:0}
 body.theme-synth .desktop::after{content:'';position:absolute;left:-50%;right:-50%;bottom:0;height:55%;background:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(224,64,251,0.06) 40px,rgba(224,64,251,0.06) 41px),repeating-linear-gradient(90deg,transparent,transparent 80px,rgba(224,64,251,0.04) 80px,rgba(224,64,251,0.04) 81px);transform:perspective(400px) rotateX(60deg);transform-origin:bottom center;animation:synthGrid 4s linear infinite;pointer-events:none;z-index:0}
 @keyframes synthGrid{from{background-position:0 0,0 0}to{background-position:0 -80px,0 0}}
+
+body.theme-desert .desktop{background:linear-gradient(180deg,rgba(26,15,5,.45) 0%,rgba(36,21,8,.35) 100%) center/cover no-repeat}
+body.theme-desert .desktop::before{content:'';position:absolute;inset:0;background:rgba(20,10,0,0.35),radial-gradient(ellipse 70% 40% at 50% 80%,rgba(232,145,58,0.18) 0%,transparent 60%);animation:desertHeat 8s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes desertHeat{0%{opacity:.5;transform:scaleY(1)}100%{opacity:1;transform:scaleY(1.04)}}
+
+body.theme-ocean .desktop{background:linear-gradient(180deg,rgba(2,13,26,.45) 0%,rgba(5,21,37,.35) 100%) center/cover no-repeat}
+body.theme-ocean .desktop::before{content:'';position:absolute;inset:0;background:rgba(2,8,18,0.4),radial-gradient(ellipse 80% 40% at 50% 60%,rgba(0,180,216,0.15) 0%,transparent 60%);animation:oceanWave 10s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes oceanWave{0%{opacity:.6;transform:translateY(0)}100%{opacity:1;transform:translateY(-8px)}}
+
+body.theme-jungle .desktop{background:linear-gradient(180deg,rgba(5,15,8,.55) 0%,rgba(8,21,16,.45) 100%) center/cover no-repeat}
+body.theme-jungle .desktop::before{content:'';position:absolute;inset:0;background:rgba(3,10,5,0.45),radial-gradient(ellipse 60% 40% at 30% 30%,rgba(45,198,83,0.1) 0%,transparent 60%);animation:jungleMist 12s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes jungleMist{0%{opacity:.5;transform:translateX(-8px)}100%{opacity:1;transform:translateX(8px)}}
+
+body.theme-blizzard .desktop{background:linear-gradient(180deg,rgba(10,21,32,.3) 0%,rgba(16,32,48,.25) 100%) center/cover no-repeat}
+body.theme-blizzard .desktop::before{content:'';position:absolute;inset:0;background:rgba(180,210,240,0.15),radial-gradient(ellipse 80% 50% at 50% 20%,rgba(144,200,240,0.12) 0%,transparent 60%);animation:blizzardDrift 6s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes blizzardDrift{0%{opacity:.6;transform:translateX(-5px)}100%{opacity:1;transform:translateX(5px)}}
+
+body.theme-matrix .desktop{background:#000;overflow:hidden}
+body.theme-matrix .desktop::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,65,0.04) 2px,rgba(0,255,65,0.04) 4px);animation:matrixScan 6s linear infinite;pointer-events:none;z-index:0}
+body.theme-matrix .desktop::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(0,255,65,0.06) 0%,transparent 70%);animation:matrixPulse 4s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes matrixScan{from{background-position:0 0}to{background-position:0 100px}}
+@keyframes matrixPulse{0%{opacity:.4}100%{opacity:1}}
+
+body.theme-cyberpunk .desktop{background:linear-gradient(180deg,rgba(8,0,12,.55) 0%,rgba(14,0,20,.45) 100%) center/cover no-repeat;overflow:hidden}
+body.theme-cyberpunk .desktop::before{content:'';position:absolute;inset:0;background:rgba(6,0,10,0.45),radial-gradient(ellipse 50% 60% at 70% 80%,rgba(246,55,236,0.2) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 20% 60%,rgba(0,200,255,0.1) 0%,transparent 60%);animation:cyberpunkGlow 5s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes cyberpunkGlow{0%{opacity:.6}100%{opacity:1}}
+
+body.theme-retro .desktop{background:#000}
+body.theme-retro .desktop::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.2) 3px,rgba(0,0,0,0.2) 4px);pointer-events:none;z-index:1}
+body.theme-retro .desktop::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(51,255,51,0.05) 0%,transparent 70%),radial-gradient(ellipse 100% 100% at 50% 50%,transparent 60%,rgba(0,0,0,0.4) 100%);animation:retroFlicker 0.12s infinite;pointer-events:none;z-index:0}
+@keyframes retroFlicker{0%{opacity:.98}50%{opacity:1}100%{opacity:.97}}
+
+body.theme-coffee .desktop{background:linear-gradient(180deg,rgba(18,10,2,.5) 0%,rgba(30,16,8,.4) 100%) center/cover no-repeat}
+body.theme-coffee .desktop::before{content:'';position:absolute;inset:0;background:rgba(14,8,2,0.4),radial-gradient(ellipse 60% 40% at 40% 60%,rgba(201,129,58,0.15) 0%,transparent 60%);animation:coffeeWarm 9s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes coffeeWarm{0%{opacity:.5}100%{opacity:1}}
+
+body.theme-autumn .desktop{background:linear-gradient(180deg,rgba(18,8,2,.5) 0%,rgba(28,14,5,.4) 100%) center/cover no-repeat}
+body.theme-autumn .desktop::before{content:'';position:absolute;inset:0;background:rgba(14,6,0,0.4),radial-gradient(ellipse 70% 40% at 50% 70%,rgba(226,105,58,0.18) 0%,transparent 60%);animation:autumnWind 10s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes autumnWind{0%{opacity:.55;transform:translateX(-6px)}100%{opacity:1;transform:translateX(6px)}}
+
+body.theme-candle .desktop{background:linear-gradient(180deg,rgba(15,8,0,.55) 0%,rgba(24,14,2,.45) 100%) center/cover no-repeat}
+body.theme-candle .desktop::before{content:'';position:absolute;inset:0;background:rgba(10,5,0,0.45),radial-gradient(ellipse 50% 60% at 50% 70%,rgba(245,166,35,0.18) 0%,transparent 60%);animation:candleFlicker 3s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes candleFlicker{0%{opacity:.6;transform:scale(1)}50%{opacity:.85;transform:scale(1.02)}100%{opacity:.7;transform:scale(0.99)}}
 
 /* ── Taskbar modes ── */
 body.tb-solid  .taskbar{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg2)!important}
@@ -116,7 +215,7 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .resize-handle.bottom{bottom:0;left:0;width:100%;height:5px;cursor:ns-resize}
 .resize-handle.bottom-right{bottom:0;right:0;width:14px;height:14px;cursor:nwse-resize}
 .resize-tooltip{position:fixed;background:rgba(0,0,0,.75);color:#fff;font-size:11px;padding:3px 8px;border-radius:5px;pointer-events:none;z-index:999999;display:none;font-family:'Oxanium',sans-serif;letter-spacing:.5px}
-.taskbar{position:fixed;bottom:20px;left:0;width:100%;height:48px;background:var(--tb-bg);border-top:1px solid rgba(255,255,255,.12);display:flex;align-items:center;padding:0 8px;z-index:10000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -2px 20px rgba(0,0,0,.15)}
+.taskbar{position:fixed;bottom:0;left:0;width:100%;height:48px;background:var(--tb-bg);border-top:1px solid rgba(255,255,255,.12);display:flex;align-items:center;padding:0 8px;z-index:10000;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 -2px 20px rgba(0,0,0,.15)}
 .start-button{width:44px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border:none;cursor:pointer;font-size:20px;border-radius:6px;transition:all .25s cubic-bezier(.34,1.56,.64,1);flex-shrink:0}
 .start-button:hover{background:var(--bg3);transform:scale(1.1) rotate(8deg)}
 .vd-switcher{display:flex;gap:3px;padding:0 6px;flex-shrink:0}
@@ -238,8 +337,8 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .qs-toggle-icon{font-size:20px;display:block;margin-bottom:4px}
 .qs-slider-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .qs-slider-row span:first-child{font-size:16px;width:22px;text-align:center}
-.qs-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
-.qs-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
+.qs-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
+.qs-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer}
 .qs-val{font-size:11px;font-weight:700;color:var(--text);width:32px;text-align:right}
 .qs-themes{display:flex;gap:6px;margin-top:12px}
 .qs-theme{text-align:center;font-size:16px;padding:7px 4px!important;flex:1;border-radius:7px;cursor:pointer;border:2px solid var(--border);font-weight:700;transition:all .18s}
@@ -281,8 +380,8 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .tray-popup-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
 .tray-slider-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 .tray-slider-row span{font-size:16px;width:22px;text-align:center}
-.tray-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
-.tray-slider::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 4px rgba(0,120,212,.4)}
+.tray-slider{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
+.tray-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 4px rgba(0,120,212,.4)}
 .tray-value{font-size:12px;font-weight:700;color:var(--text);width:34px;text-align:right}
 .tray-mute-btn{width:100%;padding:7px;margin-top:5px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--text);font-size:12px;font-family:'Oxanium',sans-serif;transition:background .15s}
 .tray-mute-btn:hover{background:var(--bg3)}
@@ -304,8 +403,38 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .shutdown-dots span:nth-child(3){animation-delay:.4s}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+
+/* ── Notification badge bubble ── */
+.notif-badge-bubble{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;background:#ff3b30;color:#fff;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;border:1.5px solid var(--tb-bg);line-height:1;pointer-events:none;z-index:1}
+.notif-badge-bubble.show{display:flex}
+.tray-icon{position:relative}
+
+/* ── Keyboard shortcuts overlay ── */
+.shortcuts-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);z-index:99995;display:none;align-items:center;justify-content:center;padding:20px}
+.shortcuts-overlay.open{display:flex;animation:fadeIn .18s ease}
+.shortcuts-box{background:var(--glass);border:1px solid var(--border);border-radius:16px;box-shadow:0 24px 60px rgba(0,0,0,.5);backdrop-filter:blur(24px);width:620px;max-width:100%;max-height:80vh;display:flex;flex-direction:column;overflow:hidden}
+.shortcuts-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.shortcuts-title{font-size:16px;font-weight:800;color:var(--text)}
+.shortcuts-close{background:none;border:none;color:var(--text2);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .15s}
+.shortcuts-close:hover{background:var(--bg2)}
+.shortcuts-body{overflow-y:auto;padding:16px 22px 20px;display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.shortcuts-body::-webkit-scrollbar{width:4px}
+.shortcuts-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.shortcut-section{margin-bottom:16px}
+.shortcut-section-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.shortcut-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:12px;color:var(--text2)}
+.shortcut-row:hover{color:var(--text)}
+.shortcut-desc{flex:1}
+.shortcut-keys{display:flex;gap:4px;flex-shrink:0}
+.kbd{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;color:var(--text);font-family:'Oxanium',monospace;min-width:22px;text-align:center}
+
+/* ── Start menu search ── */
+.sm-search-wrap{padding:10px 16px 0;flex-shrink:0}
+.sm-search{width:100%;padding:8px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Oxanium',sans-serif;font-size:13px;outline:none;transition:border-color .2s}
+.sm-search:focus{border-color:var(--accent)}
+.sm-search::placeholder{color:var(--text2)}
+.sm-no-results{text-align:center;padding:24px;color:var(--text2);font-size:13px;grid-column:1/-1}
+</style><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 </head>
@@ -403,6 +532,10 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
       <div><div class="sm-name" id="smUsername">User</div><div class="sm-status">ServerplexOS</div></div>
     </div>
   </div>
+  <!-- Search -->
+  <div class="sm-search-wrap">
+    <input class="sm-search" id="smSearch" placeholder="🔍  Search apps…" oninput="filterStartMenu(this.value)" autocomplete="off">
+  </div>
   <!-- Recent apps row -->
   <div class="sm-recents" id="smRecents" style="display:none">
     <div class="sm-recents-label">Recent</div>
@@ -415,6 +548,9 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
   <div class="sm-footer">
     <button class="sm-btn" onclick="logOut()">🔒 Log Out</button>
     <button class="sm-btn" onclick="openApp('settings')">⚙️ Settings</button>
+    <button class="sm-btn" onclick="openAppInstaller();closeStartMenu()">📦 Install App</button>
+    <button class="sm-btn" onclick="backupOS();closeStartMenu()">💾 Backup</button>
+    <button class="sm-btn" onclick="restoreOS();closeStartMenu()">📂 Restore</button>
     <button class="sm-btn" onclick="showShutdown('restart')">🔄 Restart</button>
     <button class="sm-btn" onclick="showShutdown('shutdown')">⏻ Shut Down</button>
   </div>
@@ -427,12 +563,12 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
   <div class="taskbar-apps" id="taskbarApps"></div>
   <div class="system-tray">
     <div class="tray-icon" onclick="toggleDnd()" title="Do Not Disturb">🌙<span class="dnd-dot" id="dndDot"></span></div>
-    <div class="tray-icon" onclick="toggleNotifPanel()" title="Notifications" id="notifIcon">🔔</div>
+    <div class="tray-icon" onclick="toggleNotifPanel()" title="Notifications" id="notifIcon">🔔<span class="notif-badge-bubble" id="notifBadgeBubble"></span></div>
     <div class="tray-icon" onclick="toggleQs()" title="Quick Settings">⚙️</div>
     <div class="tray-icon" id="musicTrayIcon" onclick="toggleMiniPlayer()" title="Now Playing">🎵</div>
     <div class="tray-icon" id="volumeIcon"  title="Volume"  onclick="toggleTray('volume')">🔊</div>
     <div class="tray-icon" id="networkIcon" title="Network" onclick="toggleTray('network')">📶</div>
-    <div class="tray-clock" onclick="toggleCal()" id="clockWidget">
+    <div class="tray-clock" onclick="toggleCal()" ondblclick="openApp('clock')" title="Click: Calendar  |  Double-click: Clock app" id="clockWidget">
       <div id="clockTime">12:00 PM</div>
       <div id="clockDate">Jan 1</div>
     </div>
@@ -480,7 +616,104 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
   <div class="shutdown-dots"><span></span><span></span><span></span></div>
 </div>
 
+<!-- Keyboard shortcuts overlay -->
+<div class="shortcuts-overlay" id="shortcutsOverlay" onclick="if(event.target===this)closeShortcuts()">
+  <div class="shortcuts-box">
+    <div class="shortcuts-header">
+      <span class="shortcuts-title">⌨️ Keyboard Shortcuts</span>
+      <button class="shortcuts-close" onclick="closeShortcuts()">✕</button>
+    </div>
+    <div class="shortcuts-body">
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">System</div>
+        <div class="shortcut-row"><span class="shortcut-desc">Spotlight Search</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Space</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Keyboard Shortcuts</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">?</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Close overlay / panel</span><span class="shortcut-keys"><span class="kbd">Esc</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Lock / Log Out</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">L</span></span></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Windows</div>
+        <div class="shortcut-row"><span class="shortcut-desc">Close focused window</span><span class="shortcut-keys"><span class="kbd">Alt</span><span class="kbd">F4</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Minimize window</span><span class="shortcut-keys"><span class="kbd">Alt</span><span class="kbd">-</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Maximize / restore</span><span class="shortcut-keys"><span class="kbd">Alt</span><span class="kbd">↑</span></span></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Virtual Desktops</div>
+        <div class="shortcut-row"><span class="shortcut-desc">Switch to Desktop 1–4</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">1–4</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Desktop overview</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">D</span></span></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Apps</div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open Browser</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">B</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open Terminal</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">T</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open Notepad</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">N</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open Calculator</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">C</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open File Manager</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">E</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open Settings</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">,</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Open Clock</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">K</span></span></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Desktop</div>
+        <div class="shortcut-row"><span class="shortcut-desc">Toggle theme (light/dark)</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">T</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Do Not Disturb</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">Q</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Screenshot (Clock app)</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">S</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Install App</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">I</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Backup OS</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">B</span></span></div>
+      </div>
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Taskbar Clock</div>
+        <div class="shortcut-row"><span class="shortcut-desc">Single click</span><span class="shortcut-keys"><span class="kbd">Calendar</span></span></div>
+        <div class="shortcut-row"><span class="shortcut-desc">Double-click</span><span class="shortcut-keys"><span class="kbd">Clock app</span></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
+// ══════════════════════════════════════════════
+//  WALLPAPER CONFIG — edit URLs here
+//  Use 'none' for themes with no photo (pure CSS)
+// ══════════════════════════════════════════════
+var THEME_WALLPAPERS = {
+  white:     'none',
+  black:     'none',
+  grey:      'none',
+  aurora:    'https://i.ibb.co/DP2tgPfn/aurora-Serverplex-OS-Wallpaper.png',
+  tokyo:     'https://i.ibb.co/b58zxdTL/tokyo-Serverplex-OS-Wallpaper.png',
+  forest:    'https://i.ibb.co/GQwcYKkH/forest-Serverplex-OS-Wallpaper.png',
+  space:     'https://i.ibb.co/N60DVLbm/space-Serverplex-OS-Wallpaper.png',
+  sunset:    'https://i.ibb.co/svtJ81w2/sunset-Serverplex-OS-Wallpaper.png',
+  arctic:    'https://i.ibb.co/xtK281kN/arctic-Serverplex-OS-Wallpaper.png',
+  synth:     'https://i.ibb.co/LdvjTzS1/synth-Serverplex-OS-Wallpaper.png',
+  desert:    'https://i.ibb.co/XfVHdn87/desert-Serverplex-OS-Wallpaper.png',
+  ocean:     'https://i.ibb.co/QFvMhDxC/ocean-Serverplex-OS-Wallpaper.png',
+  jungle:    'https://i.ibb.co/tPZvz6pt/jungle-Serverplex-OS-Wallpaper.png',
+  blizzard:  'https://i.ibb.co/ns3gQcHL/blizzard-Serverplex-OS-Wallpaper.png',
+  matrix:    'https://i.ibb.co/jPFTrkHs/matrix-Serverplex-OS-Wallpaper.png',
+  cyberpunk: 'https://i.ibb.co/z143HgZ/cyberpunk-Serverplex-OS-Wallpaper.png',
+  retro:     'https://i.ibb.co/GfwmVZYn/retro-Serverplex-OS-Wallpaper.png',
+  coffee:    'https://i.ibb.co/QvGQ03yP/coffee-Serverplex-OS-Wallpaper.png',
+  autumn:    'https://i.ibb.co/mVb88wxz/autumn-Serverplex-OS-Wallpaper.png',
+  candle:    'https://i.ibb.co/SDLnHZCj/candle-Serverplex-OS-Wallpaper.png',
+};
+
+// Injects wallpaper URLs into CSS at runtime so the config above is the only place to edit
+(function applyWallpaperConfig() {
+  var existing = document.getElementById('wallpaperConfigStyle');
+  if (existing) existing.remove();
+  var rules = '';
+  Object.keys(THEME_WALLPAPERS).forEach(function(theme) {
+    var url = THEME_WALLPAPERS[theme];
+    if (url === 'none') return;
+    // Find the existing gradient for this theme from the CSS and prepend the image
+    rules += 'body.theme-' + theme + ' .desktop{background-image:url("' + url + '")!important;background-size:cover!important;background-position:center!important;}';
+  });
+  var style = document.createElement('style');
+  style.id = 'wallpaperConfigStyle';
+  style.textContent = rules;
+  document.head.appendChild(style);
+})();
+
 // ── Migration ─────────────────────────────────
 (function migrateLegacyKeys(){
   if(localStorage.getItem('serverplex_migrated')==='true')return;
@@ -530,5 +763,42 @@ const GRID_SIZE=100, GRID_PAD=20;
 <script src="CoreFiles/os-minimusic.js"></script>
 <script src="CoreFiles/os-init.js"></script>
 <!-- os-init.js calls init() at its own bottom -->
+
+
+<!-- App Installer Modal -->
+<div class="ai-overlay" id="appInstallerOverlay" onclick="if(event.target===this)closeAppInstaller()">
+  <div class="ai-box">
+    <div class="ai-header">
+      <span class="ai-title">📦 App Installer</span>
+      <button class="ai-close" onclick="closeAppInstaller()">✕</button>
+    </div>
+    <div class="ai-body">
+      <div class="ai-section">Install New App</div>
+      <div class="ai-row">
+        <div class="ai-field">
+          <label>App Name</label>
+          <input class="ai-input" id="aiName" placeholder="My App">
+        </div>
+        <div class="ai-field" style="max-width:90px">
+          <label>Icon</label>
+          <input class="ai-input" id="aiIcon" placeholder="🧩" maxlength="4">
+        </div>
+      </div>
+      <div class="ai-field">
+        <label>URL / Path</label>
+        <input class="ai-input" id="aiUrl" placeholder="https://… or ./myapp/index.html">
+      </div>
+      <div class="ai-field">
+        <label>Category</label>
+        <input class="ai-input" id="aiCat" placeholder="Custom">
+      </div>
+      <div class="ai-err" id="aiErr"></div>
+      <button class="ai-save" onclick="installApp()">📦 Install App</button>
+      <div class="ai-section" style="margin-top:16px">Installed Custom Apps</div>
+      <div class="ai-installed" id="aiInstalledList"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

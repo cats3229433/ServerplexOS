@@ -68,7 +68,8 @@ function onBrightness(v) {
   document.getElementById('qsBrightVal').textContent = pct + '%';
 }
 function updateQsTheme() {
-  ['white','black','grey','aurora','tokyo','forest','space','sunset','arctic','synth'].forEach(function(t) {
+  ['white','black','grey','aurora','tokyo','forest','space','sunset','arctic','synth',
+   'desert','ocean','jungle','blizzard','matrix','cyberpunk','retro','coffee','autumn','candle'].forEach(function(t) {
     var el = document.getElementById('qt-' + t);
     if (el) el.classList.toggle('active', t === currentTheme);
   });
@@ -156,6 +157,9 @@ var THEME_ACCENTS = {
   white:'#0078d4', black:'#0078d4', grey:'#4a9eff',
   aurora:'#00d4aa', tokyo:'#ff2d55', forest:'#34c759',
   space:'#7c83fd', sunset:'#ff6b35', arctic:'#0096d6', synth:'#e040fb',
+  desert:'#e8913a', ocean:'#00b4d8', jungle:'#2dc653', blizzard:'#90c8f0',
+  matrix:'#00ff41', cyberpunk:'#f637ec', retro:'#33ff33',
+  coffee:'#c9813a', autumn:'#e2693a', candle:'#f5a623',
   custom: null
 };
 
@@ -175,6 +179,25 @@ function changeTheme(theme) {
   localStorage.setItem('serverplex_theme', theme);
   localStorage.setItem('serverplex_accent', acc);
   updateQsTheme();
+  if (typeof applyThemeCursor === 'function') applyThemeCursor(theme);
+  if (typeof applyCursorTrail === 'function' && typeof _cursorTrail !== 'undefined') {
+    applyCursorTrail(_cursorTrail);
+  }
+  // Broadcast to all open app iframes
+  document.querySelectorAll('.window-content iframe').forEach(function(iframe) {
+    try { iframe.contentWindow.postMessage({ type:'theme-change', theme:theme }, '*'); } catch(e) {}
+  });
+  // Per-theme wallpaper
+  var themeWp = localStorage.getItem('serverplex_wallpaper_' + theme);
+  if (themeWp) {
+    setWallpaper(themeWp.startsWith('data:') || themeWp.startsWith('http')
+      ? "url('" + themeWp + "') center/cover no-repeat"
+      : themeWp);
+  } else {
+    // Revert to global wallpaper or none
+    var globalWp = localStorage.getItem('serverplex_wallpaper');
+    setWallpaper(globalWp || 'none');
+  }
 }
 
 function applyCustomThemeVars(v) {
@@ -206,6 +229,11 @@ function applyCustomThemeVars(v) {
   localStorage.setItem('serverplex_accent', v.accent);
   currentTheme = 'custom';
   updateQsTheme();
+  // Broadcast to open iframes
+  document.querySelectorAll('.window-content iframe').forEach(function(iframe) {
+    try { iframe.contentWindow.postMessage({ type:'theme-change', theme:'custom' }, '*'); } catch(e) {}
+    try { iframe.contentWindow.postMessage({ type:'accent-change', accent:v.accent }, '*'); } catch(e) {}
+  });
 }
 
 function setTaskbarMode(mode) {
@@ -267,3 +295,169 @@ function logOut() {
     window.location.replace('account.html');
   }, 1600);
 }
+// ══════════════════════════════════════════════
+//  OS STATE BACKUP / RESTORE
+// ══════════════════════════════════════════════
+
+function backupOS() {
+  var data = { _version: 1, _exported: new Date().toISOString(), keys: {} };
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.startsWith('serverplex_')) {
+      data.keys[k] = localStorage.getItem(k);
+    }
+  }
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'serverplexOS-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  pushNotif('💾', 'System', 'Backup saved', 'All OS settings exported successfully.');
+}
+
+function restoreOS() {
+  var inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = '.json';
+  inp.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var fr = new FileReader();
+    fr.onload = function(ev) {
+      try {
+        var data = JSON.parse(ev.target.result);
+        if (!data.keys || !data._version) { alert('Invalid backup file.'); return; }
+        var count = 0;
+        Object.keys(data.keys).forEach(function(k) {
+          if (k.startsWith('serverplex_')) { localStorage.setItem(k, data.keys[k]); count++; }
+        });
+        if (confirm('Restored ' + count + ' settings from backup dated ' + (data._exported || 'unknown') + '.\n\nRestart now to apply everything?')) {
+          sessionStorage.setItem('serverplex_authed', 'true');
+          location.reload();
+        }
+      } catch(err) { alert('Could not read backup file: ' + err.message); }
+    };
+    fr.readAsText(file);
+  };
+  inp.click();
+}
+
+// ══════════════════════════════════════════════
+//  APP INSTALLER
+// ══════════════════════════════════════════════
+
+function loadCustomApps() {
+  try {
+    var custom = JSON.parse(localStorage.getItem('serverplex_custom_apps') || '[]');
+    custom.forEach(function(a) {
+      if (a.id && a.name && a.file) {
+        apps[a.id] = { name: a.name, icon: a.icon || '🧩', file: a.file, category: a.category || 'Custom', width: a.width || 820, height: a.height || 620, _custom: true };
+      }
+    });
+  } catch(e) {}
+}
+
+function saveCustomApps() {
+  var custom = Object.keys(apps).filter(function(id) { return apps[id]._custom; }).map(function(id) {
+    return Object.assign({ id: id }, apps[id]);
+  });
+  localStorage.setItem('serverplex_custom_apps', JSON.stringify(custom));
+}
+
+function openAppInstaller() {
+  var ov = document.getElementById('appInstallerOverlay');
+  if (!ov) return;
+  // Refresh installed list
+  var list = document.getElementById('aiInstalledList');
+  if (list) {
+    var custom = Object.keys(apps).filter(function(id){ return apps[id]._custom; });
+    if (!custom.length) {
+      list.innerHTML = '<div style="font-size:12px;color:var(--text2);padding:8px 0">No custom apps installed yet.</div>';
+    } else {
+      list.innerHTML = custom.map(function(id){
+        return '<div class="ai-installed-item">' +
+          '<span class="ai-installed-icon">' + apps[id].icon + '</span>' +
+          '<span class="ai-installed-name">' + apps[id].name + '</span>' +
+          '<button class="ai-uninstall" onclick="uninstallApp(\'' + id + '\')">Uninstall</button>' +
+        '</div>';
+      }).join('');
+    }
+  }
+  ov.classList.add('open');
+}
+
+function closeAppInstaller() {
+  var ov = document.getElementById('appInstallerOverlay');
+  if (ov) ov.classList.remove('open');
+}
+
+function installApp() {
+  var nameEl = document.getElementById('aiName');
+  var urlEl  = document.getElementById('aiUrl');
+  var iconEl = document.getElementById('aiIcon');
+  var catEl  = document.getElementById('aiCat');
+  var errEl  = document.getElementById('aiErr');
+
+  var name = nameEl.value.trim();
+  var url  = urlEl.value.trim();
+  var icon = iconEl.value.trim() || '🧩';
+  var cat  = catEl.value.trim() || 'Custom';
+
+  if (!name) { errEl.textContent = 'Name is required.'; return; }
+  if (!url)  { errEl.textContent = 'URL is required.'; return; }
+  if (!/^https?:\/\/|^\/|^\.\//i.test(url)) { url = './' + url; }
+
+  // Generate a safe ID from the name
+  var id = name.toLowerCase().replace(/[^a-z0-9]/g, '') + '_' + Date.now().toString(36);
+
+  apps[id] = { name: name, icon: icon, file: url, category: cat, _custom: true };
+  saveCustomApps();
+  renderDesktopIcons();
+  renderStartMenuApps();
+  renderPinnedApps();
+
+  nameEl.value = ''; urlEl.value = ''; iconEl.value = ''; catEl.value = '';
+  errEl.textContent = '';
+  closeAppInstaller();
+  pushNotif(icon, name, name + ' installed', 'Find it on the desktop and Start Menu.');
+}
+
+function uninstallApp(id) {
+  if (!apps[id] || !apps[id]._custom) return;
+  if (!confirm('Uninstall "' + apps[id].name + '"?')) return;
+  if (windows[id]) closeWindow(id);
+  delete apps[id];
+  saveCustomApps();
+  renderDesktopIcons();
+  renderStartMenuApps();
+  renderPinnedApps();
+}
+
+// ── Settings broadcast receiver ─────────────────
+window.addEventListener('message', function(e) {
+  if (!e.data) return;
+  var d = e.data;
+  if (d.type === 'theme-change'  && d.theme)  changeTheme(d.theme);
+  if (d.type === 'accent-change' && d.accent) {
+    localStorage.setItem('serverplex_accent', d.accent);
+    localStorage.setItem('serverplex_accent_override', d.accent);
+    document.documentElement.style.setProperty('--accent', d.accent);
+    // Propagate to all open app iframes
+    document.querySelectorAll('.window-content iframe').forEach(function(iframe) {
+      try { iframe.contentWindow.postMessage({ type:'accent-change', accent:d.accent }, '*'); } catch(err){}
+    });
+  }
+  if (d.type === 'font-scale' && d.size) {
+    document.body.style.fontSize = d.size + 'px';
+    localStorage.setItem('serverplex_os_font_size', d.size);
+  }
+  if (d.type === 'tb-mode' && d.mode) {
+    setTaskbarMode(d.mode);
+  }
+  if (d.type === 'cursor-change' && d.cursor) {
+    localStorage.setItem('serverplex_cursor', d.cursor);
+    if (typeof applyThemeCursor === 'function') applyThemeCursor(currentTheme, d.cursor);
+  }
+  if (d.type === 'clock-format' && d.format) {
+    localStorage.setItem('serverplex_clock_format', d.format);
+  }
+});

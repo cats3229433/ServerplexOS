@@ -1,81 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="app-theme.js"></script>
 <meta charset="UTF-8"><title>Paint</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.toolbar{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+body{font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.toolbar{background:var(--app-surface);border-bottom:1px solid var(--app-border);padding:8px 12px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
 .tool-group{display:flex;gap:4px;align-items:center}
-.tb-sep{width:1px;height:24px;background:rgba(255,255,255,0.1)}
-.tool-btn{padding:6px 10px;border:1px solid var(--border);border-radius:6px;background:rgba(255,255,255,0.04);color:var(--text);cursor:pointer;font-size:16px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;min-width:36px}
-.tool-btn:hover{background:rgba(255,255,255,0.1)}
-.tool-btn.active{background:var(--accent);border-color:var(--accent)}
-.label{font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase}
-.size-slider{width:80px;accent-color:var(--accent)}
-.color-swatch{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid rgba(255,255,255,0.2);position:relative;overflow:hidden;flex-shrink:0}
+.tb-sep{width:1px;height:24px;background:rgba(128,128,128,0.1)}
+.tool-btn{padding:6px 10px;border:1px solid var(--app-border);border-radius:6px;background:rgba(128,128,128,0.04);color:var(--app-text);cursor:pointer;font-size:16px;transition:all 0.15s;display:flex;align-items:center;justify-content:center;min-width:36px}
+.tool-btn:hover{background:rgba(128,128,128,0.1)}
+.tool-btn.active{background:var(--app-accent);border-color:var(--app-accent)}
+.label{font-size:11px;color:var(--app-text2);letter-spacing:1px;text-transform:uppercase}
+.size-slider{width:80px;accent-color:var(--app-accent)}
+.color-swatch{width:28px;height:28px;border-radius:6px;cursor:pointer;border:2px solid rgba(128,128,128,0.2);position:relative;overflow:hidden;flex-shrink:0}
 .color-swatch input[type=color]{position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);cursor:pointer;border:none;padding:0;opacity:0}
 .color-swatch-bg{position:absolute;inset:0;border-radius:4px}
 .palette{display:flex;gap:4px;flex-wrap:wrap;max-width:200px}
 .pal-color{width:20px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:all 0.1s;flex-shrink:0}
 .pal-color:hover{transform:scale(1.15)}
 .pal-color.selected{border-color:white}
-.opacity-slider{width:70px;accent-color:var(--accent)}
-.canvas-wrap{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:#2a2a2a;padding:16px}
+.opacity-slider{width:70px;accent-color:var(--app-accent)}
+.canvas-wrap{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;background:var(--app-bg);padding:16px}
 canvas{cursor:crosshair;background:white;box-shadow:0 4px 24px rgba(0,0,0,0.5)}
-.status-bar{background:var(--surface);border-top:1px solid var(--border);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:var(--text3);flex-shrink:0}
-
-/* ── ServerplexOS Theme System ── */
-:root { --accent: #0078d4; }
-body {
-  --bg:      #f0f2f5;
-  --bg2:     #e4e7ed;
-  --surface: #ffffff;
-  --surface2:#f0f2f5;
-  --text:    #0d0f14;
-  --text2:   #55606e;
-  --text3:   #8a95a3;
-  --border:  rgba(0,0,0,0.09);
-  --border2: rgba(0,0,0,0.14);
-  --shadow:  0 4px 20px rgba(0,0,0,.10);
-}
-body.dark {
-  --bg:      #060811;
-  --bg2:     #111420;
-  --surface: #12151f;
-  --surface2:#1a1e2e;
-  --text:    var(--text);
-  --text2:   #8b97b0;
-  --text3:   #5a6478;
-  --border:  var(--border);
-  --border2: var(--border2);
-  --shadow:  0 4px 20px rgba(0,0,0,.5);
-}
-body.grey {
-  --bg:      #3a3e4a;
-  --bg2:     #4e535e;
-  --surface: #484c57;
-  --surface2:#545862;
-  --text:    #eef0f4;
-  --text2:   #b8bec8;
-  --text3:   #858ea0;
-  --border:  rgba(255,255,255,0.10);
-  --border2: rgba(255,255,255,0.18);
-  --shadow:  0 4px 20px rgba(0,0,0,.35);
-}
+.status-bar{background:var(--app-surface);border-top:1px solid var(--app-border);padding:4px 14px;display:flex;gap:16px;font-size:11px;color:var(--app-text2);flex-shrink:0}
 </style>
 </head>
 <body>
-<script>
-(function(){
-  var t=localStorage.getItem('serverplex_theme')||'white';
-  if(t==='black')document.body.classList.add('dark');
-  else if(t==='grey')document.body.classList.add('grey');
-  var acc=localStorage.getItem('serverplex_accent');
-  if(acc)document.documentElement.style.setProperty('--accent',acc);
-})();
-</script>
 
 <div class="toolbar">
   <div class="tool-group">

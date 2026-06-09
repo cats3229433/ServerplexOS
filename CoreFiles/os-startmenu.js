@@ -32,7 +32,49 @@ function renderRecentApps() {
   }).join('');
 }
 
-// ── Start Menu ───────────────────────────────
+// ── Start Menu search/filter ──────────────────
+function filterStartMenu(q) {
+  var g = document.getElementById('smGrid');
+  if (!g) return;
+  var recents = document.getElementById('smRecents');
+  q = (q || '').toLowerCase().trim();
+  if (!q) {
+    // Show everything normally
+    Array.from(g.children).forEach(function(item) { item.style.display = ''; });
+    if (recents) recents.style.display = '';
+    var noRes = document.getElementById('smNoResults');
+    if (noRes) noRes.remove();
+    return;
+  }
+  // Hide recents while searching
+  if (recents) recents.style.display = 'none';
+  var anyMatch = false;
+  Array.from(g.children).forEach(function(item) {
+    var label = item.querySelector('.sm-label');
+    var name = label ? label.textContent.toLowerCase() : '';
+    var appId = item.dataset.appId || '';
+    var app = apps[appId];
+    var cat = app && app.category ? app.category.toLowerCase() : '';
+    var match = name.includes(q) || cat.includes(q) || appId.includes(q);
+    item.style.display = match ? '' : 'none';
+    if (match) anyMatch = true;
+  });
+  // No results message
+  var existing = document.getElementById('smNoResults');
+  if (!anyMatch) {
+    if (!existing) {
+      var msg = document.createElement('div');
+      msg.id = 'smNoResults';
+      msg.className = 'sm-no-results';
+      msg.textContent = 'No apps found for "' + q + '"';
+      g.appendChild(msg);
+    }
+  } else {
+    if (existing) existing.remove();
+  }
+}
+
+
 function renderStartMenuApps() {
   var g = document.getElementById('smGrid');
   if (!g) return;
@@ -40,6 +82,7 @@ function renderStartMenuApps() {
   Object.keys(apps).forEach(function(id, i) {
     var a = apps[id], item = document.createElement('div');
     item.className = 'sm-item';
+    item.dataset.appId = id;
     item.style.animation = 'slideUp .35s ease forwards';
     item.style.animationDelay = (i * .025) + 's';
     item.style.opacity = '0';
@@ -51,8 +94,20 @@ function renderStartMenuApps() {
   renderRecentApps();
 }
 
-function toggleStartMenu() { document.getElementById('startMenu').classList.toggle('active'); }
-function closeStartMenu()  { document.getElementById('startMenu').classList.remove('active'); }
+function toggleStartMenu() {
+  document.getElementById('startMenu').classList.toggle('active');
+  // Clear search when opening
+  var s = document.getElementById('smSearch');
+  if (s) { s.value = ''; filterStartMenu(''); }
+  if (document.getElementById('startMenu').classList.contains('active')) {
+    setTimeout(function() { if (s) s.focus(); }, 80);
+  }
+}
+function closeStartMenu() {
+  document.getElementById('startMenu').classList.remove('active');
+  var s = document.getElementById('smSearch');
+  if (s) { s.value = ''; filterStartMenu(''); }
+}
 
 // ── Pinned Apps ──────────────────────────────
 function renderPinnedApps() {

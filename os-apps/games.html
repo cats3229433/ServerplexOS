@@ -334,6 +334,9 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 
 <div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
 
+<script src="games/community.js"></script>
+<script src="games/gnmath.js"></script>
+<script src="games/cooldude.js"></script>
 <script src="games/games.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -357,8 +360,9 @@ if (_acc) document.documentElement.style.setProperty('--accent', _acc);
 var games      = [];
 var favs       = JSON.parse(localStorage.getItem('serverplex_game_favs')    || '[]');
 var recents    = JSON.parse(localStorage.getItem('serverplex_game_recents') || '[]');
-var currentCat = 'all';
-var showFavs   = false;
+var currentCat    = 'all';
+var currentSource  = 'all';
+var showFavs      = false;
 var activeGame = null;
 
 // Script-injection tracking

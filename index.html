@@ -1,217 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8" />
-	<title>Site Temporarily Closed</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<style>
-		:root {
-			color-scheme: dark;
-		}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google</title> <link id="favicon" rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; width: 100%; overflow: hidden; background: #0d0d1a; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-		* {
-			box-sizing: border-box;
-		}
-
-		body {
-			margin: 0;
-			min-height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-			background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
-			color: #e5e7eb;
-		}
-
-		.card {
-			width: 100%;
-			max-width: 640px;
-			padding: 2.5rem 2rem;
-			background: rgba(15, 23, 42, 0.9);
-			border-radius: 18px;
-			border: 1px solid rgba(148, 163, 184, 0.35);
-			box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
-			backdrop-filter: blur(18px);
-			text-align: center;
-		}
-
-		h1 {
-			font-size: 1.9rem;
-			margin: 0 0 0.75rem;
-			letter-spacing: 0.04em;
-		}
-
-		.badge {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.4rem;
-			padding: 0.25rem 0.7rem;
-			border-radius: 999px;
-			font-size: 0.75rem;
-			text-transform: uppercase;
-			letter-spacing: 0.12em;
-			background: rgba(56, 189, 248, 0.12);
-			color: #7dd3fc;
-			border: 1px solid rgba(56, 189, 248, 0.4);
-			margin-bottom: 0.9rem;
-		}
-
-		p {
-			margin: 0.25rem 0;
-			color: #9ca3af;
-			font-size: 0.95rem;
-		}
-
-		.date {
-			margin-top: 0.75rem;
-			font-weight: 600;
-			color: #e5e7eb;
-		}
-
-		.countdown-wrapper {
-			margin-top: 1.8rem;
-		}
-
-		.countdown-label {
-			font-size: 0.8rem;
-			text-transform: uppercase;
-			letter-spacing: 0.16em;
-			color: #9ca3af;
-			margin-bottom: 0.7rem;
-		}
-
-		.countdown {
-			display: flex;
-			flex-wrap: wrap;
-			justify-content: center;
-			gap: 0.75rem;
-		}
-
-		.time-box {
-			min-width: 80px;
-			padding: 0.7rem 0.6rem;
-			border-radius: 12px;
-			background: radial-gradient(circle at top, #0f172a 0, #020617 70%);
-			border: 1px solid rgba(148, 163, 184, 0.35);
-		}
-
-		.time-value {
-			font-size: 1.4rem;
-			font-weight: 700;
-			color: #f9fafb;
-		}
-
-		.time-label {
-			font-size: 0.7rem;
-			text-transform: uppercase;
-			letter-spacing: 0.16em;
-			color: #9ca3af;
-			margin-top: 0.15rem;
-		}
-
-		.footer-note {
-			margin-top: 1.8rem;
-			font-size: 0.8rem;
-			color: #6b7280;
-		}
-
-		@media (max-width: 480px) {
-			.card {
-				padding: 2rem 1.4rem;
-			}
-
-			h1 {
-				font-size: 1.6rem;
-			}
-
-			.time-box {
-				min-width: 70px;
-			}
-
-			.time-value {
-				font-size: 1.2rem;
-			}
-		}
-	</style>
+        iframe { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            display: block;
+            animation: fadeIn 0.8s ease-in forwards; 
+        }
+    </style>
 </head>
-
 <body>
-	<div class="card">
-		<div class="badge">
-			● Status: Offline
-		</div>
-		<h1>Site Temporarily Shut Down</h1>
-		<p>This site is currently offline for maintenance and upgrades.</p>
-		<p class="date">Planned reopening: <strong>August 15, 2026</strong></p>
 
-		<div class="countdown-wrapper">
-			<div class="countdown-label">Time until we’re back</div>
-			<div class="countdown" id="countdown">
-				<div class="time-box">
-					<div class="time-value" id="days">--</div>
-					<div class="time-label">Days</div>
-				</div>
-				<div class="time-box">
-					<div class="time-value" id="hours">--</div>
-					<div class="time-label">Hours</div>
-				</div>
-				<div class="time-box">
-					<div class="time-value" id="minutes">--</div>
-					<div class="time-label">Minutes</div>
-				</div>
-				<div class="time-box">
-					<div class="time-value" id="seconds">--</div>
-					<div class="time-label">Seconds</div>
-				</div>
-			</div>
-		</div>
+    <iframe id="mainFrame" src="about:blank"></iframe>
 
-		<div class="footer-note" id="footer-note">
-			Thanks for your patience. Check back closer to the reopening date for updates.
-		</div>
-	</div>
+    <script>
+        const frame = document.getElementById('mainFrame');
+        const isReturningUser = localStorage.getItem('serverplex_setup_complete') === 'true';
 
-	<script>
-		// Set target date (midnight on August 15, 2026)
-    const targetDate = new Date("2026-08-15T00:00:00");
+        // --- TAB CLOAKING LOGIC ---
+        // This ensures even if the HTML file is named index.html, 
+        // the browser tab looks like Google.
+        document.title = "Google";
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = 'https://www.google.com/favicon.ico';
+        document.getElementsByTagName('head')[0].appendChild(link);
 
-    const daysEl = document.getElementById("days");
-    const hoursEl = document.getElementById("hours");
-    const minutesEl = document.getElementById("minutes");
-    const secondsEl = document.getElementById("seconds");
-    const footerNoteEl = document.getElementById("footer-note");
+        // --- NAVIGATION LOGIC ---
+        window.addEventListener('DOMContentLoaded', () => {
+            frame.src = 'placeholder.html';
 
-    function updateCountdown() {
-      const now = new Date();
-      const diff = targetDate - now;
+            // Wait exactly 4 seconds (4000ms) before switching
+            setTimeout(() => {
+                if (isReturningUser) {
+                    frame.src = 'account.html';
+                } else {
+                    frame.src = 'welcome.html';
+                }
+            }, 4000); 
+        });
 
-      if (diff <= 0) {
-        daysEl.textContent = "0";
-        hoursEl.textContent = "0";
-        minutesEl.textContent = "0";
-        secondsEl.textContent = "0";
-        footerNoteEl.textContent = "We’re scheduled to be back. If you still see this page, the relaunch is in progress.";
-        clearInterval(timer);
-        return;
-      }
+        window.addEventListener('message', e => {
+            if (e.data && e.data.type === 'navigate') {
+                frame.src = e.data.path;
+            }
+        });
 
-      const seconds = Math.floor(diff / 1000);
-      const days = Math.floor(seconds / (60 * 60 * 24));
-      const hours = Math.floor((seconds % (60 * 60 * 24)) / (60 * 60));
-      const minutes = Math.floor((seconds % (60 * 60)) / 60);
-      const secs = seconds % 60;
-
-      daysEl.textContent = days;
-      hoursEl.textContent = String(hours).padStart(2, "0");
-      minutesEl.textContent = String(minutes).padStart(2, "0");
-      secondsEl.textContent = String(secs).padStart(2, "0");
-    }
-
-    const timer = setInterval(updateCountdown, 1000);
-    updateCountdown();
-	</script>
+        window.addEventListener('beforeunload', e => { 
+            e.preventDefault(); 
+            e.returnValue = ''; 
+        });
+    </script>
 </body>
-
 </html>

@@ -20,7 +20,7 @@ var KH0_GAMES = [
       id: '3kh0-1v1-lol',
       name: '1v1 Lol',
       icon: '⚔️',
-      cover: '',
+      cover: 'https://images.sftcdn.net/images/t_app-icon-m/p/77f9e3d7-4fdf-4df3-9f2f-266985f8e8f0/490128247/1v1-lol-download-1v1-lol-for-Windows.jpg',
       url: 'https://cdn.jsdelivr.net/gh/3khogames/3kh0@main/unblocked/1v1-lol.html',
       category: 'Arcade',
       author: 'Unknown',

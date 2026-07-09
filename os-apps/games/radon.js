@@ -181,7 +181,7 @@ var RADON_GAMES = [
       category: 'Rhythm',
       author: 'griffpatch',
       description: 'Geometry Dash is developed by Sweden-based developer Robert Topala. The game has 21 levels currently with different types of difficulty. Players can enjoy 3 levels of the game: Stereo Madness, Back on track, and Polargeist. Each one has its own difficulty and a list of best scores.',
-      featured: false,
+      featured: true,
       source: 'Radon-Games',
     },
 

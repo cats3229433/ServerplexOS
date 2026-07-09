@@ -37,7 +37,7 @@ var COOLDUDE_GAMES = [
       category: 'Arcade',
       author: 'Unknown',
       description: '',
-      featured: false,
+      featured: true,
       source: 'CoolDude',
     },
 

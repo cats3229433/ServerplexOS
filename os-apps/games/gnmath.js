@@ -24,7 +24,7 @@ var GNMATH_GAMES = [
       category: 'Arcade',
       author: 'Y8 / RobKay',
       description: 'A fast, reflex-based downhill runner where you guide a ball through a neon 3D course. Speed increases constantly as obstacles, gaps, and sharp turns demand precise movement and quick reactions.',
-      featured: false,
+      featured: true,
       source: 'GN-Math',
     },
 

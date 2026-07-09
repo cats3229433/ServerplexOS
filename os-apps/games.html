@@ -69,6 +69,26 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 .btn-feat:hover:not(:disabled){background:rgba(128,128,128,.24);transform:translateY(-1px)}
 .btn-feat:disabled{opacity:.4;cursor:not-allowed}
 .btn-feat.fav{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d}
+/* Hero section for featured games */
+.hero-wrap{margin-bottom:28px;border-radius:16px;overflow:hidden;position:relative;animation:fadeUp .35s ease}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#1e3a5f,#1a1040 60%,#0f1a35)}
+.hero-glow{position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(0,120,212,.28),transparent 70%)}
+.hero-content{position:relative;padding:22px 26px}
+.hero-eye{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(147,197,253,.7);margin-bottom:14px}
+.hero-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:12px}
+.hero-card{background:rgba(255,255,255,.04);border:1px solid rgba(128,128,128,.12);border-radius:14px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+.hero-card:hover{background:rgba(255,255,255,.07);transform:translateY(-3px);border-color:rgba(128,128,128,.22)}
+.hero-img-wrap{position:relative;padding:14px 14px 0;display:flex;justify-content:center}
+.hero-img{width:72px;height:72px;border-radius:14px;object-fit:cover;border:1px solid rgba(128,128,128,.15);box-shadow:0 6px 20px rgba(0,0,0,.3);display:block}
+.hero-img-fall{width:72px;height:72px;border-radius:14px;background:rgba(128,128,128,.08);border:1px solid rgba(128,128,128,.12);display:flex;align-items:center;justify-content:center;font-size:36px}
+.hero-badge{position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.hero-info{padding:10px 12px 12px;text-align:center}
+.hero-name{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-row{display:flex;align-items:center;justify-content:center;gap:6px}
+.btn-hero{padding:5px 14px;border-radius:7px;border:1px solid rgba(128,128,128,.2);cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:700;transition:all .2s;background:rgba(128,128,128,.14);color:#fff}
+.btn-hero:hover:not(:disabled){background:rgba(128,128,128,.24);transform:translateY(-1px)}
+.btn-hero:disabled{opacity:.4;cursor:not-allowed}
+.btn-hero.fav{background:rgba(245,158,11,.2);border-color:rgba(245,158,11,.4);color:#fcd34d}
 .sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .sec-title{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2)}
 .sec-count{font-size:12px;color:var(--app-text2)}
@@ -523,11 +543,12 @@ function render() {
   setTimeout(function() {
     if (token !== _renderToken) return; // stale render, bail
 
-    var feat = !q && currentCat === 'all' && !showFavs ? games.find(function(g){ return g.featured; }) : null;
-    var workList = feat ? list.filter(function(g){ return g.id !== feat.id; }) : list;
+    var featList = !q && currentCat === 'all' && !showFavs ? games.filter(function(g){ return g.featured; }).slice(0,5) : [];
+    var featIds = new Set(featList.map(function(g){ return g.id; }));
+    var workList = featList.length ? list.filter(function(g){ return !featIds.has(g.id); }) : list;
 
     var sections = [];
-    if (feat) sections.push({ label: null, list: [feat], isFeat: true });
+    if (featList.length) sections.push({ label: null, list: featList, isHero: true });
 
     if (currentCat === 'all' && !q && !showFavs) {
       var manual   = workList.filter(function(g){ return g._manual; });
@@ -546,7 +567,7 @@ function render() {
       if (token !== _renderToken) return;
       var html = '<div class="render-bar"><div class="render-bar-fill" id="renderBarFill" style="width:30%"></div></div>';
       sections.forEach(function(sec) {
-        if (sec.isFeat) { html += renderFeatured(sec.list[0]); }
+        if (sec.isHero) { html += renderHero(sec.list); }
         else            { html += renderSection(sec.label, sec.list); }
       });
       c.innerHTML = html;
@@ -614,22 +635,26 @@ function updateCounts() {
   if (manEl) manEl.textContent = games.filter(function(g){ return g._manual; }).length;
 }
 
-function renderFeatured(feat) {
-  var f = isFav(feat.id), hasUrl = !!feat.url;
-  var imgHtml = feat.cover
-    ? '<img class="feat-img" src="' + feat.cover + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="feat-img-fall" style="display:none">' + (feat.icon||'🎮') + '</div>'
-    : '<div class="feat-img-fall">' + (feat.icon||'🎮') + '</div>';
-  var html = '<div class="featured-wrap" onclick="openDetail(\'' + feat.id + '\')">';
-  html += '<div class="featured-bg"></div><div class="featured-glow"></div><div class="featured-content">';
-  html += '<div class="feat-img-wrap">' + imgHtml + '<div class="feat-badge">⭐ Featured</div></div>';
-  html += '<div class="feat-info"><div class="feat-eye">Featured Game</div>';
-  html += '<div class="feat-name">' + clean(feat.name) + '</div>';
-  html += '<div class="feat-desc">' + (clean(feat.description)||'') + '</div>';
-  html += '<div class="feat-row">';
-  if (feat.author) html += '<span class="feat-meta">by ' + clean(feat.author) + '</span>';
-  html += '<button class="btn-feat ' + (f?'fav':'') + '" onclick="event.stopPropagation();toggleFav(\'' + feat.id + '\')">' + (f?'⭐ Favourited':'☆ Favourite') + '</button>';
-  html += '<button class="btn-feat"' + (hasUrl ? ' onclick="event.stopPropagation();playGame(\'' + feat.id + '\')"' : ' disabled') + '>▶ Play</button>';
-  html += '</div></div></div></div>';
+function renderHero(games) {
+  var html = '<div class="hero-wrap">';
+  html += '<div class="hero-bg"></div><div class="hero-glow"></div>';
+  html += '<div class="hero-content">';
+  html += '<div class="hero-eye">⭐ Featured Games</div>';
+  html += '<div class="hero-grid">';
+  games.forEach(function(g){
+    var f = isFav(g.id), hasUrl = !!g.url;
+    var imgHtml = g.cover
+      ? '<img class="hero-img" src="' + g.cover + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'"><div class="hero-img-fall" style="display:none">' + (g.icon||'🎮') + '</div>'
+      : '<div class="hero-img-fall">' + (g.icon||'🎮') + '</div>';
+    html += '<div class="hero-card" onclick="openDetail(\'' + g.id + '\')">';
+    html += '<div class="hero-img-wrap">' + imgHtml + '<div class="hero-badge">★</div></div>';
+    html += '<div class="hero-info"><div class="hero-name">' + clean(g.name) + '</div>';
+    html += '<div class="hero-row">';
+    html += '<button class="btn-hero ' + (f?'fav':'') + '" onclick="event.stopPropagation();toggleFav(\'' + g.id + '\')">' + (f?'⭐':'☆') + '</button>';
+    html += '<button class="btn-hero"' + (hasUrl ? ' onclick="event.stopPropagation();playGame(\'' + g.id + '\')"' : ' disabled') + '>▶</button>';
+    html += '</div></div></div>';
+  });
+  html += '</div></div></div>';
   return html;
 }
 

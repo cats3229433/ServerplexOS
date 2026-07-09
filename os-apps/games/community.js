@@ -11,7 +11,7 @@ var COMMUNITY_GAMES = [
       category: 'Action',
       author: 'JustPlay.LOL',
       description: 'A fast-paced third-person shooter with Fortnite-style building, featuring 1v1 duels, box fights, and competitive modes.',
-      featured: false,
+      featured: true,
       source: 'Community',
     },
 
@@ -167,7 +167,7 @@ var COMMUNITY_GAMES = [
       category: 'Other',
       author: 'Candywriter, LLC',
       description: 'A life simulation game where every decision shapes your character’s journey from birth to death, letting you choose careers, relationships, education, and risky or wholesome paths to create unique life stories.',
-      featured: false,
+      featured: true,
       source: 'Community',
     },
 

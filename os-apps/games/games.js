@@ -12,7 +12,6 @@
 
 var MANUAL_GAMES = [
   ...(typeof COMMUNITY_GAMES !== 'undefined' ? COMMUNITY_GAMES : []),
-  ...(typeof GNMATH_GAMES !== 'undefined' ? GNMATH_GAMES : []),
   ...(typeof COOLDUDE_GAMES !== 'undefined' ? COOLDUDE_GAMES : []),
   ...(typeof KH0_GAMES !== 'undefined' ? KH0_GAMES : []),
   ...(typeof RADON_GAMES !== 'undefined' ? RADON_GAMES : []),

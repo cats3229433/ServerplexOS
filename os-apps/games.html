@@ -551,7 +551,7 @@ function render() {
   setTimeout(function() {
     if (token !== _renderToken) return; // stale render, bail
 
-    var featList = !q && currentCat === 'all' && !showFavs ? games.filter(function(g){ return g.featured; }).slice(0,5) : [];
+    var featList = !q && currentCat === 'all' && !showFavs ? games.filter(function(g){ return g.featured; }).slice(0,7) : [];
     var featIds = new Set(featList.map(function(g){ return g.id; }));
     var workList = featList.length ? list.filter(function(g){ return !featIds.has(g.id); }) : list;
 

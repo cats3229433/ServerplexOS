@@ -756,7 +756,8 @@ function openDetail(id) {
   refreshFavBtn();
 
   // Build source selector for duplicate games across repositories
-  var dupes = games.filter(function(x){ return x.id !== g.id && x.name === g.name && x.url; });
+  var allPool = (typeof ALL_GAMES !== 'undefined' ? ALL_GAMES : games);
+  var dupes = allPool.filter(function(x){ return x.id !== g.id && x.name === g.name && x.url; });
   var sel = document.getElementById('dSourceSelect');
   if (dupes.length && sel) {
     var opts = '<option value="' + g.id + '" selected>' + (g.source||'Default') + ' (current)</option>';

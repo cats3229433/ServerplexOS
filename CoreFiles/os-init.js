@@ -351,7 +351,16 @@ function init() {
   // ── 15. Cursor system ──
   if (typeof initCursorSystem === 'function') initCursorSystem();
 
-  // ── 16. Startup apps ──
+  // ── 16. Boot app from URL ──
+  setTimeout(function() {
+    var boot = sessionStorage.getItem('serverplex_boot_app');
+    if (boot) {
+      sessionStorage.removeItem('serverplex_boot_app');
+      if (apps[boot]) openApp(boot);
+    }
+  }, 600);
+
+  // ── 17. Startup apps ──
   setTimeout(function() {
     var startupApps = JSON.parse(localStorage.getItem('serverplex_startup_apps') || '[]');
     startupApps.forEach(function(id){ if (apps[id]) openApp(id); });

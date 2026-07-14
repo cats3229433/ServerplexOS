@@ -734,6 +734,13 @@ var THEME_WALLPAPERS = {
   var authed=sessionStorage.getItem('serverplex_authed')==='true'||sessionStorage.getItem('eclipseos_authed')==='true';
   if(!setup){window.location.replace('welcome.html');return;}
   if((hasPin||hasPw)&&!authed){window.location.replace('account.html');return;}
+
+  // URL-based app launch: ?app=games
+  var q = new URLSearchParams(location.search).get('app');
+  if (q) {
+    sessionStorage.setItem('serverplex_boot_app', q);
+    history.replaceState({}, '', location.pathname);
+  }
 })();
 
 // ── OS globals ────────────────────────────────

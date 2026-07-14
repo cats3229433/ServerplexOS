@@ -16,5 +16,4 @@ var MANUAL_GAMES = [
   ...(typeof COOLDUDE_GAMES !== 'undefined' ? COOLDUDE_GAMES : []),
   ...(typeof KH0_GAMES !== 'undefined' ? KH0_GAMES : []),
   ...(typeof RADON_GAMES !== 'undefined' ? RADON_GAMES : []),
-  ...(typeof TOBIAS_GAMES !== 'undefined' ? TOBIAS_GAMES : []),
 ];

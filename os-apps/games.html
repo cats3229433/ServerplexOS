@@ -108,6 +108,13 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 .card-name{font-size:13px;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-meta{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
 .cat-tag{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:2px 7px;border-radius:20px;background:rgba(0,120,212,.12);color:var(--app-accent);border:1px solid rgba(0,120,212,.2)}
+/* Category tiles */
+.cat-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:26px;animation:fadeUp .35s ease}
+.cat-tile{background:var(--app-surface);border:1px solid var(--app-border);border-radius:var(--r);padding:14px 12px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--app-shadow);position:relative;overflow:hidden}
+.cat-tile:hover{transform:translateY(-3px);border-color:var(--app-accent);box-shadow:0 6px 24px rgba(0,0,0,.3)}
+.cat-tile-icon{font-size:28px;margin-bottom:6px}
+.cat-tile-name{font-size:13px;font-weight:700;color:var(--app-text);margin-bottom:3px}
+.cat-tile-count{font-size:10px;color:var(--app-text2);font-weight:600}
 .card-recent-dot{position:absolute;top:7px;left:7px;width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 6px #22c55e;border:1px solid rgba(128,128,128,.3)}
 .state-box{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:80px 30px;text-align:center;color:var(--app-text2);grid-column:1/-1}
 .state-icon{font-size:50px}
@@ -551,6 +558,7 @@ function render() {
     if (featList.length) sections.push({ label: null, list: featList, isHero: true });
 
     if (currentCat === 'all' && !q && !showFavs) {
+      sections.push({ label: 'Categories', list: [], isCategories: true });
       var manual   = workList.filter(function(g){ return g._manual; });
       var registry = workList.filter(function(g){ return !g._manual; });
       if (manual.length)   sections.push({ label: 'My Games',  list: manual });
@@ -567,8 +575,9 @@ function render() {
       if (token !== _renderToken) return;
       var html = '<div class="render-bar"><div class="render-bar-fill" id="renderBarFill" style="width:30%"></div></div>';
       sections.forEach(function(sec) {
-        if (sec.isHero) { html += renderHero(sec.list); }
-        else            { html += renderSection(sec.label, sec.list); }
+        if (sec.isHero)       { html += renderHero(sec.list); }
+        else if (sec.isCategories) { html += renderCategories(); }
+        else                  { html += renderSection(sec.label, sec.list); }
       });
       c.innerHTML = html;
       // Animate bar to 100% then fade
@@ -655,6 +664,28 @@ function renderHero(games) {
     html += '</div></div></div>';
   });
   html += '</div></div></div>';
+  return html;
+}
+
+function renderCategories() {
+  var cats = [
+    {id:'Action',icon:'⚔️',color:'rgba(239,68,68,.2)',border:'rgba(239,68,68,.35)'},
+    {id:'Puzzle',icon:'🧩',color:'rgba(234,179,8,.2)',border:'rgba(234,179,8,.35)'},
+    {id:'Adventure',icon:'🗺️',color:'rgba(34,197,94,.2)',border:'rgba(34,197,94,.35)'},
+    {id:'Arcade',icon:'🕹️',color:'rgba(59,130,246,.2)',border:'rgba(59,130,246,.35)'},
+    {id:'Sports',icon:'⚽',color:'rgba(168,85,247,.2)',border:'rgba(168,85,247,.35)'},
+    {id:'Strategy',icon:'♟️',color:'rgba(236,72,153,.2)',border:'rgba(236,72,153,.35)'},
+    {id:'Multiplayer',icon:'👥',color:'rgba(20,184,166,.2)',border:'rgba(20,184,166,.35)'},
+    {id:'Other',icon:'📦',color:'rgba(120,113,108,.2)',border:'rgba(120,113,108,.35)'},
+  ];
+  var html = '<div class="cat-wrap">';
+  cats.forEach(function(c){
+    var n = games.filter(function(g){ return g.category === c.id; }).length;
+    html += '<div class="cat-tile" onclick="setCategory(\'' + c.id + '\')" style="background:' + c.color + ';border-color:' + c.border + '">';
+    html += '<div class="cat-tile-icon">' + c.icon + '</div><div class="cat-tile-name">' + c.id + '</div>';
+    html += '<div class="cat-tile-count">' + n + ' game' + (n!==1?'s':'') + '</div></div>';
+  });
+  html += '</div>';
   return html;
 }
 

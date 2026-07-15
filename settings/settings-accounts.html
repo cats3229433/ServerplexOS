@@ -102,6 +102,26 @@ input[type=text]:focus,input[type=password]:focus{border-color:var(--app-accent)
   </div>
 </div>
 
+<div class="section" style="margin-top:12px;">
+  <div class="sec-title">Setup &amp; Reset</div>
+  <div class="card">
+    <div class="row">
+      <div class="row-info">
+        <div class="row-label">Re-run Welcome Setup</div>
+        <div class="row-desc">Restart the first-launch wizard to change your profile, theme, or security</div>
+      </div>
+      <button class="btn btn-ghost" onclick="rerunSetup()">↺ Re-run Setup</button>
+    </div>
+    <div class="row">
+      <div class="row-info">
+        <div class="row-label" style="color:#ff3b30;">Reset Everything</div>
+        <div class="row-desc">Wipe all settings, profile, and preferences — cannot be undone</div>
+      </div>
+      <button class="btn btn-danger" onclick="resetAll()">🗑 Reset OS</button>
+    </div>
+  </div>
+</div>
+
 <script>
 var AVATARS = ['👤','😀','😎','🤖','👨','👩','🧑','👴','👵','🧔','👨‍💼','👩‍💼','🎓','👑','🐱','🐶','🦊','🐺','🦁','🐯','🐸','🐧','🌟','🎮'];
 var selectedAvatar = localStorage.getItem('serverplex_avatar') || '👤';
@@ -183,9 +203,25 @@ function clearSecurity() {
   if (!confirm('Remove PIN and password? The OS will no longer require login.')) return;
   localStorage.removeItem('serverplex_pin');
   localStorage.removeItem('serverplex_password');
+  localStorage.removeItem('serverplex_passkey');
   document.getElementById('pinInput').value = '';
   document.getElementById('pwInput').value = '';
   alert('Security removed.');
+}
+
+function rerunSetup() {
+  if (!confirm('This will restart the welcome setup wizard. Your current settings will be kept until you finish the wizard. Continue?')) return;
+  localStorage.removeItem('serverplex_setup_complete');
+  var top = window.top || window;
+  top.location.href = (top.location.pathname.replace(/\/[^/]*$/, '') || '') + '/welcome.html';
+}
+
+function resetAll() {
+  if (!confirm('⚠️ This will wipe ALL settings, your profile, theme, and security. The OS will restart fresh. This cannot be undone. Are you sure?')) return;
+  localStorage.clear();
+  sessionStorage.clear();
+  var top = window.top || window;
+  top.location.href = (top.location.pathname.replace(/\/[^/]*$/, '') || '') + '/welcome.html';
 }
 </script>
 </body>

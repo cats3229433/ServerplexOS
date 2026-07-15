@@ -42,6 +42,12 @@ body{font-family:'Oxanium',sans-serif;background:#07090f;color:#fff;height:100vh
 .error-msg{font-size:13px;color:#ff6b6b;letter-spacing:.5px;min-height:18px;text-align:center;margin-bottom:8px}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 .shake{animation:shake .4s ease}
+.passkey-btn{width:280px;padding:14px;background:rgba(124,131,253,0.12);border:1px solid rgba(124,131,253,0.35);border-radius:12px;color:#a0a8ff;font-family:'Oxanium',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;cursor:pointer;margin-bottom:8px;transition:all .25s;display:flex;align-items:center;justify-content:center;gap:10px}
+.passkey-btn:hover{background:rgba(124,131,253,0.22);border-color:rgba(124,131,253,0.6);transform:translateY(-2px);box-shadow:0 6px 24px rgba(124,131,253,0.25)}
+.passkey-btn:active{transform:scale(.97)}
+.passkey-btn.loading{opacity:.6;pointer-events:none}
+.passkey-divider{width:280px;display:flex;align-items:center;gap:10px;margin-bottom:14px;color:rgba(255,255,255,.2);font-size:12px;letter-spacing:1px}
+.passkey-divider::before,.passkey-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
 </style>
 </head>
 <body>
@@ -56,6 +62,18 @@ body{font-family:'Oxanium',sans-serif;background:#07090f;color:#fff;height:100vh
   <div class="avatar-wrap" id="avatarWrap"></div>
   <div class="lock-username" id="lockUsername">User</div>
   <div class="lock-subtitle">ServerplexOS</div>
+
+  <!-- Passkey primary button (shown when passkey is registered) -->
+  <div id="passkeyMode" style="display:none">
+    <button class="passkey-btn" id="passkeyBtn" onclick="attemptPasskey()">
+      <span>🗝️</span><span>Use Passkey</span>
+    </button>
+    <div class="error-msg" id="passkeyError"></div>
+  </div>
+
+  <!-- Divider shown when passkey + another method both exist -->
+  <div class="passkey-divider" id="passkeyDivider" style="display:none">or</div>
+
   <div id="pinMode">
     <div class="pin-display" id="pinDisplay"></div>
     <div class="error-msg" id="pinError"></div>
@@ -71,86 +89,167 @@ body{font-family:'Oxanium',sans-serif;background:#07090f;color:#fff;height:100vh
   </div>
 </div>
 <script>
-var savedPin=localStorage.getItem('serverplex_pin')||'';
-var savedPassword=localStorage.getItem('serverplex_password')||'';
-var savedUsername=localStorage.getItem('serverplex_username')||'User';
-var savedAvatar=localStorage.getItem('serverplex_avatar')||'👤';
-var avatarImage=localStorage.getItem('serverplex_avatar_image')||'';
-if(!savedPin&&!savedPassword){window.location.replace('desktop.html');}
-document.getElementById('lockUsername').textContent=savedUsername;
-var aw=document.getElementById('avatarWrap');
-if(avatarImage){aw.innerHTML='<img src="'+avatarImage+'" alt="avatar">';}else{aw.textContent=savedAvatar;}
-function updateClock(){
-  var now=new Date(),fmt=localStorage.getItem('serverplex_clock_format')||'12';
-  var h=now.getHours(),m=now.getMinutes().toString().padStart(2,'0');
-  var ts=fmt==='24'?h.toString().padStart(2,'0')+':'+m:((h%12||12)+':'+m+' '+(h>=12?'PM':'AM'));
-  document.getElementById('wakeTime').textContent=ts;
-  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('wakeDate').textContent=days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate();
+var savedPin      = localStorage.getItem('serverplex_pin')          || '';
+var savedPassword = localStorage.getItem('serverplex_password')     || '';
+var savedPasskey  = localStorage.getItem('serverplex_passkey')      || '';
+var savedUsername = localStorage.getItem('serverplex_username')     || 'User';
+var savedAvatar   = localStorage.getItem('serverplex_avatar')       || '👤';
+var avatarImage   = localStorage.getItem('serverplex_avatar_image') || '';
+
+// No auth set → go straight to desktop
+if (!savedPin && !savedPassword && !savedPasskey) { window.location.replace('desktop.html'); }
+
+// Avatar + username
+document.getElementById('lockUsername').textContent = savedUsername;
+var aw = document.getElementById('avatarWrap');
+if (avatarImage) { aw.innerHTML = '<img src="' + avatarImage + '" alt="avatar">'; }
+else { aw.textContent = savedAvatar; }
+
+// Clock
+function updateClock() {
+  var now = new Date(), fmt = localStorage.getItem('serverplex_clock_format') || '12';
+  var h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
+  var ts = fmt === '24' ? h.toString().padStart(2,'0') + ':' + m : ((h % 12 || 12) + ':' + m + ' ' + (h >= 12 ? 'PM' : 'AM'));
+  document.getElementById('wakeTime').textContent = ts;
+  var days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('wakeDate').textContent = days[now.getDay()] + ', ' + months[now.getMonth()] + ' ' + now.getDate();
 }
-updateClock();setInterval(updateClock,1000);
-function wake(){
+updateClock(); setInterval(updateClock, 1000);
+
+// ── Build UI based on what security methods are set ──
+var hasPasskey   = !!savedPasskey && window.PublicKeyCredential;
+var hasPin       = !!savedPin;
+var hasPassword  = !!savedPassword && !hasPin;  // password only shown if no PIN
+var hasFallback  = hasPin || hasPassword;
+
+if (hasPasskey) {
+  document.getElementById('passkeyMode').style.display = 'block';
+}
+if (hasPasskey && hasFallback) {
+  document.getElementById('passkeyDivider').style.display = 'flex';
+}
+if (hasPin) {
+  document.getElementById('pinMode').style.display = 'block';
+  document.getElementById('pwMode').style.display  = 'none';
+  buildPinUI();
+} else if (hasPassword) {
+  document.getElementById('pinMode').style.display = 'none';
+  document.getElementById('pwMode').style.display  = 'block';
+} else {
+  document.getElementById('pinMode').style.display = 'none';
+  document.getElementById('pwMode').style.display  = 'none';
+}
+
+// ── Wake ──
+function wake() {
   document.getElementById('wakeScreen').classList.add('hidden');
   document.getElementById('loginScreen').classList.add('visible');
-  if(savedPassword&&!savedPin)document.getElementById('pwInput').focus();
+  if (hasPasskey && !hasFallback) {
+    // Passkey is the only method — auto-prompt
+    setTimeout(attemptPasskey, 400);
+  } else if (hasPassword && !hasPin) {
+    document.getElementById('pwInput').focus();
+  }
 }
-if(savedPin){document.getElementById('pwMode').style.display='none';document.getElementById('pinMode').style.display='block';buildPinUI();}
-else{document.getElementById('pinMode').style.display='none';document.getElementById('pwMode').style.display='block';}
-var pinValue='';
-function buildPinUI(){
-  var display=document.getElementById('pinDisplay');
-  display.innerHTML='';
-  for(var i=0;i<4;i++){var d=document.createElement('div');d.className='pin-dot';d.id='pd'+i;display.appendChild(d);}
-  var numpad=document.getElementById('numpad');
-  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(function(k){
-    var key=document.createElement('div');
-    key.className='nk';key.textContent=k===''?'':k;
-    if(k!==''){key.addEventListener('click',function(){
-      if(k==='⌫'){pinValue=pinValue.slice(0,-1);}else if(pinValue.length<4){pinValue+=k;}
-      updateDots();document.getElementById('pinError').textContent='';
-      if(pinValue.length===4)setTimeout(submitPin,200);
-    });}
+
+// ── PIN ──
+var pinValue = '';
+function buildPinUI() {
+  var display = document.getElementById('pinDisplay');
+  display.innerHTML = '';
+  for (var i = 0; i < 4; i++) { var d = document.createElement('div'); d.className = 'pin-dot'; d.id = 'pd' + i; display.appendChild(d); }
+  var numpad = document.getElementById('numpad');
+  [1,2,3,4,5,6,7,8,9,'',0,'⌫'].forEach(function(k) {
+    var key = document.createElement('div');
+    key.className = 'nk'; key.textContent = k === '' ? '' : k;
+    if (k !== '') { key.addEventListener('click', function() {
+      if (k === '⌫') { pinValue = pinValue.slice(0,-1); } else if (pinValue.length < 4) { pinValue += k; }
+      updateDots(); document.getElementById('pinError').textContent = '';
+      if (pinValue.length === 4) setTimeout(submitPin, 200);
+    }); }
     numpad.appendChild(key);
   });
 }
-function updateDots(err){
-  for(var i=0;i<4;i++){var dot=document.getElementById('pd'+i);if(!dot)return;dot.className='pin-dot'+(i<pinValue.length?(err?' error':' filled'):'');}
+function updateDots(err) {
+  for (var i = 0; i < 4; i++) { var dot = document.getElementById('pd' + i); if (!dot) return; dot.className = 'pin-dot' + (i < pinValue.length ? (err ? ' error' : ' filled') : ''); }
 }
-function submitPin(){
-  if(pinValue===savedPin){unlock();}
-  else{
-    updateDots(true);document.getElementById('pinError').textContent='Incorrect PIN.';
+function submitPin() {
+  if (pinValue === savedPin) { unlock(); }
+  else {
+    updateDots(true); document.getElementById('pinError').textContent = 'Incorrect PIN.';
     document.getElementById('numpad').classList.add('shake');
-    setTimeout(function(){pinValue='';updateDots();document.getElementById('pinError').textContent='';document.getElementById('numpad').classList.remove('shake');},700);
+    setTimeout(function() { pinValue = ''; updateDots(); document.getElementById('pinError').textContent = ''; document.getElementById('numpad').classList.remove('shake'); }, 700);
   }
 }
-document.getElementById('pwEye').addEventListener('click',function(){var i=document.getElementById('pwInput');i.type=i.type==='password'?'text':'password';});
-document.getElementById('pwInput').addEventListener('keydown',function(e){if(e.key==='Enter')submitPassword();});
-function submitPassword(){
-  var entered=document.getElementById('pwInput').value;
-  if(entered===savedPassword){unlock();}
-  else{
-    var inp=document.getElementById('pwInput');
-    inp.classList.add('shake');document.getElementById('pwError').textContent='Incorrect password.';inp.style.borderColor='rgba(255,80,80,.6)';
-    setTimeout(function(){inp.classList.remove('shake');inp.style.borderColor='';document.getElementById('pwError').textContent='';inp.value='';},700);
+
+// ── Password ──
+document.getElementById('pwEye').addEventListener('click', function() { var i = document.getElementById('pwInput'); i.type = i.type === 'password' ? 'text' : 'password'; });
+document.getElementById('pwInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitPassword(); });
+function submitPassword() {
+  var entered = document.getElementById('pwInput').value;
+  if (entered === savedPassword) { unlock(); }
+  else {
+    var inp = document.getElementById('pwInput');
+    inp.classList.add('shake'); document.getElementById('pwError').textContent = 'Incorrect password.'; inp.style.borderColor = 'rgba(255,80,80,.6)';
+    setTimeout(function() { inp.classList.remove('shake'); inp.style.borderColor = ''; document.getElementById('pwError').textContent = ''; inp.value = ''; }, 700);
   }
 }
-// BUG FIX: was arrow fn with two statements and no braces — syntax error
-function unlock(){
-  var screen=document.getElementById('loginScreen');
-  screen.style.transition='opacity .4s ease';
-  screen.style.opacity='0';
-  setTimeout(function(){
-    sessionStorage.setItem('serverplex_authed','true');
-    window.location.href='desktop.html';
-  },400);
+
+// ── Passkey ──
+function attemptPasskey() {
+  if (!window.PublicKeyCredential) {
+    document.getElementById('passkeyError').textContent = 'Passkeys not supported in this browser.';
+    return;
+  }
+  var btn = document.getElementById('passkeyBtn');
+  btn.classList.add('loading');
+  btn.querySelector('span:last-child').textContent = 'Waiting for device…';
+  document.getElementById('passkeyError').textContent = '';
+
+  var storedData = null;
+  try { storedData = JSON.parse(savedPasskey); } catch(e) {}
+  if (!storedData || !storedData.credId) {
+    document.getElementById('passkeyError').textContent = 'No passkey registered — use PIN or password.';
+    btn.classList.remove('loading'); btn.querySelector('span:last-child').textContent = 'Use Passkey'; return;
+  }
+
+  var credId = Uint8Array.from(storedData.credId);
+  var challenge = new Uint8Array(32); crypto.getRandomValues(challenge);
+
+  navigator.credentials.get({
+    publicKey: {
+      challenge: challenge,
+      allowCredentials: [{ id: credId, type: 'public-key' }],
+      userVerification: 'preferred',
+      timeout: 60000
+    }
+  }).then(function() {
+    unlock();
+  }).catch(function(err) {
+    btn.classList.remove('loading'); btn.querySelector('span:last-child').textContent = 'Use Passkey';
+    var msg = (err && err.name === 'NotAllowedError') ? 'Cancelled — try again.' : 'Passkey failed. Use PIN or password instead.';
+    document.getElementById('passkeyError').textContent = msg;
+  });
 }
-document.addEventListener('keydown',function(e){
-  if(!document.getElementById('loginScreen').classList.contains('visible')){wake();return;}
-  if(savedPin){
-    if(e.key>='0'&&e.key<='9'&&pinValue.length<4){pinValue+=e.key;updateDots();if(pinValue.length===4)setTimeout(submitPin,200);}
-    else if(e.key==='Backspace'){pinValue=pinValue.slice(0,-1);updateDots();}
+
+// ── Unlock ──
+function unlock() {
+  var screen = document.getElementById('loginScreen');
+  screen.style.transition = 'opacity .4s ease';
+  screen.style.opacity = '0';
+  setTimeout(function() {
+    sessionStorage.setItem('serverplex_authed', 'true');
+    window.location.href = 'desktop.html';
+  }, 400);
+}
+
+// ── Keyboard shortcut for PIN ──
+document.addEventListener('keydown', function(e) {
+  if (!document.getElementById('loginScreen').classList.contains('visible')) { wake(); return; }
+  if (savedPin) {
+    if (e.key >= '0' && e.key <= '9' && pinValue.length < 4) { pinValue += e.key; updateDots(); if (pinValue.length === 4) setTimeout(submitPin, 200); }
+    else if (e.key === 'Backspace') { pinValue = pinValue.slice(0,-1); updateDots(); }
   }
 });
 </script>

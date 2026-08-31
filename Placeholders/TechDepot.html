@@ -1,0 +1,2576 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Digital Depot — Next-Gen Tech</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --white: #ffffff;
+        --off: #f5f5f3;
+        --light: #ebebea;
+        --mid: #c8c8c4;
+        --dark: #1a1a1a;
+        --ink: #111111;
+        --blue: #0057ff;
+        --blue-light: #3378ff;
+        --blue-pale: #e8efff;
+        --cyan: #00d4ff;
+        --red: #ff2d55;
+        --green: #00c853;
+        --yellow: #ffd600;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        background: var(--white);
+        color: var(--ink);
+        font-family: "DM Sans", sans-serif;
+        font-weight: 400;
+        overflow-x: hidden;
+        cursor: none;
+      }
+
+      /* Custom cursor */
+      .cursor {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: var(--blue);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 99999;
+        transition:
+          transform 0.15s,
+          width 0.2s,
+          height 0.2s,
+          background 0.2s;
+        transform: translate(-50%, -50%);
+      }
+      .cursor-ring {
+        position: fixed;
+        width: 36px;
+        height: 36px;
+        border: 1.5px solid var(--blue);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 99998;
+        transform: translate(-50%, -50%);
+        transition:
+          transform 0.08s linear,
+          width 0.2s,
+          height 0.2s,
+          opacity 0.2s;
+        opacity: 0.5;
+      }
+      body:hover .cursor {
+        opacity: 1;
+      }
+
+      /* ── NAV ── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 200;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--light);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 3rem;
+        height: 64px;
+        animation: slideDown 0.6s ease both;
+      }
+
+      @keyframes slideDown {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .nav-logo {
+        font-family: "Syne", sans-serif;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .logo-d {
+        width: 32px;
+        height: 32px;
+        background: var(--blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem;
+        font-weight: 800;
+        border-radius: 6px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 0.25rem;
+        list-style: none;
+      }
+
+      .nav-links a {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: var(--dark);
+        text-decoration: none;
+        border-radius: 6px;
+        transition:
+          background 0.2s,
+          color 0.2s;
+      }
+
+      .nav-links a:hover {
+        background: var(--off);
+        color: var(--ink);
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .nav-search {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--off);
+        border: 1px solid var(--light);
+        border-radius: 8px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        color: var(--mid);
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .nav-search:hover {
+        border-color: var(--blue);
+        color: var(--dark);
+      }
+
+      .nav-cart {
+        position: relative;
+        background: var(--ink);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.45rem 1rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: background 0.2s;
+      }
+
+      .nav-cart:hover {
+        background: var(--blue);
+      }
+
+      .cart-badge {
+        background: var(--blue);
+        color: white;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        font-size: 0.65rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+      }
+
+      .nav-cart:hover .cart-badge {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        align-items: center;
+        padding-top: 64px;
+        overflow: hidden;
+      }
+
+      .hero-left {
+        padding: 6rem 3rem 6rem 3rem;
+        animation: fadeUp 0.8s ease 0.3s both;
+      }
+
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--blue-pale);
+        color: var(--blue);
+        border-radius: 100px;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.72rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero-tag-dot {
+        width: 6px;
+        height: 6px;
+        background: var(--blue);
+        border-radius: 50%;
+        animation: blink 2s ease infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+
+      .hero-title {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(3rem, 5.5vw, 5.5rem);
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        margin-bottom: 1.5rem;
+        color: var(--ink);
+      }
+
+      .hero-title .accent {
+        color: var(--blue);
+      }
+      .hero-title .outline {
+        -webkit-text-stroke: 2px var(--ink);
+        color: transparent;
+      }
+
+      .hero-desc {
+        font-size: 1rem;
+        line-height: 1.7;
+        color: #666;
+        max-width: 440px;
+        margin-bottom: 2.5rem;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 3rem;
+      }
+
+      .btn-blue {
+        background: var(--blue);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 2rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+
+      .btn-blue:hover {
+        background: var(--blue-light);
+        transform: translateY(-1px);
+      }
+
+      .btn-ghost {
+        background: transparent;
+        color: var(--ink);
+        border: 1.5px solid var(--light);
+        border-radius: 10px;
+        padding: 0.85rem 2rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+
+      .btn-ghost:hover {
+        border-color: var(--ink);
+        background: var(--off);
+      }
+
+      .hero-stats {
+        display: flex;
+        gap: 2.5rem;
+      }
+
+      .stat-num {
+        font-family: "Syne", sans-serif;
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+      }
+
+      .stat-label {
+        font-size: 0.72rem;
+        color: #999;
+        margin-top: 0.1rem;
+        font-weight: 400;
+      }
+
+      .hero-right {
+        position: relative;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--off);
+        overflow: hidden;
+        animation: fadeIn 1s ease 0.5s both;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .hero-right-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 70% 50% at 50% 50%,
+          rgba(0, 87, 255, 0.08) 0%,
+          transparent 70%
+        );
+      }
+
+      /* Geometric grid lines */
+      .grid-lines {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(0, 87, 255, 0.04) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 87, 255, 0.04) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      /* Hero product — laptop SVG */
+      .hero-product {
+        position: relative;
+        z-index: 2;
+        animation: float 5s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-2deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(2deg);
+        }
+      }
+
+      .hero-badge {
+        position: absolute;
+        background: white;
+        border-radius: 14px;
+        padding: 0.7rem 1rem;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        white-space: nowrap;
+        animation: floatBadge var(--fd) ease-in-out infinite var(--fd2);
+      }
+
+      @keyframes floatBadge {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .badge-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      /* ── TICKER ── */
+      .ticker-wrap {
+        overflow: hidden;
+        background: var(--ink);
+        padding: 0.8rem 0;
+        border-top: 1px solid #222;
+        border-bottom: 1px solid #222;
+      }
+
+      .ticker-track {
+        display: flex;
+        gap: 3rem;
+        animation: ticker 22s linear infinite;
+        width: max-content;
+      }
+
+      @keyframes ticker {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      .ticker-item {
+        font-family: "Syne", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        white-space: nowrap;
+      }
+
+      .ticker-item .highlight {
+        color: var(--cyan);
+      }
+      .ticker-sep {
+        color: var(--blue);
+        opacity: 0.5;
+      }
+
+      /* ── CATEGORIES ── */
+      .categories {
+        padding: 5rem 3rem;
+      }
+
+      .section-label {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 0.6rem;
+      }
+
+      .section-title {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1.05;
+        margin-bottom: 3rem;
+      }
+
+      .cat-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 1rem;
+      }
+
+      .cat-card {
+        background: var(--off);
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s;
+        border: 1.5px solid transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .cat-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--blue);
+        opacity: 0;
+        transition: opacity 0.25s;
+      }
+
+      .cat-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--blue);
+      }
+
+      .cat-card:hover::before {
+        opacity: 0.04;
+      }
+
+      .cat-icon {
+        width: 52px;
+        height: 52px;
+        margin: 0 auto 0.8rem;
+      }
+
+      .cat-name {
+        font-family: "Syne", sans-serif;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .cat-count {
+        font-size: 0.68rem;
+        color: #999;
+        margin-top: 0.2rem;
+      }
+
+      /* ── FEATURED ── */
+      .featured {
+        padding: 2rem 3rem 5rem;
+      }
+
+      .featured-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 0.4rem;
+      }
+
+      .filter-tab {
+        background: none;
+        border: 1.5px solid var(--light);
+        border-radius: 8px;
+        padding: 0.4rem 1rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.78rem;
+        font-weight: 500;
+        cursor: pointer;
+        color: #666;
+        transition: all 0.2s;
+      }
+
+      .filter-tab.active,
+      .filter-tab:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: var(--blue-pale);
+      }
+
+      .products-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+      }
+
+      .product-card {
+        border: 1.5px solid var(--light);
+        border-radius: 18px;
+        overflow: hidden;
+        transition: all 0.3s;
+        background: white;
+        position: relative;
+      }
+
+      .product-card:hover {
+        border-color: var(--blue);
+        transform: translateY(-4px);
+        box-shadow: 0 16px 40px rgba(0, 87, 255, 0.1);
+      }
+
+      .product-img-wrap {
+        background: var(--off);
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .product-tag {
+        position: absolute;
+        top: 0.8rem;
+        left: 0.8rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+      }
+
+      .tag-new {
+        background: var(--blue);
+        color: white;
+      }
+      .tag-sale {
+        background: var(--red);
+        color: white;
+      }
+      .tag-hot {
+        background: var(--yellow);
+        color: var(--ink);
+      }
+      .tag-best {
+        background: var(--green);
+        color: white;
+      }
+
+      .product-wish {
+        position: absolute;
+        top: 0.8rem;
+        right: 0.8rem;
+        width: 32px;
+        height: 32px;
+        background: white;
+        border-radius: 50%;
+        border: 1.5px solid var(--light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+      }
+
+      .product-wish:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+
+      .product-info {
+        padding: 1.1rem;
+      }
+
+      .product-brand {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--blue);
+        margin-bottom: 0.3rem;
+      }
+
+      .product-name {
+        font-family: "Syne", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.25;
+        margin-bottom: 0.4rem;
+        color: var(--ink);
+      }
+
+      .product-specs {
+        font-size: 0.72rem;
+        color: #999;
+        margin-bottom: 0.9rem;
+      }
+
+      .product-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .product-price {
+        font-family: "Syne", sans-serif;
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+      }
+
+      .product-price .old-price {
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: #aaa;
+        text-decoration: line-through;
+        display: block;
+        line-height: 1;
+      }
+
+      .add-to-cart {
+        background: var(--ink);
+        color: white;
+        border: none;
+        border-radius: 9px;
+        padding: 0.55rem 1.1rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+
+      .add-to-cart:hover {
+        background: var(--blue);
+        transform: scale(1.03);
+      }
+
+      .product-rating {
+        font-size: 0.7rem;
+        color: #999;
+        margin-bottom: 0.7rem;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+      }
+
+      .stars-display {
+        color: var(--yellow);
+        letter-spacing: -0.05em;
+      }
+
+      /* ── DEAL BANNER ── */
+      .deal-banner {
+        margin: 0 3rem 5rem;
+        background: var(--ink);
+        border-radius: 24px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 340px;
+        position: relative;
+      }
+
+      .deal-left {
+        padding: 3.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .deal-eyebrow {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--cyan);
+        margin-bottom: 1rem;
+      }
+
+      .deal-title {
+        font-family: "Syne", sans-serif;
+        font-size: 2.8rem;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        color: white;
+        margin-bottom: 1rem;
+      }
+
+      .deal-title span {
+        color: var(--cyan);
+      }
+
+      .deal-desc {
+        font-size: 0.88rem;
+        color: rgba(255, 255, 255, 0.55);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+
+      .deal-cta {
+        background: var(--blue);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0.9rem 2rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        align-self: flex-start;
+      }
+
+      .deal-cta:hover {
+        background: var(--blue-light);
+      }
+
+      .deal-right {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0f0f1a 0%, #1a1a35 100%);
+        overflow: hidden;
+      }
+
+      .deal-right::before {
+        content: "";
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          rgba(0, 212, 255, 0.15),
+          transparent 70%
+        );
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      /* Countdown */
+      .countdown {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .count-block {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        padding: 0.5rem 0.7rem;
+        text-align: center;
+        min-width: 50px;
+      }
+
+      .count-num {
+        font-family: "Syne", sans-serif;
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: white;
+        line-height: 1;
+      }
+
+      .count-label {
+        font-size: 0.55rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 0.2rem;
+      }
+
+      /* ── BRANDS ── */
+      .brands-section {
+        padding: 4rem 3rem;
+        border-top: 1px solid var(--light);
+        border-bottom: 1px solid var(--light);
+        margin: 0 3rem;
+        margin-bottom: 5rem;
+      }
+
+      .brands-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+
+      .brand-logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.1rem;
+        letter-spacing: -0.04em;
+        color: var(--mid);
+        transition: color 0.2s;
+        cursor: default;
+      }
+
+      .brand-logo:hover {
+        color: var(--ink);
+      }
+
+      /* ── PERKS ── */
+      .perks {
+        padding: 2rem 3rem 6rem;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+      }
+
+      .perk-card {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+      }
+
+      .perk-icon-wrap {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        background: var(--blue-pale);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--blue);
+      }
+
+      .perk-title {
+        font-family: "Syne", sans-serif;
+        font-size: 0.95rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.25rem;
+      }
+
+      .perk-desc {
+        font-size: 0.78rem;
+        color: #888;
+        line-height: 1.6;
+      }
+
+      /* ── NEWSLETTER ── */
+      .newsletter {
+        background: var(--blue);
+        padding: 5rem 3rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .newsletter::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -20%;
+        width: 60%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.04);
+        transform: rotate(-15deg);
+      }
+
+      .newsletter::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 40%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.03);
+        transform: rotate(-15deg);
+      }
+
+      .newsletter h2 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(1.8rem, 3vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: white;
+        margin-bottom: 0.8rem;
+      }
+
+      .newsletter p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+        margin-bottom: 2rem;
+      }
+
+      .newsletter-form {
+        display: flex;
+        max-width: 440px;
+        margin: 0 auto;
+        gap: 0.75rem;
+      }
+
+      .newsletter-input {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1.5px solid rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        padding: 0.85rem 1.2rem;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        color: white;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+
+      .newsletter-input::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
+      .newsletter-input:focus {
+        border-color: rgba(255, 255, 255, 0.5);
+      }
+
+      .newsletter-btn {
+        background: white;
+        color: var(--blue);
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-family: "Syne", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s;
+        white-space: nowrap;
+      }
+
+      .newsletter-btn:hover {
+        transform: scale(1.03);
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        background: var(--ink);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 4rem 3rem 2rem;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+      }
+
+      .footer-brand-desc {
+        font-size: 0.82rem;
+        line-height: 1.7;
+        margin-top: 1rem;
+        color: rgba(255, 255, 255, 0.4);
+        max-width: 240px;
+      }
+
+      .footer-col h4 {
+        font-family: "Syne", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 1.2rem;
+      }
+
+      .footer-col ul {
+        list-style: none;
+      }
+      .footer-col li {
+        margin-bottom: 0.7rem;
+      }
+      .footer-col a {
+        color: rgba(255, 255, 255, 0.4);
+        text-decoration: none;
+        font-size: 0.82rem;
+        transition: color 0.2s;
+      }
+      .footer-col a:hover {
+        color: white;
+      }
+
+      .footer-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.25);
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <nav>
+      <a class="nav-logo" href="#">
+        <div class="logo-d">D</div>
+        Digital Depot
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#">Laptops</a></li>
+        <li><a href="#">Phones</a></li>
+        <li><a href="#">Audio</a></li>
+        <li><a href="#">Gaming</a></li>
+        <li><a href="#">Accessories</a></li>
+        <li><a href="#">Deals</a></li>
+      </ul>
+
+      <div class="nav-right">
+        <div class="nav-search">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.35-4.35" />
+          </svg>
+          Search products…
+          <span
+            style="
+              font-size: 0.65rem;
+              background: var(--light);
+              padding: 0.1rem 0.4rem;
+              border-radius: 4px;
+              color: var(--mid);
+            "
+            >⌘K</span
+          >
+        </div>
+        <button class="nav-cart" id="cartBtn">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 01-8 0" />
+          </svg>
+          Cart
+          <span class="cart-badge" id="cartCount">0</span>
+        </button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-tag">
+          <div class="hero-tag-dot"></div>
+          New arrivals just dropped
+        </div>
+        <h1 class="hero-title">
+          Tech<br />
+          <span class="outline">That</span><br />
+          <span class="accent">Moves</span><br />
+          You.
+        </h1>
+        <p class="hero-desc">
+          From flagship phones to pro-grade laptops — Digital Depot stocks the
+          gear that powers your world. Free 2-day shipping on orders over $50.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-blue">Shop Now</button>
+          <button class="btn-ghost">View Deals →</button>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-num">50K+</div>
+            <div class="stat-label">Products in stock</div>
+          </div>
+          <div>
+            <div class="stat-num">4.9★</div>
+            <div class="stat-label">Average rating</div>
+          </div>
+          <div>
+            <div class="stat-num">2 Day</div>
+            <div class="stat-label">Free shipping</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-right-bg"></div>
+        <div class="grid-lines"></div>
+
+        <div class="hero-product">
+          <svg
+            width="420"
+            height="310"
+            viewBox="0 0 420 310"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect
+              x="60"
+              y="20"
+              width="300"
+              height="210"
+              rx="12"
+              fill="#1a1a2e"
+            />
+            <rect
+              x="60"
+              y="20"
+              width="300"
+              height="210"
+              rx="12"
+              stroke="#333"
+              stroke-width="1.5"
+            />
+            <rect
+              x="72"
+              y="32"
+              width="276"
+              height="188"
+              rx="6"
+              fill="#0a0a18"
+            />
+            <defs>
+              <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#0057ff" stop-opacity="0.9" />
+                <stop offset="50%" stop-color="#00d4ff" stop-opacity="0.7" />
+                <stop offset="100%" stop-color="#7b2fff" stop-opacity="0.8" />
+              </linearGradient>
+              <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2a2a2a" />
+                <stop offset="100%" stop-color="#1a1a1a" />
+              </linearGradient>
+            </defs>
+            <rect
+              x="72"
+              y="32"
+              width="276"
+              height="188"
+              rx="6"
+              fill="url(#screen)"
+              opacity="0.15"
+            />
+            <rect
+              x="84"
+              y="44"
+              width="252"
+              height="14"
+              rx="3"
+              fill="rgba(255,255,255,0.06)"
+            />
+            <circle cx="91" cy="51" r="3" fill="rgba(255,80,80,0.6)" />
+            <circle cx="100" cy="51" r="3" fill="rgba(255,196,0,0.6)" />
+            <circle cx="109" cy="51" r="3" fill="rgba(0,200,83,0.6)" />
+            <rect
+              x="84"
+              y="68"
+              width="80"
+              height="4"
+              rx="2"
+              fill="rgba(0,87,255,0.7)"
+            />
+            <rect
+              x="172"
+              y="68"
+              width="50"
+              height="4"
+              rx="2"
+              fill="rgba(0,212,255,0.5)"
+            />
+            <rect
+              x="84"
+              y="80"
+              width="40"
+              height="4"
+              rx="2"
+              fill="rgba(255,255,255,0.2)"
+            />
+            <rect
+              x="132"
+              y="80"
+              width="100"
+              height="4"
+              rx="2"
+              fill="rgba(123,47,255,0.6)"
+            />
+            <rect
+              x="84"
+              y="92"
+              width="120"
+              height="4"
+              rx="2"
+              fill="rgba(0,87,255,0.4)"
+            />
+            <rect
+              x="84"
+              y="104"
+              width="60"
+              height="4"
+              rx="2"
+              fill="rgba(0,212,255,0.5)"
+            />
+            <rect
+              x="152"
+              y="104"
+              width="80"
+              height="4"
+              rx="2"
+              fill="rgba(255,255,255,0.15)"
+            />
+            <rect
+              x="84"
+              y="116"
+              width="30"
+              height="4"
+              rx="2"
+              fill="rgba(255,255,255,0.1)"
+            />
+            <rect
+              x="122"
+              y="116"
+              width="90"
+              height="4"
+              rx="2"
+              fill="rgba(0,87,255,0.6)"
+            />
+            <ellipse
+              cx="210"
+              cy="130"
+              rx="100"
+              ry="70"
+              fill="rgba(0,87,255,0.1)"
+            />
+            <rect
+              x="84"
+              y="128"
+              width="2"
+              height="12"
+              rx="1"
+              fill="rgba(0,212,255,0.9)"
+            >
+              <animate
+                attributeName="opacity"
+                values="1;0;1"
+                dur="1s"
+                repeatCount="indefinite"
+              />
+            </rect>
+            <rect
+              x="84"
+              y="148"
+              width="150"
+              height="4"
+              rx="2"
+              fill="rgba(255,255,255,0.08)"
+            />
+            <rect
+              x="84"
+              y="160"
+              width="80"
+              height="4"
+              rx="2"
+              fill="rgba(0,87,255,0.3)"
+            />
+            <circle cx="210" cy="37" r="2" fill="#333" />
+            <rect
+              x="55"
+              y="228"
+              width="310"
+              height="14"
+              rx="4"
+              fill="url(#base)"
+            />
+            <rect
+              x="40"
+              y="240"
+              width="340"
+              height="60"
+              rx="8"
+              fill="url(#base)"
+            />
+            <rect
+              x="40"
+              y="240"
+              width="340"
+              height="60"
+              rx="8"
+              stroke="#333"
+              stroke-width="1"
+            />
+            <g opacity="0.4">
+              <rect x="60" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="82" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="104" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="126" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="148" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="170" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="192" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="214" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="236" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="258" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="280" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="302" y="252" width="18" height="10" rx="2" fill="#444" />
+              <rect x="68" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="90" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="112" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="134" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="156" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="178" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="200" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="222" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="244" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect x="266" y="266" width="18" height="10" rx="2" fill="#444" />
+              <rect
+                x="130"
+                y="280"
+                width="140"
+                height="10"
+                rx="3"
+                fill="#444"
+              />
+              <rect
+                x="155"
+                y="293"
+                width="90"
+                height="3"
+                rx="1.5"
+                fill="#555"
+              />
+            </g>
+            <rect
+              x="60"
+              y="241"
+              width="300"
+              height="6"
+              rx="3"
+              fill="rgba(0,87,255,0.15)"
+            />
+          </svg>
+
+          <div
+            class="hero-badge"
+            style="top: -20px; right: -20px; --fd: 4s; --fd2: 0s"
+          >
+            <div class="badge-dot" style="background: var(--green)"></div>
+            In Stock · Ships Today
+          </div>
+          <div
+            class="hero-badge"
+            style="bottom: 60px; left: -30px; --fd: 4.5s; --fd2: 0.7s"
+          >
+            ⚡ Q4 Pro Chip
+          </div>
+          <div
+            class="hero-badge"
+            style="bottom: 10px; right: -10px; --fd: 5s; --fd2: 0.3s"
+          >
+            <span
+              style="
+                font-family: &quot;Syne&quot;, sans-serif;
+                font-size: 0.9rem;
+                font-weight: 800;
+                color: var(--blue);
+              "
+              >$1,299</span
+            >
+            <span
+              style="
+                text-decoration: line-through;
+                color: #aaa;
+                font-size: 0.75rem;
+              "
+              >$1,599</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="ticker-wrap">
+      <div class="ticker-track">
+        <span class="ticker-item"
+          >Free 2-Day Shipping
+          <span class="highlight">On Orders $50+</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >New <span class="highlight">Zenith X1 Pro</span> Now Available</span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Student Discount <span class="highlight">15% Off</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Trade-In &amp; Save Up To <span class="highlight">$400</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Extended Warranty
+          <span class="highlight">Plans Available</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Free 2-Day Shipping
+          <span class="highlight">On Orders $50+</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >New <span class="highlight">Zenith X1 Pro</span> Now Available</span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Student Discount <span class="highlight">15% Off</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Trade-In &amp; Save Up To <span class="highlight">$400</span></span
+        >
+        <span class="ticker-sep">◆</span>
+        <span class="ticker-item"
+          >Extended Warranty
+          <span class="highlight">Plans Available</span></span
+        >
+      </div>
+    </div>
+
+    <section class="categories">
+      <p class="section-label">Browse by category</p>
+      <h2 class="section-title">What are you<br />looking for?</h2>
+
+      <div class="cat-grid">
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 52 52" fill="none">
+            <rect
+              x="6"
+              y="12"
+              width="40"
+              height="26"
+              rx="4"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <rect x="10" y="16" width="32" height="18" rx="2" fill="#e8efff" />
+            <rect x="16" y="40" width="20" height="3" rx="1.5" fill="#c8c8c4" />
+            <rect x="12" y="43" width="28" height="2" rx="1" fill="#c8c8c4" />
+          </svg>
+          <div class="cat-name">Laptops</div>
+          <div class="cat-count">218 products</div>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 52 52" fill="none">
+            <rect
+              x="16"
+              y="6"
+              width="20"
+              height="40"
+              rx="5"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <rect x="19" y="10" width="14" height="24" rx="2" fill="#e8efff" />
+            <circle
+              cx="26"
+              cy="40"
+              r="2.5"
+              stroke="#0057ff"
+              stroke-width="1.2"
+            />
+          </svg>
+          <div class="cat-name">Phones</div>
+          <div class="cat-count">345 products</div>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 52 52" fill="none">
+            <circle
+              cx="26"
+              cy="26"
+              r="16"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <circle cx="26" cy="26" r="8" fill="#e8efff" />
+            <path
+              d="M18 14 Q10 8 8 18"
+              stroke="#0057ff"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+            <path
+              d="M34 14 Q42 8 44 18"
+              stroke="#0057ff"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+          </svg>
+          <div class="cat-name">Audio</div>
+          <div class="cat-count">190 products</div>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 52 52" fill="none">
+            <rect
+              x="6"
+              y="14"
+              width="40"
+              height="28"
+              rx="4"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <circle cx="18" cy="28" r="4" stroke="#0057ff" stroke-width="1.2" />
+            <circle cx="30" cy="24" r="2" fill="#0057ff" opacity="0.5" />
+            <circle cx="36" cy="28" r="2" fill="#0057ff" opacity="0.5" />
+            <circle cx="30" cy="32" r="2" fill="#0057ff" opacity="0.5" />
+            <circle cx="24" cy="28" r="2" fill="#0057ff" opacity="0.5" />
+          </svg>
+          <div class="cat-name">Gaming</div>
+          <div class="cat-count">412 products</div>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 52 52" fill="none">
+            <rect
+              x="8"
+              y="16"
+              width="36"
+              height="24"
+              rx="4"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <rect x="12" y="20" width="28" height="16" rx="2" fill="#e8efff" />
+            <rect x="18" y="42" width="16" height="3" rx="1.5" fill="#c8c8c4" />
+            <line
+              x1="14"
+              y1="42"
+              x2="38"
+              y2="42"
+              stroke="#c8c8c4"
+              stroke-width="1.5"
+            />
+          </svg>
+          <div class="cat-name">Monitors</div>
+          <div class="cat-count">97 products</div>
+        </div>
+        <div class="cat-card">
+          <svg class="cat-icon" viewBox="0 0 52 52" fill="none">
+            <rect
+              x="18"
+              y="8"
+              width="16"
+              height="22"
+              rx="3"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <rect
+              x="14"
+              y="18"
+              width="24"
+              height="12"
+              rx="3"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <line
+              x1="26"
+              y1="30"
+              x2="26"
+              y2="38"
+              stroke="#0057ff"
+              stroke-width="1.5"
+            />
+            <rect
+              x="18"
+              y="38"
+              width="16"
+              height="4"
+              rx="2"
+              fill="#e8efff"
+              stroke="#0057ff"
+              stroke-width="1"
+            />
+          </svg>
+          <div class="cat-name">Accessories</div>
+          <div class="cat-count">830 products</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="featured">
+      <div class="featured-header">
+        <div>
+          <p class="section-label">Handpicked for you</p>
+          <h2 class="section-title">Featured Products</h2>
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setFilter(this)">
+            All
+          </button>
+          <button class="filter-tab" onclick="setFilter(this)">
+            New Arrivals
+          </button>
+          <button class="filter-tab" onclick="setFilter(this)">On Sale</button>
+          <button class="filter-tab" onclick="setFilter(this)">
+            Top Rated
+          </button>
+        </div>
+      </div>
+
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="product-img-wrap" style="background: #f0f4ff">
+            <span class="product-tag tag-new">New</span>
+            <span class="product-wish">♡</span>
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <path
+                d="M30 65 Q30 30 65 30 Q100 30 100 65"
+                stroke="#0057ff"
+                stroke-width="4"
+                stroke-linecap="round"
+                fill="none"
+              />
+              <rect
+                x="18"
+                y="60"
+                width="18"
+                height="28"
+                rx="9"
+                fill="#0057ff"
+              />
+              <rect
+                x="94"
+                y="60"
+                width="18"
+                height="28"
+                rx="9"
+                fill="#0057ff"
+              />
+              <rect
+                x="20"
+                y="64"
+                width="14"
+                height="20"
+                rx="7"
+                fill="#3378ff"
+              />
+              <rect
+                x="96"
+                y="64"
+                width="14"
+                height="20"
+                rx="7"
+                fill="#3378ff"
+              />
+              <circle
+                cx="65"
+                cy="65"
+                r="6"
+                fill="#e8efff"
+                stroke="#0057ff"
+                stroke-width="1.5"
+              />
+              <line
+                x1="65"
+                y1="30"
+                x2="65"
+                y2="24"
+                stroke="#0057ff"
+                stroke-width="2"
+              />
+              <circle cx="65" cy="22" r="3" fill="#0057ff" />
+            </svg>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">Sonicore</div>
+            <div class="product-name">Wave 7 Wireless ANC</div>
+            <div class="product-rating">
+              <span class="stars-display">★★★★★</span>
+              <span>4.9 (2,341)</span>
+            </div>
+            <div class="product-specs">
+              30hr battery · High-Res Audio · Multipoint
+            </div>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="old-price">$399</span>
+                $329
+              </div>
+              <button class="add-to-cart" onclick="addToCart()">Add +</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap" style="background: #fff8f0">
+            <span class="product-tag tag-hot">Hot</span>
+            <span class="product-wish">♡</span>
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <rect
+                x="38"
+                y="16"
+                width="54"
+                height="98"
+                rx="10"
+                fill="#1a1a1a"
+              />
+              <rect
+                x="38"
+                y="16"
+                width="54"
+                height="98"
+                rx="10"
+                stroke="#333"
+                stroke-width="1.5"
+              />
+              <rect
+                x="42"
+                y="22"
+                width="46"
+                height="80"
+                rx="6"
+                fill="#0a0a18"
+              />
+              <rect
+                x="42"
+                y="22"
+                width="46"
+                height="80"
+                rx="6"
+                fill="url(#phone-screen)"
+                opacity="0.3"
+              />
+              <defs>
+                <linearGradient id="phone-screen" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#0057ff" />
+                  <stop offset="100%" stop-color="#00d4ff" />
+                </linearGradient>
+              </defs>
+              <rect
+                x="44"
+                y="30"
+                width="42"
+                height="6"
+                rx="3"
+                fill="rgba(255,255,255,0.1)"
+              />
+              <rect
+                x="44"
+                y="40"
+                width="28"
+                height="4"
+                rx="2"
+                fill="rgba(0,87,255,0.6)"
+              />
+              <rect
+                x="44"
+                y="48"
+                width="38"
+                height="4"
+                rx="2"
+                fill="rgba(255,255,255,0.08)"
+              />
+              <circle cx="65" cy="19" r="2.5" fill="#333" />
+              <circle cx="65" cy="109" r="3" fill="#444" />
+              <circle
+                cx="56"
+                cy="36"
+                r="5"
+                fill="#222"
+                stroke="#444"
+                stroke-width="1"
+              />
+              <circle cx="56" cy="36" r="3" fill="#111" />
+              <circle
+                cx="68"
+                cy="36"
+                r="5"
+                fill="#222"
+                stroke="#444"
+                stroke-width="1"
+              />
+              <circle cx="68" cy="36" r="3" fill="#111" />
+              <circle
+                cx="62"
+                cy="46"
+                r="5"
+                fill="#222"
+                stroke="#444"
+                stroke-width="1"
+              />
+              <circle cx="62" cy="46" r="3" fill="#111" />
+            </svg>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">Zenith</div>
+            <div class="product-name">X1 Pro Max 256GB</div>
+            <div class="product-rating">
+              <span class="stars-display">★★★★★</span>
+              <span>4.8 (5,892)</span>
+            </div>
+            <div class="product-specs">Z19 Pro · 48MP · Titanium</div>
+            <div class="product-footer">
+              <div class="product-price">$1,199</div>
+              <button class="add-to-cart" onclick="addToCart()">Add +</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap" style="background: #f0fff4">
+            <span class="product-tag tag-sale">Sale</span>
+            <span class="product-wish">♡</span>
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <rect
+                x="42"
+                y="28"
+                width="46"
+                height="50"
+                rx="14"
+                fill="#1a1a1a"
+              />
+              <rect
+                x="42"
+                y="28"
+                width="46"
+                height="50"
+                rx="14"
+                stroke="#333"
+                stroke-width="1.5"
+              />
+              <rect
+                x="46"
+                y="32"
+                width="38"
+                height="42"
+                rx="10"
+                fill="#0a0a18"
+              />
+              <circle cx="65" cy="53" r="16" fill="rgba(0,87,255,0.15)" />
+              <text
+                x="65"
+                y="50"
+                text-anchor="middle"
+                fill="rgba(255,255,255,0.9)"
+                font-size="7"
+                font-family="monospace"
+              >
+                10:09
+              </text>
+              <text
+                x="65"
+                y="59"
+                text-anchor="middle"
+                fill="rgba(255,255,255,0.4)"
+                font-size="5"
+                font-family="monospace"
+              >
+                MON 29
+              </text>
+              <circle
+                cx="65"
+                cy="53"
+                r="14"
+                stroke="rgba(255,0,80,0.4)"
+                stroke-width="1.5"
+                fill="none"
+                stroke-dasharray="44 88"
+              />
+              <circle
+                cx="65"
+                cy="53"
+                r="11"
+                stroke="rgba(0,200,83,0.4)"
+                stroke-width="1.5"
+                fill="none"
+                stroke-dasharray="55 69"
+              />
+              <rect
+                x="50"
+                y="76"
+                width="30"
+                height="22"
+                rx="5"
+                fill="#2a2a2a"
+              />
+              <rect
+                x="50"
+                y="10"
+                width="30"
+                height="22"
+                rx="5"
+                fill="#2a2a2a"
+              />
+              <rect x="52" y="82" width="26" height="2" rx="1" fill="#444" />
+              <rect x="52" y="86" width="26" height="2" rx="1" fill="#444" />
+              <rect x="52" y="90" width="18" height="2" rx="1" fill="#444" />
+              <rect
+                x="88"
+                y="45"
+                width="5"
+                height="12"
+                rx="2.5"
+                fill="#333"
+                stroke="#444"
+                stroke-width="0.5"
+              />
+            </svg>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">Zenith</div>
+            <div class="product-name">Zenith Watch Ultra 3</div>
+            <div class="product-rating">
+              <span class="stars-display">★★★★★</span>
+              <span>4.9 (1,204)</span>
+            </div>
+            <div class="product-specs">60hr battery · Titanium · GPS</div>
+            <div class="product-footer">
+              <div class="product-price">
+                <span class="old-price">$799</span>
+                $649
+              </div>
+              <button class="add-to-cart" onclick="addToCart()">Add +</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img-wrap" style="background: #f5f0ff">
+            <span class="product-tag tag-best">Best Seller</span>
+            <span class="product-wish">♡</span>
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <rect
+                x="32"
+                y="38"
+                width="66"
+                height="52"
+                rx="26"
+                fill="#e8e8e8"
+              />
+              <rect
+                x="32"
+                y="38"
+                width="66"
+                height="52"
+                rx="26"
+                stroke="#ccc"
+                stroke-width="1"
+              />
+              <path
+                d="M34 64 Q65 60 96 64"
+                stroke="#bbb"
+                stroke-width="1"
+                stroke-dasharray="3 2"
+              />
+              <circle cx="65" cy="64" r="3" fill="#aaa" />
+              <ellipse
+                cx="50"
+                cy="72"
+                rx="10"
+                ry="13"
+                fill="white"
+                stroke="#ddd"
+                stroke-width="1"
+              />
+              <circle cx="50" cy="70" r="4" fill="#f0f0f0" />
+              <ellipse
+                cx="80"
+                cy="72"
+                rx="10"
+                ry="13"
+                fill="white"
+                stroke="#ddd"
+                stroke-width="1"
+              />
+              <circle cx="80" cy="70" r="4" fill="#f0f0f0" />
+              <circle cx="65" cy="84" r="2.5" fill="#00d4ff" opacity="0.8" />
+              <line
+                x1="65"
+                y1="88"
+                x2="65"
+                y2="94"
+                stroke="#ccc"
+                stroke-width="1.5"
+              />
+              <rect x="60" y="94" width="10" height="3" rx="1.5" fill="#ccc" />
+            </svg>
+          </div>
+          <div class="product-info">
+            <div class="product-brand">AuraPods</div>
+            <div class="product-name">AuraPods Pro 3 w/ MagCharge</div>
+            <div class="product-rating">
+              <span class="stars-display">★★★★★</span>
+              <span>4.9 (8,341)</span>
+            </div>
+            <div class="product-specs">N2 chip · ANC · 35hr case</div>
+            <div class="product-footer">
+              <div class="product-price">$279</div>
+              <button class="add-to-cart" onclick="addToCart()">Add +</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="deal-banner">
+      <div class="deal-left">
+        <div class="deal-eyebrow">⚡ Flash Deal — Ends Soon</div>
+        <h2 class="deal-title">
+          Nexus 5 Pro<br /><span>$150 Off</span><br />Today Only
+        </h2>
+        <p class="deal-desc">
+          The Nexus 5 Pro with 2TB storage. Includes Cosmo Bot and an OmniSense
+          controller. No trade-in required.
+        </p>
+        <button class="deal-cta">Grab the Deal →</button>
+      </div>
+      <div class="deal-right">
+        <div class="countdown">
+          <div class="count-block">
+            <div class="count-num" id="hours">08</div>
+            <div class="count-label">Hours</div>
+          </div>
+          <div class="count-block">
+            <div class="count-num" id="mins">42</div>
+            <div class="count-label">Mins</div>
+          </div>
+          <div class="count-block">
+            <div class="count-num" id="secs">17</div>
+            <div class="count-label">Secs</div>
+          </div>
+        </div>
+
+        <svg
+          width="280"
+          height="260"
+          viewBox="0 0 280 260"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="ps5body" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e8e8e8" />
+              <stop offset="100%" stop-color="#c0c0c0" />
+            </linearGradient>
+            <linearGradient id="ps5glow" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#0057ff" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#00d4ff" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <ellipse
+            cx="140"
+            cy="200"
+            rx="100"
+            ry="30"
+            fill="rgba(0,87,255,0.15)"
+          />
+          <path
+            d="M70 60 Q60 40 80 30 L120 30 Q140 30 140 60 L140 200 Q140 220 120 220 L90 220 Q70 220 70 200 Z"
+            fill="url(#ps5body)"
+          />
+          <path
+            d="M210 60 Q220 40 200 30 L160 30 Q140 30 140 60 L140 200 Q140 220 160 220 L190 220 Q210 220 210 200 Z"
+            fill="url(#ps5body)"
+          />
+          <rect x="125" y="80" width="30" height="8" rx="2" fill="#d0d0d0" />
+          <line
+            x1="125"
+            y1="84"
+            x2="155"
+            y2="84"
+            stroke="#aaa"
+            stroke-width="0.5"
+          />
+          <rect
+            x="136"
+            y="60"
+            width="8"
+            height="60"
+            rx="4"
+            fill="rgba(0,212,255,0.4)"
+          />
+          <rect
+            x="136"
+            y="60"
+            width="8"
+            height="60"
+            rx="4"
+            fill="url(#ps5glow)"
+          />
+          <circle
+            cx="140"
+            cy="150"
+            r="8"
+            fill="#ccc"
+            stroke="#aaa"
+            stroke-width="1"
+          />
+          <circle cx="140" cy="150" r="4" fill="#b0b0b0" />
+          <line
+            x1="75"
+            y1="100"
+            x2="95"
+            y2="100"
+            stroke="#aaa"
+            stroke-width="1.5"
+          />
+          <line
+            x1="75"
+            y1="106"
+            x2="95"
+            y2="106"
+            stroke="#aaa"
+            stroke-width="1.5"
+          />
+          <line
+            x1="75"
+            y1="112"
+            x2="92"
+            y2="112"
+            stroke="#aaa"
+            stroke-width="1.5"
+          />
+          <line
+            x1="185"
+            y1="100"
+            x2="205"
+            y2="100"
+            stroke="#aaa"
+            stroke-width="1.5"
+          />
+          <line
+            x1="185"
+            y1="106"
+            x2="205"
+            y2="106"
+            stroke="#aaa"
+            stroke-width="1.5"
+          />
+          <line
+            x1="188"
+            y1="112"
+            x2="205"
+            y2="112"
+            stroke="#aaa"
+            stroke-width="1.5"
+          />
+          <rect x="130" y="42" width="20" height="5" rx="2.5" fill="#aaa" />
+          <ellipse cx="140" cy="222" rx="60" ry="8" fill="rgba(0,0,0,0.15)" />
+        </svg>
+      </div>
+    </div>
+
+    <section class="brands-section">
+      <p class="section-label" style="text-align: center; margin-bottom: 2rem">
+        Authorized Retailer For
+      </p>
+      <div class="brands-row">
+        <div class="brand-logo">Zenith</div>
+        <div class="brand-logo">NovaTech</div>
+        <div class="brand-logo">Sonicore</div>
+        <div class="brand-logo">Cygnus</div>
+        <div class="brand-logo">Vertex</div>
+        <div class="brand-logo">Resonate</div>
+        <div class="brand-logo">Luma</div>
+        <div class="brand-logo">Periphera</div>
+      </div>
+    </section>
+
+    <div class="perks">
+      <div class="perk-card">
+        <div class="perk-icon-wrap">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+        <div>
+          <div class="perk-title">Free 2-Day Shipping</div>
+          <p class="perk-desc">
+            On all orders over $50. Same-day delivery available in select
+            cities.
+          </p>
+        </div>
+      </div>
+      <div class="perk-card">
+        <div class="perk-icon-wrap">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+        </div>
+        <div>
+          <div class="perk-title">Easy 30-Day Returns</div>
+          <p class="perk-desc">
+            Not happy? Send it back no questions asked within 30 days of
+            purchase.
+          </p>
+        </div>
+      </div>
+      <div class="perk-card">
+        <div class="perk-icon-wrap">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+        </div>
+        <div>
+          <div class="perk-title">2-Year Warranty</div>
+          <p class="perk-desc">
+            Every product comes with our extended warranty. Extended plans
+            available.
+          </p>
+        </div>
+      </div>
+      <div class="perk-card">
+        <div class="perk-icon-wrap">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4l3 3" />
+          </svg>
+        </div>
+        <div>
+          <div class="perk-title">24/7 Expert Support</div>
+          <p class="perk-desc">
+            Our tech-savvy team is always on hand via chat, phone, or in-store.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <section class="newsletter">
+      <h2>Get the Drop First.</h2>
+      <p>
+        New releases, exclusive deals, and tech news — straight to your inbox.
+        No spam, ever.
+      </p>
+      <div class="newsletter-form">
+        <input
+          class="newsletter-input"
+          type="email"
+          placeholder="your@email.com"
+        />
+        <button class="newsletter-btn">Subscribe</button>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-grid">
+        <div>
+          <a
+            class="nav-logo"
+            href="#"
+            style="
+              color: white;
+              text-decoration: none;
+              display: inline-flex;
+              align-items: center;
+              gap: 0.5rem;
+              margin-bottom: 0.5rem;
+            "
+          >
+            <div class="logo-d">D</div>
+            <span
+              style="
+                font-family: &quot;Syne&quot;, sans-serif;
+                font-size: 1.1rem;
+                font-weight: 800;
+              "
+              >Digital Depot</span
+            >
+          </a>
+          <p class="footer-brand-desc">
+            Your one-stop shop for the latest tech, powered by experts who
+            actually care about what you buy.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h4>Shop</h4>
+          <ul>
+            <li><a href="#">Laptops & Desktops</a></li>
+            <li><a href="#">Smartphones</a></li>
+            <li><a href="#">Audio & Headphones</a></li>
+            <li><a href="#">Gaming</a></li>
+            <li><a href="#">Smart Home</a></li>
+            <li><a href="#">Accessories</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Help</h4>
+          <ul>
+            <li><a href="#">Track Order</a></li>
+            <li><a href="#">Returns & Refunds</a></li>
+            <li><a href="#">Warranty Claims</a></li>
+            <li><a href="#">Contact Support</a></li>
+            <li><a href="#">Store Locator</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+            <li><a href="#">Affiliate Program</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Digital Depot. All rights reserved.</span>
+        <span>Secure checkout · SSL encrypted · PCI compliant</span>
+      </div>
+    </footer>
+
+    <script>
+      // ── Cursor
+      const cursor = document.getElementById("cursor");
+      const ring = document.getElementById("cursorRing");
+      let mx = 0,
+        my = 0,
+        rx = 0,
+        ry = 0;
+      document.addEventListener("mousemove", (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        cursor.style.left = mx + "px";
+        cursor.style.top = my + "px";
+      });
+      function animRing() {
+        rx += (mx - rx) * 0.12;
+        ry += (my - ry) * 0.12;
+        ring.style.left = rx + "px";
+        ring.style.top = ry + "px";
+        requestAnimationFrame(animRing);
+      }
+      animRing();
+      document
+        .querySelectorAll("button, a, .cat-card, .product-card, .dest-card")
+        .forEach((el) => {
+          el.addEventListener("mouseenter", () => {
+            cursor.style.transform = "translate(-50%,-50%) scale(2.5)";
+            ring.style.opacity = "0.2";
+          });
+          el.addEventListener("mouseleave", () => {
+            cursor.style.transform = "translate(-50%,-50%) scale(1)";
+            ring.style.opacity = "0.5";
+          });
+        });
+
+      // ── Cart
+      let count = 0;
+      const badge = document.getElementById("cartCount");
+      window.addToCart = function () {
+        count++;
+        badge.textContent = count;
+        badge.style.background = "#00c853";
+        setTimeout(() => (badge.style.background = ""), 400);
+      };
+
+      // ── Filter tabs
+      window.setFilter = function (el) {
+        document
+          .querySelectorAll(".filter-tab")
+          .forEach((t) => t.classList.remove("active"));
+        el.classList.add("active");
+      };
+
+      // ── Countdown
+      let totalSecs = 8 * 3600 + 42 * 60 + 17;
+      function tick() {
+        if (totalSecs <= 0) return;
+        totalSecs--;
+        const h = Math.floor(totalSecs / 3600);
+        const m = Math.floor((totalSecs % 3600) / 60);
+        const s = totalSecs % 60;
+        document.getElementById("hours").textContent = String(h).padStart(
+          2,
+          "0",
+        );
+        document.getElementById("mins").textContent = String(m).padStart(
+          2,
+          "0",
+        );
+        document.getElementById("secs").textContent = String(s).padStart(
+          2,
+          "0",
+        );
+      }
+      setInterval(tick, 1000);
+
+      // ── Wishlist toggle
+      document.querySelectorAll(".product-wish").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          btn.textContent = btn.textContent === "♡" ? "♥" : "♡";
+          btn.style.color = btn.textContent === "♥" ? "var(--red)" : "";
+          btn.style.borderColor = btn.textContent === "♥" ? "var(--red)" : "";
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -24,61 +24,38 @@
       background: #000;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      gap: 32px;
+      gap: 28px;
       z-index: 100;
-      transition: opacity 0.8s ease;
+      transition: opacity 0.6s ease;
     }
     #bootScreen.fade-out { opacity: 0; pointer-events: none; }
 
     .boot-logo {
       font-family: 'Oxanium', sans-serif;
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: 8px;
-      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: rgba(255,255,255,0.9);
       text-transform: uppercase;
-      animation: logoReveal 1s ease forwards;
-      opacity: 0;
-    }
-    @keyframes logoReveal {
-      0% { opacity: 0; letter-spacing: 20px; }
-      100% { opacity: 1; letter-spacing: 8px; }
     }
 
-    .boot-icon {
-      font-size: 80px;
-      animation: iconPulse 2s ease infinite;
+    .boot-spinner {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-top-color: #0078d4;
+      animation: spin 0.85s linear infinite;
     }
-    @keyframes iconPulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(0,120,212,0.5)); }
-      50% { transform: scale(1.05); filter: drop-shadow(0 0 40px rgba(0,120,212,0.9)); }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
-    .boot-progress-container {
-      width: 300px;
-      display: flex; flex-direction: column; gap: 12px;
-    }
     .boot-status {
-      font-size: 12px;
-      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
       letter-spacing: 2px;
-      text-align: center;
       text-transform: uppercase;
       font-family: 'Oxanium', sans-serif;
-      min-height: 16px;
-    }
-    .boot-bar-track {
-      width: 100%; height: 3px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .boot-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #0078d4, #00b4d8);
-      width: 0%;
-      transition: width 0.4s ease;
-      box-shadow: 0 0 10px rgba(0,120,212,0.8);
     }
 
     /* ===== LOGIN SCREEN ===== */
@@ -315,14 +292,9 @@
 
   <!-- BOOT SCREEN -->
   <div id="bootScreen">
-    <div class="boot-icon">💻</div>
-    <div class="boot-logo">Axel's OS</div>
-    <div class="boot-progress-container">
-      <div class="boot-status" id="bootStatus">Initializing...</div>
-      <div class="boot-bar-track">
-        <div class="boot-bar-fill" id="bootBar"></div>
-      </div>
-    </div>
+    <div class="boot-logo">ServerplexOS</div>
+    <div class="boot-spinner"></div>
+    <div class="boot-status" id="bootStatus">Loading...</div>
   </div>
 
   <!-- LOGIN SCREEN -->
@@ -430,47 +402,36 @@
     }
 
     // ===== Boot sequence =====
-    const bootSteps = [
-      { pct: 15, msg: 'Loading kernel...' },
-      { pct: 30, msg: 'Initializing hardware...' },
-      { pct: 50, msg: 'Loading system files...' },
-      { pct: 65, msg: 'Starting services...' },
-      { pct: 80, msg: 'Loading desktop environment...' },
-      { pct: 95, msg: 'Finalizing...' },
-      { pct: 100, msg: 'Welcome.' },
+    const bootMessages = [
+      'Loading system files...',
+      'Starting services...',
+      'Loading desktop environment...',
+      'Almost ready...',
     ];
-
-    const bootBar = document.getElementById('bootBar');
     const bootStatus = document.getElementById('bootStatus');
+    let msgIndex = 0;
 
-    let stepIndex = 0;
-    function runBootStep() {
-      if (stepIndex >= bootSteps.length) {
-        setTimeout(showLoginScreen, 600);
-        return;
+    const msgInterval = setInterval(() => {
+      if (msgIndex < bootMessages.length) {
+        bootStatus.textContent = bootMessages[msgIndex++];
       }
-      const step = bootSteps[stepIndex++];
-      bootBar.style.width = step.pct + '%';
-      bootStatus.textContent = step.msg;
-      const delay = stepIndex === bootSteps.length ? 800 : 350 + Math.random() * 200;
-      setTimeout(runBootStep, delay);
-    }
+    }, 700);
 
     function showLoginScreen() {
+      clearInterval(msgInterval);
       const bootScreen = document.getElementById('bootScreen');
       const loginScreen = document.getElementById('loginScreen');
       bootScreen.classList.add('fade-out');
       setTimeout(() => {
         bootScreen.style.display = 'none';
         loginScreen.classList.add('visible');
-        // Animate card in
         document.getElementById('loginCard').style.animationPlayState = 'running';
         document.getElementById('passwordInput').focus();
-      }, 800);
+      }, 600);
     }
 
-    // Start boot after a brief pause
-    setTimeout(runBootStep, 500);
+    // Show login after ~3.5s
+    setTimeout(showLoginScreen, 3500);
   </script>
 </body>
 </html>

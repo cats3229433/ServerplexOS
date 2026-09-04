@@ -1,5 +1,5 @@
 // Game entries for ServerplexOS Games app
-// Generated automatically — do not edit manually
+// Generated automatically - do not edit manually
 
 var COOLDUDE_GAMES = [
   {

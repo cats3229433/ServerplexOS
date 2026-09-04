@@ -207,9 +207,63 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 .game-player-frame{flex:1;border:none;width:100%;height:100%;display:block}
 ::-webkit-scrollbar{width:6px}
 ::-webkit-scrollbar-thumb{background:var(--app-border);border-radius:3px}
+
+/* ===== PRELOAD SCREEN ===== */
+#preloadScreen {
+  position: fixed; inset: 0;
+  background: var(--app-bg, #0d0d1a);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+  z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+#preloadScreen.fade-out { opacity: 0; pointer-events: none; }
+.preload-title {
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+}
+.preload-spinner {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.06);
+  border-top-color: var(--app-accent, #0078d4);
+  animation: preloadSpin 0.8s linear infinite;
+}
+@keyframes preloadSpin { to { transform: rotate(360deg); } }
+.preload-status {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.2);
+  text-transform: uppercase;
+  min-height: 16px;
+}
+.preload-bar-track {
+  width: 200px; height: 2px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.preload-bar-fill {
+  height: 100%;
+  background: var(--app-accent, #0078d4);
+  width: 0%;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px var(--app-accent, #0078d4);
+}
 </style>
 </head>
 <body>
+<!-- PRELOAD SCREEN -->
+<div id="preloadScreen">
+  <div class="preload-title">Games</div>
+  <div class="preload-spinner"></div>
+  <div class="preload-bar-track"><div class="preload-bar-fill" id="preloadBar"></div></div>
+  <div class="preload-status" id="preloadStatus">Loading game library...</div>
+</div>
+
 
 <div class="app">
   <div class="topbar">
@@ -220,7 +274,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
     <div class="spacer"></div>
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
-      <input type="text" id="searchInput" placeholder="Search games…" oninput="onSearch()">
+      <input type="text" id="searchInput" placeholder="Search games..." oninput="onSearch()">
       <span class="search-clear" id="searchClear" onclick="clearSearch()">✕</span>
     </div>
     <select id="sortSelect" class="tb-select" onchange="render()" title="Sort games">
@@ -264,13 +318,13 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 
     <div class="content" id="content">
       <div class="game-grid">
-        <div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Loading games…</p></div>
+        <div class="state-box"><span class="state-icon spin">⟳</span><p class="state-msg">Loading games...</p></div>
       </div>
     </div>
   </div>
 
   <div class="statusbar">
-    <span id="statusText">Connecting…</span>
+    <span id="statusText">Connecting...</span>
     <span style="margin-left:auto;display:flex;align-items:center;gap:10px">
       <span id="batteryDisplay" style="display:none;align-items:center;gap:6px;font-size:10px;letter-spacing:.5px">
         <!-- Visual battery widget -->
@@ -318,7 +372,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
   </div>
 </div>
 
-<!-- Battery low warning (< 20%) — lets user continue anyway -->
+<!-- Battery low warning (< 20%)  -  lets user continue anyway -->
 <div class="batt-overlay" id="battWarnOverlay">
   <div class="batt-modal">
     <span class="batt-icon">🪫</span>
@@ -332,7 +386,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
   </div>
 </div>
 
-<!-- Battery critical block (≤ 5%) — cannot continue until plugged in -->
+<!-- Battery critical block (≤ 5%)  -  cannot continue until plugged in -->
 <div class="batt-overlay" id="battBlockOverlay">
   <div class="batt-modal">
     <span class="batt-icon">🔴</span>
@@ -345,7 +399,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
   </div>
 </div>
 
-<!-- Game player — blob iframe for full isolation -->
+<!-- Game player  -  blob iframe for full isolation -->
 <div class="game-player-overlay" id="gamePlayerOverlay">
   <div class="game-player-bar">
     <span id="gpIcon" style="font-size:18px">🎮</span>
@@ -356,12 +410,12 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
   </div>
   <!-- script-run container (manual games) -->
   <div class="game-player-container" id="gameContainer" style="display:none"></div>
-  <!-- loading overlay — sits after iframe so it renders on top -->
+  <!-- loading overlay  -  sits after iframe so it renders on top -->
   <div class="game-loader" id="gameLoader">
     <div class="game-loader-spinner"></div>
-    <div class="game-loader-name" id="gameLoaderName">Loading…</div>
+    <div class="game-loader-name" id="gameLoaderName">Loading...</div>
     <div class="game-loader-bar"><div class="game-loader-fill" id="gameLoaderFill"></div></div>
-    <div class="game-loader-status" id="gameLoaderStatus">Fetching from CDN…</div>
+    <div class="game-loader-status" id="gameLoaderStatus">Fetching from CDN...</div>
   </div>
   <!-- iframe (registry / external games) -->
   <iframe class="game-player-frame" id="gamePlayerFrame" style="display:none" allow="autoplay; fullscreen; gamepad"></iframe>
@@ -374,10 +428,12 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 <script src="games/3kh0.js"></script>
 <script src="games/radon.js"></script>
 <script src="games/games.js"></script>
+<script src="games/chilibowl.js"></script>
+<script src="games/minecraft-clients.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  MANUAL GAMES
-//  Add your own games here — they run as injected scripts (no iframe).
+//  Add your own games here  -  they run as injected scripts (no iframe).
 //  Registry games from the JSON still load in an iframe as before.
 // ═══════════════════════════════════════════════════════════════
 // Games loaded from games/games.js
@@ -475,7 +531,7 @@ function setRenderBar(pct) {
 async function loadGames() {
   // Show skeletons immediately so user sees activity
   document.getElementById('content').innerHTML = skeletonGrid(12);
-  document.getElementById('statusText').textContent = 'Loading games…';
+  document.getElementById('statusText').textContent = 'Loading games...';
 
   var registryGames = [];
   try {
@@ -749,8 +805,8 @@ function openDetail(id) {
   document.getElementById('dTags').innerHTML = tags;
   document.getElementById('dDesc').textContent = clean(g.description)||'No description.';
   document.getElementById('dGrid').innerHTML =
-    '<div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">'+(g.category||'—')+'</div></div>'+
-    '<div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">'+(clean(g.author)||'—')+'</div></div>'+
+    '<div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">'+(g.category||' - ')+'</div></div>'+
+    '<div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">'+(clean(g.author)||' - ')+'</div></div>'+
     '<div class="detail-cell"><div class="detail-key">Favourite</div><div class="detail-val">'+(isFav(g.id)?'⭐ Yes':'☆ No')+'</div></div>'+
     '<div class="detail-cell"><div class="detail-key">Last Played</div><div class="detail-val">'+(recents.includes(g.id)?'#'+(recents.indexOf(g.id)+1)+' recently':'Not yet')+'</div></div>';
   refreshFavBtn();
@@ -797,7 +853,7 @@ var _blobUrl = null;
 
 function launchGame() {
   if (!activeGame || !activeGame.url) { showToast('No game file set','⚠️'); return; }
-  // Battery gate — warn at ≤20%, block at ≤5%
+  // Battery gate  -  warn at ≤20%, block at ≤5%
   if (!checkBatteryBeforeLaunch()) return;
   _launchDirect();
 }
@@ -816,11 +872,11 @@ function _launchDirect() {
   var loaderStatus = document.getElementById('gameLoaderStatus');
   if (loader) {
     loader.classList.remove('hidden');
-    loaderName.textContent = activeGame.name || 'Loading…';
-    loaderStatus.textContent = 'Fetching from CDN…';
+    loaderName.textContent = activeGame.name || 'Loading...';
+    loaderStatus.textContent = 'Fetching from CDN...';
   }
 
-  // Always use the iframe — container div is unused now
+  // Always use the iframe  -  container div is unused now
   var container = document.getElementById('gameContainer');
   var frame     = document.getElementById('gamePlayerFrame');
   container.style.display = 'none';
@@ -831,7 +887,7 @@ function _launchDirect() {
 
   if (activeGame._manual) {
     // Fetch HTML, rewrite relative paths, wrap in a blob URL.
-    // The iframe loads the blob — fully isolated, no shared CSS/JS.
+    // The iframe loads the blob  -  fully isolated, no shared CSS/JS.
     fetch(activeGame.url)
       .then(function(r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -841,7 +897,7 @@ function _launchDirect() {
         var fill   = document.getElementById('gameLoaderFill');
         var status = document.getElementById('gameLoaderStatus');
         if (!r.body || !total) {
-          if (status) status.textContent = 'Downloading…';
+          if (status) status.textContent = 'Downloading...';
           if (fill) { fill.style.transition = 'none'; fill.style.width = '0%'; setTimeout(function(){ fill.style.transition = ''; }, 50); }
           return r.text();
         }
@@ -859,7 +915,7 @@ function _launchDirect() {
             received += result.value.length;
             var pct = Math.min(Math.round(received / total * 100), 99);
             if (fill)   fill.style.width = pct + '%';
-            if (status) status.textContent = pct + '% — ' + Math.round(received/1024) + ' KB / ' + Math.round(total/1024) + ' KB';
+            if (status) status.textContent = pct + '%  -  ' + Math.round(received/1024) + ' KB / ' + Math.round(total/1024) + ' KB';
             return pump();
           });
         }
@@ -875,7 +931,7 @@ function _launchDirect() {
         // Revoke any previous blob to free memory
         if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
         _blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-        if (loaderStatus) loaderStatus.textContent = 'Starting game…';
+        if (loaderStatus) loaderStatus.textContent = 'Starting game...';
         if (document.getElementById('gameLoaderFill')) document.getElementById('gameLoaderFill').style.width = '100%';
         frame.onload = function() {
           var l = document.getElementById('gameLoader');
@@ -887,7 +943,10 @@ function _launchDirect() {
       .catch(function() {
         var l = document.getElementById('gameLoader');
         if (l) l.classList.add('hidden');
-        frame.srcdoc = '<body style="background:#000;color:#fca5a5;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:14px;margin:0">Could not load game - check the URL</body>';
+        var errBody = document.createElement('body');
+        errBody.style.cssText = 'background:#000;color:#fca5a5;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:14px;margin:0';
+        errBody.textContent = 'Could not load game';
+        frame.srcdoc = '<html>' + errBody.outerHTML + '</html>';
       });
   } else {
     frame.src = activeGame.url;
@@ -915,7 +974,7 @@ function closeGamePlayer() {
 
 function reloadGame() {
   if (!activeGame) return;
-  // Skip battery check on reload — user already acknowledged it to get here
+  // Skip battery check on reload  -  user already acknowledged it to get here
   _launchDirect();
 }
 
@@ -990,7 +1049,7 @@ function updateBatteryUI() {
 }
 
 function initBattery() {
-  if (!('getBattery' in navigator)) return; // API not available — silently skip
+  if (!('getBattery' in navigator)) return; // API not available  -  silently skip
   navigator.getBattery().then(function(bat) {
     _battery = bat;
     function sync() {
@@ -1001,12 +1060,12 @@ function initBattery() {
     sync();
     bat.addEventListener('levelchange',   sync);
     bat.addEventListener('chargingchange', sync);
-  }).catch(function() { /* permission denied or unsupported — skip */ });
+  }).catch(function() { /* permission denied or unsupported  -  skip */ });
 }
 
 function checkBatteryBeforeLaunch() {
   // Returns true if OK to launch immediately, false if blocked/warned
-  if (_battCharging) return true; // charging — always OK
+  if (_battCharging) return true; // charging  -  always OK
   if (_battPct <= 5) {
     showBattBlock(_battPct);
     return false;
@@ -1044,8 +1103,32 @@ function closeBattBlock() {
   document.getElementById('battBlockOverlay').classList.remove('open');
 }
 
-loadGames();
-initBattery();
+// ===== PRELOAD =====
+(function() {
+  var preloadEl = document.getElementById('preloadScreen');
+  var preloadBar = document.getElementById('preloadBar');
+  var messages = ['Loading game library...', 'Getting things ready...', 'Almost there...'];
+  var msgEl = document.getElementById('preloadStatus');
+  var msgIndex = 0;
+  var msgTimer = setInterval(function() {
+    msgIndex = (msgIndex + 1) % messages.length;
+    msgEl.textContent = messages[msgIndex];
+  }, 900);
+
+  // Animate the bar over 3 seconds
+  setTimeout(function() { preloadBar.style.width = '60%'; }, 100);
+  setTimeout(function() { preloadBar.style.width = '85%'; }, 1500);
+  setTimeout(function() { preloadBar.style.width = '100%'; }, 2600);
+
+  setTimeout(function() {
+    clearInterval(msgTimer);
+    preloadEl.classList.add('fade-out');
+    setTimeout(function() { preloadEl.style.display = 'none'; }, 500);
+  }, 3000);
+
+  loadGames();
+  initBattery();
+})();
 </script>
 </body>
 </html>

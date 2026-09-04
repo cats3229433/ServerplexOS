@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — ServerplexOS Lite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root { --accent: #0078d4; }
+
+    body {
+      font-family: 'Oxanium', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      position: sticky;
+      top: 0;
+      background: #0a0a0a;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.7);
+      text-transform: uppercase;
+    }
+    .header-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 2px;
+      margin-top: 4px;
+    }
+    .save-all-btn {
+      padding: 9px 22px;
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Oxanium', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .save-all-btn:hover { opacity: 0.85; }
+
+    /* ── Content ── */
+    .content {
+      padding: 28px 32px 48px;
+      max-width: 560px;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 36px;
+    }
+    .section-title {
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* ── Row ── */
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      gap: 16px;
+    }
+    .row:last-child { border-bottom: none; }
+    .row-label {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .row-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.3);
+      margin-top: 3px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Controls ── */
+    input[type="text"],
+    input[type="password"],
+    input[type="url"],
+    select {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Oxanium', sans-serif;
+      font-size: 13px;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 0;
+    }
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="url"]:focus,
+    select:focus { border-color: rgba(0,120,212,0.5); }
+    select { cursor: pointer; appearance: none; -webkit-appearance: none; }
+    select option { background: #111; }
+
+    input[type="color"] {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    /* Toggle switch */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .toggle {
+      position: relative;
+      width: 40px; height: 22px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 22px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 3px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+    /* ── Background picker ── */
+    .bg-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .bg-swatch {
+      width: 48px; height: 48px;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s, transform 0.15s;
+      flex-shrink: 0;
+    }
+    .bg-swatch:hover { transform: scale(1.08); }
+    .bg-swatch.active { border-color: var(--accent); }
+    .bg-swatch.custom {
+      background: rgba(255,255,255,0.06);
+      border: 1px dashed rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ── Links editor ── */
+    .links-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .link-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .link-row input { flex: 1; }
+    .link-remove-btn {
+      background: rgba(255,80,80,0.1);
+      border: 1px solid rgba(255,80,80,0.2);
+      border-radius: 6px;
+      color: rgba(255,100,100,0.7);
+      font-size: 14px;
+      width: 32px; height: 32px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .link-remove-btn:hover { background: rgba(255,80,80,0.2); }
+    .add-link-btn {
+      margin-top: 8px;
+      background: none;
+      border: 1px dashed rgba(255,255,255,0.12);
+      border-radius: 8px;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Oxanium', sans-serif;
+      font-size: 12px;
+      letter-spacing: 1px;
+      padding: 9px 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .add-link-btn:hover {
+      border-color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.6);
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.6);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── Danger zone ── */
+    .danger-btn {
+      padding: 9px 18px;
+      background: rgba(255,60,60,0.08);
+      border: 1px solid rgba(255,60,60,0.2);
+      border-radius: 8px;
+      color: rgba(255,100,100,0.8);
+      font-family: 'Oxanium', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .danger-btn:hover { background: rgba(255,60,60,0.15); }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div>
+      <h1>Settings</h1>
+      <div class="header-sub">ServerplexOS Lite</div>
+    </div>
+    <button class="save-all-btn" onclick="saveAll()">Save</button>
+  </div>
+
+  <div class="content">
+
+    <!-- Homescreen -->
+    <div class="section">
+      <div class="section-title">Homescreen</div>
+
+      <div class="row">
+        <div>
+          <div class="row-label">Show clock</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="w-clock" checked>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="row-label">Show greeting</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="w-greeting" checked>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="row-label">Show quick links</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="w-links" checked>
+          <div class="toggle-track"></div>
+        </label>
+      </div>
+
+      <div class="row">
+        <div>
+          <div class="row-label">Clock format</div>
+        </div>
+        <select id="clock-format">
+          <option value="12">12-hour</option>
+          <option value="24">24-hour</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Background -->
+    <div class="section">
+      <div class="section-title">Background</div>
+      <div class="bg-options" id="bg-options">
+        <div class="bg-swatch" data-val="" style="background:#0d0d1a;" title="Default"></div>
+        <div class="bg-swatch" data-val="#000" style="background:#000;" title="Black"></div>
+        <div class="bg-swatch" data-val="gradient:linear-gradient(135deg,#0d0d1a,#0a1628)" style="background:linear-gradient(135deg,#0d0d1a,#0a1628);" title="Deep blue"></div>
+        <div class="bg-swatch" data-val="gradient:linear-gradient(135deg,#0f0c29,#302b63,#24243e)" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);" title="Purple night"></div>
+        <div class="bg-swatch" data-val="gradient:linear-gradient(135deg,#0d1b2a,#1b2838)" style="background:linear-gradient(135deg,#0d1b2a,#1b2838);" title="Steam dark"></div>
+        <div class="bg-swatch" data-val="gradient:linear-gradient(135deg,#0a0a0a,#1a1a2e)" style="background:linear-gradient(135deg,#0a0a0a,#1a1a2e);" title="Midnight"></div>
+        <div class="bg-swatch custom" data-val="custom" title="Custom image URL">+</div>
+      </div>
+      <div style="margin-top:12px; display:none;" id="custom-url-wrap">
+        <input type="url" id="custom-bg-url" placeholder="https://example.com/image.jpg" style="width:100%;" />
+      </div>
+    </div>
+
+    <!-- Accent color -->
+    <div class="section">
+      <div class="section-title">Appearance</div>
+      <div class="row">
+        <div>
+          <div class="row-label">Accent color</div>
+          <div class="row-sub">Used across both OS and Lite</div>
+        </div>
+        <input type="color" id="accent-color" value="#0078d4" />
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="section">
+      <div class="section-title">Quick Links</div>
+      <div class="links-list" id="links-list"></div>
+      <button class="add-link-btn" onclick="addLink()">+ Add link</button>
+    </div>
+
+    <!-- Profile -->
+    <div class="section">
+      <div class="section-title">Profile</div>
+      <div class="row">
+        <div class="row-label">Username</div>
+        <input type="text" id="s-username" placeholder="Your name" maxlength="24" style="width:180px;" />
+      </div>
+      <div class="row">
+        <div class="row-label">Avatar</div>
+        <input type="text" id="s-avatar" placeholder="👤" maxlength="4" style="width:80px;" />
+      </div>
+    </div>
+
+    <!-- Security -->
+    <div class="section">
+      <div class="section-title">Security</div>
+      <div class="row">
+        <div class="row-label">New PIN</div>
+        <input type="password" id="s-pin" placeholder="Leave blank to keep" maxlength="16" style="width:180px;" />
+      </div>
+      <div class="row">
+        <div class="row-label">Confirm PIN</div>
+        <input type="password" id="s-pin2" placeholder="Confirm new PIN" maxlength="16" style="width:180px;" />
+      </div>
+    </div>
+
+    <!-- Boot -->
+    <div class="section">
+      <div class="section-title">Boot</div>
+      <div class="row">
+        <div>
+          <div class="row-label">Default boot mode</div>
+          <div class="row-sub">Applied next time you boot</div>
+        </div>
+        <select id="s-default-boot">
+          <option value="lite">ServerplexOS Lite</option>
+          <option value="full">ServerplexOS</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Danger -->
+    <div class="section">
+      <div class="section-title">Reset</div>
+      <div class="row">
+        <div>
+          <div class="row-label">Reset Lite settings</div>
+          <div class="row-sub">Clears background, widgets, and links</div>
+        </div>
+        <button class="danger-btn" onclick="resetLite()">Reset</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ── Accent ──
+    const accent = localStorage.getItem('serverplex_accent') || '#0078d4';
+    document.documentElement.style.setProperty('--accent', accent);
+
+    // ── Load settings ──
+    function get(k) { return localStorage.getItem(k); }
+    function set(k,v) { localStorage.setItem(k,v); }
+
+    // Widgets
+    const widgets = JSON.parse(get('serverplex_lite_widgets') || '{"clock":true,"greeting":true,"links":true}');
+    document.getElementById('w-clock').checked    = widgets.clock    !== false;
+    document.getElementById('w-greeting').checked = widgets.greeting !== false;
+    document.getElementById('w-links').checked    = widgets.links    !== false;
+
+    // Clock format (shared key)
+    document.getElementById('clock-format').value = get('serverplex_clock_format') || '12';
+
+    // Accent
+    document.getElementById('accent-color').value = get('serverplex_accent') || '#0078d4';
+    document.getElementById('accent-color').addEventListener('input', e => {
+      document.documentElement.style.setProperty('--accent', e.target.value);
+    });
+
+    // Profile
+    document.getElementById('s-username').value = get('serverplex_username') || '';
+    document.getElementById('s-avatar').value   = get('serverplex_avatar')   || '👤';
+
+    // Boot
+    document.getElementById('s-default-boot').value = get('serverplex_default_boot') || 'lite';
+
+    // ── Background swatches ──
+    const currentBg = get('serverplex_lite_bg') || '';
+    document.querySelectorAll('.bg-swatch').forEach(sw => {
+      const val = sw.dataset.val;
+      if (val === 'custom') {
+        sw.addEventListener('click', () => {
+          document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('active'));
+          sw.classList.add('active');
+          document.getElementById('custom-url-wrap').style.display = 'block';
+        });
+      } else {
+        if (val === currentBg) sw.classList.add('active');
+        sw.addEventListener('click', () => {
+          document.querySelectorAll('.bg-swatch').forEach(s => s.classList.remove('active'));
+          sw.classList.add('active');
+          document.getElementById('custom-url-wrap').style.display = 'none';
+        });
+      }
+    });
+
+    // ── Quick links ──
+    const defaultLinks = [
+      { label: 'YouTube', url: 'https://youtube.com' },
+      { label: 'GitHub',  url: 'https://github.com' },
+      { label: 'Reddit',  url: 'https://reddit.com' },
+    ];
+    let links = JSON.parse(get('serverplex_lite_links') || 'null') || defaultLinks;
+
+    function renderLinks() {
+      const list = document.getElementById('links-list');
+      list.innerHTML = '';
+      links.forEach((l, i) => {
+        const row = document.createElement('div');
+        row.className = 'link-row';
+        row.innerHTML = `
+          <input type="text" placeholder="Label" value="${escHtml(l.label)}" data-i="${i}" data-field="label" style="width:110px;" />
+          <input type="url"  placeholder="https://..." value="${escHtml(l.url)}" data-i="${i}" data-field="url" />
+          <button class="link-remove-btn" onclick="removeLink(${i})">×</button>
+        `;
+        list.appendChild(row);
+      });
+      list.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', e => {
+          links[+e.target.dataset.i][e.target.dataset.field] = e.target.value;
+        });
+      });
+    }
+    renderLinks();
+
+    function addLink() {
+      links.push({ label: '', url: '' });
+      renderLinks();
+    }
+    function removeLink(i) {
+      links.splice(i, 1);
+      renderLinks();
+    }
+    function escHtml(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Save all ──
+    function saveAll() {
+      // Widgets
+      set('serverplex_lite_widgets', JSON.stringify({
+        clock:    document.getElementById('w-clock').checked,
+        greeting: document.getElementById('w-greeting').checked,
+        links:    document.getElementById('w-links').checked,
+      }));
+
+      // Clock format
+      set('serverplex_clock_format', document.getElementById('clock-format').value);
+
+      // Accent
+      const newAccent = document.getElementById('accent-color').value;
+      set('serverplex_accent', newAccent);
+      set('serverplex_accent_override', newAccent);
+
+      // Background
+      const activeSwatch = document.querySelector('.bg-swatch.active');
+      if (activeSwatch) {
+        const val = activeSwatch.dataset.val;
+        if (val === 'custom') {
+          const url = document.getElementById('custom-bg-url').value.trim();
+          if (url) set('serverplex_lite_bg', url);
+        } else {
+          set('serverplex_lite_bg', val);
+        }
+      }
+
+      // Links
+      set('serverplex_lite_links', JSON.stringify(links.filter(l => l.label || l.url)));
+
+      // Profile
+      const uname = document.getElementById('s-username').value.trim();
+      const avatar = document.getElementById('s-avatar').value.trim();
+      if (uname) set('serverplex_username', uname);
+      if (avatar) set('serverplex_avatar', avatar);
+
+      // PIN
+      const pin1 = document.getElementById('s-pin').value;
+      const pin2 = document.getElementById('s-pin2').value;
+      if (pin1 || pin2) {
+        if (pin1 !== pin2) {
+          document.getElementById('s-pin2').style.borderColor = 'rgba(255,80,80,0.6)';
+          setTimeout(() => document.getElementById('s-pin2').style.borderColor = '', 2000);
+          showToast('PINs do not match');
+          return;
+        }
+        set('serverplex_pin', pin1);
+        document.getElementById('s-pin').value  = '';
+        document.getElementById('s-pin2').value = '';
+      }
+
+      // Boot
+      set('serverplex_default_boot', document.getElementById('s-default-boot').value);
+
+      showToast('Settings saved');
+
+      // Notify parent lite.html to refresh
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: 'lite-settings-saved' }, '*');
+      }
+    }
+
+    function resetLite() {
+      if (!confirm('Reset all Lite settings to defaults?')) return;
+      ['serverplex_lite_bg','serverplex_lite_widgets','serverplex_lite_links'].forEach(k => localStorage.removeItem(k));
+      showToast('Lite settings reset');
+      setTimeout(() => location.reload(), 800);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+  </script>
+</body>
+</html>

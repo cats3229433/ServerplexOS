@@ -4,21 +4,30 @@
 // MANUAL_GAMES = deduplicated list (shown in game grid)
 
 var ALL_GAMES = [
-  ...(typeof COMMUNITY_GAMES !== 'undefined' ? COMMUNITY_GAMES : []),
-  ...(typeof COOLDUDE_GAMES  !== 'undefined' ? COOLDUDE_GAMES  : []),
-  ...(typeof KH0_GAMES       !== 'undefined' ? KH0_GAMES       : []),
-  ...(typeof RADON_GAMES     !== 'undefined' ? RADON_GAMES     : []),
+  ...(typeof COMMUNITY_GAMES        !== 'undefined' ? COMMUNITY_GAMES        : []),
+  ...(typeof COOLDUDE_GAMES         !== 'undefined' ? COOLDUDE_GAMES         : []),
+  ...(typeof KH0_GAMES              !== 'undefined' ? KH0_GAMES              : []),
+  ...(typeof RADON_GAMES            !== 'undefined' ? RADON_GAMES            : []),
+  ...(typeof CHILIBOWL_GAMES        !== 'undefined' ? CHILIBOWL_GAMES        : []),
+  ...(typeof MINECRAFT_CLIENTS      !== 'undefined' ? MINECRAFT_CLIENTS      : []),
 ];
 
 // Deduplicate by normalized name.
 // For each group of duplicates, keep the entry that scores highest:
-//   3pts = has cover image
-//   2pts = has description
-//   1pt  = has author
-// Ties broken by source priority order: Community > CoolDude > 3KH0 > Radon-Games
+//   30pts = has cover image
+//   20pts = has description
+//   10pts = has author
+// Ties broken by source priority order
 (function() {
   var normalize = function(n) { return (n || '').toLowerCase().replace(/[^a-z0-9]/g, ''); };
-  var sourcePriority = { 'Community': 4, 'CoolDude': 3, '3KH0': 2, 'Radon-Games': 1 };
+  var sourcePriority = {
+    'Community':          10,
+    'CoolDude':            9,
+    '3KH0':                8,
+    'Radon-Games':         7,
+    'ChiliBowl':           6,
+    'MinecraftClients':    5,
+  };
 
   var grouped = {};
   ALL_GAMES.forEach(function(g) {
@@ -42,7 +51,6 @@ var ALL_GAMES = [
       return;
     }
 
-    // Score each entry — pick the best one
     var scored = group.map(function(x) {
       var score = (sourcePriority[x.source] || 0);
       if (x.cover)       score += 30;
@@ -54,11 +62,8 @@ var ALL_GAMES = [
     deduped.push(scored[0].g);
   });
 
-  var MANUAL_GAMES = deduped;
-  // Expose globally
-  window.MANUAL_GAMES = MANUAL_GAMES;
+  window.MANUAL_GAMES = deduped;
 })();
 
-// Fallback if not set
 if (typeof window.MANUAL_GAMES === 'undefined') window.MANUAL_GAMES = ALL_GAMES;
 var MANUAL_GAMES = window.MANUAL_GAMES;

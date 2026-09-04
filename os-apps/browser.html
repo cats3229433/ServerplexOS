@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script src="app-theme.js"></script>
+<script src="../CoreFiles/app-theme.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<title>Browser — ServerplexOS</title>
+<title>Browser - ServerplexOS</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 html,body { height:100%; overflow:hidden; font-family:'Oxanium',sans-serif; background:var(--app-bg); color:var(--app-text); }
@@ -536,7 +536,7 @@ body { display:flex; flex-direction:column; }
       <div class="url-bar">
         <span class="sec-icon" id="secIcon">🌐</span>
         <span class="proxy-pill" id="proxyPill">PROXY</span>
-        <input class="url-input" id="urlInput" placeholder="Search or enter address…" autocomplete="off" spellcheck="false">
+        <input class="url-input" id="urlInput" placeholder="Search or enter address..." autocomplete="off" spellcheck="false">
       </div>
       <div class="suggestions" id="suggestions"></div>
     </div>
@@ -563,7 +563,7 @@ body { display:flex; flex-direction:column; }
   <!-- Find bar -->
   <div class="find-bar" id="findBar">
     <span style="font-size:12px;color:var(--app-text2)">🔍</span>
-    <input class="find-input" id="findInput" placeholder="Find in page…">
+    <input class="find-input" id="findInput" placeholder="Find in page...">
     <span class="find-count" id="findCount"></span>
     <button class="find-btn" id="findPrevBtn">↑</button>
     <button class="find-btn" id="findNextBtn">↓</button>
@@ -586,7 +586,7 @@ body { display:flex; flex-direction:column; }
       <button class="pane-bar-btn" onclick="splitNav('back')" title="Back">←</button>
       <button class="pane-bar-btn" onclick="splitNav('forward')" title="Forward">→</button>
       <button class="pane-bar-btn" onclick="splitNav('reload')" title="Reload">↺</button>
-      <input id="pane2Url" placeholder="Search or enter address…" style="flex:1;padding:3px 10px;background:var(--app-bg);border:1px solid var(--app-border);border-radius:14px;font-family:Oxanium,sans-serif;font-size:11px;color:var(--app-text);outline:none" autocomplete="off">
+      <input id="pane2Url" placeholder="Search or enter address..." style="flex:1;padding:3px 10px;background:var(--app-bg);border:1px solid var(--app-border);border-radius:14px;font-family:Oxanium,sans-serif;font-size:11px;color:var(--app-text);outline:none" autocomplete="off">
       <button class="pane-bar-btn" onclick="splitNav('go')" title="Go">→</button>
       <button class="pane-bar-btn" onclick="closeSplitView()" title="Close split" style="color:#f85149">✕</button>
     </div>
@@ -611,7 +611,7 @@ var ContentFilter = {
     return { blocked: false };
   }
 };
-try { var cfScript = document.createElement('script'); cfScript.src = 'BrowserFiles/content-filter.js'; document.head.appendChild(cfScript); } catch(e) {}
+// content-filter is defined inline above
 
 // ── State ──
 var tabs = [], activeId = null, counter = 0;
@@ -634,7 +634,7 @@ var ENGINES = {
   bing:   function(q){ return 'https://www.bing.com/search?q=' + encodeURIComponent(q); },
 };
 
-// User quick links — persisted, starts empty
+// User quick links - persisted, starts empty
 var QUICK_LINKS = [];
 try { var qlSaved = localStorage.getItem('bw_quicklinks'); if (qlSaved) QUICK_LINKS = JSON.parse(qlSaved); } catch(e) {}
 function saveQuickLinks() { try { localStorage.setItem('bw_quicklinks', JSON.stringify(QUICK_LINKS)); } catch(e) {} }
@@ -721,7 +721,7 @@ function buildNewTabPage() {
     '<div class="newtab-logo">🌐</div>' +
     '<div class="newtab-title">New Tab</div>' +
     '<div class="newtab-search-wrap">' +
-      '<input class="newtab-search" id="ntSearch" placeholder="Search or enter address…" autocomplete="off">' +
+      '<input class="newtab-search" id="ntSearch" placeholder="Search or enter address..." autocomplete="off">' +
       '<button class="newtab-search-go" id="ntGo">→</button>' +
     '</div>' +
     emptyHint +
@@ -1284,7 +1284,7 @@ function enterReaderMode(t) {
   var rf = document.createElement('div');
   rf.className = 'reader-frame active';
   rf.id = rfId;
-  rf.innerHTML = '<div class="reader-loading"><div class="reader-spinner"></div><span>Fetching article…</span></div>';
+  rf.innerHTML = '<div class="reader-loading"><div class="reader-spinner"></div><span>Fetching article...</span></div>';
   document.getElementById('pane1').appendChild(rf);
   if (t.frameEl) t.frameEl.style.display = 'none';
   readerActive = true;
@@ -1487,7 +1487,7 @@ function showGroupCtx(e, tabId) {
   inputWrap.style.padding = '4px 12px';
   var nameInp = document.createElement('input');
   nameInp.id = 'gNameInput';
-  nameInp.placeholder = 'Group name…';
+  nameInp.placeholder = 'Group name...';
   nameInp.style.cssText = 'width:100%;padding:5px 8px;background:var(--app-surface2);border:1px solid var(--app-border);border-radius:6px;color:var(--app-text);font-family:Oxanium,sans-serif;font-size:12px;outline:none';
   nameInp.value = t.group && tabGroups[t.group] ? tabGroups[t.group].name : '';
   inputWrap.appendChild(nameInp);
@@ -1569,7 +1569,7 @@ showTabCtx = function(e, id, isPinned) {
   sep.style.cssText = 'height:1px;background:var(--app-border);margin:3px 4px';
   var item = document.createElement('div');
   item.className = 'ctx-item';
-  item.innerHTML = '🏷️ Tab Group…';
+  item.innerHTML = '🏷️ Tab Group...';
   item.onclick = function(e2) {
     e2.stopPropagation();
     menu.classList.remove('open');
@@ -1638,9 +1638,9 @@ var PROXY_PRESETS = {
 };
 
 var PROXY_INFO = {
-  uv:  '🔷 <b>Ultraviolet</b> — Encode URL as <code>/service/</code> + encoded path. Works with most sites. <a href="https://github.com/titaniumnetwork-dev/Ultraviolet" target="_blank">Deploy your own →</a>',
-  sj:  '⚡ <b>ScramJet</b> — Faster next-gen proxy using WASM. Some sites work better here. <a href="https://github.com/MercuryWorkshop/scramjet" target="_blank">Deploy your own →</a>',
-  off: '🚫 <b>No Proxy</b> — Direct iframe. Many sites block embedding with X-Frame-Options. Use a proxy if sites show a blank page.'
+  uv:  '🔷 <b>Ultraviolet</b> - Encode URL as <code>/service/</code> + encoded path. Works with most sites. <a href="https://github.com/titaniumnetwork-dev/Ultraviolet" target="_blank">Deploy your own →</a>',
+  sj:  '⚡ <b>ScramJet</b> - Faster next-gen proxy using WASM. Some sites work better here. <a href="https://github.com/MercuryWorkshop/scramjet" target="_blank">Deploy your own →</a>',
+  off: '🚫 <b>No Proxy</b> - Direct iframe. Many sites block embedding with X-Frame-Options. Use a proxy if sites show a blank page.'
 };
 
 var proxyConfig = { type:'off', url:'' };
@@ -1668,7 +1668,7 @@ function updateProxyUI() {
   if (!btn || !pill) return;
   var on = isProxyOn();
   btn.classList.toggle('proxy-on', on);
-  btn.title = on ? ('Proxy ON: ' + proxyConfig.type.toUpperCase() + ' — Click to configure') : 'Enable Proxy (Ctrl+Shift+P)';
+  btn.title = on ? ('Proxy ON: ' + proxyConfig.type.toUpperCase() + ' - Click to configure') : 'Enable Proxy (Ctrl+Shift+P)';
   pill.classList.toggle('show', on);
   pill.textContent = on ? proxyConfig.type.toUpperCase() : '';
 }
@@ -1778,7 +1778,7 @@ navigate = function(raw) {
     });
     frame.addEventListener('error', function() {
       document.getElementById('loadingBar').classList.remove('active');
-      if (!isProxyOn()) showToast('⚠️ Site blocked iframe — try enabling Proxy');
+      if (!isProxyOn()) showToast('⚠️ Site blocked iframe - try enabling Proxy');
     });
   } else { t.url = url; t.frameEl.src = finalUrl; }
   document.getElementById('loadingBar').classList.add('active');
@@ -1896,7 +1896,7 @@ function buildSplitNewTab(id) {
   wrap.style.cssText = 'position:relative;width:100%;max-width:400px';
 
   var inp = document.createElement('input');
-  inp.placeholder = 'Search or enter address…';
+  inp.placeholder = 'Search or enter address...';
   inp.style.cssText = 'width:100%;padding:10px 44px 10px 16px;background:var(--app-surface);border:1.5px solid var(--app-border);border-radius:24px;font-family:Oxanium,sans-serif;font-size:13px;color:var(--app-text);outline:none';
 
   var goBtn = document.createElement('button');

@@ -1,6 +1,6 @@
 // Game entries for ServerplexOS Games app
   // Source: 3KH0 (3khogames/3kh0)
-  // Generated automatically — do not edit manually
+  // Generated automatically - do not edit manually
 
 var KH0_GAMES = [
   {
@@ -591,7 +591,7 @@ var KH0_GAMES = [
   {
     id: '3kh0-papas-burgeria',
     name: 'Papas Burgeria',
-    icon: '👨‍🍳',
+    icon: '👨🍳',
     cover: '',
     url: 'https://cdn.jsdelivr.net/gh/3khogames/3kh0@main/unblocked/papas-burgeria.html',
     category: 'Arcade',
@@ -604,7 +604,7 @@ var KH0_GAMES = [
   {
     id: '3kh0-papas-pizzaria',
     name: 'Papas Pizzaria',
-    icon: '👨‍🍳',
+    icon: '👨🍳',
     cover: '',
     url: 'https://cdn.jsdelivr.net/gh/3khogames/3kh0@main/unblocked/papas-pizzaria.html',
     category: 'Arcade',
@@ -1098,7 +1098,7 @@ var KH0_GAMES = [
   {
     id: '3kh0-yohohoio',
     name: 'Yohohoio',
-    icon: '🏴‍☠️',
+    icon: '🏴☠️',
     cover: '',
     url: 'https://cdn.jsdelivr.net/gh/3khogames/3kh0@main/unblocked/yohohoio.html',
     category: 'Arcade',

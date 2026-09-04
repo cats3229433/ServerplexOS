@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServerplexOS Lite</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --accent: #0078d4;
+      --dock-h: 68px;
+    }
+
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;
+      font-family: 'Oxanium', sans-serif;
+    }
+
+    /* ── Background ── */
+    #bg {
+      position: fixed; inset: 0;
+      background: #0d0d1a;
+      background-size: cover;
+      background-position: center;
+      z-index: 0;
+      transition: background 0.4s ease;
+    }
+    #bg.has-image { background-color: transparent; }
+    #bg-overlay {
+      position: fixed; inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 20;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .tb-left {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.6);
+    }
+    .tb-center {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 1px;
+    }
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .tb-clock {
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      letter-spacing: 1px;
+    }
+    .tb-icon-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.5);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+      line-height: 1;
+    }
+    .tb-icon-btn:hover {
+      color: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ── Homescreen ── */
+    #homescreen {
+      position: fixed;
+      inset: 44px 0 var(--dock-h) 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 5;
+      padding: 24px;
+    }
+
+    /* Widget: clock */
+    .widget-clock {
+      text-align: center;
+    }
+    .widget-clock-time {
+      font-size: clamp(52px, 8vw, 88px);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 2px;
+      line-height: 1;
+      text-shadow: 0 2px 40px rgba(0,0,0,0.4);
+    }
+    .widget-clock-date {
+      font-size: 15px;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 3px;
+      margin-top: 10px;
+    }
+
+    /* Widget: greeting */
+    .widget-greeting {
+      font-size: clamp(18px, 2.5vw, 26px);
+      font-weight: 300;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 1px;
+      text-align: center;
+      text-shadow: 0 1px 20px rgba(0,0,0,0.4);
+    }
+
+    /* Widget: weather placeholder */
+    .widget-weather {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.6);
+      letter-spacing: 1px;
+    }
+
+    /* Widget: quick links */
+    .widget-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .quick-link {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.55);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s, color 0.15s;
+    }
+    .quick-link:hover {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* ── Dock ── */
+    #dock {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      height: calc(var(--dock-h) - 12px);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      z-index: 20;
+    }
+
+    .dock-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      padding: 8px 14px;
+      border-radius: 12px;
+      transition: background 0.15s, transform 0.15s;
+      border: none;
+      background: none;
+    }
+    .dock-item:hover {
+      background: rgba(255,255,255,0.08);
+      transform: translateY(-3px);
+    }
+    .dock-item.active {
+      background: rgba(255,255,255,0.1);
+    }
+    .dock-icon { font-size: 26px; line-height: 1; }
+    .dock-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      font-family: 'Oxanium', sans-serif;
+    }
+    .dock-item.active .dock-label { color: rgba(255,255,255,0.8); }
+
+    .dock-divider {
+      width: 1px;
+      height: 32px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 4px;
+    }
+
+    /* ── App overlay ── */
+    #app-overlay {
+      position: fixed;
+      inset: 44px 0 var(--dock-h) 0;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    #app-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .app-topbar {
+      height: 42px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .app-close-btn {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      border-radius: 6px;
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: 'Oxanium', sans-serif;
+      letter-spacing: 1px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .app-close-btn:hover {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+    }
+    .app-title {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.5);
+    }
+
+    #app-frame {
+      flex: 1;
+      border: none;
+      display: block;
+      background: #000;
+    }
+
+    /* ── Context menu (right-click homescreen) ── */
+    #ctx-menu {
+      position: fixed;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 6px;
+      z-index: 100;
+      display: none;
+      min-width: 170px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    #ctx-menu.open { display: block; }
+    .ctx-item {
+      padding: 9px 14px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.65);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.1s, color 0.1s;
+    }
+    .ctx-item:hover {
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+    }
+    .ctx-sep {
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+      margin: 4px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div id="bg"></div>
+  <div id="bg-overlay"></div>
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <div class="tb-left">SPLX LITE</div>
+    <div class="tb-center" id="tb-greeting"></div>
+    <div class="tb-right">
+      <div class="tb-clock" id="tb-clock"></div>
+      <button class="tb-icon-btn" onclick="openApp('settings', 'Settings', '../lite/settings.html')" title="Settings">⚙</button>
+    </div>
+  </div>
+
+  <!-- Homescreen -->
+  <div id="homescreen">
+    <div class="widget-clock" id="w-clock">
+      <div class="widget-clock-time" id="hs-time">00:00</div>
+      <div class="widget-clock-date" id="hs-date"></div>
+    </div>
+    <div class="widget-greeting" id="w-greeting"></div>
+    <div class="widget-links" id="w-links"></div>
+  </div>
+
+  <!-- App overlay -->
+  <div id="app-overlay">
+    <div class="app-topbar">
+      <button class="app-close-btn" onclick="closeApp()">← Back</button>
+      <div class="app-title" id="app-overlay-title"></div>
+    </div>
+    <iframe id="app-frame" src="about:blank" allowfullscreen></iframe>
+  </div>
+
+  <!-- Dock -->
+  <div id="dock">
+    <button class="dock-item active" id="dock-home" onclick="goHome()">
+      <span class="dock-icon">🏠</span>
+      <span class="dock-label">Home</span>
+    </button>
+    <div class="dock-divider"></div>
+    <button class="dock-item" id="dock-games" onclick="openApp('games', 'Games', '../os-apps/games.html')">
+      <span class="dock-icon">🎮</span>
+      <span class="dock-label">Games</span>
+    </button>
+    <button class="dock-item" id="dock-browser" onclick="openApp('browser', 'Browser', '../os-apps/browser.html')">
+      <span class="dock-icon">🌐</span>
+      <span class="dock-label">Browser</span>
+    </button>
+    <div class="dock-divider"></div>
+    <button class="dock-item" id="dock-settings" onclick="openApp('settings', 'Settings', 'settings.html')">
+      <span class="dock-icon">⚙️</span>
+      <span class="dock-label">Settings</span>
+    </button>
+  </div>
+
+  <!-- Context menu -->
+  <div id="ctx-menu">
+    <div class="ctx-item" onclick="openApp('settings','Settings','settings.html'); closeCtx()">⚙ Customize</div>
+    <div class="ctx-sep"></div>
+    <div class="ctx-item" onclick="window.location.href='../bootmenu.html'; closeCtx()">↩ Boot Menu</div>
+  </div>
+
+  <script>
+    // ── Read localStorage ──
+    const accent   = localStorage.getItem('serverplex_accent')   || '#0078d4';
+    const username = localStorage.getItem('serverplex_username') || 'User';
+    const bgValue  = localStorage.getItem('serverplex_lite_bg')  || '';
+    const widgets  = JSON.parse(localStorage.getItem('serverplex_lite_widgets') || '{"clock":true,"greeting":true,"links":true}');
+
+    document.documentElement.style.setProperty('--accent', accent);
+
+    // ── Background ──
+    const bgEl = document.getElementById('bg');
+    function applyBg(val) {
+      if (!val) {
+        bgEl.style.background = '#0d0d1a';
+        bgEl.style.backgroundImage = '';
+        bgEl.classList.remove('has-image');
+        return;
+      }
+      if (val.startsWith('#') || val.startsWith('rgb') || val.startsWith('hsl')) {
+        bgEl.style.background = val;
+        bgEl.style.backgroundImage = '';
+        bgEl.classList.remove('has-image');
+      } else if (val.startsWith('gradient:')) {
+        bgEl.style.background = val.replace('gradient:', '');
+        bgEl.style.backgroundImage = '';
+        bgEl.classList.remove('has-image');
+      } else {
+        // URL or base64 image
+        bgEl.style.backgroundImage = `url('${val}')`;
+        bgEl.style.backgroundSize = 'cover';
+        bgEl.style.backgroundPosition = 'center';
+        bgEl.classList.add('has-image');
+        // darken overlay for readability
+        document.getElementById('bg-overlay').style.background = 'rgba(0,0,0,0.35)';
+      }
+    }
+    applyBg(bgValue);
+
+    // ── Widgets visibility ──
+    document.getElementById('w-clock').style.display   = widgets.clock    !== false ? '' : 'none';
+    document.getElementById('w-greeting').style.display = widgets.greeting !== false ? '' : 'none';
+    document.getElementById('w-links').style.display    = widgets.links    !== false ? '' : 'none';
+
+    // ── Clock ──
+    function getGreetingWord() {
+      const h = new Date().getHours();
+      if (h < 5)  return 'Good night';
+      if (h < 12) return 'Good morning';
+      if (h < 17) return 'Good afternoon';
+      if (h < 21) return 'Good evening';
+      return 'Good night';
+    }
+    function updateClock() {
+      const now = new Date();
+      const fmt = localStorage.getItem('serverplex_clock_format') || '12';
+      let h = now.getHours(), m = now.getMinutes().toString().padStart(2,'0');
+      let suffix = '';
+      if (fmt === '12') {
+        suffix = h >= 12 ? ' PM' : ' AM';
+        h = h % 12 || 12;
+      }
+      document.getElementById('hs-time').textContent = `${h}:${m}${suffix}`;
+      document.getElementById('tb-clock').textContent = `${h}:${m}${suffix}`;
+      const days   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      document.getElementById('hs-date').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // ── Greeting ──
+    const greetingEl = document.getElementById('w-greeting');
+    const tbGreetEl  = document.getElementById('tb-greeting');
+    function updateGreeting() {
+      const g = `${getGreetingWord()}, ${username}.`;
+      greetingEl.textContent = g;
+      tbGreetEl.textContent  = `${getGreetingWord()}, ${username}`;
+    }
+    updateGreeting();
+
+    // ── Quick links ──
+    const defaultLinks = [
+      { label: 'YouTube',  url: 'https://youtube.com' },
+      { label: 'GitHub',   url: 'https://github.com' },
+      { label: 'Reddit',   url: 'https://reddit.com' },
+    ];
+    const savedLinks = JSON.parse(localStorage.getItem('serverplex_lite_links') || 'null') || defaultLinks;
+    const linksEl = document.getElementById('w-links');
+    function renderLinks() {
+      linksEl.innerHTML = '';
+      savedLinks.forEach(l => {
+        const a = document.createElement('button');
+        a.className = 'quick-link';
+        a.textContent = l.label;
+        a.onclick = () => openApp('browser', l.label, '../os-apps/browser.html');
+        linksEl.appendChild(a);
+      });
+    }
+    renderLinks();
+
+    // ── App overlay ──
+    let currentApp = null;
+    const overlay   = document.getElementById('app-overlay');
+    const appFrame  = document.getElementById('app-frame');
+    const appTitle  = document.getElementById('app-overlay-title');
+
+    function openApp(id, label, src) {
+      currentApp = id;
+      appTitle.textContent = label.toUpperCase();
+      appFrame.src = src;
+      overlay.classList.add('open');
+      // Dock active state
+      document.querySelectorAll('.dock-item').forEach(el => el.classList.remove('active'));
+      const dockEl = document.getElementById('dock-' + id);
+      if (dockEl) dockEl.classList.add('active');
+      document.getElementById('dock-home').classList.remove('active');
+    }
+
+    function closeApp() {
+      overlay.classList.remove('open');
+      setTimeout(() => { appFrame.src = 'about:blank'; }, 250);
+      currentApp = null;
+      document.querySelectorAll('.dock-item').forEach(el => el.classList.remove('active'));
+      document.getElementById('dock-home').classList.add('active');
+    }
+
+    function goHome() {
+      if (overlay.classList.contains('open')) closeApp();
+    }
+
+    // ── Listen for messages from settings iframe ──
+    window.addEventListener('message', e => {
+      if (e.data && e.data.type === 'lite-settings-saved') {
+        // Re-apply any changed settings
+        const newBg = localStorage.getItem('serverplex_lite_bg') || '';
+        applyBg(newBg);
+        const newWidgets = JSON.parse(localStorage.getItem('serverplex_lite_widgets') || '{}');
+        document.getElementById('w-clock').style.display    = newWidgets.clock    !== false ? '' : 'none';
+        document.getElementById('w-greeting').style.display = newWidgets.greeting !== false ? '' : 'none';
+        document.getElementById('w-links').style.display    = newWidgets.links    !== false ? '' : 'none';
+        const newAccent = localStorage.getItem('serverplex_accent') || '#0078d4';
+        document.documentElement.style.setProperty('--accent', newAccent);
+        updateGreeting();
+        renderLinks();
+        closeApp();
+      }
+    });
+
+    // ── Right-click context menu ──
+    const ctxMenu = document.getElementById('ctx-menu');
+    document.getElementById('homescreen').addEventListener('contextmenu', e => {
+      e.preventDefault();
+      ctxMenu.style.left = Math.min(e.clientX, window.innerWidth  - 180) + 'px';
+      ctxMenu.style.top  = Math.min(e.clientY, window.innerHeight - 120) + 'px';
+      ctxMenu.classList.add('open');
+    });
+    document.addEventListener('click', () => ctxMenu.classList.remove('open'));
+    function closeCtx() { ctxMenu.classList.remove('open'); }
+  </script>
+</body>
+</html>

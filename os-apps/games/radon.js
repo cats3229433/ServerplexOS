@@ -1,6 +1,6 @@
 // Game entries for ServerplexOS Games app
   // Source: Radon-Games (Radon-Games/Radon-Games)
-  // Generated automatically — do not edit manually
+  // Generated automatically - do not edit manually
   
 var RADON_GAMES = [
   {

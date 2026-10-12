@@ -124,7 +124,7 @@ var COMMUNITY_GAMES = [
       name: 'Basket Random',
       icon: '🏀',
       cover: 'https://play-lh.googleusercontent.com/gP8T5Z1O-ngxIloiwcBZzrzyLPYDp0R_1BDNKUDZboIRPVImeyWI8-7aExvB9gAGNKc',
-      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketRandom.html',
+      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketRandom.html', //broken 
       category: 'Sports',
       author: 'RHM Interactive',
       description: 'A chaotic physics-based basketball game where each round changes the court, gravity, and player movement, creating unpredictable and hilarious matches as you try to score before your opponent.',
@@ -137,7 +137,7 @@ var COMMUNITY_GAMES = [
       name: 'Basketball Bros',
       icon: '🏀',
       cover: 'https://www.basketball-bros.io/basketball-bros/logo.png',
-      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketballBros.html',
+      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BasketballBros.html', //broken
       category: 'Sports',
       author: 'Fan-Made / Unknown',
       description: 'A fast-paced 1v1 arcade basketball game focused on quick movement, flashy dunks, simple controls, and chaotic back-and-forth scoring. Players outmaneuver opponents, time jumps, and use aggressive blocks to win short, intense matches.',
@@ -163,7 +163,7 @@ var COMMUNITY_GAMES = [
       name: 'Bit Planes',
       icon: '🛩️',
       cover: 'https://th.bing.com/th/id/OIP.3uAc7AgCcWCTs2y_x2k0lgHaHa?w=166&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BitLife.html',
+      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BitLife.html', //broken swaped with BitLife
       category: 'Arcade',
       author: 'Fan-Made / Unknown',
       description: 'A retro-style arcade flying game where you pilot pixel aircraft through waves of enemies, dodge projectiles, collect power-ups, and survive increasingly intense levels with simple but fast-paced controls.',
@@ -202,7 +202,7 @@ var COMMUNITY_GAMES = [
       name: 'Boxing Random',
       icon: '🥊',
       cover: 'https://games76ez.com/uploads/2025/8/boxing-random.jpg',
-      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BoxingRandom.html',
+      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/B/BoxingRandom.html', //broken does not load
       category: 'Sports',
       author: 'RHM Interactive',
       description: 'A chaotic physics-based boxing game where each round changes fighter positions, platforms, and conditions, creating unpredictable and hilarious one-button matches.',
@@ -215,7 +215,7 @@ var COMMUNITY_GAMES = [
       name: 'Chess',
       icon: '♟️',
       cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8a9db7bb-486f-4f74-ba59-513e78b175c4/dfy1l6k-3891a94b-1b8b-4d35-b0e5-c28da471c789.png/v1/fill/w_512,h_512/chess_com___icon_by_shamo45_dfy1l6k-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvOGE5ZGI3YmItNDg2Zi00Zjc0LWJhNTktNTEzZTc4YjE3NWM0XC9kZnkxbDZrLTM4OTFhOTRiLTFiOGItNGQzNS1iMGU1LWMyOGRhNDcxYzc4OS5wbmciLCJ3aWR0aCI6Ijw9NTEyIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.KJBGUzMYClczE0wyHEWIpcTb1D-4JXceZQJJzcH_ER8',
-      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/chess.html',
+      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/C/chess.html', 
       category: 'Strategy',
       author: 'Unknown',
       description: 'A classic two-player strategy game focused on tactical positioning, long-term planning, and outmaneuvering the opponent\'s king through a combination of offense and defense.',
@@ -276,7 +276,7 @@ var COMMUNITY_GAMES = [
     },
 
   {
-      id: 'community-deltarune',
+      id: 'community-deltarune',      
       name: 'Deltarune',
       icon: '⭐',
       cover: 'https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8ef1af63-5387-4149-9fc7-91af014f7541/deurk9t-fa41a1c5-0302-48a0-9243-08f5a5ae564c.png/v1/fill/w_512,h_512/deltarune_dock_icon_by_usednoo25_by_usednoo25_deurk9t-fullview.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9NTEyIiwicGF0aCI6IlwvZlwvOGVmMWFmNjMtNTM4Ny00MTQ5LTlmYzctOTFhZjAxNGY3NTQxXC9kZXVyazl0LWZhNDFhMWM1LTAzMDItNDhhMC05MjQzLTA4ZjVhNWFlNTY0Yy5wbmciLCJ3aWR0aCI6Ijw9NTEyIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmltYWdlLm9wZXJhdGlvbnMiXX0.eF0TmiWOKHqzO5gQ2DRdwN1fX3kdw0uva-IDPwABz2U',
@@ -292,8 +292,8 @@ var COMMUNITY_GAMES = [
       id: 'community-drive-mad',
       name: 'Drive Mad',
       icon: '🚗',
-      cover: 'https://th.bing.com/th/id/OIP.odp26kFzqu9k2p8kmeAJGgHaHa?w=178&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3',
-      url: 'https://cdn.jsdelivr.net/gh/Serverplex/ServerplexOS-Games@master/Games/D/DriveMad.html',
+      cover: 'https://th.bing.com/th/id/OIP.odp26kFzqu9k2p8kmeAJGgHaHa?w=178&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3', //broken assets do not load
+      url: 'https://cdn.jsdelivr.net/gh/Arham43-ops/Drive-Mad-Game@main/index.html',
       category: 'Arcade',
       author: 'Unknown',
       description: 'A physics-based driving game where you navigate unstable vehicles across tricky obstacle courses, balancing speed and control to reach the finish without flipping.',

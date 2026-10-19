@@ -151,6 +151,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 .dsec-title{font-size:9px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--app-text2);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .dsec-title::after{content:'';flex:1;height:1px;background:var(--app-border)}
 .detail-desc{font-size:13px;color:var(--app-text2);line-height:1.75}
+.detail-warning{padding:10px 12px;border:1px solid rgba(245,158,11,.35);border-radius:8px;background:rgba(245,158,11,.1);color:#fcd34d;font-size:12px;line-height:1.6}
 .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .detail-cell{background:var(--app-surface2);border:1px solid var(--app-border);border-radius:8px;padding:9px 11px}
 .detail-key{font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text2);margin-bottom:3px}
@@ -166,6 +167,21 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 .btn-fav.is-fav{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.4);color:#fcd34d}
 .btn-close{padding:10px 14px;border-radius:10px;border:1px solid var(--app-border);background:transparent;color:var(--app-text2);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
 .btn-close:hover{background:var(--app-surface2);color:var(--app-text)}
+.btn-settings{padding:10px 12px;border-radius:10px;border:1px solid var(--app-border);background:var(--app-surface2);color:var(--app-text2);font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-settings:hover{color:var(--app-text);border-color:var(--app-accent)}
+.game-settings-overlay{position:fixed;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(8px);z-index:100000;display:none;align-items:center;justify-content:center;padding:20px}
+.game-settings-overlay.open{display:flex;animation:popIn .18s ease}
+.game-settings-modal{width:100%;max-width:440px;max-height:88vh;overflow:auto;background:var(--app-surface);border:1px solid var(--app-border);border-radius:18px;padding:22px;box-shadow:var(--app-shadow)}
+.game-settings-title{font-size:18px;font-weight:800;margin-bottom:3px}
+.game-settings-subtitle{font-size:12px;color:var(--app-text2);margin-bottom:18px;overflow-wrap:anywhere}
+.storage-section{padding:14px 0;border-top:1px solid var(--app-border)}
+.storage-section h3{font-size:13px;margin-bottom:5px}
+.storage-section p{font-size:12px;line-height:1.6;color:var(--app-text2);margin-bottom:10px}
+.storage-action{padding:8px 11px;border-radius:8px;border:1px solid var(--app-border);background:var(--app-surface2);color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:12px;font-weight:700;cursor:pointer}
+.storage-action:hover{border-color:var(--app-accent)}
+.storage-action.danger{color:#ef4444;border-color:rgba(239,68,68,.35)}
+.storage-notice{padding:10px 12px;border-radius:9px;background:var(--app-surface2);font-size:11px;line-height:1.6;color:var(--app-text2);margin-top:10px}
+.game-settings-footer{display:flex;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--app-border)}
 .statusbar{background:var(--app-surface);border-top:1px solid var(--app-border);padding:3px 16px;display:flex;gap:14px;font-size:10px;color:var(--app-text2);flex-shrink:0;letter-spacing:.5px}
 .toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--app-surface);border:1px solid var(--app-border);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;box-shadow:var(--app-shadow);z-index:99999;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -195,14 +211,40 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 .game-player-btn.exit:hover{background:rgba(239,68,68,0.25)}
 /* Script-run container (manual games) */
 .game-player-container{flex:1;width:100%;height:100%;overflow:auto;position:relative;background:#000}
-.game-loader{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:99999;transition:opacity .4s}
+.game-loader{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:99999;transition:opacity .4s;padding:24px;text-align:center}
 .game-loader.hidden{opacity:0;pointer-events:none}
 .game-loader-spinner{width:44px;height:44px;border:3px solid rgba(255,255,255,.1);border-top-color:var(--app-accent);border-radius:50%;animation:gpSpin .8s linear infinite}
 .game-loader-name{font-family:'Oxanium',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,.8)}
-.game-loader-status{font-family:'Oxanium',sans-serif;font-size:11px;color:rgba(255,255,255,.4)}
-.game-loader-bar{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden;margin-top:4px}
+.game-loader-stage{font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--app-accent)}
+.game-loader-progress-row{display:flex;align-items:center;gap:10px;width:min(320px,80vw)}
+.game-loader-bar{flex:1;height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-top:4px}
 .game-loader-fill{height:100%;background:var(--app-accent);border-radius:2px;width:0%;transition:width .15s linear}
+.game-loader-fill.indeterminate{width:34%;animation:gpIndeterminate 1.1s ease-in-out infinite}
+.game-loader-percent{width:38px;text-align:right;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;color:rgba(255,255,255,.72)}
+.game-loader-status{font-family:'Oxanium',sans-serif;font-size:12px;color:rgba(255,255,255,.62);min-height:17px}
+.game-loader-detail{font-family:'Oxanium',sans-serif;font-size:10px;color:rgba(255,255,255,.32);min-height:14px}
+.game-loader-cancel{margin-top:4px;padding:8px 16px;border-radius:8px;border:1px solid rgba(239,68,68,.42);background:rgba(239,68,68,.12);color:#fca5a5;font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s}
+.game-loader-cancel:hover{background:rgba(239,68,68,.24);color:#fff}
+.game-loader.error .game-loader-spinner,
+.game-loader.error .game-loader-name,
+.game-loader.error .game-loader-stage,
+.game-loader.error .game-loader-progress-row,
+.game-loader.error .game-loader-status,
+.game-loader.error .game-loader-detail,
+.game-loader.error .game-loader-cancel{display:none}
+.game-loader-error{display:none;flex-direction:column;align-items:center;gap:12px;width:min(390px,90vw);padding:26px 24px 22px;background:rgba(20,20,28,.96);border:1px solid rgba(239,68,68,.42);border-radius:16px;box-shadow:0 18px 60px rgba(0,0,0,.55)}
+.game-loader.error .game-loader-error{display:flex}
+.game-loader-error-icon{font-size:34px;line-height:1}
+.game-loader-error-title{font-family:'Oxanium',sans-serif;font-size:16px;font-weight:800;color:#fff}
+.game-loader-error-message{font-family:'Oxanium',sans-serif;font-size:12px;line-height:1.55;color:#fca5a5}
+.game-loader-error-hint{font-family:'Oxanium',sans-serif;font-size:10px;line-height:1.5;color:rgba(255,255,255,.42)}
+.game-loader-error-actions{display:flex;gap:8px;margin-top:4px}
+.game-loader-error-btn{padding:8px 14px;border-radius:8px;border:1px solid rgba(128,128,128,.2);background:rgba(128,128,128,.1);color:rgba(255,255,255,.78);font-family:'Oxanium',sans-serif;font-size:11px;font-weight:800;cursor:pointer;transition:all .15s}
+.game-loader-error-btn:hover{background:rgba(128,128,128,.2);color:#fff}
+.game-loader-error-btn.primary{background:rgba(0,120,212,.2);border-color:rgba(0,120,212,.5);color:#93c5fd}
+.game-loader-error-btn.primary:hover{background:rgba(0,120,212,.32)}
 @keyframes gpSpin{to{transform:rotate(360deg)}}
+@keyframes gpIndeterminate{0%{transform:translateX(-150%)}50%{transform:translateX(130%)}100%{transform:translateX(300%)}}
 /* Iframe container (registry games) */
 .game-player-frame{flex:1;border:none;width:100%;height:100%;display:block}
 ::-webkit-scrollbar{width:6px}
@@ -358,6 +400,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
     </div>
     <div class="detail-body">
       <div class="dsec"><div class="dsec-title">Description</div><div class="detail-desc" id="dDesc"></div></div>
+      <div class="dsec" id="dWarningSection" style="display:none"><div class="dsec-title">Warnings</div><div class="detail-warning" id="dWarning"></div></div>
       <div class="dsec"><div class="dsec-title">Details</div><div class="detail-grid" id="dGrid"></div></div>
     </div>
     <div class="detail-footer">
@@ -370,6 +413,27 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
       <button class="btn-close" onclick="closeDetail()">Close</button>
     </div>
   </div>
+</div>
+
+<div class="game-settings-overlay" id="gameSettingsOverlay" onclick="if(event.target===this)closeGameSettings()">
+  <section class="game-settings-modal" role="dialog" aria-modal="true" aria-labelledby="gameSettingsTitle">
+    <div class="game-settings-title" id="gameSettingsTitle">Game storage</div>
+    <div class="game-settings-subtitle" id="gameSettingsSubtitle"></div>
+    <div class="storage-section">
+      <h3>Saved library data</h3>
+      <p>Remove this game's favourite and recently played entries saved by ServerplexOS.</p>
+      <button class="storage-action danger" onclick="clearGameData()">Clear saved library data</button>
+    </div>
+    <div class="storage-section">
+      <h3>Cached game file</h3>
+      <p>Remove copies of this game's launch file from this site's Cache Storage, if any.</p>
+      <button class="storage-action danger" onclick="removeCachedGameFiles()">Remove cached game file</button>
+    </div>
+    <div class="storage-notice">Game progress stored by the game's own website is separate from ServerplexOS. For privacy and security, this app cannot read or erase another website's storage. Clear that data in your browser's site settings.</div>
+    <div class="game-settings-footer">
+      <button class="btn-close" onclick="closeGameSettings()">Done</button>
+    </div>
+  </section>
 </div>
 
 <!-- Battery low warning (< 20%)  -  lets user continue anyway -->
@@ -405,7 +469,9 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
     <span id="gpIcon" style="font-size:18px">🎮</span>
     <span class="game-player-title" id="gpTitle">Game</span>
     <button class="game-player-btn" onclick="reloadGame()">↻ Reload</button>
-    <button class="game-player-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button class="game-player-btn" id="gameFocusButton" onclick="toggleFocus()">◉ Focus</button>
+    <button class="game-player-btn" id="gameFullscreenButton" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    <button class="game-player-btn" onclick="openGameSettings()" aria-label="Game storage settings" title="Game storage settings">⚙ Settings</button>
     <button class="game-player-btn exit" onclick="closeGamePlayer()">✕ Exit</button>
   </div>
   <!-- script-run container (manual games) -->
@@ -414,8 +480,24 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
   <div class="game-loader" id="gameLoader">
     <div class="game-loader-spinner"></div>
     <div class="game-loader-name" id="gameLoaderName">Loading...</div>
-    <div class="game-loader-bar"><div class="game-loader-fill" id="gameLoaderFill"></div></div>
-    <div class="game-loader-status" id="gameLoaderStatus">Fetching from CDN...</div>
+    <div class="game-loader-stage" id="gameLoaderStage">Connecting to game host</div>
+    <div class="game-loader-progress-row">
+      <div class="game-loader-bar"><div class="game-loader-fill" id="gameLoaderFill"></div></div>
+      <span class="game-loader-percent" id="gameLoaderPercent">0%</span>
+    </div>
+    <div class="game-loader-status" id="gameLoaderStatus">Checking the game source...</div>
+    <div class="game-loader-detail" id="gameLoaderDetail">Elapsed 0s · You can abort at any time</div>
+    <button class="game-loader-cancel" id="gameLoaderCancel" onclick="abortGameLoad()">Abort loading</button>
+    <div class="game-loader-error" id="gameLoadError" role="alert" aria-live="assertive">
+      <div class="game-loader-error-icon">⚠️</div>
+      <div class="game-loader-error-title">Game could not be loaded</div>
+      <div class="game-loader-error-message" id="gameLoadErrorMessage">The game stopped responding.</div>
+      <div class="game-loader-error-hint">Loading has stopped. You can try the game again or return to the library.</div>
+      <div class="game-loader-error-actions">
+        <button class="game-loader-error-btn primary" onclick="retryGameLoad()">Try again</button>
+        <button class="game-loader-error-btn" onclick="abortGameLoad()">Back to library</button>
+      </div>
+    </div>
   </div>
   <!-- iframe (registry / external games) -->
   <iframe class="game-player-frame" id="gamePlayerFrame" style="display:none" allow="autoplay; fullscreen; gamepad"></iframe>
@@ -424,13 +506,7 @@ html,body{height:100%;font-family:'Oxanium',sans-serif;background:var(--app-bg);
 <div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg"></span></div>
 
 <script src="games/community.js"></script>
-<script src="games/cooldude.js"></script>
-<script src="games/3kh0.js"></script>
-<script src="games/radon.js"></script>
 <script src="games/games.js"></script>
-<script src="games/monkeygg2.js"></script>
-<script src="games/chilibowl.js"></script>
-<script src="games/minecraft-clients.js"></script>
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  MANUAL GAMES
@@ -614,8 +690,7 @@ function render() {
     if (token !== _renderToken) return; // stale render, bail
 
     var featList = !q && currentCat === 'all' && !showFavs ? games.filter(function(g){ return g.featured; }).slice(0,7) : [];
-    var featIds = new Set(featList.map(function(g){ return g.id; }));
-    var workList = featList.length ? list.filter(function(g){ return !featIds.has(g.id); }) : list;
+    var workList = list;
 
     var sections = [];
     if (featList.length) sections.push({ label: null, list: featList, isHero: true });
@@ -711,7 +786,7 @@ function renderHero(games) {
   var html = '<div class="hero-wrap">';
   html += '<div class="hero-bg"></div><div class="hero-glow"></div>';
   html += '<div class="hero-content">';
-  html += '<div class="hero-eye">⭐ Featured Games</div>';
+  html += '<div class="hero-eye">⭐ Featured & Popular Games</div>';
   html += '<div class="hero-grid">';
   games.forEach(function(g){
     var f = isFav(g.id), hasUrl = !!g.url;
@@ -805,6 +880,7 @@ function openDetail(id) {
   if (g._manual)  tags += '<span class="cat-tag" style="background:rgba(0,120,212,.15);color:var(--app-accent);border-color:rgba(0,120,212,.35)">My Game</span>';
   document.getElementById('dTags').innerHTML = tags;
   document.getElementById('dDesc').textContent = clean(g.description)||'No description.';
+  updateDetailWarning(g);
   document.getElementById('dGrid').innerHTML =
     '<div class="detail-cell"><div class="detail-key">Category</div><div class="detail-val">'+(g.category||' - ')+'</div></div>'+
     '<div class="detail-cell"><div class="detail-key">Author</div><div class="detail-val">'+(clean(g.author)||' - ')+'</div></div>'+
@@ -836,12 +912,86 @@ function setDetailSource(id) {
   activeGame = g;
   document.getElementById('dTitle').textContent = clean(g.name);
   document.getElementById('dByline').textContent = [g.author?'by '+clean(g.author):'',g.category].filter(Boolean).join(' · ');
+  updateDetailWarning(g);
   var dc = document.getElementById('dCover');
   dc.innerHTML = g.cover ? '<img src="' + g.cover + '" style="width:100%;height:100%;object-fit:cover;border-radius:14px" onerror="this.parentElement.textContent=\'' + (g.icon||'🎮').replace(/'/g,"\\'") + '\'">' : (g.icon||'🎮');
   var pb = document.getElementById('dPlayBtn');
   pb.disabled = !g.url; pb.style.opacity = g.url?'1':'0.4'; pb.title = g.url?'':'No game file set';
 }
+function updateDetailWarning(g) {
+  var section = document.getElementById('dWarningSection');
+  var warning = document.getElementById('dWarning');
+  var text = g.warning && g.warning.trim ? g.warning.trim() : '';
+  warning.textContent = text;
+  section.style.display = text ? '' : 'none';
+}
 function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); }
+
+function openGameSettings() {
+  if (!activeGame) return;
+  document.getElementById('gameSettingsTitle').textContent = clean(activeGame.name) + ' storage';
+  var origin = '';
+  try {
+    origin = activeGame.url ? new URL(activeGame.url, location.href).origin : 'No game file set';
+  } catch (error) {
+    origin = 'Game URL is invalid';
+  }
+  document.getElementById('gameSettingsSubtitle').textContent = origin;
+  document.getElementById('gameSettingsOverlay').classList.add('open');
+}
+
+function closeGameSettings() {
+  document.getElementById('gameSettingsOverlay').classList.remove('open');
+}
+
+function clearGameData() {
+  if (!activeGame) return;
+  var gameName = clean(activeGame.name) || 'this game';
+  if (!confirm('Clear the saved favourite and play history for "' + gameName + '"?')) return;
+  try {
+    favs = favs.filter(function(id) { return id !== activeGame.id; });
+    recents = recents.filter(function(id) { return id !== activeGame.id; });
+    saveFavs();
+    saveRecents();
+    updateCounts();
+    render();
+    refreshFavBtn();
+    showToast('Saved game data cleared', '✓');
+  } catch (error) {
+    showToast('Could not clear saved library data: ' + error.message, '⚠️');
+  }
+}
+
+async function removeCachedGameFiles() {
+  if (!activeGame || !activeGame.url) {
+    showToast('This game has no launch file to remove', '⚠️');
+    return;
+  }
+  if (!('caches' in window)) {
+    showToast('Cache Storage is not available in this browser', '⚠️');
+    return;
+  }
+  if (!confirm('Remove cached copies of "' + (clean(activeGame.name) || 'this game') + '" from this site?')) return;
+
+  try {
+    var gameUrl = new URL(activeGame.url, location.href);
+    var cacheNames = await caches.keys();
+    var removed = 0;
+    for (var i = 0; i < cacheNames.length; i++) {
+      var cache = await caches.open(cacheNames[i]);
+      var requests = await cache.keys();
+      for (var j = 0; j < requests.length; j++) {
+        var cachedUrl = new URL(requests[j].url);
+        if (cachedUrl.origin === gameUrl.origin && cachedUrl.pathname === gameUrl.pathname) {
+          if (await cache.delete(requests[j])) removed++;
+        }
+      }
+    }
+    showToast(removed ? 'Removed ' + removed + ' cached game file' + (removed === 1 ? '' : 's') : 'No cached game files found', removed ? '✓' : 'ℹ️');
+  } catch (error) {
+    showToast('Could not remove cached game files: ' + error.message, '⚠️');
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════
 //  LAUNCH
@@ -851,6 +1001,154 @@ function closeDetail() { document.getElementById('detailOverlay').classList.remo
 //  Registry games: iframe src set directly.
 // ═══════════════════════════════════════════════════════════════
 var _blobUrl = null;
+var _loadController = null;
+var _loadToken = 0;
+var _loadTimers = [];
+var _loadStartedAt = 0;
+var _loadDetailText = 'You can abort at any time';
+var _loadPercent = 0;
+
+function clearGameLoadTimers() {
+  _loadTimers.forEach(function(timer) { clearTimeout(timer); clearInterval(timer); });
+  _loadTimers = [];
+}
+
+function stopGameLoad() {
+  _loadToken++;
+  clearGameLoadTimers();
+  if (_loadController) {
+    _loadController.abort();
+    _loadController = null;
+  }
+  var frame = document.getElementById('gamePlayerFrame');
+  if (frame) {
+    frame.onload = null;
+    frame.onerror = null;
+  }
+}
+
+function isGameLoadActive(loadId) {
+  return loadId === _loadToken;
+}
+
+function updateLoaderDetail(text) {
+  var detail = document.getElementById('gameLoaderDetail');
+  if (!detail) return;
+  if (text !== undefined) _loadDetailText = text;
+  var elapsed = _loadStartedAt ? Math.floor((Date.now() - _loadStartedAt) / 1000) : 0;
+  detail.textContent = 'Elapsed ' + elapsed + 's · ' + _loadDetailText;
+}
+
+function setLoaderProgress(percent, stage, status, detail) {
+  _loadPercent = Math.max(0, Math.min(100, Math.round(percent)));
+  var fill = document.getElementById('gameLoaderFill');
+  var percentEl = document.getElementById('gameLoaderPercent');
+  var stageEl = document.getElementById('gameLoaderStage');
+  var statusEl = document.getElementById('gameLoaderStatus');
+  if (fill) {
+    fill.classList.remove('indeterminate');
+    fill.style.width = _loadPercent + '%';
+  }
+  if (percentEl) percentEl.textContent = _loadPercent + '%';
+  if (stageEl && stage) stageEl.textContent = stage;
+  if (statusEl && status) statusEl.textContent = status;
+  updateLoaderDetail(detail);
+}
+
+function beginGameLoad(name) {
+  stopGameLoad();
+  var loadId = ++_loadToken;
+  _loadStartedAt = Date.now();
+  _loadDetailText = 'You can abort at any time';
+  _loadPercent = 0;
+  _loadController = window.AbortController ? new AbortController() : null;
+
+  var loader = document.getElementById('gameLoader');
+  var loaderName = document.getElementById('gameLoaderName');
+  var cancel = document.getElementById('gameLoaderCancel');
+  var fill = document.getElementById('gameLoaderFill');
+  if (loader) loader.classList.remove('hidden', 'error');
+  if (loaderName) loaderName.textContent = name || 'Loading...';
+  if (cancel) {
+    cancel.disabled = false;
+    cancel.textContent = 'Abort loading';
+  }
+  if (fill) {
+    fill.classList.remove('indeterminate');
+    fill.style.width = '0%';
+  }
+  setLoaderProgress(0, 'Connecting to game host', 'Checking the game source...');
+
+  var elapsedTimer = setInterval(function() {
+    if (isGameLoadActive(loadId)) updateLoaderDetail();
+  }, 1000);
+  _loadTimers.push(elapsedTimer);
+  _loadTimers.push(setTimeout(function() {
+    if (isGameLoadActive(loadId)) {
+      failGameLoad(loadId, 'This game did not respond within 45 seconds.');
+    }
+  }, 45000));
+  return loadId;
+}
+
+function finishGameLoad(loadId) {
+  if (!isGameLoadActive(loadId)) return;
+  clearGameLoadTimers();
+  _loadController = null;
+  setLoaderProgress(100, 'Game ready', 'Starting the game...', 'Loaded successfully');
+  var loader = document.getElementById('gameLoader');
+  setTimeout(function() {
+    if (isGameLoadActive(loadId) && loader) loader.classList.add('hidden');
+  }, 260);
+}
+
+function failGameLoad(loadId, message) {
+  if (!isGameLoadActive(loadId)) return;
+  clearGameLoadTimers();
+  if (_loadController) {
+    _loadController.abort();
+    _loadController = null;
+  }
+  var frame = document.getElementById('gamePlayerFrame');
+  if (frame) {
+    frame.onload = null;
+    frame.onerror = null;
+    frame.src = 'about:blank';
+  }
+  setLoaderProgress(Math.max(_loadPercent, 8), 'Could not start game', message || 'The game could not finish loading.', 'Use Abort to return to the library');
+  var errorMessage = document.getElementById('gameLoadErrorMessage');
+  if (errorMessage) errorMessage.textContent = message || 'The game could not finish loading.';
+  var loader = document.getElementById('gameLoader');
+  if (loader) loader.classList.add('error');
+}
+
+function retryGameLoad() {
+  if (!activeGame || !activeGame.url) {
+    abortGameLoad();
+    return;
+  }
+  _launchDirect();
+}
+
+function abortGameLoad() {
+  stopGameLoad();
+  var frame = document.getElementById('gamePlayerFrame');
+  if (frame) {
+    frame.src = 'about:blank';
+    frame.style.display = 'none';
+  }
+  if (_blobUrl) {
+    URL.revokeObjectURL(_blobUrl);
+    _blobUrl = null;
+  }
+  var loader = document.getElementById('gameLoader');
+  if (loader) loader.classList.remove('hidden', 'error');
+  var overlay = document.getElementById('gamePlayerOverlay');
+  if (overlay) overlay.classList.remove('open');
+  document.getElementById('gameContainer').style.display = 'none';
+  render();
+  showToast('Game loading aborted', '✕');
+}
 
 function launchGame() {
   if (!activeGame || !activeGame.url) { showToast('No game file set','⚠️'); return; }
@@ -866,16 +1164,7 @@ function _launchDirect() {
   document.getElementById('gpTitle').textContent = clean(activeGame.name) || 'Game';
   document.getElementById('gpIcon').textContent  = activeGame.icon || '🎮';
   document.getElementById('gamePlayerOverlay').classList.add('open');
-
-  // Show loader
-  var loader = document.getElementById('gameLoader');
-  var loaderName = document.getElementById('gameLoaderName');
-  var loaderStatus = document.getElementById('gameLoaderStatus');
-  if (loader) {
-    loader.classList.remove('hidden');
-    loaderName.textContent = activeGame.name || 'Loading...';
-    loaderStatus.textContent = 'Fetching from CDN...';
-  }
+  var loadId = beginGameLoad(activeGame.name || 'Loading...');
 
   // Always use the iframe  -  container div is unused now
   var container = document.getElementById('gameContainer');
@@ -889,17 +1178,18 @@ function _launchDirect() {
   if (activeGame._manual) {
     // Fetch HTML, rewrite relative paths, wrap in a blob URL.
     // The iframe loads the blob  -  fully isolated, no shared CSS/JS.
-    fetch(activeGame.url)
+    setLoaderProgress(12, 'Connecting to game host', 'Connected. Preparing download...');
+    fetch(activeGame.url, _loadController ? { signal: _loadController.signal } : {})
       .then(function(r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
+        if (!isGameLoadActive(loadId)) return null;
         var contentLength = r.headers.get('Content-Length');
         var total = contentLength ? parseInt(contentLength) : 0;
         var received = 0;
         var fill   = document.getElementById('gameLoaderFill');
-        var status = document.getElementById('gameLoaderStatus');
+        setLoaderProgress(20, 'Downloading game files', 'Receiving game HTML...', total ? Math.round(total / 1024) + ' KB expected' : 'Download size is not advertised');
         if (!r.body || !total) {
-          if (status) status.textContent = 'Downloading...';
-          if (fill) { fill.style.transition = 'none'; fill.style.width = '0%'; setTimeout(function(){ fill.style.transition = ''; }, 50); }
+          if (fill) fill.classList.add('indeterminate');
           return r.text();
         }
         var reader = r.body.getReader();
@@ -914,15 +1204,17 @@ function _launchDirect() {
             }
             chunks.push(result.value);
             received += result.value.length;
-            var pct = Math.min(Math.round(received / total * 100), 99);
-            if (fill)   fill.style.width = pct + '%';
-            if (status) status.textContent = pct + '%  -  ' + Math.round(received/1024) + ' KB / ' + Math.round(total/1024) + ' KB';
+            var rawPct = Math.min(Math.round(received / total * 100), 99);
+            var pct = 20 + Math.min(Math.round(rawPct * 0.5), 50);
+            setLoaderProgress(pct, 'Downloading game files', rawPct + '% downloaded', Math.round(received / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB');
             return pump();
           });
         }
         return pump();
       })
       .then(function(html) {
+        if (!isGameLoadActive(loadId) || html === null) return;
+        setLoaderProgress(74, 'Preparing game session', 'Rewriting local asset paths...', 'Building an isolated game frame');
         // Inject <base> so relative asset paths still resolve
         var base = activeGame.url;
         if (!/<base[\s>]/i.test(html)) {
@@ -932,37 +1224,51 @@ function _launchDirect() {
         // Revoke any previous blob to free memory
         if (_blobUrl) { URL.revokeObjectURL(_blobUrl); _blobUrl = null; }
         _blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-        if (loaderStatus) loaderStatus.textContent = 'Starting game...';
-        if (document.getElementById('gameLoaderFill')) document.getElementById('gameLoaderFill').style.width = '100%';
+        setLoaderProgress(90, 'Starting game', 'Launching isolated game frame...', 'Waiting for the game to respond');
         frame.onload = function() {
-          var l = document.getElementById('gameLoader');
-          if (l) l.classList.add('hidden');
-          frame.onload = null;
+          finishGameLoad(loadId);
+        };
+        frame.onerror = function() {
+          failGameLoad(loadId, 'The isolated game frame could not start.');
         };
         frame.src = _blobUrl;
       })
-      .catch(function() {
-        var l = document.getElementById('gameLoader');
-        if (l) l.classList.add('hidden');
-        var errBody = document.createElement('body');
-        errBody.style.cssText = 'background:#000;color:#fca5a5;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;font-size:14px;margin:0';
-        errBody.textContent = 'Could not load game';
-        frame.srcdoc = '<html>' + errBody.outerHTML + '</html>';
+      .catch(function(error) {
+        if (!isGameLoadActive(loadId) || (error && error.name === 'AbortError')) return;
+        failGameLoad(loadId, 'Could not download the game files.');
       });
   } else {
+    setLoaderProgress(20, 'Connecting to game host', 'Opening the game frame...', 'Waiting for the remote page to respond');
+    _loadTimers.push(setTimeout(function() {
+      if (isGameLoadActive(loadId)) setLoaderProgress(42, 'Downloading game files', 'The game is responding slowly...', 'Still connected · you can abort safely');
+    }, 650));
+    _loadTimers.push(setTimeout(function() {
+      if (isGameLoadActive(loadId)) setLoaderProgress(68, 'Preparing game session', 'Loading scripts and assets...', 'The game may take a little longer on first load');
+    }, 1800));
+    _loadTimers.push(setTimeout(function() {
+      if (isGameLoadActive(loadId)) setLoaderProgress(84, 'Starting game', 'Almost ready...', 'Waiting for the game to finish initializing');
+    }, 4200));
     frame.src = activeGame.url;
     frame.onload = function() {
-      var l = document.getElementById('gameLoader');
-      if (l) l.classList.add('hidden');
-      frame.onload = null;
+      finishGameLoad(loadId);
+    };
+    frame.onerror = function() {
+      failGameLoad(loadId, 'The game page could not be opened.');
     };
   }
 }
 
 function closeGamePlayer() {
+  stopGameLoad();
   document.getElementById('gamePlayerOverlay').classList.remove('open');
+  setFocusMode(false);
+  if (document.fullscreenElement === document.getElementById('gamePlayerOverlay') && document.exitFullscreen) {
+    document.exitFullscreen().catch(function(error) {
+      showToast('Could not exit fullscreen: ' + error.message, '⚠️');
+    });
+  }
   var l = document.getElementById('gameLoader');
-  if (l) l.classList.remove('hidden');
+  if (l) l.classList.remove('hidden', 'error');
   var f = document.getElementById('gameLoaderFill');
   if (f) f.style.width = '0%';
   var frame = document.getElementById('gamePlayerFrame');
@@ -979,11 +1285,46 @@ function reloadGame() {
   _launchDirect();
 }
 
+var _gameFocusMode = false;
+
+function setFocusMode(enabled) {
+  _gameFocusMode = enabled;
+  var button = document.getElementById('gameFocusButton');
+  if (button) button.textContent = enabled ? '◉ Exit Focus' : '◉ Focus';
+  if (window.parent !== window) {
+    window.parent.postMessage({ type: 'serverplex-game-focus', enabled: enabled }, location.origin);
+  }
+}
+
+function toggleFocus() {
+  setFocusMode(!_gameFocusMode);
+}
+
+function updateFullscreenButton() {
+  var button = document.getElementById('gameFullscreenButton');
+  if (button) button.textContent = document.fullscreenElement === document.getElementById('gamePlayerOverlay')
+    ? '⛶ Exit Fullscreen'
+    : '⛶ Fullscreen';
+}
+
 function toggleFullscreen() {
   var overlay = document.getElementById('gamePlayerOverlay');
-  if (!document.fullscreenElement) { overlay.requestFullscreen && overlay.requestFullscreen(); }
-  else { document.exitFullscreen && document.exitFullscreen(); }
+  if (document.fullscreenElement === overlay) {
+    document.exitFullscreen().catch(function(error) {
+      showToast('Could not exit fullscreen: ' + error.message, '⚠️');
+    });
+    return;
+  }
+  if (!overlay.requestFullscreen) {
+    showToast('Fullscreen is not available in this browser', '⚠️');
+    return;
+  }
+  overlay.requestFullscreen().catch(function(error) {
+    showToast('Could not enter fullscreen: ' + error.message, '⚠️');
+  });
 }
+
+document.addEventListener('fullscreenchange', updateFullscreenButton);
 
 // Toast
 var toastT;

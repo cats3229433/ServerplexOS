@@ -172,7 +172,7 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .notif-toast-close{background:none;border:none;color:var(--text2);cursor:pointer;font-size:14px;padding:0 2px;flex-shrink:0;transition:color .15s}
 .notif-toast-close:hover{color:var(--text)}
 
-.desktop{position:fixed;top:0;left:0;width:100%;height:calc(100% - 68px);background:var(--bg);background-size:cover;background-position:center;overflow:hidden}
+.desktop{position:fixed;top:0;left:0;width:100%;height:calc(100% - 48px);background:var(--bg);background-size:cover;background-position:center;overflow:hidden}
 .desktop-icons{padding:20px;position:relative;width:100%;height:100%}
 .desktop-icon{width:80px;height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;border-radius:6px;padding:8px;position:absolute;transition:background .15s,box-shadow .15s,transform .15s}
 .desktop-icon:not(.dragging){transition:left .2s,top .2s,background .15s,transform .15s}
@@ -187,15 +187,23 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .grid-preview.occupied{border-color:#ff3b30;background:rgba(255,59,48,.1)}
 .rubber-band{position:absolute;border:1px solid var(--accent);background:rgba(0,120,212,.08);pointer-events:none;display:none;z-index:998}
 .snap-preview{position:fixed;background:rgba(0,120,212,.18);border:2px solid rgba(0,120,212,.55);border-radius:6px;pointer-events:none;z-index:99999;display:none;transition:all .12s}
-.window.snap-left{top:0!important;left:0!important;width:50%!important;height:calc(100% - 68px)!important;border-radius:0;transition:all .2s}
-.window.snap-right{top:0!important;left:50%!important;width:50%!important;height:calc(100% - 68px)!important;border-radius:0;transition:all .2s}
-.window.snap-tl{top:0!important;left:0!important;width:50%!important;height:50%!important;border-radius:0;transition:all .2s}
-.window.snap-tr{top:0!important;left:50%!important;width:50%!important;height:50%!important;border-radius:0;transition:all .2s}
-.window.snap-bl{top:50%!important;left:0!important;width:50%!important;height:calc(50% - 34px)!important;border-radius:0;transition:all .2s}
-.window.snap-br{top:50%!important;left:50%!important;width:50%!important;height:calc(50% - 34px)!important;border-radius:0;transition:all .2s}
-.window{position:absolute;background:var(--win-bg);border:1px solid var(--border);border-radius:10px 10px 6px 6px;box-shadow:0 16px 48px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.2);display:flex;flex-direction:column;min-width:360px;min-height:260px;z-index:100;animation:winOpen .22s cubic-bezier(.34,1.56,.64,1)}
+.window-grid-preview{position:fixed;display:none;pointer-events:none;background:rgba(0,120,212,.09);border:1px dashed rgba(0,120,212,.75);border-radius:8px;z-index:99998;transition:all .08s}
+.window.snap-left{top:0!important;left:0!important;width:50%!important;height:calc(100% - 48px)!important;border-radius:0;transition:all .2s}
+.window.snap-right{top:0!important;left:50%!important;width:50%!important;height:calc(100% - 48px)!important;border-radius:0;transition:all .2s}
+.window.snap-tl{top:0!important;left:0!important;width:50%!important;height:calc((100% - 48px)/2)!important;border-radius:0;transition:all .2s}
+.window.snap-tr{top:0!important;left:50%!important;width:50%!important;height:calc((100% - 48px)/2)!important;border-radius:0;transition:all .2s}
+.window.snap-bl{top:calc((100% - 48px)/2)!important;left:0!important;width:50%!important;height:calc((100% - 48px)/2)!important;border-radius:0;transition:all .2s}
+.window.snap-br{top:calc((100% - 48px)/2)!important;left:50%!important;width:50%!important;height:calc((100% - 48px)/2)!important;border-radius:0;transition:all .2s}
+.window{position:absolute;background:var(--win-bg);border:1px solid var(--border);border-radius:10px 10px 6px 6px;box-shadow:0 16px 48px rgba(0,0,0,.35),0 2px 8px rgba(0,0,0,.2);display:flex;flex-direction:column;min-width:0;min-height:0;z-index:100;animation:winOpen .22s cubic-bezier(.34,1.56,.64,1)}
+.window.game-focus-mode{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;border:0!important;border-radius:0!important;z-index:2147483000!important}
+.window.game-focus-mode .window-titlebar,.window.game-focus-mode .resize-handle{display:none!important}
+.window.game-focus-mode .window-content{width:100%;height:100%}
+.window.game-focus-entering{animation:gameFocusEnter .28s cubic-bezier(.2,.8,.2,1) both;transform-origin:top left}
+.window.game-focus-exiting{animation:gameFocusExit .24s cubic-bezier(.4,0,.8,.4) both;transform-origin:top left}
+@keyframes gameFocusEnter{from{opacity:.75;transform:translate(var(--game-focus-x),var(--game-focus-y)) scale(var(--game-focus-sx),var(--game-focus-sy))}to{opacity:1;transform:translate(0,0) scale(1,1)}}
+@keyframes gameFocusExit{from{opacity:1;transform:translate(0,0) scale(1,1)}to{opacity:.78;transform:translate(var(--game-focus-x),var(--game-focus-y)) scale(var(--game-focus-sx),var(--game-focus-sy))}}
 .window.closing{animation:winClose .18s ease-out forwards}
-.window.maximized{top:0!important;left:0!important;width:100%!important;height:calc(100% - 68px)!important;border-radius:0;transition:all .28s cubic-bezier(.34,1.56,.64,1)}
+.window.maximized{top:0!important;left:0!important;width:100%!important;height:calc(100% - 48px)!important;border-radius:0;transition:all .28s cubic-bezier(.34,1.56,.64,1)}
 .window.minimizing{animation:winMin .28s ease-out forwards}
 .window.minimized{display:none}
 .window.restoring{animation:winRestore .28s cubic-bezier(.34,1.56,.64,1)}
@@ -310,7 +318,7 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .vd-thumb:hover,.vd-thumb.active{border-color:var(--accent);transform:scale(1.04);box-shadow:0 8px 24px rgba(0,120,212,.3)}
 .vd-thumb-label{font-size:13px;font-weight:700;color:var(--text)}
 .vd-thumb-count{font-size:11px;color:var(--text2)}
-.notif-panel{position:fixed;top:0;right:0;width:320px;height:calc(100% - 68px);background:var(--glass);border-left:1px solid var(--border);backdrop-filter:blur(24px);z-index:99970;transform:translateX(100%);transition:transform .28s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column}
+.notif-panel{position:fixed;top:0;right:0;width:320px;height:calc(100% - 48px);background:var(--glass);border-left:1px solid var(--border);backdrop-filter:blur(24px);z-index:99970;transform:translateX(100%);transition:transform .28s cubic-bezier(.34,1.56,.64,1);display:flex;flex-direction:column}
 .notif-panel.open{transform:translateX(0)}
 .notif-header{padding:18px 16px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .notif-title{font-size:14px;font-weight:700;color:var(--text)}
@@ -361,10 +369,10 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .ctx-item:hover{background:var(--bg2)}
 .ctx-sep{height:1px;background:var(--border);margin:3px 0}
 .desktop-widget{position:absolute;z-index:50;user-select:none}
-.widget-clock{background:rgba(0,0,0,.48);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 18px;color:#fff;text-align:center;cursor:move;min-width:140px}
+.widget-clock{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:14px;padding:12px 18px;color:var(--text);text-align:center;cursor:move;min-width:140px}
 .widget-clock .wc-time{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1}
 .widget-clock .wc-date{font-size:11px;opacity:.55;margin-top:4px;letter-spacing:1px}
-.widget-stats{background:rgba(0,0,0,.48);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;color:#fff;cursor:move;min-width:160px}
+.widget-stats{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:14px;padding:12px 14px;color:var(--text);cursor:move;min-width:160px}
 .widget-stats .ws-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:2px 0}
 .widget-stats .ws-label{opacity:.55}
 .widget-stats .ws-val{font-weight:700}
@@ -372,9 +380,35 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 .widget-stats .ws-fill{height:100%;border-radius:2px;transition:width .8s ease}
 .widget-sticky{background:#fef08a;border-radius:10px;padding:10px 12px;cursor:move;min-width:160px;min-height:100px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
 .widget-sticky textarea{width:100%;height:80px;border:none;background:transparent;resize:none;outline:none;font-family:'Oxanium',sans-serif;font-size:12px;color:rgba(0,0,0,.7)}
-.widget-weather{background:rgba(0,0,0,.48);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:14px 16px;color:#fff;cursor:move;min-width:160px}
-.widget-close{position:absolute;top:5px;right:7px;background:rgba(0,0,0,.18);border:none;border-radius:50%;width:17px;height:17px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .18s}
+.widget-weather,.widget-forecast,.widget-schedule{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:14px;padding:14px 16px;color:var(--text);cursor:move;min-width:190px;max-width:min(320px,calc(100vw - 16px))}
+.widget-card-heading{font-size:10px;font-weight:800;letter-spacing:2px;opacity:.72;margin:0 20px 8px 0;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between}
+.widget-card-heading button{background:transparent;border:0;color:var(--text);cursor:pointer;padding:2px 4px;font-size:13px}
+.widget-weather-entry{display:flex;gap:5px;margin-top:8px}
+.widget-weather-entry input{min-width:0;flex:1;padding:6px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font:11px 'Oxanium',sans-serif}
+.widget-weather-entry button,.widget-schedule-form button{padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font:700 10px 'Oxanium',sans-serif;cursor:pointer}
+.widget-use-location{padding:4px 0;border:0;background:transparent;color:var(--text2);font:10px 'Oxanium',sans-serif;cursor:pointer}
+.widget-weather-meta,.widget-attribution{font-size:9px;opacity:.68;margin-top:7px}
+.widget-attribution a{color:var(--text);text-decoration:underline}
+.widget-weather-current{font-size:24px;font-weight:800;line-height:1.2}
+.widget-weather-summary{font-size:11px;opacity:.8;margin-top:2px}
+.widget-weather-details{display:flex;flex-wrap:wrap;gap:5px 10px;font-size:10px;opacity:.75;margin-top:8px}
+.widget-forecast-list,.widget-schedule-list{display:grid;gap:6px;max-height:210px;overflow-y:auto}
+.widget-forecast-day,.widget-schedule-entry{display:grid;grid-template-columns:42px 26px 1fr auto;align-items:center;gap:5px;font-size:10px}
+.widget-forecast-day{grid-template-columns:42px 24px 1fr auto}
+.widget-forecast-day span:nth-child(3){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.widget-forecast-day span:last-child,.widget-schedule-time{font-weight:700;white-space:nowrap}
+.widget-schedule-form{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:9px}
+.widget-schedule-form input,.widget-schedule-form select{min-width:0;padding:5px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--text);font:10px 'Oxanium',sans-serif}
+.widget-schedule-form input[name="title"],.widget-schedule-form input[name="location"],.widget-schedule-form button{grid-column:1/-1}
+.widget-schedule-next{font-size:10px;font-weight:700;margin:-2px 0 8px;opacity:.85}
+.widget-schedule-entry small{display:block;font-size:9px;opacity:.7}
+.widget-schedule-empty{font-size:10px;opacity:.72;padding:5px 0}
+.widget-schedule-remove{border:0;background:transparent;color:var(--text2);cursor:pointer;font-size:11px;padding:1px 3px}
+.widget-schedule-remove:hover{color:#ff3b30}
+.widget-close{position:absolute;top:5px;right:7px;background:var(--bg2);border:1px solid var(--border);border-radius:50%;width:19px;height:19px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .18s;color:var(--text)}
 .desktop-widget:hover .widget-close{opacity:1}
+#widgetContainer{position:absolute;inset:0;z-index:30;pointer-events:none}
+.desktop-widget{pointer-events:auto}
 .tray-popup{position:fixed;bottom:72px;right:12px;background:var(--glass);border:1px solid var(--border);border-radius:14px;padding:14px;width:250px;box-shadow:0 10px 32px rgba(0,0,0,.3);z-index:99973;display:none;backdrop-filter:blur(24px);animation:scaleIn .18s ease}
 .tray-popup.active{display:block}
 .tray-popup-title{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px}
@@ -441,6 +475,7 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
 <body>
 
 <div class="snap-preview" id="snapPreview"></div>
+<div class="window-grid-preview" id="windowGridPreview"></div>
 <div class="resize-tooltip" id="resizeTooltip"></div>
 <div class="desk-ctx" id="deskCtx"></div>
 <div class="tb-ctx" id="tbCtx"></div>
@@ -648,7 +683,6 @@ body:not(.theme-white):not(.theme-arctic) .desktop-icon.selected{box-shadow:0 0 
         <div class="shortcut-row"><span class="shortcut-desc">Open Terminal</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">T</span></span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Open Notepad</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">N</span></span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Open Calculator</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">C</span></span></div>
-        <div class="shortcut-row"><span class="shortcut-desc">Open File Manager</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">E</span></span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Open Settings</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">,</span></span></div>
         <div class="shortcut-row"><span class="shortcut-desc">Open Clock</span><span class="shortcut-keys"><span class="kbd">Ctrl</span><span class="kbd">Shift</span><span class="kbd">K</span></span></div>
       </div>
@@ -756,7 +790,7 @@ let notifications=JSON.parse(localStorage.getItem('serverplex_notifs')||'[]');
 let pinnedAppIds=JSON.parse(localStorage.getItem('serverplex_pinned')||'["browser","games","settings","terminal"]');
 let volLevel=100, isMuted=false;
 let calDate=new Date();
-const GRID_SIZE=100, GRID_PAD=20;
+const GRID_SIZE=100, GRID_PAD=20, OS_TASKBAR_HEIGHT=48;
 </script>
 
 <!-- Modules — ORDER MATTERS -->

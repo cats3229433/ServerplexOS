@@ -10,25 +10,46 @@
 // ══════════════════════════════════════════════
 
 // ── Grid Helpers ─────────────────────────────────
-function getGridPos(x, y) {
-  var col = Math.round((x - GRID_PAD) / GRID_SIZE), row = Math.round((y - GRID_PAD) / GRID_SIZE);
-  return { x: GRID_PAD + col * GRID_SIZE, y: GRID_PAD + row * GRID_SIZE, col, row };
+var DESKTOP_ICON_SIZE = 80;
+
+function getIconGridMetrics() {
+  var container = document.getElementById('desktopIcons');
+  var width = Math.max(1, container ? container.clientWidth : window.innerWidth);
+  var fallbackHeight = window.innerHeight - (typeof OS_TASKBAR_HEIGHT === 'number' ? OS_TASKBAR_HEIGHT : 48);
+  var height = Math.max(1, container ? container.clientHeight : fallbackHeight);
+  var padX = Math.min(GRID_PAD, Math.max(0, (width - DESKTOP_ICON_SIZE) / 2));
+  var padY = Math.min(GRID_PAD, Math.max(0, (height - DESKTOP_ICON_SIZE) / 2));
+  var maxCols = Math.max(1, Math.floor((width - DESKTOP_ICON_SIZE - padX) / GRID_SIZE) + 1);
+  var maxRows = Math.max(1, Math.floor((height - DESKTOP_ICON_SIZE - padY) / GRID_SIZE) + 1);
+  return { width: width, height: height, padX: padX, padY: padY, maxCols: maxCols, maxRows: maxRows };
 }
-function gridOccupied(col, row, exclude) {
+
+function getGridPos(x, y) {
+  var metrics = getIconGridMetrics();
+  x = Number(x) || 0;
+  y = Number(y) || 0;
+  var col = Math.max(0, Math.min(metrics.maxCols - 1, Math.round((x - metrics.padX) / GRID_SIZE)));
+  var row = Math.max(0, Math.min(metrics.maxRows - 1, Math.round((y - metrics.padY) / GRID_SIZE)));
+  return { x: metrics.padX + col * GRID_SIZE, y: metrics.padY + row * GRID_SIZE, col: col, row: row };
+}
+function gridOccupied(col, row, exclude, occupiedCells) {
+  if (occupiedCells) return occupiedCells.has(col + ',' + row);
   return Object.keys(desktopLayout).some(id => {
     if (id === exclude) return false;
     var g = getGridPos(desktopLayout[id].x, desktopLayout[id].y);
     return g.col === col && g.row === row;
   });
 }
-function nextFreeGrid(start) {
-  start = start || 0;
-  var maxCols = Math.floor((window.innerWidth - GRID_PAD * 2) / GRID_SIZE);
-  for (var i = start; i < 1000; i++) {
-    var col = i % maxCols, row = Math.floor(i / maxCols);
-    if (!gridOccupied(col, row)) return { x: GRID_PAD + col * GRID_SIZE, y: GRID_PAD + row * GRID_SIZE, col, row };
+function nextFreeGrid(start, occupiedCells) {
+  start = Math.max(0, Number(start) || 0);
+  var metrics = getIconGridMetrics();
+  var total = metrics.maxCols * metrics.maxRows;
+  for (var i = start; i < total; i++) {
+    var col = i % metrics.maxCols, row = Math.floor(i / metrics.maxCols);
+    if (!gridOccupied(col, row, null, occupiedCells))
+      return { x: metrics.padX + col * GRID_SIZE, y: metrics.padY + row * GRID_SIZE, col: col, row: row };
   }
-  return { x: GRID_PAD, y: GRID_PAD, col: 0, row: 0 };
+  return { x: metrics.padX, y: metrics.padY, col: 0, row: 0 };
 }
 
 // ── Desktop Icons ────────────────────────────────
@@ -115,15 +136,19 @@ function makeIconDraggable(element) {
   });
   document.addEventListener('mousemove', e => {
     if (!isDragging) return; e.preventDefault();
-    var nx = initialX + (e.clientX - startX), ny = initialY + (e.clientY - startY);
+    var metrics = getIconGridMetrics();
+    var nx = Math.max(0, Math.min(initialX + (e.clientX - startX), metrics.width - element.offsetWidth));
+    var ny = Math.max(0, Math.min(initialY + (e.clientY - startY), metrics.height - element.offsetHeight));
     element.style.left = nx + 'px'; element.style.top = ny + 'px';
     var gPos = getGridPos(nx, ny), occ = gridOccupied(gPos.col, gPos.row, element.dataset.appId);
-    gp.style.display = 'block'; gp.style.left = gPos.x + 'px'; gp.style.top = gPos.y + 'px';
-    gp.className = 'grid-preview' + (occ ? ' occupied' : '');
+    if (gp) {
+      gp.style.display = 'block'; gp.style.left = gPos.x + 'px'; gp.style.top = gPos.y + 'px';
+      gp.className = 'grid-preview' + (occ ? ' occupied' : '');
+    }
   });
   document.addEventListener('mouseup', () => {
     if (!isDragging) return; isDragging = false;
-    element.style.zIndex = ''; element.classList.remove('dragging'); gp.style.display = 'none';
+    element.style.zIndex = ''; element.classList.remove('dragging'); if (gp) gp.style.display = 'none';
     var cx = parseInt(element.style.left), cy = parseInt(element.style.top);
     var gPos = getGridPos(cx, cy), appId = element.dataset.appId;
     if (gridOccupied(gPos.col, gPos.row, appId)) {
@@ -135,6 +160,21 @@ function makeIconDraggable(element) {
       localStorage.setItem('serverplex_desktop_layout', JSON.stringify(desktopLayout));
     }
   });
+}
+
+function constrainDesktopIcons() {
+  var occupied = new Set();
+  document.querySelectorAll('.desktop-icon').forEach(function(icon) {
+    var appId = icon.dataset.appId;
+    var saved = desktopLayout[appId] || { x: icon.offsetLeft, y: icon.offsetTop };
+    var pos = getGridPos(saved.x, saved.y);
+    if (occupied.has(pos.col + ',' + pos.row)) pos = nextFreeGrid(0, occupied);
+    occupied.add(pos.col + ',' + pos.row);
+    icon.style.left = pos.x + 'px';
+    icon.style.top = pos.y + 'px';
+    desktopLayout[appId] = { x: pos.x, y: pos.y };
+  });
+  localStorage.setItem('serverplex_desktop_layout', JSON.stringify(desktopLayout));
 }
 
 // ── Rubber-band Multi-select ─────────────────────
@@ -179,6 +219,8 @@ function initContextMenu() {
       <div class="ctx-item" onclick="addWidget('clock');closeCtxMenu()">🕐 Add Clock Widget</div>
       <div class="ctx-item" onclick="addWidget('stats');closeCtxMenu()">📊 Add Stats Widget</div>
       <div class="ctx-item" onclick="addWidget('weather');closeCtxMenu()">🌤️ Add Weather Widget</div>
+      <div class="ctx-item" onclick="addWidget('forecast');closeCtxMenu()">🌦️ Add Forecast Widget</div>
+      <div class="ctx-item" onclick="addWidget('schedule');closeCtxMenu()">📚 Add Class Schedule Widget</div>
       <div class="ctx-item" onclick="addWidget('sticky');closeCtxMenu()">📌 Add Sticky Widget</div>
       <div class="ctx-sep"></div>
       <div class="ctx-item" onclick="toggleSpotlight();closeCtxMenu()">🔍 Spotlight Search</div>
@@ -191,9 +233,11 @@ function initContextMenu() {
       <div class="ctx-item" onclick="openAppInstaller();closeCtxMenu()">📦 Install App from URL</div>
       <div class="ctx-item" onclick="backupOS();closeCtxMenu()">💾 Backup OS State</div>
       <div class="ctx-item" onclick="restoreOS();closeCtxMenu()">📂 Restore OS State</div>`;
-    var x = Math.min(e.clientX, window.innerWidth - 220), y = Math.min(e.clientY, window.innerHeight - 320);
-    menu.style.left = x + 'px'; menu.style.top = y + 'px';
+    menu.style.left = '0px'; menu.style.top = '0px';
     menu.classList.add('open');
+    var menuWidth = menu.offsetWidth || 220, menuHeight = menu.offsetHeight || 360;
+    menu.style.left = Math.max(0, Math.min(e.clientX, window.innerWidth - menuWidth)) + 'px';
+    menu.style.top = Math.max(0, Math.min(e.clientY, window.innerHeight - menuHeight)) + 'px';
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCtxMenu(); });
 }

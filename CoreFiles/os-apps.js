@@ -8,10 +8,9 @@
 const APP_COLORS = {
   browser:'#0078d4', notepad:'#ff9500', calculator:'#5856d6', calendar:'#34c759',
   terminal:'#1c1c1e', code:'#007acc', paint:'#ff2d55', todolist:'#ff9500',
-  stickynotes:'#ffcc00', imageviewer:'#af52de', clock:'#5ac8fa', recyclebin:'#8e8e93',
+  stickynotes:'#ffcc00', imageviewer:'#af52de', clock:'#5ac8fa',
   search:'#0078d4', musicplayer:'#fc3158', markdowneditor:'#34c759',
-  settings:'#636366', filemanager:'#0078d4', games:'#ff375f',
-  voicerecorder:'#ff3b30', screenrecorder:'#ff3b30', appstore:'#0078d4',
+  settings:'#636366', games:'#ff375f', appstore:'#0078d4',
 };
 
 const apps = {
@@ -26,21 +25,15 @@ const apps = {
   stickynotes:    { name:'Sticky Notes',     icon:'📌', file:'os-apps/stickynotes.html',     category:'Productivity' },
   imageviewer:    { name:'Image Viewer',     icon:'🖼️', file:'os-apps/imageviewer.html',     category:'Media' },
   clock:          { name:'Clock',            icon:'⏰', file:'os-apps/clock.html',           category:'Utilities' },
-  recyclebin:     { name:'Recycle Bin',      icon:'🗑️', file:'os-apps/recyclebin.html',      category:'System' },
   search:         { name:'Search',           icon:'🔍', file:'os-apps/search.html',          category:'System' },
   musicplayer:    { name:'Music Player',     icon:'🎵', file:'os-apps/musicplayer.html',     category:'Media' },
   markdowneditor: { name:'Markdown Editor',  icon:'📄', file:'os-apps/markdowneditor.html',  category:'Productivity' },
   settings:       { name:'Settings',         icon:'⚙️', file:'settings/settings-main.html', category:'System' },
-  filemanager:    { name:'File Manager',     icon:'📁', file:'os-apps/filemanager.html',     category:'System' },
   games:          { name:'Games',            icon:'🎮', file:'os-apps/games.html',           category:'Entertainment' },
-  voicerecorder:  { name:'Voice Recorder',   icon:'🎙️', file:'os-apps/voicerecorder.html',  category:'Media' },
-  screenrecorder: { name:'Screen Recorder',  icon:'📹', file:'os-apps/screenrecorder.html', category:'Media' },
   appstore:       { name:'App Store',        icon:'🏪', file:'os-apps/appstore.html',        category:'System' },
-  videorecorder:  { name:'Video Recorder',   icon:'🎥', file:'os-apps/videorecorder.html',  category:'Media' },
   drawings:       { name:'Drawings',         icon:'✏️', file:'os-apps/drawings.html',         category:'Creative', width:1100, height:720 },
   videoeditor:    { name:'Video Editor',     icon:'🎬', file:'os-apps/videoeditor.html',      category:'Media',   width:1200, height:740 },
   vectoreditor:   { name:'Vector Editor',    icon:'🖊️', file:'os-apps/vectoreditor.html',     category:'Creative', width:1200, height:760 },
-  mediastream:    { name:'Media',            icon:'🎶', file:'os-apps/mediastream.html',     category:'Media' },
 };
 
 // Custom icons map — add image URLs here per app ID e.g. browser:'https://...'

@@ -269,6 +269,7 @@ function init() {
 
   window.addEventListener('resize', function() {
     Object.values(windows).forEach(function(w){ constrainWindow(w.element); });
+    if (typeof constrainDesktopIcons === 'function') constrainDesktopIcons();
   });
 
   // ── 13. Keyboard shortcuts ──
@@ -306,11 +307,9 @@ function init() {
     if (ctrl && !shift && e.key === 'b') { e.preventDefault(); openApp('browser');     return; }
     if (ctrl && !shift && e.key === 't') { e.preventDefault(); openApp('terminal');    return; }
     if (ctrl && !shift && e.key === 'n') { e.preventDefault(); openApp('notepad');     return; }
-    if (ctrl && !shift && e.key === 'e') { e.preventDefault(); openApp('filemanager'); return; }
     if (ctrl && !shift && e.key === ',') { e.preventDefault(); openApp('settings');    return; }
     if (ctrl && shift && e.key === 'C')  { e.preventDefault(); openApp('calculator');  return; }
     if (ctrl && shift && e.key === 'K')  { e.preventDefault(); openApp('clock');       return; }
-    if (ctrl && shift && e.key === 'S')  { e.preventDefault(); openApp('screenrecorder'); return; }
 
     // Theme toggle
     if (ctrl && shift && e.key === 'T') {

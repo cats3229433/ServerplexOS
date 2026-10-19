@@ -1,0 +1,35 @@
+{
+	"items": [
+
+		{
+			"title": "Game Repair in progress & more!",
+			"date": "2026-10-19",
+			"content": [
+				{
+					"type": "heading",
+					"text": "Game repair progress",
+					"level": 3
+				},
+				{
+					"type": "paragraph",
+					"text": "So we are going to begin working on fixing all the games that are currently broken. We are working on it on the order of what they are on our catelog. But if you have one that you want done now, email axel or ask him. But regardless of that, we will eventually fix everything. So wait and maybe the game you want will be fixed!"
+				},
+
+    { "type": "spacer", "size": "large" },
+
+    { "type": "heading", "text": "Apps, Browser, and App Store!", "level": 3 },
+    { "type": "paragraph", "text": "So we are working on the browser to get you all free. But we need the VPS and code for it. So we are working on that after the games are done. Then, with the apps, we will be working on them from fixing the themes, font color mismatch, and fuctionally. Also yes it is true, we are having an app store with other sites. So you have options." },
+    { "type": "spacer", "size": "large" },
+
+	    { "type": "heading", "text": "Our silent protest & revolution", "level": 3 },
+    { "type": "paragraph", "text": "Thank you for using our site, or anything to get around restrictions. This shows that you are part of the revelution from and by students against survellence and censoring. So thanks, you just being on our site helps! We all hate GoGuardian anyway." },
+    { "type": "spacer", "size": "large" },
+
+	  { "type": "paragraph", "text": "-Serverplex Development Team" }
+
+
+
+			]
+		}
+	]
+}

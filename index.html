@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google</title> <link id="favicon" rel="icon" type="image/x-icon" href="https://www.google.com/favicon.ico">
+    <title>Dashboard</title>
+    <link id="favicon" rel="icon" href="https://cdn.jsdelivr.net/gh/cats3229433/ServerplexOS/ServerplexSiteIcon.png">
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,23 +29,13 @@
         const frame = document.getElementById('mainFrame');
         const isReturningUser = localStorage.getItem('serverplex_setup_complete') === 'true';
 
-        // --- TAB CLOAKING LOGIC ---
-        // This ensures even if the HTML file is named index.html, 
-        // the browser tab looks like Google.
-        document.title = "Google";
-        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-        link.type = 'image/x-icon';
-        link.rel = 'shortcut icon';
-        link.href = 'https://www.google.com/favicon.ico';
-        document.getElementsByTagName('head')[0].appendChild(link);
-
         // --- NAVIGATION LOGIC ---
         window.addEventListener('DOMContentLoaded', () => {
             frame.src = 'placeholder.html';
 
-            // Wait exactly 4 seconds (4000ms) before switching
+            // First-time visitors set up a profile before choosing a boot mode.
             setTimeout(() => {
-                frame.src = 'bootmenu.html';
+                frame.src = isReturningUser ? 'bootmenu.html' : 'welcome.html';
             }, 4000); 
         });
 

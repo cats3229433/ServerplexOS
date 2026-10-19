@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ServerplexOS Browser</title>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Oxanium', sans-serif;
+      color: #e6edf3;
+      /* Navy at top-left, blending into black at bottom-right */
+      background: linear-gradient(135deg, #0a1f5c 0%, #0b1530 35%, #05070d 70%, #000000 100%);
+      background-attachment: fixed;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grey grid overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(140, 150, 165, 0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(140, 150, 165, 0.14) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Soft glow to add depth */
+    body::after {
+      content: "";
+      position: fixed;
+      width: 60vmax;
+      height: 60vmax;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(40, 90, 200, 0.18), transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      max-width: 620px;
+      margin: 1.5rem;
+      padding: 2.5rem 2.25rem;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      text-align: center;
+    }
+
+    .message {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+      line-height: 1.6;
+      letter-spacing: 0.02em;
+      color: #e6edf3;
+      text-shadow: 0 0 12px rgba(120, 170, 255, 0.25);
+    }
+
+    .divider {
+      height: 1px;
+      margin: 2rem 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+
+    .discord-btn {
+      display: inline-block;
+      padding: 0.85rem 2rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #5865f2, #3b48c9);
+      color: #ffffff;
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      box-shadow: 0 8px 24px rgba(88, 101, 242, 0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(88, 101, 242, 0.5);
+    }
+
+    .qr-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .qr-label {
+      font-size: 0.95rem;
+      color: rgba(230, 237, 243, 0.75);
+    }
+
+    .qr-code {
+      padding: 12px;
+      border-radius: 14px;
+      background: #ffffff;
+      line-height: 0;
+    }
+
+    .qr-code svg {
+      width: 160px;
+      height: 160px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="message">
+      The ServerplexOS Browser is currently under development. There is no set date for completion. So Join our Discord Server for updates and more!
+    </p>
+
+    <div class="divider"></div>
+
+    <a class="discord-btn" href="https://discord.gg/6zPGduTJRv" target="_blank" rel="noopener noreferrer">
+      Join the Serverplex Discord
+    </a>
+
+    <div class="divider"></div>
+
+    <div class="qr-block">
+      <div class="qr-code" id="qr"></div>
+      <span class="qr-label">Scan with your phone to join our Discord Server!</span>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var qr = qrcode(0, 'M');
+      qr.addData('https://discord.gg/6zPGduTJRv');
+      qr.make();
+      document.getElementById('qr').innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0 });
+    })();
+  </script>
+</body>
+</html>

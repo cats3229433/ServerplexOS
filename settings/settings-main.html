@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="../app-theme.js"></script>
+<script src="../CoreFiles/app-theme.js"></script>
 <meta charset="UTF-8">
 <title>Settings — ServerplexOS</title>
 <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
@@ -742,14 +742,22 @@ function changePin() {
   var p = prompt('Enter new 4-digit PIN:');
   if (p === null) return;
   if (!/^\d{4}$/.test(p)) { alert('PIN must be exactly 4 digits.'); return; }
+  var confirmPin = prompt('Confirm new 4-digit PIN:');
+  if (confirmPin === null) return;
+  if (p !== confirmPin) { alert('PINs do not match.'); return; }
   set('serverplex_pin', p);
+  localStorage.removeItem('serverplex_password');
   toast('PIN updated');
 }
 function changePassword() {
   var p = prompt('Enter new password (min 4 chars):');
   if (p === null) return;
   if (p.length < 4) { alert('Password too short.'); return; }
-  set('serverplex_password', btoa(p));
+  var confirmPassword = prompt('Confirm new password:');
+  if (confirmPassword === null) return;
+  if (p !== confirmPassword) { alert('Passwords do not match.'); return; }
+  set('serverplex_password', p);
+  localStorage.removeItem('serverplex_pin');
   toast('Password updated');
 }
 
@@ -818,9 +826,9 @@ function renderAbout() {
 
 // ── Icon Packs ────────────────────────────────
 var _IP_APP_IDS = ['browser','notepad','calculator','calendar','terminal','code','paint','todolist',
-  'stickynotes','imageviewer','clock','recyclebin','search','musicplayer','markdowneditor',
-  'settings','filemanager','games','voicerecorder','screenrecorder','appstore',
-  'videorecorder','drawings','videoeditor','vectoreditor','mediastream'];
+  'stickynotes','imageviewer','clock','search','musicplayer','markdowneditor',
+  'settings','games','appstore',
+  'drawings','videoeditor','vectoreditor'];
 
 function ipStatus(msg, ok) {
   var el = document.getElementById('ipStatus');

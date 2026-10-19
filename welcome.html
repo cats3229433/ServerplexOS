@@ -275,6 +275,15 @@
     .skip-row {
       margin-top: 14px; text-align: center;
     }
+    .wizard-skip {
+      position: fixed; top: 18px; right: 20px; z-index: 10;
+      padding: 8px 13px; border-radius: 9px;
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(9,14,24,.72); color: var(--muted);
+      font: 600 12px 'Oxanium',sans-serif; cursor: pointer;
+      backdrop-filter: blur(10px); transition: .18s ease;
+    }
+    .wizard-skip:hover { color: var(--text); border-color: rgba(255,255,255,.3); background: rgba(20,28,42,.9); }
     .btn-skip {
       display: inline-flex; align-items: center; gap: 7px;
       padding: 10px 20px;
@@ -483,6 +492,7 @@
     .shake { animation: shake 0.4s ease; }
 
     @media (max-width: 520px) {
+      .wizard-skip { top: 10px; right: 10px; padding: 7px 10px; font-size: 11px; }
       .card { padding: 32px 24px 28px; }
       .hero-wordmark { font-size: 28px; }
       .feature-strip { flex-direction: column; gap: 8px; }
@@ -493,6 +503,7 @@
 <body>
   <div class="bg-layer"></div>
   <div class="bg-grid"></div>
+  <button class="wizard-skip" type="button" onclick="skipSetup()">Skip setup</button>
 
   <div class="wizard">
     <div class="progress-track" id="progressTrack"></div>
@@ -513,7 +524,7 @@
         <div class="feature-strip">
           <div class="feature-pill">
             <div class="feature-pill-icon">🎮</div>
-            <div class="feature-pill-label">460+ Games</div>
+            <div class="feature-pill-label">500+ Games</div>
             <div class="feature-pill-desc">Unblocked & ready</div>
           </div>
           <div class="feature-pill">
@@ -1055,8 +1066,21 @@
 
     function launchOS() {
       localStorage.setItem('serverplex_setup_complete', 'true');
-      sessionStorage.setItem('serverplex_authed', 'true');
-      window.location.href = 'desktop.html';
+      sessionStorage.removeItem('serverplex_authed');
+      window.location.href = 'bootmenu.html';
+    }
+
+    function skipSetup() {
+      if (!localStorage.getItem('serverplex_username')) localStorage.setItem('serverplex_username', 'User');
+      if (!localStorage.getItem('serverplex_avatar')) localStorage.setItem('serverplex_avatar', '👤');
+      if (!localStorage.getItem('serverplex_theme')) localStorage.setItem('serverplex_theme', 'aurora');
+      if (!localStorage.getItem('serverplex_accent')) localStorage.setItem('serverplex_accent', '#00d4aa');
+      if (!localStorage.getItem('serverplex_clock_format')) localStorage.setItem('serverplex_clock_format', '12');
+      if (!localStorage.getItem('serverplex_notifications_enabled')) localStorage.setItem('serverplex_notifications_enabled', 'true');
+      if (!localStorage.getItem('serverplex_default_boot')) localStorage.setItem('serverplex_default_boot', 'lite');
+      localStorage.setItem('serverplex_setup_complete', 'true');
+      sessionStorage.removeItem('serverplex_authed');
+      window.location.href = 'bootmenu.html';
     }
 
     // Init

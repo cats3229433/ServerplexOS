@@ -1,177 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<script src="app-theme.js"></script>
-<meta charset="UTF-8"><title>Calendar</title>
-<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Oxanium',sans-serif;background:var(--app-bg);color:var(--app-text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{padding:16px 20px;background:var(--app-surface);border-bottom:1px solid var(--app-border);display:flex;align-items:center;gap:12px;flex-shrink:0}
-.nav-btn{background:rgba(128,128,128,0.05);border:1px solid var(--app-border);border-radius:8px;color:var(--app-text);padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px;transition:all 0.2s}
-.nav-btn:hover{background:var(--app-border)}
-.month-title{font-size:20px;font-weight:700;flex:1;text-align:center}
-.today-btn{background:var(--app-accent);border:none;border-radius:8px;color:white;padding:6px 14px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:13px}
-.view-btns{display:flex;gap:4px}
-.view-btn{background:rgba(128,128,128,0.05);border:1px solid var(--app-border);border-radius:6px;color:var(--app-text2);padding:5px 10px;cursor:pointer;font-family:'Oxanium',sans-serif;font-size:11px}
-.view-btn.active{background:var(--app-accent);color:white;border-color:var(--app-accent)}
-.main{flex:1;display:flex;overflow:hidden}
-.cal-wrap{flex:1;padding:16px;overflow-y:auto}
-.day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
-.day-header{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--app-text2);padding:8px 0;text-transform:uppercase}
-.day-header.weekend{color:var(--app-accent)}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.day-cell{min-height:90px;background:var(--app-surface);border:1px solid rgba(128,128,128,0.04);border-radius:8px;padding:8px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:3px}
-.day-cell:hover{background:var(--app-surface2);border-color:var(--app-border)}
-.day-cell.other{opacity:0.3}
-.day-cell.today{border-color:var(--app-accent);background:color-mix(in srgb, var(--app-accent) 15%, var(--app-bg))}
-.day-num{font-size:13px;font-weight:600;width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%}
-.day-cell.today .day-num{background:var(--app-accent);color:white}
-.event-dot{font-size:10px;padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sidebar{width:260px;background:var(--app-surface);border-left:1px solid var(--app-border);padding:16px;overflow-y:auto;flex-shrink:0}
-.sidebar h3{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--app-text2);margin-bottom:12px}
-.add-event{width:100%;padding:10px;background:var(--app-accent);border:none;border-radius:8px;color:white;font-family:'Oxanium',sans-serif;font-size:13px;cursor:pointer;margin-bottom:16px}
-.add-event:hover{background:var(--app-accent)}
-.event-form{background:var(--app-bg);border:1px solid var(--app-border);border-radius:8px;padding:12px;margin-bottom:16px;display:none}
-.event-form input,.event-form select{width:100%;padding:7px 10px;background:var(--app-surface);border:1px solid var(--app-border);border-radius:6px;color:var(--app-text);font-family:'Oxanium',sans-serif;font-size:12px;outline:none;margin-bottom:8px}
-.event-form input::placeholder{color:var(--app-text2)}
-.form-btns{display:flex;gap:6px}
-.form-btn{flex:1;padding:7px;border:none;border-radius:6px;font-family:'Oxanium',sans-serif;font-size:12px;cursor:pointer}
-.form-save{background:#238636;color:white}
-.form-cancel{background:var(--app-surface2);color:#ccc}
-.upcoming-event{padding:8px;background:var(--app-bg);border-left:3px solid var(--app-accent);border-radius:0 6px 6px 0;margin-bottom:6px;font-size:12px}
-.ue-title{font-weight:600;color:var(--app-text)}
-.ue-date{color:var(--app-text2);font-size:11px;margin-top:2px}
-.ev-colors{display:flex;gap:6px;margin-bottom:8px}
-.ev-color{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent}
-.ev-color.selected{border-color:white}
-.no-events{color:var(--app-text2);font-size:12px;padding:8px 0}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculator</title>
+  <script src="../CoreFiles/app-theme.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin:0; min-width:280px; height:100vh; padding:16px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--app-bg); color:var(--app-text);
+      font-family:'Oxanium',sans-serif;
+    }
+    .calculator {
+      width:min(100%,360px); padding:16px;
+      border:1px solid var(--app-border); border-radius:18px;
+      background:var(--app-surface); box-shadow:0 18px 44px rgba(0,0,0,.24);
+    }
+    .display {
+      height:112px; margin-bottom:14px; padding:14px;
+      display:flex; flex-direction:column; justify-content:flex-end; align-items:flex-end;
+      overflow:hidden; border-radius:12px; background:var(--app-surface2);
+    }
+    .expression {
+      width:100%; min-height:20px; color:var(--app-text2);
+      font-size:13px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    }
+    .value {
+      width:100%; color:var(--app-text); font-size:clamp(30px,9vw,44px);
+      line-height:1.15; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+      font-variant-numeric:tabular-nums;
+    }
+    .keys { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    button {
+      min-height:56px; border:1px solid var(--app-border); border-radius:11px;
+      background:var(--app-bg); color:var(--app-text); cursor:pointer;
+      font:700 18px 'Oxanium',sans-serif; transition:transform .1s,background .12s,border-color .12s;
+      -webkit-tap-highlight-color:transparent;
+    }
+    button:hover { background:var(--app-surface2); border-color:var(--app-accent); }
+    button:active { transform:scale(.96); }
+    button.utility { color:var(--app-text2); font-size:15px; }
+    button.operator { color:var(--app-accent); background:color-mix(in srgb,var(--app-accent) 10%,var(--app-bg)); }
+    button.equals { color:#fff; background:var(--app-accent); border-color:var(--app-accent); }
+    button.zero { grid-column:span 2; }
+    button:focus-visible { outline:2px solid var(--app-accent); outline-offset:2px; }
+  </style>
 </head>
 <body>
-
-<div class="header">
-  <button class="nav-btn" onclick="changeMonth(-1)">←</button>
-  <div class="month-title" id="monthTitle"></div>
-  <button class="nav-btn" onclick="changeMonth(1)">→</button>
-  <button class="today-btn" onclick="goToday()">Today</button>
-</div>
-<div class="main">
-  <div class="cal-wrap">
-    <div class="day-headers">
-      <div class="day-header weekend">Sun</div>
-      <div class="day-header">Mon</div>
-      <div class="day-header">Tue</div>
-      <div class="day-header">Wed</div>
-      <div class="day-header">Thu</div>
-      <div class="day-header">Fri</div>
-      <div class="day-header weekend">Sat</div>
+  <main class="calculator" aria-label="Calculator">
+    <div class="display" aria-live="polite">
+      <div class="expression" id="expression"></div>
+      <div class="value" id="display">0</div>
     </div>
-    <div class="cal-grid" id="calGrid"></div>
-  </div>
-  <div class="sidebar">
-    <h3>Events</h3>
-    <button class="add-event" onclick="toggleForm()">+ Add Event</button>
-    <div class="event-form" id="eventForm">
-      <input type="text" id="evTitle" placeholder="Event title">
-      <input type="date" id="evDate">
-      <input type="time" id="evTime" placeholder="Time (optional)">
-      <input type="text" id="evNote" placeholder="Notes (optional)">
-      <div class="ev-colors" id="evColors"></div>
-      <div class="form-btns">
-        <button class="form-btn form-save" onclick="saveEvent()">Save</button>
-        <button class="form-btn form-cancel" onclick="toggleForm()">Cancel</button>
-      </div>
+    <div class="keys">
+      <button class="utility" data-action="clear" aria-label="Clear">AC</button>
+      <button class="utility" data-action="sign" aria-label="Change sign">±</button>
+      <button class="utility" data-action="percent" aria-label="Percent">%</button>
+      <button class="operator" data-op="÷" aria-label="Divide">÷</button>
+      <button data-digit="7">7</button><button data-digit="8">8</button><button data-digit="9">9</button>
+      <button class="operator" data-op="×" aria-label="Multiply">×</button>
+      <button data-digit="4">4</button><button data-digit="5">5</button><button data-digit="6">6</button>
+      <button class="operator" data-op="−" aria-label="Subtract">−</button>
+      <button data-digit="1">1</button><button data-digit="2">2</button><button data-digit="3">3</button>
+      <button class="operator" data-op="+" aria-label="Add">+</button>
+      <button class="utility zero" data-action="zero">0</button><button data-action="decimal">.</button>
+      <button class="equals" data-action="equals" aria-label="Equals">=</button>
     </div>
-    <h3>Upcoming</h3>
-    <div id="upcomingList"></div>
-  </div>
-</div>
-<script>
-const COLORS=['var(--app-accent)','#238636','#da3633','#e3b341','#8957e5','#f78166'];
-let events=JSON.parse(localStorage.getItem('serverplex_calendar_events')||'[]');
-let cur=new Date(),selColor=COLORS[0];
-const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-const today=new Date();
+  </main>
+  <script>
+    (function() {
+      var display = document.getElementById('display');
+      var expression = document.getElementById('expression');
+      var current = '0';
+      var previous = null;
+      var operator = null;
+      var replaceCurrent = false;
+      var justEvaluated = false;
 
-function save(){localStorage.setItem('serverplex_calendar_events',JSON.stringify(events));}
-function dateStr(d){return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+      function render() {
+        display.textContent = current;
+        expression.textContent = operator && previous !== null ? previous + ' ' + operator : '';
+      }
+      function normalize(n) {
+        if (!Number.isFinite(n)) throw new Error('Invalid result');
+        if (Object.is(n, -0)) n = 0;
+        return String(Number(n.toPrecision(12)));
+      }
+      function apply(a, b, op) {
+        if (op === '+') return a + b;
+        if (op === '−') return a - b;
+        if (op === '×') return a * b;
+        if (op === '÷') {
+          if (b === 0) throw new Error('Cannot divide by zero');
+          return a / b;
+        }
+        return b;
+      }
+      function inputDigit(digit) {
+        if (replaceCurrent || justEvaluated) {
+          current = digit;
+          replaceCurrent = false;
+          justEvaluated = false;
+        } else if (current === '0') current = digit;
+        else if (current.replace('-', '').length < 14) current += digit;
+        render();
+      }
+      function chooseOperator(next) {
+        var value = Number(current);
+        try {
+          if (operator && !replaceCurrent) value = apply(previous, value, operator);
+          current = normalize(value);
+          previous = Number(current);
+          operator = next;
+          replaceCurrent = true;
+          justEvaluated = false;
+          render();
+        } catch (err) {
+          current = 'Error';
+          previous = null;
+          operator = null;
+          replaceCurrent = true;
+          expression.textContent = err.message;
+          display.textContent = current;
+        }
+      }
+      function equals() {
+        if (!operator || previous === null) return;
+        var right = Number(current);
+        var left = previous;
+        var op = operator;
+        try {
+          current = normalize(apply(left, right, op));
+          expression.textContent = left + ' ' + op + ' ' + right + ' =';
+          previous = null;
+          operator = null;
+          replaceCurrent = true;
+          justEvaluated = true;
+          display.textContent = current;
+        } catch (err) {
+          current = 'Error';
+          previous = null;
+          operator = null;
+          replaceCurrent = true;
+          expression.textContent = err.message;
+          display.textContent = current;
+        }
+      }
+      function clear() {
+        current = '0'; previous = null; operator = null;
+        replaceCurrent = false; justEvaluated = false;
+        render();
+      }
+      function action(name) {
+        if (name === 'clear') return clear();
+        if (name === 'zero') return inputDigit('0');
+        if (name === 'equals') return equals();
+        if (name === 'decimal') {
+          if (replaceCurrent || justEvaluated) { current = '0'; replaceCurrent = false; justEvaluated = false; }
+          if (!current.includes('.')) current += '.';
+          return render();
+        }
+        if (name === 'sign' && current !== '0' && current !== 'Error') {
+          current = current.charAt(0) === '-' ? current.slice(1) : '-' + current;
+          return render();
+        }
+        if (name === 'percent' && current !== 'Error') {
+          current = normalize(Number(current) / 100);
+          replaceCurrent = true;
+          return render();
+        }
+      }
 
-function render(){
-  document.getElementById('monthTitle').textContent=`${months[cur.getMonth()]} ${cur.getFullYear()}`;
-  const grid=document.getElementById('calGrid');
-  grid.innerHTML='';
-  const y=cur.getFullYear(),m=cur.getMonth();
-  const first=new Date(y,m,1).getDay();
-  const days=new Date(y,m+1,0).getDate();
-  const prevDays=new Date(y,m,0).getDate();
-  for(let i=first-1;i>=0;i--){
-    const cell=document.createElement('div');
-    cell.className='day-cell other';
-    cell.innerHTML=`<div class="day-num">${prevDays-i}</div>`;
-    grid.appendChild(cell);
-  }
-  for(let d=1;d<=days;d++){
-    const dateS=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday=d===today.getDate()&&m===today.getMonth()&&y===today.getFullYear();
-    const cell=document.createElement('div');
-    cell.className='day-cell'+(isToday?' today':'');
-    const dayEvs=events.filter(e=>e.date===dateS);
-    cell.innerHTML=`<div class="day-num">${d}</div>${dayEvs.map(e=>`<div class="event-dot" style="background:${e.color}22;color:${e.color};border-left:2px solid ${e.color}">${e.time?e.time+' ':''} ${e.title}</div>`).join('')}`;
-    cell.onclick=()=>clickDay(dateS);
-    grid.appendChild(cell);
-  }
-  renderUpcoming();
-}
-
-function renderUpcoming(){
-  const list=document.getElementById('upcomingList');
-  const todayS=dateStr(today);
-  const upcoming=events.filter(e=>e.date>=todayS).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,10);
-  list.innerHTML=upcoming.length?upcoming.map(e=>`<div class="upcoming-event" style="border-color:${e.color}"><div class="ue-title">${e.title}</div><div class="ue-date">${e.date}${e.time?' · '+e.time:''}</div></div>`).join(''):`<div class="no-events">No upcoming events</div>`;
-}
-
-function clickDay(date){
-  document.getElementById('evDate').value=date;
-  document.getElementById('eventForm').style.display='block';
-  document.getElementById('evTitle').focus();
-}
-
-function toggleForm(){
-  const f=document.getElementById('eventForm');
-  f.style.display=f.style.display==='block'?'none':'block';
-  if(f.style.display==='block'&&!document.getElementById('evDate').value){
-    document.getElementById('evDate').value=dateStr(new Date());
-  }
-}
-
-function saveEvent(){
-  const title=document.getElementById('evTitle').value.trim();
-  const date=document.getElementById('evDate').value;
-  if(!title||!date)return;
-  events.push({id:Date.now(),title,date,time:document.getElementById('evTime').value,note:document.getElementById('evNote').value,color:selColor});
-  save();
-  document.getElementById('evTitle').value='';
-  document.getElementById('evTime').value='';
-  document.getElementById('evNote').value='';
-  document.getElementById('eventForm').style.display='none';
-  render();
-}
-
-function changeMonth(d){cur.setMonth(cur.getMonth()+d);render();}
-function goToday(){cur=new Date(today);render();}
-
-// Color picker
-const cp=document.getElementById('evColors');
-COLORS.forEach(c=>{
-  const d=document.createElement('div');
-  d.className='ev-color'+(c===selColor?' selected':'');
-  d.style.background=c;
-  d.onclick=()=>{selColor=c;document.querySelectorAll('.ev-color').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');};
-  cp.appendChild(d);
-});
-
-render();
-</script>
+      document.querySelector('.keys').addEventListener('click', function(event) {
+        var button = event.target.closest('button');
+        if (!button) return;
+        if (button.dataset.digit !== undefined) inputDigit(button.dataset.digit);
+        else if (button.dataset.op) chooseOperator(button.dataset.op);
+        else action(button.dataset.action);
+      });
+      document.addEventListener('keydown', function(event) {
+        if (/^\d$/.test(event.key)) { inputDigit(event.key); return; }
+        if (event.key === '.') { action('decimal'); return; }
+        if (event.key === 'Enter' || event.key === '=') { event.preventDefault(); equals(); return; }
+        if (event.key === 'Escape') { clear(); return; }
+        if (event.key === 'Backspace') {
+          if (!replaceCurrent && current !== 'Error') current = current.length > 1 ? current.slice(0,-1) : '0';
+          render(); return;
+        }
+        var ops = {'+':'+','-':'−','*':'×','/':'÷'};
+        if (ops[event.key]) { event.preventDefault(); chooseOperator(ops[event.key]); }
+      });
+      render();
+    })();
+  </script>
 </body>
 </html>

@@ -383,6 +383,14 @@
         <div class="row-label">Confirm PIN</div>
         <input type="password" id="s-pin2" placeholder="Confirm new PIN" maxlength="16" style="width:180px;" />
       </div>
+      <div class="row">
+        <div class="row-label">New Password</div>
+        <input type="password" id="s-password" placeholder="Leave blank to keep current" autocomplete="new-password" style="width:180px;" />
+      </div>
+      <div class="row">
+        <div class="row-label">Confirm Password</div>
+        <input type="password" id="s-password2" placeholder="Confirm new password" autocomplete="new-password" style="width:180px;" />
+      </div>
     </div>
 
     <!-- Boot -->
@@ -510,6 +518,23 @@
 
     // ── Save all ──
     function saveAll() {
+      const pin1 = document.getElementById('s-pin').value;
+      const pin2 = document.getElementById('s-pin2').value;
+      const password1 = document.getElementById('s-password').value;
+      const password2 = document.getElementById('s-password2').value;
+      if ((pin1 || pin2) && (password1 || password2)) {
+        showToast('Choose either a PIN or a password');
+        return;
+      }
+      if ((pin1 || pin2) && (!/^\d{4}$/.test(pin1) || pin1 !== pin2)) {
+        showToast('Enter and confirm the same 4-digit PIN');
+        return;
+      }
+      if ((password1 || password2) && (password1.length < 4 || password1 !== password2)) {
+        showToast('Passwords must match and be at least 4 characters');
+        return;
+      }
+
       // Widgets
       set('serverplex_lite_widgets', JSON.stringify({
         clock:    document.getElementById('w-clock').checked,
@@ -546,20 +571,15 @@
       if (uname) set('serverplex_username', uname);
       if (avatar) set('serverplex_avatar', avatar);
 
-      // PIN
-      const pin1 = document.getElementById('s-pin').value;
-      const pin2 = document.getElementById('s-pin2').value;
-      if (pin1 || pin2) {
-        if (pin1 !== pin2) {
-          document.getElementById('s-pin2').style.borderColor = 'rgba(255,80,80,0.6)';
-          setTimeout(() => document.getElementById('s-pin2').style.borderColor = '', 2000);
-          showToast('PINs do not match');
-          return;
-        }
+      // Update login security only when a new credential was entered.
+      if (pin1) {
         set('serverplex_pin', pin1);
-        document.getElementById('s-pin').value  = '';
-        document.getElementById('s-pin2').value = '';
+        localStorage.removeItem('serverplex_password');
+      } else if (password1) {
+        set('serverplex_password', password1);
+        localStorage.removeItem('serverplex_pin');
       }
+      ['s-pin','s-pin2','s-password','s-password2'].forEach(id => document.getElementById(id).value = '');
 
       // Boot
       set('serverplex_default_boot', document.getElementById('s-default-boot').value);

@@ -297,10 +297,19 @@
       z-index: 10;
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.2s ease;
+      transition: opacity 0.2s ease, inset 0.28s cubic-bezier(0.2,0.8,0.2,1);
       display: flex;
       flex-direction: column;
     }
+    #app-overlay.game-focus-mode {
+      inset: 0;
+      z-index: 2147483000;
+    }
+    #app-overlay.game-focus-mode .app-topbar { display: none; }
+    #app-overlay.focus-entering { animation: liteFocusEnter 0.28s ease both; }
+    #app-overlay.focus-exiting { animation: liteFocusExit 0.24s ease both; }
+    @keyframes liteFocusEnter { from { opacity: .75; } to { opacity: 1; } }
+    @keyframes liteFocusExit { from { opacity: 1; } to { opacity: .78; } }
     #app-overlay.open {
       opacity: 1;
       pointer-events: all;
@@ -575,6 +584,7 @@
     const overlay   = document.getElementById('app-overlay');
     const appFrame  = document.getElementById('app-frame');
     const appTitle  = document.getElementById('app-overlay-title');
+    let focusExitTimer = null;
 
     function openApp(id, label, src) {
       currentApp = id;
@@ -589,12 +599,37 @@
     }
 
     function closeApp() {
+      setGameFocusMode(false, false);
       overlay.classList.remove('open');
       setTimeout(() => { appFrame.src = 'about:blank'; }, 250);
       currentApp = null;
       document.querySelectorAll('.dock-item').forEach(el => el.classList.remove('active'));
       document.getElementById('dock-home').classList.add('active');
     }
+
+    function setGameFocusMode(enabled, animate = true) {
+      clearTimeout(focusExitTimer);
+      focusExitTimer = null;
+      overlay.classList.remove('focus-entering', 'focus-exiting');
+      if (!enabled && overlay.classList.contains('game-focus-mode') && animate) {
+        overlay.classList.add('focus-exiting');
+        focusExitTimer = setTimeout(() => {
+          overlay.classList.remove('game-focus-mode', 'focus-exiting');
+          focusExitTimer = null;
+        }, 240);
+        return;
+      }
+      overlay.classList.toggle('game-focus-mode', enabled);
+      if (enabled && animate) overlay.classList.add('focus-entering');
+    }
+
+    window.addEventListener('message', event => {
+      const data = event.data;
+      if (event.origin !== location.origin || currentApp !== 'games' || !data ||
+          data.type !== 'serverplex-game-focus' || typeof data.enabled !== 'boolean' ||
+          event.source !== appFrame.contentWindow) return;
+      setGameFocusMode(data.enabled);
+    });
 
     function goHome() {
       if (overlay.classList.contains('open')) closeApp();

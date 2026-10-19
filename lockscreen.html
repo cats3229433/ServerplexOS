@@ -188,7 +188,9 @@ document.getElementById('pwEye').addEventListener('click', function() { var i = 
 document.getElementById('pwInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') submitPassword(); });
 function submitPassword() {
   var entered = document.getElementById('pwInput').value;
-  if (entered === savedPassword) { unlock(); }
+  var matches = entered === savedPassword;
+  if (!matches) { try { matches = btoa(entered) === savedPassword; } catch (e) {} }
+  if (matches) { unlock(); }
   else {
     var inp = document.getElementById('pwInput');
     inp.classList.add('shake'); document.getElementById('pwError').textContent = 'Incorrect password.'; inp.style.borderColor = 'rgba(255,80,80,.6)';

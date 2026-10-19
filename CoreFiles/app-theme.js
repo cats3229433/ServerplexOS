@@ -10,7 +10,7 @@
   var THEMES = {
     white:     { bg:'#f0f0f0', surface:'#ffffff', surface2:'#e8e8e8', text:'#111111', text2:'#4a4a4a', border:'#d0d0d0', accent:'#0078d4', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.1)' },
     black:     { bg:'#0a0a0a', surface:'#1e1e1e', surface2:'#2a2a2a', text:'#f0f0f0', text2:'#b8b8b8', border:'#444444', accent:'#0078d4', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.5)' },
-    grey:      { bg:'#6a6a6a', surface:'#707070', surface2:'#7a7a7a', text:'#ffffff', text2:'#eeeeee', border:'#999999', accent:'#4a9eff', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.3)' },
+    grey:      { bg:'#575757', surface:'#626262', surface2:'#6b6b6b', text:'#ffffff', text2:'#eeeeee', border:'#999999', accent:'#4a9eff', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.3)' },
     aurora:    { bg:'#0a0e1a', surface:'#0d1220', surface2:'#111830', text:'#e8f4f8', text2:'#9cbdd8', border:'#1e2d45', accent:'#00d4aa', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.6)' },
     tokyo:     { bg:'#1a1b2e', surface:'#1f2040', surface2:'#16213e', text:'#eef2ff', text2:'#b8c0d8', border:'#2d3561', accent:'#ff2d55', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.6)' },
     forest:    { bg:'#0d1f0e', surface:'#0f2210', surface2:'#1a321b', text:'#d4edda', text2:'#96c89e', border:'#1e3d20', accent:'#34c759', radius:'8px', shadow:'0 2px 12px rgba(0,0,0,0.6)' },
@@ -33,12 +33,46 @@
   var _theme  = localStorage.getItem('serverplex_theme')  || 'black';
   var _accent = localStorage.getItem('serverplex_accent') || '#0078d4';
 
+  function hexRgb(color) {
+    if (typeof color !== 'string') return null;
+    var value = color.trim().replace(/^#/, '');
+    if (/^[0-9a-f]{3}$/i.test(value)) value = value.split('').map(function(c){ return c + c; }).join('');
+    if (!/^[0-9a-f]{6}$/i.test(value)) return null;
+    return [0, 2, 4].map(function(i){ return parseInt(value.slice(i, i + 2), 16) / 255; });
+  }
+
+  function relativeLuminance(color) {
+    var rgb = hexRgb(color);
+    if (!rgb) return null;
+    var channels = rgb.map(function(value) {
+      return value <= 0.04045 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4);
+    });
+    return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+  }
+
+  function contrastRatio(foreground, background) {
+    var fg = relativeLuminance(foreground), bg = relativeLuminance(background);
+    if (fg === null || bg === null) return 0;
+    return (Math.max(fg, bg) + 0.05) / (Math.min(fg, bg) + 0.05);
+  }
+
+  function readableColor(color, backgrounds, minimum) {
+    if (backgrounds.every(function(bg){ return contrastRatio(color, bg) >= minimum; })) return color;
+    var blackScore = Math.min.apply(null, backgrounds.map(function(bg){ return contrastRatio('#000000', bg); }));
+    var whiteScore = Math.min.apply(null, backgrounds.map(function(bg){ return contrastRatio('#ffffff', bg); }));
+    return blackScore >= whiteScore ? '#000000' : '#ffffff';
+  }
+
   // ── Apply theme ───────────────────────────
   function applyTheme(themeId) {
     _theme = themeId;
     var savedAcc = localStorage.getItem('serverplex_accent');
     if (savedAcc) _accent = savedAcc;
     var t = Object.assign({}, THEMES[themeId] || THEMES['black'], { accent: _accent });
+    var textSurfaces = [t.bg, t.surface, t.surface2];
+    t.text = readableColor(t.text, textSurfaces, 4.5);
+    t.text2 = readableColor(t.text2, textSurfaces, 3);
+    t.accentText = readableColor('#ffffff', [t.accent], 4.5);
 
     var existing = document.getElementById('_appThemeStyle');
     if (existing) existing.remove();
@@ -55,6 +89,7 @@
         '--app-text2:'    + t.text2    + ';' +
         '--app-border:'   + t.border   + ';' +
         '--app-accent:'   + t.accent   + ';' +
+        '--app-accent-text:' + t.accentText + ';' +
         '--app-radius:'   + t.radius   + ';' +
         '--app-shadow:'   + t.shadow   + ';' +
         '--app-font:"Oxanium",sans-serif;' +
@@ -118,12 +153,14 @@
         'font-weight:700;' +
         'border-radius:var(--app-radius);' +
         'border:none;' +
+        'background:var(--app-surface2);' +
+        'color:var(--app-text);' +
         'cursor:pointer;' +
         'transition:opacity .15s,transform .15s,background .15s;' +
       '}' +
       'button:hover{opacity:.88}' +
-      'button:active{transform:scale(.97)}'
-      ':focus-visible{outline:2px solid var(--app-accent);outline-offset:2px;}' + +
+      'button:active{transform:scale(.97)}' +
+      ':focus-visible{outline:2px solid var(--app-accent);outline-offset:2px;}' +
 
       // ── Utility classes every app can use ──
       // Selection
@@ -134,7 +171,12 @@
       '.at-card-row:last-child{border-bottom:none}' +
       // Buttons
       '.at-btn{padding:8px 16px;background:var(--app-surface2);color:var(--app-text);border:1px solid var(--app-border)}' +
-      '.at-btn-primary{background:var(--app-accent);color:#fff;border:none}' +
+      '.at-btn-primary{background:var(--app-accent);color:var(--app-accent-text);border:none}' +
+      '.play-btn,.mini-btn:not(.ghost):not(.danger),.play-circle,.btn-play,.batt-btn.primary,.search-go,' +
+      '.tb-btn.accent,.pc-btn.play,.modal-btn.primary,.modal-install.get,.today-btn,.view-btn.active,' +
+      '.add-event,.day-cell.today .day-num,.filter-btn.active,.equals,.tool-btn.active,.tb-btn.active,' +
+      '.ctrl-btn[style*="--app-accent"],.w-btn-p,.status-bar,.s-btn-primary,.proxy-save,.proxy-badge,' +
+      '.nt-add-save,.collapse-btn,.reader-exit{color:var(--app-accent-text)!important}' +
       '.at-btn-danger{background:rgba(255,59,48,.1);color:#ff3b30;border:1px solid rgba(255,59,48,.3)}' +
       // Labels
       '.at-label{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--app-text);opacity:.65}' +

@@ -10,6 +10,9 @@ var ALL_GAMES = [
   ...(typeof RADON_GAMES            !== 'undefined' ? RADON_GAMES            : []),
   ...(typeof CHILIBOWL_GAMES        !== 'undefined' ? CHILIBOWL_GAMES        : []),
   ...(typeof MINECRAFT_CLIENTS      !== 'undefined' ? MINECRAFT_CLIENTS      : []),
+  ...(typeof SKIRTS_SLOPE_GAMES     !== 'undefined' ? SKIRTS_SLOPE_GAMES     : []),
+  ...(typeof HELLGAMES_GAMES        !== 'undefined' ? HELLGAMES_GAMES        : []),
+  ...(typeof INDIAMONDA_GAMES       !== 'undefined' ? INDIAMONDA_GAMES       : []),
 ];
 
 // Deduplicate by normalized name.
@@ -27,6 +30,9 @@ var ALL_GAMES = [
     'Radon-Games':         7,
     'ChiliBowl':           6,
     'MinecraftClients':    5,
+    'Skirts-Slope':        4,
+    'Hellgames':           3,
+    'IndiaMonda':          2,
   };
 
   var grouped = {};

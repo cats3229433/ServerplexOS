@@ -313,18 +313,14 @@
       <div class="login-username" id="loginUsername">USER</div>
       <div class="login-subtitle">ServerplexOS</div>
 
-      <div class="input-group">
+      <div class="input-group" id="credentialGroup">
         <input type="password" id="passwordInput" placeholder="Enter PIN or leave blank" autocomplete="off" />
         <span class="input-icon" id="togglePassword">👁</span>
       </div>
 
       <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign In →</button>
 
-      <div class="error-msg" id="errorMsg"></div>
-
-      <div class="login-hint">
-        No account? <span onclick="guestLogin()">Continue as Guest</span>
-      </div>
+      <div class="error-msg" id="errorMsg" role="alert" aria-live="polite"></div>
     </div>
   </div>
 
@@ -339,11 +335,38 @@
   <script>
     // ===== Load saved user info =====
     var savedUsername = localStorage.getItem('serverplex_username') || 'User';
-    var savedAvatar   = localStorage.getItem('serverplex_avatar')   || '👤';
-    var savedPin      = localStorage.getItem('serverplex_pin')      || '';
+    var savedAvatar = localStorage.getItem('serverplex_avatar') || '👤';
+    var savedAvatarImage = localStorage.getItem('serverplex_avatar_image') || '';
+    var savedPin = localStorage.getItem('serverplex_pin') || '';
+    var savedPassword = localStorage.getItem('serverplex_password') || '';
+    var savedPasskey = localStorage.getItem('serverplex_passkey') || '';
+    var hasCredential = !!(savedPin || savedPassword || savedPasskey);
+
+    if (localStorage.getItem('serverplex_setup_complete') !== 'true') {
+      window.location.replace('welcome.html');
+    } else if (savedPasskey) {
+      // Use the shared lock screen, which supports passkeys and fallback credentials.
+      window.location.replace('lockscreen.html');
+    }
 
     document.getElementById('loginUsername').textContent = savedUsername.toUpperCase();
-    document.getElementById('loginAvatar').textContent = savedAvatar;
+    var avatarEl = document.getElementById('loginAvatar');
+    if (savedAvatarImage) {
+      var avatarImg = document.createElement('img');
+      avatarImg.src = savedAvatarImage;
+      avatarImg.alt = 'User avatar';
+      avatarImg.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+      avatarEl.replaceChildren(avatarImg);
+    } else avatarEl.textContent = savedAvatar;
+    if (!hasCredential) {
+      document.getElementById('credentialGroup').style.display = 'none';
+      document.getElementById('loginBtn').textContent = 'Launch →';
+    } else {
+      document.getElementById('passwordInput').placeholder = savedPin && savedPassword
+        ? 'Enter your PIN or password'
+        : (savedPin ? 'Enter your 4-digit PIN' : 'Enter your password');
+      document.getElementById('loginBtn').textContent = 'Sign In →';
+    }
 
     // ===== Clock =====
     function updateClock() {
@@ -364,32 +387,30 @@
       input.type = input.type === 'password' ? 'text' : 'password';
     };
 
-    // ===== Enter key to login =====
     document.getElementById('passwordInput').addEventListener('keydown', e => {
       if (e.key === 'Enter') doLogin();
     });
 
-    // ===== Login logic =====
+    function passwordMatches(entered, stored) {
+      if (entered === stored) return true;
+      // Older Settings builds stored ASCII passwords as base64.
+      try { return btoa(entered) === stored; } catch (e) { return false; }
+    }
+
     function doLogin() {
       const entered = document.getElementById('passwordInput').value;
       const errorMsg = document.getElementById('errorMsg');
+      const valid = !hasCredential || (savedPin && entered === savedPin) ||
+        (savedPassword && passwordMatches(entered, savedPassword));
 
-      if (savedPin && entered !== savedPin) {
-        errorMsg.textContent = 'Incorrect PIN. Try again.';
+      if (!valid) {
+        errorMsg.textContent = savedPin && savedPassword
+          ? 'Incorrect PIN or password. Try again.'
+          : (savedPin ? 'Incorrect PIN. Try again.' : 'Incorrect password. Try again.');
         document.getElementById('passwordInput').style.borderColor = 'rgba(255,80,80,0.6)';
-        setTimeout(() => {
-          errorMsg.textContent = '';
-          document.getElementById('passwordInput').style.borderColor = '';
-        }, 2000);
+        document.getElementById('passwordInput').focus();
         return;
       }
-
-      launchOS();
-    }
-
-    function guestLogin() {
-      localStorage.setItem('serverplex_username', 'Guest');
-      localStorage.setItem('serverplex_avatar', '👤');
       launchOS();
     }
 
@@ -397,8 +418,9 @@
       const overlay = document.getElementById('launchOverlay');
       overlay.classList.add('visible');
       setTimeout(() => {
-        sessionStorage.setItem('serverplex_authed', 'true'); window.location.href = 'desktop.html';
-      }, 1200);
+        sessionStorage.setItem('serverplex_authed', 'true');
+        window.location.href = 'desktop.html';
+      }, 500);
     }
 
     // ===== Boot sequence =====
@@ -410,11 +432,8 @@
     ];
     const bootStatus = document.getElementById('bootStatus');
     let msgIndex = 0;
-
     const msgInterval = setInterval(() => {
-      if (msgIndex < bootMessages.length) {
-        bootStatus.textContent = bootMessages[msgIndex++];
-      }
+      if (msgIndex < bootMessages.length) bootStatus.textContent = bootMessages[msgIndex++];
     }, 700);
 
     function showLoginScreen() {
@@ -426,12 +445,10 @@
         bootScreen.style.display = 'none';
         loginScreen.classList.add('visible');
         document.getElementById('loginCard').style.animationPlayState = 'running';
-        document.getElementById('passwordInput').focus();
+        if (hasCredential) document.getElementById('passwordInput').focus();
       }, 600);
     }
-
-    // Show login after ~3.5s
-    setTimeout(showLoginScreen, 3500);
+    setTimeout(showLoginScreen, 1200);
   </script>
 </body>
 </html>

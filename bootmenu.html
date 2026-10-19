@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ServerplexOS — Boot</title>
+  <script>
+    if (localStorage.getItem('serverplex_setup_complete') !== 'true') {
+      window.location.replace('welcome.html');
+    }
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -359,6 +364,211 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* ── Updates and announcements ── */
+    .update-log-btn {
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      color: rgba(255,255,255,0.55);
+      font-family: 'Oxanium', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+    }
+    .update-log-btn:hover, .update-log-btn.has-unread {
+      border-color: rgba(0,120,212,0.45);
+      color: #fff;
+      background: rgba(0,120,212,0.1);
+    }
+    .update-log-count {
+      min-width: 18px;
+      height: 18px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0 5px;
+      border-radius: 9px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .update-log-count.visible { display: inline-flex; }
+    .updates-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(0,0,0,0.24);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .updates-overlay.open { opacity: 1; pointer-events: all; }
+    .updates-panel {
+      display: flex;
+      flex-direction: column;
+      width: min(720px, 100%);
+      max-height: min(70vh, 540px);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 12px;
+      background: rgba(14,14,14,0.78);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.42);
+      transform: translateY(12px);
+      transition: transform 0.22s ease;
+    }
+    .updates-overlay.open .updates-panel { transform: translateY(0); }
+    .updates-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .updates-heading { min-width: 0; }
+    .updates-kind {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--accent);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .updates-header h2 {
+      overflow-wrap: anywhere;
+      color: rgba(255,255,255,0.92);
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .updates-close {
+      border: 0;
+      background: none;
+      color: rgba(255,255,255,0.45);
+      font-size: 22px;
+      cursor: pointer;
+    }
+    .updates-close:hover { color: #fff; }
+    .update-items { min-height: 130px; overflow-y: auto; padding: 20px 22px; }
+    .update-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      max-height: min(42vh, 320px);
+      overflow-y: auto;
+    }
+    .update-item-meta {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+      color: rgba(255,255,255,0.38);
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .update-item-kind { color: var(--accent); }
+    .update-item-title { margin-bottom: 9px; color: rgba(255,255,255,0.9); font-size: 15px; }
+    .update-item-message { color: rgba(255,255,255,0.66); font-size: 12px; line-height: 1.75; white-space: pre-wrap; }
+    .update-item-content { display: flex; flex-direction: column; width: 100%; gap: 10px; }
+    .update-item-content-heading { color: rgba(255,255,255,0.9); font-weight: 700; line-height: 1.4; }
+    .update-item-content-heading.level-3 { font-size: 14px; }
+    .update-item-content-heading.level-4 { font-size: 12px; }
+    .update-item-content-heading.level-5 { font-size: 11px; }
+    .update-item-paragraph { color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1.75; white-space: pre-wrap; }
+    .update-item-spacer.small { height: 6px; }
+    .update-item-spacer.medium { height: 14px; }
+    .update-item-spacer.large { height: 24px; }
+    .update-item-list { padding-left: 22px; color: rgba(255,255,255,0.72); font-size: 12px; line-height: 1.8; }
+    .update-item-list li + li { margin-top: 3px; }
+    .update-item-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      width: fit-content;
+      margin-top: 2px;
+      padding: 0 14px;
+      border: 1px solid rgba(0,120,212,0.5);
+      border-radius: 7px;
+      background: rgba(0,120,212,0.2);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .update-item-button:hover { background: rgba(0,120,212,0.34); border-color: rgba(0,150,255,0.7); }
+    .update-item-button.secondary { border-color: rgba(255,255,255,0.18); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.82); }
+    .update-item-button.secondary:hover { background: rgba(255,255,255,0.12); }
+    .update-item-button-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 9px;
+      background: rgba(255,255,255,0.035);
+    }
+    .update-item-button-image-frame { position: relative; align-self: start; width: 100%; aspect-ratio: 1; overflow: hidden; }
+    .update-item-button-image { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+    .update-item-button-details { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; min-width: 0; padding: 12px; }
+    .update-item-button-description { color: rgba(255,255,255,0.72); font-size: 11px; line-height: 1.6; white-space: pre-wrap; }
+    .update-item-link { display: inline-block; margin-top: 9px; color: #8bc8ff; font-size: 11px; text-decoration: none; }
+    .update-item-link:hover { text-decoration: underline; }
+    .updates-empty { padding: 36px 10px; color: rgba(255,255,255,0.38); font-size: 12px; text-align: center; }
+    .updates-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 22px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .updates-position { color: rgba(255,255,255,0.36); font-size: 10px; letter-spacing: 1px; }
+    .updates-actions { display: flex; align-items: center; gap: 8px; }
+    .updates-action {
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 7px;
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.72);
+      font-family: 'Oxanium', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      cursor: pointer;
+    }
+    .updates-action:hover { background: rgba(255,255,255,0.09); color: #fff; }
+    .updates-action.primary { border-color: rgba(0,120,212,0.5); background: rgba(0,120,212,0.2); color: #fff; }
+    .updates-action[hidden] { display: none; }
+    @media (max-width: 600px) {
+      .update-log-btn { bottom: 18px; left: 18px; }
+      .settings-btn { bottom: 18px; right: 18px; }
+      .updates-panel { max-height: 82vh; }
+      .updates-header { padding: 15px 16px 12px; }
+      .update-items { padding: 16px; }
+      .updates-footer { padding: 10px 16px; }
+    }
   </style>
 </head>
 <body>
@@ -414,7 +624,10 @@
 
   <!-- Settings button -->
   <button class="settings-btn" onclick="openSettings()" title="Boot settings">⚙</button>
-
+  <button class="update-log-btn" id="updateLogButton" onclick="openUpdateLog()" title="View announcements and updates">
+    <span aria-hidden="true">◷</span><span>Update log</span>
+    <span class="update-log-count" id="updateLogCount" aria-label="unread items">0</span>
+  </button>
   <!-- Settings panel -->
   <div class="settings-overlay" id="settingsOverlay" onclick="overlayClick(event)">
     <div class="settings-panel">
@@ -454,6 +667,26 @@
 
   <div class="save-toast" id="saveToast">Settings saved</div>
 
+  <div class="updates-overlay" id="updatesOverlay" onclick="updateOverlayClick(event)" role="dialog" aria-modal="true" aria-labelledby="updatesTitle">
+    <section class="updates-panel">
+      <header class="updates-header">
+        <div class="updates-heading">
+          <span class="updates-kind" id="updatesKind">Announcement</span>
+          <h2 id="updatesTitle">New post</h2>
+        </div>
+        <button class="updates-close" onclick="closeUpdateLog()" aria-label="Close and resume boot menu">×</button>
+      </header>
+      <div class="update-items" id="updateItems"></div>
+      <footer class="updates-footer">
+        <span class="updates-position" id="updatesPosition"></span>
+        <div class="updates-actions">
+          <button class="updates-action" onclick="closeUpdateLog()">Close</button>
+          <button class="updates-action primary" id="updatesNext" onclick="nextUpdateItem()">Next →</button>
+        </div>
+      </footer>
+    </section>
+  </div>
+
   <script>
     // ── CSS variable for accent (reads from localStorage like the main OS) ──
     const accent = localStorage.getItem('serverplex_accent') || '#0078d4';
@@ -463,15 +696,20 @@
     let selected = localStorage.getItem('serverplex_default_boot') || 'lite';
     let countdown = 10;
     let timer;
+    let updateEntries = [];
+    let unreadEntries = [];
+    let activeUpdateSequence = [];
+    let activeUpdateIndex = 0;
+    const updateSeenKey = 'serverplex_update_log_seen';
 
     // ── Apply selection visually ──
-    function select(mode) {
+    function select(mode, startTimer = true) {
       selected = mode;
       document.getElementById('card-full').classList.toggle('selected', mode === 'full');
       document.getElementById('card-lite').classList.toggle('selected', mode === 'lite');
       document.getElementById('countdownTarget').textContent =
         mode === 'full' ? 'ServerplexOS' : 'ServerplexOS Lite';
-      resetCountdown();
+      if (startTimer) resetCountdown();
     }
 
     function handleCardKey(e, mode) {
@@ -481,6 +719,10 @@
     // ── Keyboard shortcuts ──
     document.addEventListener('keydown', e => {
       if (document.getElementById('settingsOverlay').classList.contains('open')) return;
+      if (document.getElementById('updatesOverlay').classList.contains('open')) {
+        if (e.key === 'Escape') closeUpdateLog();
+        return;
+      }
       if (e.key === '1') select('full');
       if (e.key === '2') select('lite');
       if (e.key === 'Enter') boot();
@@ -491,7 +733,8 @@
       clearInterval(timer);
       if (selected === 'full') {
         const authed = sessionStorage.getItem('serverplex_authed') === 'true';
-        window.location.href = authed ? 'desktop.html' : 'account.html';
+        const hasPasskey = !!localStorage.getItem('serverplex_passkey');
+        window.location.href = authed ? 'desktop.html' : hasPasskey ? 'lockscreen.html' : 'account.html';
       } else {
         window.location.href = 'lite/lite.html';
       }
@@ -583,8 +826,283 @@
       setTimeout(() => t.classList.remove('show'), 2200);
     }
 
+    // ── Announcements and updates ──
+    function normalizeUpdateContent(blocks) {
+      if (!Array.isArray(blocks)) return [];
+      return blocks.flatMap(block => {
+        if (!block || typeof block !== 'object') return [];
+        if (block.type === 'heading' && typeof block.text === 'string') {
+          const level = [3, 4, 5].includes(Number(block.level)) ? Number(block.level) : 3;
+          return [{ type: 'heading', text: block.text, level }];
+        }
+        if (block.type === 'paragraph' && typeof block.text === 'string') {
+          return [{ type: 'paragraph', text: block.text }];
+        }
+        if (block.type === 'spacer') {
+          const size = ['small', 'medium', 'large'].includes(block.size) ? block.size : 'medium';
+          return [{ type: 'spacer', size }];
+        }
+        if (block.type === 'list' && Array.isArray(block.items)) {
+          const items = block.items.filter(item => typeof item === 'string');
+          return items.length ? [{ type: 'list', items, ordered: block.ordered === true }] : [];
+        }
+        if (block.type === 'button' && typeof block.text === 'string' && typeof block.url === 'string') {
+          const style = block.style === 'secondary' ? 'secondary' : 'primary';
+          return [{
+            type: 'button',
+            text: block.text,
+            url: block.url,
+            style,
+            image: typeof block.image === 'string' ? block.image : '',
+            imageAlt: typeof block.imageAlt === 'string' ? block.imageAlt : '',
+            description: typeof block.description === 'string' ? block.description : ''
+          }];
+        }
+        return [];
+      });
+    }
+
+    async function readUpdateFile(path, type) {
+      try {
+        const response = await fetch(path);
+        if (!response.ok) return [];
+        const data = await response.json();
+        const items = Array.isArray(data) ? data : data.items;
+        if (!Array.isArray(items)) return [];
+        return items.flatMap(item => {
+          if (!item || !item.title || !item.date || Number.isNaN(Date.parse(item.date))) return [];
+          const content = normalizeUpdateContent(item.content);
+          const message = item.message ? String(item.message) : '';
+          if (!message && !content.length) return [];
+          const title = String(item.title);
+          const date = String(item.date);
+          return [{
+            type,
+            title,
+            date,
+            message,
+            content,
+            link: item.link ? String(item.link) : '',
+            key: type + ':' + date + ':' + title
+          }];
+        });
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function createUpdateLink(href, label, className) {
+      try {
+        const url = new URL(href, window.location.href);
+        if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+        const link = document.createElement('a');
+        link.className = className;
+        link.href = url.href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = label;
+        return link;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function renderUpdateContent(entry, blocks) {
+      const content = document.createElement('div');
+      content.className = 'update-item-content';
+      blocks.forEach(block => {
+        if (block.type === 'heading') {
+          const heading = document.createElement('h' + block.level);
+          heading.className = 'update-item-content-heading level-' + block.level;
+          heading.textContent = block.text;
+          content.appendChild(heading);
+        } else if (block.type === 'paragraph') {
+          const paragraph = document.createElement('p');
+          paragraph.className = 'update-item-paragraph';
+          paragraph.textContent = block.text;
+          content.appendChild(paragraph);
+        } else if (block.type === 'spacer') {
+          const spacer = document.createElement('div');
+          spacer.className = 'update-item-spacer ' + block.size;
+          spacer.setAttribute('aria-hidden', 'true');
+          content.appendChild(spacer);
+        } else if (block.type === 'list') {
+          const list = document.createElement(block.ordered ? 'ol' : 'ul');
+          list.className = 'update-item-list';
+          block.items.forEach(text => {
+            const listItem = document.createElement('li');
+            listItem.textContent = text;
+            list.appendChild(listItem);
+          });
+          content.appendChild(list);
+        } else if (block.type === 'button') {
+          const style = block.style === 'secondary' ? ' secondary' : '';
+          const button = createUpdateLink(block.url, block.text, 'update-item-button' + style);
+          if (button && block.image) {
+            try {
+              const imageUrl = new URL(block.image, window.location.href);
+              if (imageUrl.protocol === 'http:' || imageUrl.protocol === 'https:') {
+                const card = document.createElement('div');
+                card.className = 'update-item-button-card';
+                const imageFrame = document.createElement('div');
+                imageFrame.className = 'update-item-button-image-frame';
+                const image = document.createElement('img');
+                image.className = 'update-item-button-image';
+                image.src = imageUrl.href;
+                image.alt = block.imageAlt || block.description || block.text;
+                image.loading = 'lazy';
+                imageFrame.appendChild(image);
+                const details = document.createElement('div');
+                details.className = 'update-item-button-details';
+                if (block.description) {
+                  const description = document.createElement('p');
+                  description.className = 'update-item-button-description';
+                  description.textContent = block.description;
+                  details.appendChild(description);
+                }
+                details.appendChild(button);
+                card.append(imageFrame, details);
+                content.appendChild(card);
+              } else {
+                content.appendChild(button);
+              }
+            } catch (error) {
+              content.appendChild(button);
+            }
+          } else if (button) {
+            content.appendChild(button);
+          }
+        }
+      });
+      entry.appendChild(content);
+    }
+
+    function readSeenUpdateKeys() {
+      try {
+        const keys = JSON.parse(localStorage.getItem(updateSeenKey) || '[]');
+        return new Set(Array.isArray(keys) ? keys : []);
+      } catch (error) {
+        return new Set();
+      }
+    }
+
+    function updateUnreadPreview() {
+      const button = document.getElementById('updateLogButton');
+      const count = document.getElementById('updateLogCount');
+      const unreadCount = unreadEntries.length;
+      count.textContent = unreadCount;
+      count.classList.toggle('visible', unreadCount > 0);
+      button.classList.toggle('has-unread', unreadCount > 0);
+    }
+
+    async function loadUpdateLog() {
+      const base = 'updates%2Bannouncements/';
+      const result = await Promise.all([
+        readUpdateFile(base + 'announcements.json', 'Announcement'),
+        readUpdateFile(base + 'updates.json', 'Update')
+      ]);
+      updateEntries = result.flat().sort((a, b) => Date.parse(b.date) - Date.parse(a.date));
+      const seen = readSeenUpdateKeys();
+      unreadEntries = updateEntries.filter(item => !seen.has(item.key));
+      updateUnreadPreview();
+      if (unreadEntries.length) openUpdateSequence(unreadEntries);
+      else resetCountdown();
+    }
+
+    function markUpdateSeen(item) {
+      const seen = readSeenUpdateKeys();
+      if (!seen.has(item.key)) {
+        seen.add(item.key);
+        localStorage.setItem(updateSeenKey, JSON.stringify(Array.from(seen)));
+      }
+      unreadEntries = updateEntries.filter(entry => !seen.has(entry.key));
+      updateUnreadPreview();
+    }
+
+    function renderCurrentUpdate() {
+      const container = document.getElementById('updateItems');
+      container.replaceChildren();
+      const item = activeUpdateSequence[activeUpdateIndex];
+      const next = document.getElementById('updatesNext');
+      const position = document.getElementById('updatesPosition');
+      const kind = document.getElementById('updatesKind');
+      const title = document.getElementById('updatesTitle');
+
+      if (!item) {
+        kind.textContent = 'Update Log';
+        title.textContent = 'No announcements or updates yet';
+        const empty = document.createElement('div');
+        empty.className = 'updates-empty';
+        empty.textContent = 'New posts will appear here.';
+        container.appendChild(empty);
+        position.textContent = '';
+        next.hidden = true;
+        return;
+      }
+
+      kind.textContent = item.type;
+      title.textContent = item.title;
+      position.textContent = (activeUpdateIndex + 1) + ' / ' + activeUpdateSequence.length;
+      next.hidden = activeUpdateIndex >= activeUpdateSequence.length - 1;
+
+      const entry = document.createElement('article');
+      entry.className = 'update-item';
+      const meta = document.createElement('div');
+      meta.className = 'update-item-meta';
+      const date = document.createElement('time');
+      date.dateTime = item.date;
+      const parsedDate = new Date(item.date + 'T00:00:00');
+      date.textContent = Number.isNaN(parsedDate.getTime()) ? item.date : parsedDate.toLocaleDateString();
+      meta.appendChild(date);
+      entry.appendChild(meta);
+      if (item.content.length) {
+        renderUpdateContent(entry, item.content);
+      } else {
+        const message = document.createElement('p');
+        message.className = 'update-item-message';
+        message.textContent = item.message;
+        entry.appendChild(message);
+      }
+
+      if (item.link) {
+        const link = createUpdateLink(item.link, 'Open link ↗', 'update-item-link');
+        if (link) entry.appendChild(link);
+      }
+      container.appendChild(entry);
+      markUpdateSeen(item);
+    }
+
+    function openUpdateSequence(entries) {
+      clearInterval(timer);
+      activeUpdateSequence = entries.slice();
+      activeUpdateIndex = 0;
+      renderCurrentUpdate();
+      document.getElementById('updatesOverlay').classList.add('open');
+    }
+
+    function nextUpdateItem() {
+      if (activeUpdateIndex + 1 < activeUpdateSequence.length) {
+        activeUpdateIndex++;
+        renderCurrentUpdate();
+      }
+    }
+
+    function openUpdateLog() {
+      openUpdateSequence(updateEntries);
+    }
+
+    function closeUpdateLog() {
+      document.getElementById('updatesOverlay').classList.remove('open');
+      resetCountdown();
+    }
+
+    function updateOverlayClick(event) {
+      if (event.target === document.getElementById('updatesOverlay')) closeUpdateLog();
+    }
+
     // ── Init ──
-    select(selected);
+    select(selected, false);
+    loadUpdateLog();
   </script>
 </body>
 </html>

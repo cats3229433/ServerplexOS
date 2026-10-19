@@ -38,6 +38,7 @@ input[type=text]:focus,input[type=password]:focus{border-color:var(--app-accent)
 .btn-danger{background:rgba(255,59,48,.12);color:#ff3b30;border:1px solid rgba(255,59,48,.3)}
 .btn-danger:hover{background:rgba(255,59,48,.22)}
 .success{padding:10px 14px;background:rgba(52,199,89,.15);color:#34c759;border:1px solid rgba(52,199,89,.3);border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+.error{padding:10px 14px;background:rgba(255,59,48,.12);color:#ff6b6b;border:1px solid rgba(255,59,48,.3);border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
 .footer-row{padding:14px 16px;display:flex;gap:10px}
 </style>
 </head>
@@ -56,6 +57,7 @@ input[type=text]:focus,input[type=password]:focus{border-color:var(--app-accent)
       </div>
     </div>
     <div class="success" id="successMsg">✅ Profile saved successfully!</div>
+    <div class="error" id="errorMsg" role="alert"></div>
     <div class="row">
       <div class="row-info"><div class="row-label">Username</div><div class="row-desc">Your display name across the OS</div></div>
       <input type="text" id="usernameInput" placeholder="Enter username" maxlength="24">
@@ -84,13 +86,21 @@ input[type=text]:focus,input[type=password]:focus{border-color:var(--app-accent)
 <div class="section">
   <div class="sec-title">Security</div>
   <div class="card">
-    <div class="row">
-      <div class="row-info"><div class="row-label">PIN</div><div class="row-desc">4-digit login PIN (leave blank to remove)</div></div>
-      <input type="password" id="pinInput" placeholder="New 4-digit PIN" maxlength="4">
+      <div class="row">
+      <div class="row-info"><div class="row-label">PIN</div><div class="row-desc">New 4-digit PIN (leave blank to keep current)</div></div>
+      <input type="password" id="pinInput" placeholder="New 4-digit PIN" maxlength="4" inputmode="numeric">
     </div>
     <div class="row">
-      <div class="row-info"><div class="row-label">Password</div><div class="row-desc">Text password (leave blank to remove)</div></div>
+      <div class="row-info"><div class="row-label">Confirm PIN</div></div>
+      <input type="password" id="pinConfirmInput" placeholder="Confirm new PIN" maxlength="4" inputmode="numeric">
+    </div>
+    <div class="row">
+      <div class="row-info"><div class="row-label">Password</div><div class="row-desc">New password (leave blank to keep current)</div></div>
       <input type="password" id="pwInput" placeholder="New password">
+    </div>
+    <div class="row">
+      <div class="row-info"><div class="row-label">Confirm Password</div></div>
+      <input type="password" id="pwConfirmInput" placeholder="Confirm new password">
     </div>
   </div>
 </div>
@@ -175,16 +185,44 @@ function handleUpload(e) {
 
 function save() {
   var uname = document.getElementById('usernameInput').value.trim() || 'User';
+  var pin = document.getElementById('pinInput').value.trim();
+  var pinConfirm = document.getElementById('pinConfirmInput').value.trim();
+  var pw  = document.getElementById('pwInput').value;
+  var pwConfirm = document.getElementById('pwConfirmInput').value;
+  var error = document.getElementById('errorMsg');
+  error.style.display = 'none';
+  if ((pin || pinConfirm) && (pw || pwConfirm)) {
+    error.textContent = 'Choose either a PIN or a password, not both.';
+    error.style.display = 'block';
+    return;
+  }
+  if ((pin || pinConfirm) && (!/^\d{4}$/.test(pin) || pin !== pinConfirm)) {
+    error.textContent = 'Enter and confirm the same 4-digit PIN.';
+    error.style.display = 'block';
+    return;
+  }
+  if ((pw || pwConfirm) && (pw.length < 4 || pw !== pwConfirm)) {
+    error.textContent = 'Enter and confirm the same password (at least 4 characters).';
+    error.style.display = 'block';
+    return;
+  }
+
   localStorage.setItem('serverplex_username', uname);
-  localStorage.setItem('serverplex_avatar',   selectedAvatar);
+  localStorage.setItem('serverplex_avatar', selectedAvatar);
   if (uploadedImage) localStorage.setItem('serverplex_avatar_image', uploadedImage);
   else localStorage.removeItem('serverplex_avatar_image');
   document.getElementById('displayName').textContent = uname;
 
-  var pin = document.getElementById('pinInput').value.trim();
-  var pw  = document.getElementById('pwInput').value;
-  if (pin && /^\d{4}$/.test(pin)) { localStorage.setItem('serverplex_pin', pin); localStorage.removeItem('serverplex_password'); }
-  else if (pw) { localStorage.setItem('serverplex_password', pw); localStorage.removeItem('serverplex_pin'); }
+  if (pin) {
+    localStorage.setItem('serverplex_pin', pin);
+    localStorage.removeItem('serverplex_password');
+  } else if (pw) {
+    localStorage.setItem('serverplex_password', pw);
+    localStorage.removeItem('serverplex_pin');
+  }
+  ['pinInput','pinConfirmInput','pwInput','pwConfirmInput'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
 
   // Update parent OS
   if (window.parent) {
@@ -200,13 +238,15 @@ function save() {
 }
 
 function clearSecurity() {
-  if (!confirm('Remove PIN and password? The OS will no longer require login.')) return;
+  if (!confirm('Remove all sign-in security (PIN, password, and passkey)? The OS will no longer require login.')) return;
   localStorage.removeItem('serverplex_pin');
   localStorage.removeItem('serverplex_password');
   localStorage.removeItem('serverplex_passkey');
   document.getElementById('pinInput').value = '';
+  document.getElementById('pinConfirmInput').value = '';
   document.getElementById('pwInput').value = '';
-  alert('Security removed.');
+  document.getElementById('pwConfirmInput').value = '';
+  alert('All sign-in security removed.');
 }
 
 function rerunSetup() {

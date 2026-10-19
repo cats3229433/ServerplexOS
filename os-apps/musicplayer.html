@@ -170,7 +170,7 @@ input.mini-text:focus{border-color:var(--app-accent)}
 .bb-dot.red{background:var(--red)}
 .bb-dot.amber{background:var(--amber)}
 </style>
-<script src="app-theme.js"></script>
+<script src="../CoreFiles/app-theme.js"></script>
 </head>
 <body>
 <div class="app">
@@ -472,8 +472,6 @@ function init() {
   // Load saved crossfade
   const savedCf = localStorage.getItem('mp_crossfade');
   if (savedCf) { crossfadeSec = parseInt(savedCf); document.getElementById('crossfadeSel').value = savedCf; updateCfStatus(); }
-}
-
 }
 
 // ══════════════════════════════════════════════
@@ -1221,9 +1219,9 @@ init();
     if(!/^(mp3|wav|ogg|flac|m4a|aac)$/.test(req.ext||''))return;
     localStorage.removeItem('spx_file_open');
     if(!req.content)return;
-    // content is a data URL stored by the file manager
+    // content is a data URL provided by another local app
     var url=req.content;
-    queue.push({name:req.name,artist:'File Manager',url:url,duration:0});
+    queue.push({name:req.name,artist:'Local File',url:url,duration:0});
     renderPlaylist();
     loadTrack(queue.length-1,true);
   } catch(e){}

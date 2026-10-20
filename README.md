@@ -6,8 +6,6 @@ Here is some info about it:
 
 Im still working & updating so it may not be done yet.
 
-## Portable Launcher
+## Cloudflare Pages Build
 
-Open `launcher.html` from a code editor preview or as a local file. From a local web server or GitHub Pages, it opens the site at that same location. When opened directly as a file, it opens the published ServerplexOS site.
-
-The GitHub Actions workflow publishes this repository on pushes to `main`, excluding `monochrome/`. Enable GitHub Pages once in repository settings: **Settings → Pages → Build and deployment → GitHub Actions**. The launcher follows the repository's Pages URL when this code is moved to `ServerplexOS`.
+Set the Pages build command to `npm run build:pages` and the output directory to `dist`. The build keeps the root `index.html` unchanged, minifies JavaScript and inline scripts in the other HTML pages, and excludes `monochrome/` and source maps. Minification only discourages casual reading; delivered code remains inspectable in DevTools.

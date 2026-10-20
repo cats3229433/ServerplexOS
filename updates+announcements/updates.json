@@ -1,1 +1,47 @@
+{
+	"items": [
+		{
+			"title": "",
+			"date": "YYYY-MM-DD",
+			"content": [
+				{
+					"type": "heading",
+					"text": "Section heading",
+					"level": 3
+				},
+				{
+					"type": "paragraph",
+					"text": "Write an announcement paragraph here."
+				},
+				{
+					"type": "spacer",
+					"size": "medium"
+				},
+				{
+					"type": "list",
+					"items": [
+						"Add a list item",
+						"Add another list item"
+					],
+					"ordered": false
+				},
+				{
+					"type": "button",
+					"text": "Button label",
+					"url": "https://example.com",
+					"style": "primary",
+					"image": "https://example.com/image.jpg",
+					"imageAlt": "Describe the image for accessibility",
+					"description": "Optional text shown beside the image and above the button."
+				}
+			]
+		},
 
+		{
+			"title": "We begin on the update log",
+			"date": "2026-10-19",
+			"message": "We begin with the update log. I wonder if this is a good idea or not.",
+			"link": ""
+		}
+	]
+}

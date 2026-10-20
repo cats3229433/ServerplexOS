@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Opening ServerplexOS</title>
+</head>
+<body>
+  <p>Opening ServerplexOS…</p>
+  <p><a href="https://cats3229433.github.io/ServerplexOS/">Continue to ServerplexOS</a></p>
+  <script>
+    const productionUrl = 'https://cats3229433.github.io/ServerplexOS/';
+    const isWebUrl = location.protocol === 'http:' || location.protocol === 'https:';
+    const siteUrl = isWebUrl ? new URL('./', location.href).href : productionUrl;
+    window.location.replace(siteUrl);
+  </script>
+</body>
+</html>
